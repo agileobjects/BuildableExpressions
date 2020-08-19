@@ -1,19 +1,14 @@
 ﻿// ReSharper disable once CheckNamespace
-namespace ReBuild
+namespace BuildExp
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using AgileObjects.BuildableExpressions;
     using AgileObjects.BuildableExpressions.Compilation;
     using AgileObjects.BuildableExpressions.Configuration;
     using AgileObjects.BuildableExpressions.InputOutput;
     using AgileObjects.BuildableExpressions.Logging;
     using AgileObjects.BuildableExpressions.SourceCode;
     using AgileObjects.NetStandardPolyfills;
-    using AgileObjects.ReadableExpressions;
     using static AgileObjects.BuildableExpressions.BuildConstants;
     using MsBuildTask = Microsoft.Build.Utilities.Task;
 
@@ -88,10 +83,9 @@ namespace ReBuild
                 _logger.Info($"Using output file {config.OutputFile}");
 
                 var expressionBuilderSource = _fileManager.Read(config.InputFile);
-                var referenceAssemblyTypes = GetReferenceAssemblyTypes(expressionBuilderSource);
 
                 var compilationResult = _compiler
-                    .Compile(expressionBuilderSource, referenceAssemblyTypes);
+                    .Compile(expressionBuilderSource);
 
                 if (compilationResult.Failed)
                 {
@@ -107,7 +101,7 @@ namespace ReBuild
 
                 _logger.Info("Expression compilation succeeded");
 
-                var sourceCodeExpression = GetSourceCodeExpressionOrThrow(compilationResult);
+                var sourceCodeExpression = compilationResult.ToSourceCodeExpression();
 
                 _fileManager.Write(
                     Path.Combine(ContentRoot, config.OutputFile),
@@ -146,85 +140,6 @@ namespace ReBuild
             var inputFileContent = _fileManager.Read(inputFilePath);
 
             _fileManager.Write(Path.Combine(ContentRoot, config.InputFile), inputFileContent);
-        }
-
-        private static ICollection<Type> GetReferenceAssemblyTypes(string expressionBuilderSource)
-        {
-            var referenceAssemblyTypes = new List<Type>
-            {
-                typeof(object),
-                typeof(AssemblyExtensionsPolyfill),
-                typeof(ReadableExpression),
-                typeof(SourceCodeFactory)
-            };
-
-            if (expressionBuilderSource.Contains("using System.Linq"))
-            {
-                referenceAssemblyTypes.Add(typeof(Enumerable));
-            }
-
-            return referenceAssemblyTypes;
-        }
-
-        private static SourceCodeExpression GetSourceCodeExpressionOrThrow(
-            CompilationResult compilationResult)
-        {
-            var builderType = GetBuilderTypeOrThrow(compilationResult);
-            var buildMethod = GetBuildMethodOrThrow(builderType);
-            var buildMethodResult = buildMethod.Invoke(null, Array.Empty<object>());
-
-            if (buildMethodResult == null)
-            {
-                throw new InvalidOperationException($"{InputClass}.{InputMethod} returned null");
-            }
-
-            return (SourceCodeExpression)buildMethodResult;
-        }
-
-        private static Type GetBuilderTypeOrThrow(CompilationResult compilationResult)
-        {
-            var builderTypes = compilationResult
-                .CompiledAssembly
-                .GetTypes()
-                .Where(t => t.Name == InputClass)
-                .ToList();
-
-            if (builderTypes.Count == 0)
-            {
-                throw new NotSupportedException($"Expected input Type {InputClass} not found");
-            }
-
-            if (builderTypes.Count > 1)
-            {
-                throw new NotSupportedException($"Multiple {InputClass} Types found");
-            }
-
-            return builderTypes[0];
-        }
-
-        private static MethodInfo GetBuildMethodOrThrow(Type builderType)
-        {
-            var buildMethod = builderType.GetPublicStaticMethod(InputMethod);
-
-            if (buildMethod == null)
-            {
-                throw new NotSupportedException(
-                    $"Expected public, static method {InputClass}.{InputMethod} not found");
-            }
-
-            if (buildMethod.GetParameters().Any())
-            {
-                throw new NotSupportedException(
-                    $"Expected method {InputClass}.{InputMethod} to be parameterless");
-            }
-
-            if (buildMethod.ReturnType != typeof(SourceCodeExpression))
-            {
-                throw new NotSupportedException(
-                    $"Expected method {InputClass}.{InputMethod} to return {nameof(SourceCodeExpression)}");
-            }
-
-            return buildMethod;
         }
     }
 }

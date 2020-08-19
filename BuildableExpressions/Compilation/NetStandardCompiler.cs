@@ -14,10 +14,11 @@ namespace AgileObjects.BuildableExpressions.Compilation
 
     internal class NetStandardCompiler : ICompiler
     {
-        public CompilationResult Compile(
-            string expressionBuilderSource,
-            ICollection<Type> referenceAssemblyTypes)
+        public CompilationResult Compile(string expressionBuilderSource)
         {
+            var assemblyReferences = CreateReferences(
+                expressionBuilderSource.GetReferenceAssemblyTypes());
+
             var sourceTree = SyntaxFactory.ParseSyntaxTree(expressionBuilderSource);
 
             using var outputStream = new MemoryStream();
@@ -25,7 +26,7 @@ namespace AgileObjects.BuildableExpressions.Compilation
             var compilationResult = CSharpCompilation
                 .Create("ExpressionBuildOutput_" + Path.GetFileNameWithoutExtension(Path.GetTempFileName()))
                 .WithOptions(new CSharpCompilationOptions(DynamicallyLinkedLibrary))
-                .AddReferences(CreateReferences(referenceAssemblyTypes))
+                .AddReferences(assemblyReferences)
                 .AddSyntaxTrees(sourceTree)
                 .Emit(outputStream);
 

@@ -29,7 +29,7 @@ namespace MyNamespace
         }
     }
 }";
-            var result = compiler.Compile(SOURCE, Array.Empty<Type>());
+            var result = compiler.Compile(SOURCE);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -61,7 +61,7 @@ namespace MyNamespace
         }
     }
 }";
-            var result = compiler.Compile(SOURCE, new[] { typeof(Enumerable) });
+            var result = compiler.Compile(SOURCE);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -113,12 +113,7 @@ namespace MyNamespace
 }
     ";
 
-            var result = compiler.Compile(SOURCE, new[]
-            {
-                typeof(Enumerable),
-                typeof(ReadableExpression),
-                typeof(SourceCodeFactory)
-            });
+            var result = compiler.Compile(SOURCE);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()

@@ -3,15 +3,12 @@ namespace AgileObjects.BuildableExpressions.Compilation
 {
     using System;
     using System.CodeDom.Compiler;
-    using System.Collections.Generic;
     using System.Linq;
     using Microsoft.CSharp;
 
     internal class NetFrameworkCompiler : ICompiler
     {
-        public CompilationResult Compile(
-            string expressionBuilderSource,
-            ICollection<Type> referenceAssemblyTypes)
+        public CompilationResult Compile(string expressionBuilderSource)
         {
             var codeProvider = new CSharpCodeProvider();
 
@@ -21,8 +18,12 @@ namespace AgileObjects.BuildableExpressions.Compilation
                 TreatWarningsAsErrors = false
             };
 
-            parameters.ReferencedAssemblies.AddRange(referenceAssemblyTypes
-                .Select(GetAssemblyFilePath).ToArray());
+            var referenceAssemblyPaths = expressionBuilderSource
+                .GetReferenceAssemblyTypes()
+                .Select(GetAssemblyFilePath)
+                .ToArray();
+
+            parameters.ReferencedAssemblies.AddRange(referenceAssemblyPaths);
 
             var compilationResult = codeProvider
                 .CompileAssemblyFromSource(parameters, expressionBuilderSource);

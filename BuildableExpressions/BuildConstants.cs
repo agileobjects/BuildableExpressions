@@ -2,8 +2,8 @@
 {
     internal static class BuildConstants
     {
-        public const string InputFileKey = "ReBuildInput";
-        public const string OutputFileKey = "ReBuildOutput";
+        public const string InputFileKey = "BuildableExpressionsInput";
+        public const string OutputFileKey = "BuildableExpressionsOutput";
 
         public const string InputClass = "ExpressionBuilder";
         public const string InputMethod = "Build";
