@@ -5,11 +5,12 @@
     using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using Common;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
 #endif
 
-    public static class FluentAssertionExtensions
+    public static class CompilationAssertionExtensions
     {
         public static void ShouldCompile(this string sourceCode)
         {
@@ -18,13 +19,14 @@
             var syntaxTree = CSharpSyntaxTree.ParseText(sourceCode);
 
             var compilation = CSharpCompilation.Create(
-                "ReadableExpressionsTestAssembly" + Guid.NewGuid(),
+                "BuildableExpressionsTestAssembly" + Guid.NewGuid(),
                 new[] { syntaxTree },
                 new[]
                 {
                     MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(Regex).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(CompilationAssertionExtensions).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(FluentAssertionExtensions).Assembly.Location),
                 },
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));

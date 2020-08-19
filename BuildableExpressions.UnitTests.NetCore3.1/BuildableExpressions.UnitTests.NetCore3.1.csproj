@@ -19,9 +19,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\CommonAssemblyInfo.cs">
-      <Link>Properties\CommonAssemblyInfo.cs</Link>
-    </Compile>
     <Compile Include="..\ClsCompliant.cs">
       <Link>Properties\ClsCompliant.cs</Link>
     </Compile>
@@ -34,6 +31,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="..\BuildableExpressions.UnitTests\FluentAssertionExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
@@ -43,8 +44,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BuildableExpressions.UnitTests.Common\BuildableExpressions.UnitTests.Common.csproj" />
     <ProjectReference Include="..\BuildableExpressions\BuildableExpressions.csproj" />
+    <ProjectReference Include="..\BuildableExpressions.UnitTests.Common\BuildableExpressions.UnitTests.Common.csproj" />
   </ItemGroup>
 
 </Project>

@@ -4,7 +4,9 @@
     using System.Collections.Generic;
     using System.Linq;
     using BuildableExpressions;
+    using BuildableExpressions.Compilation;
     using Common;
+    using NetStandardPolyfills;
     using ReadableExpressions;
     using SourceCode;
     using Xunit;
@@ -102,7 +104,7 @@ namespace MyNamespace
         {
             var doNothing = Expression.Lambda<Action>(Expression.Default(typeof(void)));
 
-            return ReadableSourceCodeExpression
+            return SourceCodeFactory
                 .SourceCode(sc => sc
                     .WithClass(""MyClass"", cls => cls
                         .WithMethod(""DoNothing"", doNothing)));
