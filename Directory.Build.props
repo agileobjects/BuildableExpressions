@@ -1,0 +1,22 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <LangVersion>8.0</LangVersion>
+    <Company>AgileObjects Ltd</Company>
+    <Product>AgileObjects.BuildableExpressions</Product>
+    <Authors>Steve Wilkes</Authors>
+    <Copyright>Copyright © AgileObjects Ltd 2020</Copyright>
+    <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
+    <AssemblyOriginatorKeyFile>..\BuildableExpressions.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/AgileObjects/BuildableExpressions</RepositoryUrl>
+    
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <Version>0.1.0-preview1</Version>
+  </PropertyGroup>
+
+</Project>
