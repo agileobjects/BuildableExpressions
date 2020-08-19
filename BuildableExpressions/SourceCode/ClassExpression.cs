@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq.Expressions;
-using AgileObjects.BuildableExpressions.SourceCode.Api;
-using AgileObjects.BuildableExpressions.SourceCode.Extensions;
-
-namespace AgileObjects.BuildableExpressions.SourceCode
+﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq.Expressions;
+    using Api;
+    using BuildableExpressions.Extensions;
+    using Extensions;
+    using ReadableExpressions.Extensions;
+
     /// <summary>
     /// Represents a class in a piece of source code.
     /// </summary>
@@ -29,7 +31,7 @@ namespace AgileObjects.BuildableExpressions.SourceCode
             SourceCodeExpression parent,
             Expression body,
             SourceCodeTranslationSettings settings)
-            : this(parent, Extensions.Enumerable<string>.EmptyArray, body, settings)
+            : this(parent, Enumerable<string>.EmptyArray, body, settings)
         {
         }
 
@@ -40,7 +42,7 @@ namespace AgileObjects.BuildableExpressions.SourceCode
             SourceCodeTranslationSettings settings)
             : this(parent, summaryLines, settings)
         {
-            Interfaces = Extensions.Enumerable<Type>.EmptyReadOnlyCollection;
+            Interfaces = Enumerable<Type>.EmptyReadOnlyCollection;
             _body = body;
 
             var method = MethodExpression.For(this, body, settings);
@@ -56,9 +58,9 @@ namespace AgileObjects.BuildableExpressions.SourceCode
             SourceCodeExpression parent,
             BlockExpression body,
             SourceCodeTranslationSettings settings)
-            : this(parent, Extensions.Enumerable<string>.EmptyArray, settings)
+            : this(parent, Enumerable<string>.EmptyArray, settings)
         {
-            Interfaces = Extensions.Enumerable<Type>.EmptyReadOnlyCollection;
+            Interfaces = Enumerable<Type>.EmptyReadOnlyCollection;
             _body = body;
             _methods = new List<MethodExpression>();
             _methodsByReturnType = new Dictionary<Type, List<MethodExpression>>();
@@ -84,7 +86,7 @@ namespace AgileObjects.BuildableExpressions.SourceCode
 
             Interfaces = interfaceTypes != null
                 ? new ReadOnlyCollection<Type>(interfaceTypes)
-                : Extensions.Enumerable<Type>.EmptyReadOnlyCollection;
+                : Enumerable<Type>.EmptyReadOnlyCollection;
 
             var methodCount = methodBuilders.Count;
 

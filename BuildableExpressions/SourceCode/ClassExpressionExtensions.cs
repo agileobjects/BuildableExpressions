@@ -1,9 +1,12 @@
-﻿using System.Linq;
-using System.Reflection;
-using AgileObjects.BuildableExpressions.SourceCode.Api;
-
-namespace AgileObjects.BuildableExpressions.SourceCode
+﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
+    using System.Linq;
+    using System.Reflection;
+    using Api;
+    using BuildableExpressions.Extensions;
+    using NetStandardPolyfills;
+    using ReadableExpressions.Extensions;
+
     internal static class ClassExpressionExtensions
     {
         public static string GetMethodName(

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
+    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Interfaces;
 
@@ -88,9 +89,9 @@
 
         public Type Type => _class.Type;
 
-        public int TranslationSize { get; private set; }
+        public int TranslationSize { get; }
 
-        public int FormattingSize { get; private set; }
+        public int FormattingSize { get; }
 
         public int GetIndentSize()
         {

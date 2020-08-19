@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using Interfaces;
+    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Interfaces;
 

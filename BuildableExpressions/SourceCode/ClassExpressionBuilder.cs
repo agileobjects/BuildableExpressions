@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using AgileObjects.BuildableExpressions.SourceCode.Api;
-
-namespace AgileObjects.BuildableExpressions.SourceCode
+﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using Api;
+    using BuildableExpressions.Extensions;
+
     internal class ClassExpressionBuilder : IClassExpressionSettings
     {
         private readonly IList<MethodExpressionBuilder> _methodBuilders;

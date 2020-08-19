@@ -7,6 +7,7 @@
     using Extensions;
     using NetStandardPolyfills;
     using ReadableExpressions;
+    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations.Reflection;
     using static System.Linq.Expressions.ExpressionType;
 

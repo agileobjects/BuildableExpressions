@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using SourceCode.Extensions;
 
     internal static class InternalEnumerableExtensions
@@ -30,6 +31,29 @@
                     }
 
                     return result;
+            }
+        }
+
+        [DebuggerStepThrough]
+        public static IEnumerable<TResult> Project<TItem, TResult>(
+            this IEnumerable<TItem> items,
+            Func<TItem, TResult> projector)
+        {
+            foreach (var item in items)
+            {
+                yield return projector.Invoke(item);
+            }
+        }
+
+        [DebuggerStepThrough]
+        public static IEnumerable<T> Filter<T>(this IEnumerable<T> items, Func<T, bool> predicate)
+        {
+            foreach (var item in items)
+            {
+                if (predicate.Invoke(item))
+                {
+                    yield return item;
+                }
             }
         }
     }

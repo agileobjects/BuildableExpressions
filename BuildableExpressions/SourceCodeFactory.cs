@@ -7,9 +7,9 @@
     using SourceCode.Api;
 
     /// <summary>
-    /// A factory class providing source code Expressions.
+    /// A factory class providing <see cref="SourceCodeExpression"/>-building methods.
     /// </summary>
-    public static class ReadableSourceCodeExpression
+    public static class SourceCodeFactory
     {
         /// <summary>
         /// Create a <see cref="SourceCodeExpression"/> representing a complete piece of source code
