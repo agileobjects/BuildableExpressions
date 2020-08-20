@@ -35,7 +35,7 @@ namespace AgileObjects.BuildableExpressions.Configuration
             return new Config
             {
                 InputFile = appSettings[$"appSettings:{InputFileKey}"],
-                OutputFile = appSettings[$"appSettings:{OutputFileKey}"]
+                OutputDirectory = appSettings[$"appSettings:{OutputDirectoryKey}"]
             };
         }
     }

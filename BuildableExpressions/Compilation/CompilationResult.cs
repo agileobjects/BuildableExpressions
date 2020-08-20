@@ -16,7 +16,7 @@
 
         public ICollection<string> Errors { get; set; }
 
-        public SourceCodeExpression ToSourceCodeExpression()
+        public IEnumerable<SourceCodeExpression> ToSourceCodeExpressions()
         {
             var builderType = GetBuilderTypeOrThrow();
             var buildMethod = GetBuildMethodOrThrow(builderType);
@@ -27,7 +27,7 @@
                 throw new InvalidOperationException($"{InputClass}.{InputMethod} returned null");
             }
 
-            return (SourceCodeExpression)buildMethodResult;
+            return (IEnumerable<SourceCodeExpression>)buildMethodResult;
         }
 
         private Type GetBuilderTypeOrThrow()

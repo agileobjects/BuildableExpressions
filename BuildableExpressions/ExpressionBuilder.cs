@@ -1,6 +1,7 @@
 ﻿namespace MyNamespace
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq.Expressions;
     using AgileObjects.BuildableExpressions;
     using AgileObjects.BuildableExpressions.SourceCode;
@@ -16,13 +17,13 @@
         /// project is built.
         /// </summary>
         /// <returns>The <see cref="SourceCodeExpression"/> to compile.</returns>
-        public static SourceCodeExpression Build()
+        public static IEnumerable<SourceCodeExpression> Build()
         {
             // Replace this code with your own, building a SourceCodeExpression
             // to be compiled to a source code file:
             var doNothing = Expression.Lambda<Action>(Expression.Default(typeof(void)));
 
-            return ReadableSourceCodeExpression
+            yield return ReadableSourceCodeExpression
                 .SourceCode(sc => sc
                     .WithNamespaceOf(typeof(ExpressionBuilder))
                     .WithClass("MyClass", cls => cls

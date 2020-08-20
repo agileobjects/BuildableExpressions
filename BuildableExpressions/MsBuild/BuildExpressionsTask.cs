@@ -21,6 +21,7 @@ namespace BuildExp
         private readonly IFileManager _fileManager;
         private readonly IConfigManager _configManager;
         private readonly ICompiler _compiler;
+        private readonly OutputWriter _outputWriter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BuildExpressionsTask"/> class.
@@ -35,11 +36,11 @@ namespace BuildExp
                 new NetStandardConfigManager(BclFileManager.Instance),
 #endif
 #if NETFRAMEWORK
-                new NetFrameworkCompiler()
+                new NetFrameworkCompiler(),
 #else
-                new NetStandardCompiler()
+                new NetStandardCompiler(),
 #endif
-                )
+                new OutputWriter(BclFileManager.Instance))
         {
             ((MsBuildTaskLogger)_logger).SetTask(this);
         }
@@ -48,12 +49,14 @@ namespace BuildExp
             ILogger logger,
             IFileManager fileManager,
             IConfigManager configManager,
-            ICompiler compiler)
+            ICompiler compiler,
+            OutputWriter outputWriter)
         {
             _logger = logger;
             _fileManager = fileManager;
             _configManager = configManager;
             _compiler = compiler;
+            _outputWriter = outputWriter;
         }
 
         /// <summary>
@@ -75,12 +78,12 @@ namespace BuildExp
 
                 _logger.Info($"Using input file {config.InputFile}");
 
-                if (string.IsNullOrEmpty(config.OutputFile))
+                if (string.IsNullOrEmpty(config.OutputDirectory))
                 {
-                    config.OutputFile = DefaultOutputFile;
+                    config.OutputDirectory = DefaultOutputFile;
                 }
 
-                _logger.Info($"Using output file {config.OutputFile}");
+                _logger.Info($"Using output file {config.OutputDirectory}");
 
                 var expressionBuilderSource = _fileManager.Read(config.InputFile);
 
@@ -101,11 +104,12 @@ namespace BuildExp
 
                 _logger.Info("Expression compilation succeeded");
 
-                var sourceCodeExpression = compilationResult.ToSourceCodeExpression();
+                var sourceCodeExpressions = compilationResult.ToSourceCodeExpressions();
 
-                _fileManager.Write(
-                    Path.Combine(ContentRoot, config.OutputFile),
-                    sourceCodeExpression.ToSourceCode());
+                _outputWriter.Write(
+                    sourceCodeExpressions,
+                    ContentRoot,
+                    config);
 
                 _logger.Info("Expression compilation output updated");
                 return true;

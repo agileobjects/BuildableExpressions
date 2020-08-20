@@ -7,5 +7,7 @@
         string Read(string filePath);
 
         void Write(string filePath, string contents);
+
+        void EnsureDirectory(string directory);
     }
 }

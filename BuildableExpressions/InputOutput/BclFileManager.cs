@@ -12,5 +12,8 @@
 
         public void Write(string filePath, string contents)
             => File.WriteAllText(filePath, contents);
+
+        public void EnsureDirectory(string directory)
+            => Directory.CreateDirectory(directory);
     }
 }

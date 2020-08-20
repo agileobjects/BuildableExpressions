@@ -43,7 +43,7 @@ namespace AgileObjects.BuildableExpressions.Configuration
             return new Config
             {
                 InputFile = exeConfig.AppSettings.Settings[InputFileKey]?.Value,
-                OutputFile = exeConfig.AppSettings.Settings[OutputFileKey]?.Value
+                OutputDirectory = exeConfig.AppSettings.Settings[OutputDirectoryKey]?.Value
             };
         }
     }

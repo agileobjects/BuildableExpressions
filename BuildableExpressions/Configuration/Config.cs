@@ -4,6 +4,6 @@
     {
         public string InputFile { get; set; }
 
-        public string OutputFile { get; set; }
+        public string OutputDirectory { get; set; }
     }
 }
