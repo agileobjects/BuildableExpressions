@@ -30,7 +30,10 @@
 
                 if (!string.IsNullOrEmpty(@namespace))
                 {
-                    outputDirectory = Path.Combine(outputDirectory, @namespace);
+                    outputDirectory = Path.Combine(new[] { outputDirectory }
+                        .Concat(@namespace.Split('.'))
+                        .ToArray());
+
                     _fileManager.EnsureDirectory(outputDirectory);
                 }
 
