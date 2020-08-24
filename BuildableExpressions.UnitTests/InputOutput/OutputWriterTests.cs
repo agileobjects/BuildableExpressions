@@ -6,10 +6,10 @@
     using BuildableExpressions.InputOutput;
     using Configuration;
     using Moq;
+    using ProjectManagement;
     using Xunit;
     using static System.Linq.Expressions.Expression;
     using static SourceCodeFactory;
-    using static Moq.Times;
 
     public class OutputWriterTests
     {
@@ -21,7 +21,9 @@
         {
             var fileManagerMock = new Mock<IFileManager>();
 
-            var outputWriter = new OutputWriter(fileManagerMock.Object);
+            var outputWriter = new OutputWriter(
+                fileManagerMock.Object,
+                Mock.Of<IProjectManager>());
 
             var doNothing = SourceCode(
                 Lambda<Action>(Default(typeof(void))),
@@ -48,7 +50,9 @@
         {
             var fileManagerMock = new Mock<IFileManager>();
 
-            var outputWriter = new OutputWriter(fileManagerMock.Object);
+            var outputWriter = new OutputWriter(
+                fileManagerMock.Object,
+                Mock.Of<IProjectManager>());
 
             const string PROJECT_DIRECTORY = @"C:\Data\VisualStudio\BuildableExpressions";
             const string ROOT_NAMESPACE = "AgileObjects.BuildableExpressions";

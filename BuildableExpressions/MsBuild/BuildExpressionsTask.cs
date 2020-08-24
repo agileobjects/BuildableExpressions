@@ -6,6 +6,7 @@ namespace BuildXpr
     using AgileObjects.BuildableExpressions.Configuration;
     using AgileObjects.BuildableExpressions.InputOutput;
     using AgileObjects.BuildableExpressions.Logging;
+    using AgileObjects.BuildableExpressions.ProjectManagement;
     using AgileObjects.BuildableExpressions.SourceCode;
     using MsBuildTask = Microsoft.Build.Utilities.Task;
 
@@ -41,7 +42,14 @@ namespace BuildXpr
 #else
                 new NetStandardCompiler(),
 #endif
-                new OutputWriter(BclFileManager.Instance))
+                new OutputWriter(
+                    BclFileManager.Instance,
+#if NETFRAMEWORK
+                    new NetFrameworkProjectManager()
+#else
+                    new NullProjectManager()
+#endif
+                    ))
         {
             MsBuildTaskLogger.Instance.SetTask(this);
         }
