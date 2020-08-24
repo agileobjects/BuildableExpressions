@@ -3,7 +3,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Configuration;
     using SourceCode;
 
     internal class OutputWriter
@@ -17,10 +16,8 @@
 
         public void Write(
             IEnumerable<SourceCodeExpression> sourceCodeExpressions,
-            string contentRoot,
-            Config config)
+            string outputRoot)
         {
-            var outputRoot = Path.Combine(contentRoot, config.OutputDirectory);
             _fileManager.EnsureDirectory(outputRoot);
 
             foreach (var sourceCodeExpression in sourceCodeExpressions)

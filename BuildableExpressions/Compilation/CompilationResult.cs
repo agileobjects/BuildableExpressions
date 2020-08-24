@@ -66,10 +66,11 @@
                     $"Expected method {InputClass}.{InputMethod} to be parameterless");
             }
 
-            if (buildMethod.ReturnType != typeof(SourceCodeExpression))
+            if (!buildMethod.ReturnType.IsAssignableTo(typeof(IEnumerable<SourceCodeExpression>)))
             {
                 throw new NotSupportedException(
-                    $"Expected method {InputClass}.{InputMethod} to return {nameof(SourceCodeExpression)}");
+                    $"Expected method {InputClass}.{InputMethod} to return " +
+                    $"IEnumerable<{nameof(SourceCodeExpression)}>");
             }
 
             return buildMethod;

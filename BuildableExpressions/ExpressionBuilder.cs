@@ -1,4 +1,4 @@
-﻿namespace MyNamespace
+﻿namespace DefaultNamespace
 {
     using System;
     using System.Collections.Generic;
@@ -23,7 +23,7 @@
             // to be compiled to a source code file:
             var doNothing = Expression.Lambda<Action>(Expression.Default(typeof(void)));
 
-            yield return ReadableSourceCodeExpression
+            yield return SourceCodeFactory
                 .SourceCode(sc => sc
                     .WithNamespaceOf(typeof(ExpressionBuilder))
                     .WithClass("MyClass", cls => cls

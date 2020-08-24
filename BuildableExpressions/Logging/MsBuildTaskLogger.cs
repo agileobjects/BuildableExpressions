@@ -11,7 +11,7 @@
         public void SetTask(MsBuildTask task) => _task = task;
 
         public void Info(string message)
-            => _task.Log.LogMessage(MessageImportance.Normal, message);
+            => _task.Log.LogMessage(MessageImportance.High, message);
 
         public void Warning(string message)
             => _task.Log.LogWarning(message);

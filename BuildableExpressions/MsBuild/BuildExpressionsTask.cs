@@ -1,5 +1,5 @@
 ﻿// ReSharper disable once CheckNamespace
-namespace BuildExp
+namespace BuildXpr
 {
     using System;
     using System.IO;
@@ -66,6 +66,12 @@ namespace BuildExp
         public string ContentRoot { get; set; }
 
         /// <summary>
+        /// Gets or sets the root path of the project providing the <see cref="SourceCodeExpression"/>
+        /// to build.
+        /// </summary>
+        public string RootNamespace { get; set; }
+
+        /// <summary>
         /// Generates a source code file from a <see cref="SourceCodeExpression"/>.
         /// </summary>
         public override bool Execute()
@@ -76,19 +82,17 @@ namespace BuildExp
 
                 EnsureInputFile(config);
 
-                _logger.Info($"Using input file {config.InputFile}");
-
                 if (string.IsNullOrEmpty(config.OutputDirectory))
                 {
-                    config.OutputDirectory = DefaultOutputFile;
+                    config.OutputDirectory = DefaultOutputDirectory;
                 }
 
-                _logger.Info($"Using output file {config.OutputDirectory}");
+                var outputRoot = Path.Combine(ContentRoot, config.OutputDirectory);
+
+                _logger.Info($"Compiling Expressions from {config.InputFile} to {outputRoot}...");
 
                 var expressionBuilderSource = _fileManager.Read(config.InputFile);
-
-                var compilationResult = _compiler
-                    .Compile(expressionBuilderSource);
+                var compilationResult = _compiler.Compile(expressionBuilderSource);
 
                 if (compilationResult.Failed)
                 {
@@ -106,10 +110,7 @@ namespace BuildExp
 
                 var sourceCodeExpressions = compilationResult.ToSourceCodeExpressions();
 
-                _outputWriter.Write(
-                    sourceCodeExpressions,
-                    ContentRoot,
-                    config);
+                _outputWriter.Write(sourceCodeExpressions, outputRoot);
 
                 _logger.Info("Expression compilation output updated");
                 return true;
@@ -137,11 +138,17 @@ namespace BuildExp
 
             var inputFilePath = Path.Combine(
                 typeof(BuildExpressionsTask).GetAssembly().Location,
-                "../../..",
+                "..", "..", "..",
                 "content",
                 config.InputFile);
 
             var inputFileContent = _fileManager.Read(inputFilePath);
+
+            if (!string.IsNullOrEmpty(RootNamespace))
+            {
+                inputFileContent = inputFileContent
+                    .Replace(DefaultInputFileNamespace, RootNamespace);
+            }
 
             _fileManager.Write(Path.Combine(ContentRoot, config.InputFile), inputFileContent);
         }
