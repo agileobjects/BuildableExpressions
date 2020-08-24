@@ -7,6 +7,7 @@ namespace AgileObjects.BuildableExpressions.ProjectManagement
     internal class NetFrameworkProjectManager : IProjectManager
     {
         private Project _project;
+        private bool _filesAdded;
 
         public void Load(string projectPath)
             => _project = new Project(projectPath);
@@ -16,10 +17,17 @@ namespace AgileObjects.BuildableExpressions.ProjectManagement
             if (_project.Items.All(i => i.EvaluatedInclude != filePath))
             {
                 _project.AddItem("Compile", filePath);
+                _filesAdded = true;
             }
         }
 
-        public void Save() => _project.Save();
+        public void Save()
+        {
+            if (_filesAdded)
+            {
+                _project.Save();
+            }
+        }
     }
 }
 #endif
