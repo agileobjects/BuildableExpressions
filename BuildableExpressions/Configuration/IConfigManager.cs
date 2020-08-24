@@ -2,8 +2,6 @@
 {
     internal interface IConfigManager
     {
-        string ConfigFileName { get; }
-
-        Config GetConfigOrNull(string contentRoot);
+        void Populate(Config config);
     }
 }

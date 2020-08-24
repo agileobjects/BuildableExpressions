@@ -6,6 +6,8 @@
 
     internal class MsBuildTaskLogger : ILogger
     {
+        public static readonly MsBuildTaskLogger Instance = new MsBuildTaskLogger();
+
         private MsBuildTask _task;
 
         public void SetTask(MsBuildTask task) => _task = task;

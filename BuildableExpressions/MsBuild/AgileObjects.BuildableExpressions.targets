@@ -8,6 +8,6 @@
   <UsingTask TaskName="BuildXpr.BuildExpressionsTask" AssemblyFile="$(_BuildXprTaskAssembly)" />
 
   <Target Name="BuildExpressions" BeforeTargets="BeforeCompile" Condition="'$(BuildExpressions)' != 'False'">
-    <BuildXpr.BuildExpressionsTask ContentRoot="$(MSBuildProjectDirectory)" RootNamespace="$(RootNamespace)" />
+    <BuildXpr.BuildExpressionsTask ProjectPath="$(MSBuildProjectFullPath)" RootNamespace="$(RootNamespace)" />
   </Target>
 </Project>

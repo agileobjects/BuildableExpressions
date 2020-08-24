@@ -2,14 +2,11 @@
 namespace BuildXpr
 {
     using System;
-    using System.IO;
     using AgileObjects.BuildableExpressions.Compilation;
     using AgileObjects.BuildableExpressions.Configuration;
     using AgileObjects.BuildableExpressions.InputOutput;
     using AgileObjects.BuildableExpressions.Logging;
     using AgileObjects.BuildableExpressions.SourceCode;
-    using AgileObjects.NetStandardPolyfills;
-    using static AgileObjects.BuildableExpressions.BuildConstants;
     using MsBuildTask = Microsoft.Build.Utilities.Task;
 
     /// <summary>
@@ -20,6 +17,7 @@ namespace BuildXpr
         private readonly ILogger _logger;
         private readonly IFileManager _fileManager;
         private readonly IConfigManager _configManager;
+        private readonly InputFileProvider _inputFileProvider;
         private readonly ICompiler _compiler;
         private readonly OutputWriter _outputWriter;
 
@@ -28,13 +26,16 @@ namespace BuildXpr
         /// </summary>
         public BuildExpressionsTask()
             : this(
-                new MsBuildTaskLogger(),
+                MsBuildTaskLogger.Instance,
                 BclFileManager.Instance,
 #if NETFRAMEWORK
                 new NetFrameworkConfigManager(BclFileManager.Instance),
 #else
                 new NetStandardConfigManager(BclFileManager.Instance),
 #endif
+                new InputFileProvider(
+                    BclFileManager.Instance,
+                    MsBuildTaskLogger.Instance),
 #if NETFRAMEWORK
                 new NetFrameworkCompiler(),
 #else
@@ -42,28 +43,30 @@ namespace BuildXpr
 #endif
                 new OutputWriter(BclFileManager.Instance))
         {
-            ((MsBuildTaskLogger)_logger).SetTask(this);
+            MsBuildTaskLogger.Instance.SetTask(this);
         }
 
         internal BuildExpressionsTask(
             ILogger logger,
             IFileManager fileManager,
             IConfigManager configManager,
+            InputFileProvider inputFileProvider,
             ICompiler compiler,
             OutputWriter outputWriter)
         {
             _logger = logger;
             _fileManager = fileManager;
             _configManager = configManager;
+            _inputFileProvider = inputFileProvider;
             _compiler = compiler;
             _outputWriter = outputWriter;
         }
 
         /// <summary>
-        /// Gets or sets the root path of the project providing the <see cref="SourceCodeExpression"/>
+        /// Gets or sets the full path of the project providing the <see cref="SourceCodeExpression"/>
         /// to build.
         /// </summary>
-        public string ContentRoot { get; set; }
+        public string ProjectPath { get; set; }
 
         /// <summary>
         /// Gets or sets the root path of the project providing the <see cref="SourceCodeExpression"/>
@@ -72,37 +75,32 @@ namespace BuildXpr
         public string RootNamespace { get; set; }
 
         /// <summary>
-        /// Generates a source code file from a <see cref="SourceCodeExpression"/>.
+        /// Generates source code files from a set of <see cref="SourceCodeExpression"/>s.
         /// </summary>
         public override bool Execute()
         {
             try
             {
-                var config = _configManager.GetConfigOrNull(ContentRoot) ?? new Config();
-
-                EnsureInputFile(config);
-
-                if (string.IsNullOrEmpty(config.OutputDirectory))
+                var config = new Config
                 {
-                    config.OutputDirectory = DefaultOutputDirectory;
-                }
+                    ProjectPath = ProjectPath,
+                    RootNamespace = RootNamespace
+                };
 
-                var outputRoot = Path.Combine(ContentRoot, config.OutputDirectory);
+                _configManager.Populate(config);
+                _inputFileProvider.EnsureInputFile(config);
 
-                _logger.Info($"Compiling Expressions from {config.InputFile} to {outputRoot}...");
+                _logger.Info($"Compiling Expressions from {config.InputFile} to {config.OutputRoot}...");
 
                 var expressionBuilderSource = _fileManager.Read(config.InputFile);
-                var compilationResult = _compiler.Compile(expressionBuilderSource);
 
-                if (compilationResult.Failed)
+                var compilationFailed = _compiler.CompilationFailed(
+                    expressionBuilderSource,
+                    _logger,
+                    out var compilationResult);
+
+                if (compilationFailed)
                 {
-                    _logger.Error("Expression compilation failed:");
-
-                    foreach (var error in compilationResult.Errors)
-                    {
-                        _logger.Error(error);
-                    }
-
                     return false;
                 }
 
@@ -110,7 +108,7 @@ namespace BuildXpr
 
                 var sourceCodeExpressions = compilationResult.ToSourceCodeExpressions();
 
-                _outputWriter.Write(sourceCodeExpressions, outputRoot);
+                _outputWriter.Write(sourceCodeExpressions, config);
 
                 _logger.Info("Expression compilation output updated");
                 return true;
@@ -120,37 +118,6 @@ namespace BuildXpr
                 _logger.Error(ex);
                 return false;
             }
-        }
-
-        private void EnsureInputFile(Config config)
-        {
-            if (string.IsNullOrEmpty(config.InputFile))
-            {
-                config.InputFile = DefaultInputFile;
-            }
-
-            if (_fileManager.Exists(config.InputFile))
-            {
-                return;
-            }
-
-            _logger.Info($"Creating default input file {config.InputFile}...");
-
-            var inputFilePath = Path.Combine(
-                typeof(BuildExpressionsTask).GetAssembly().Location,
-                "..", "..", "..",
-                "content",
-                config.InputFile);
-
-            var inputFileContent = _fileManager.Read(inputFilePath);
-
-            if (!string.IsNullOrEmpty(RootNamespace))
-            {
-                inputFileContent = inputFileContent
-                    .Replace(DefaultInputFileNamespace, RootNamespace);
-            }
-
-            _fileManager.Write(Path.Combine(ContentRoot, config.InputFile), inputFileContent);
         }
     }
 }

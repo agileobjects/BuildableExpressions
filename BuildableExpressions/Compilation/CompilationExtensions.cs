@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Logging;
     using NetStandardPolyfills;
     using ReadableExpressions;
 
@@ -25,6 +26,29 @@
             }
 
             return referenceAssemblyTypes;
+        }
+
+        public static bool CompilationFailed(
+            this ICompiler compiler,
+            string expressionBuilderSource,
+            ILogger logger,
+            out CompilationResult compilationResult)
+        {
+            compilationResult = compiler.Compile(expressionBuilderSource);
+
+            if (!compilationResult.Failed)
+            {
+                return false;
+            }
+
+            logger.Error("Expression compilation failed:");
+
+            foreach (var error in compilationResult.Errors)
+            {
+                logger.Error(error);
+            }
+
+            return true;
         }
     }
 }

@@ -15,36 +15,30 @@ namespace AgileObjects.BuildableExpressions.Configuration
             _fileManager = fileManager;
         }
 
-        public string ConfigFileName => "web.config/app.config";
-
-        public Config GetConfigOrNull(string contentRoot)
+        public void Populate(Config config)
         {
-            var configFilePath = Path.Combine(contentRoot, "web.config");
+            var configFilePath = Path.Combine(config.ContentRoot, "web.config");
 
             if (_fileManager.Exists(configFilePath))
             {
-                return GetConfig(configFilePath);
+                PopulateFrom(configFilePath, config);
+                return;
             }
 
-            configFilePath = Path.Combine(contentRoot, "app.config");
+            configFilePath = Path.Combine(config.ContentRoot, "app.config");
 
             if (_fileManager.Exists(configFilePath))
             {
-                return GetConfig(configFilePath);
+                PopulateFrom(configFilePath, config);
             }
-
-            return null;
         }
 
-        private static Config GetConfig(string configFilePath)
+        private static void PopulateFrom(string configFilePath, Config config)
         {
             var exeConfig = ConfigurationManager.OpenExeConfiguration(configFilePath);
 
-            return new Config
-            {
-                InputFile = exeConfig.AppSettings.Settings[InputFileKey]?.Value,
-                OutputDirectory = exeConfig.AppSettings.Settings[OutputDirectoryKey]?.Value
-            };
+            config.InputFile = exeConfig.AppSettings.Settings[InputFileKey]?.Value;
+            config.OutputDirectory = exeConfig.AppSettings.Settings[OutputDirectoryKey]?.Value;
         }
     }
 }

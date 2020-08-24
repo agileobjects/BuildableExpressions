@@ -15,28 +15,23 @@ namespace AgileObjects.BuildableExpressions.Configuration
             _fileManager = fileManager;
         }
 
-        public string ConfigFileName => "appsettings.json";
-
-        public Config GetConfigOrNull(string contentRoot)
+        public void Populate(Config config)
         {
-            var configFilePath = Path.Combine(contentRoot, ConfigFileName);
+            var configFilePath = Path.Combine(config.ContentRoot, "appsettings.json");
 
             if (!_fileManager.Exists(configFilePath))
             {
-                return null;
+                return;
             }
 
             var builder = new ConfigurationBuilder()
-                .SetBasePath(contentRoot)
+                .SetBasePath(config.ContentRoot)
                 .AddJsonFile("appsettings.json", optional: false);
 
             var appSettings = builder.Build();
 
-            return new Config
-            {
-                InputFile = appSettings[$"appSettings:{InputFileKey}"],
-                OutputDirectory = appSettings[$"appSettings:{OutputDirectoryKey}"]
-            };
+            config.InputFile = appSettings[$"appSettings:{InputFileKey}"];
+            config.OutputDirectory = appSettings[$"appSettings:{OutputDirectoryKey}"];
         }
     }
 }

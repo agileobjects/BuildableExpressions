@@ -3,7 +3,9 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using Configuration;
     using SourceCode;
+    using static System.StringComparison;
 
     internal class OutputWriter
     {
@@ -16,20 +18,25 @@
 
         public void Write(
             IEnumerable<SourceCodeExpression> sourceCodeExpressions,
-            string outputRoot)
+            Config config)
         {
-            _fileManager.EnsureDirectory(outputRoot);
+            var rootNamespace = config.RootNamespace;
+
+            _fileManager.EnsureDirectory(config.OutputRoot);
 
             foreach (var sourceCodeExpression in sourceCodeExpressions)
             {
-                var outputDirectory = outputRoot;
                 var @namespace = sourceCodeExpression.Namespace;
 
-                if (!string.IsNullOrEmpty(@namespace))
+                var outputDirectory = config.OutputRoot;
+
+                if (@namespace != rootNamespace &&
+                    @namespace.StartsWith(rootNamespace, OrdinalIgnoreCase))
                 {
-                    outputDirectory = Path.Combine(new[] { outputDirectory }
-                        .Concat(@namespace.Split('.'))
-                        .ToArray());
+                    @namespace = @namespace.Substring(rootNamespace.Length + 1);
+
+                    outputDirectory = Path.Combine(
+                        new[] { config.OutputRoot }.Concat(@namespace.Split('.')).ToArray());
 
                     _fileManager.EnsureDirectory(outputDirectory);
                 }
