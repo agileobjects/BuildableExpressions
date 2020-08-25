@@ -1,6 +1,7 @@
 ﻿#if NETFRAMEWORK
 namespace AgileObjects.BuildableExpressions.ProjectManagement
 {
+    using System.IO;
     using System.Linq;
     using Microsoft.Build.Evaluation;
 
@@ -9,8 +10,15 @@ namespace AgileObjects.BuildableExpressions.ProjectManagement
         private Project _project;
         private bool _filesAdded;
 
+        public string RootNamespace
+            => _project.GetPropertyValue(nameof(RootNamespace));
+
         public void Load(string projectPath)
-            => _project = new Project(projectPath);
+        {
+            _project = ProjectCollection
+                .GlobalProjectCollection
+                .LoadProject(Path.GetFileName(projectPath));
+        }
 
         public void Add(string filePath)
         {

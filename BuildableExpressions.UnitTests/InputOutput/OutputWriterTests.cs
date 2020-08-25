@@ -20,10 +20,11 @@
         public void ShouldWriteToRootDirectory()
         {
             var fileManagerMock = new Mock<IFileManager>();
+            var projectManagerMock = new Mock<IProjectManager>();
 
             var outputWriter = new OutputWriter(
                 fileManagerMock.Object,
-                Mock.Of<IProjectManager>());
+                projectManagerMock.Object);
 
             var doNothing = SourceCode(
                 Lambda<Action>(Default(typeof(void))),
@@ -36,23 +37,28 @@
                 OutputDirectory = _projectDirectory
             };
 
+            var fileName = doNothing.Classes.First().Name + ".cs";
+
             outputWriter.Write(new[] { doNothing }, config);
 
             fileManagerMock.Verify(fm => fm.EnsureDirectory(_projectDirectory));
 
             fileManagerMock.Verify(fm => fm.Write(
-                @$"{_projectDirectory}\{doNothing.Classes.First().Name}.cs",
+                Path.Combine(_projectDirectory, fileName),
                 It.IsAny<string>()));
+
+            projectManagerMock.Verify(pm => pm.Add(fileName));
         }
 
         [Fact]
         public void ShouldWriteToNamespaceDirectories()
         {
             var fileManagerMock = new Mock<IFileManager>();
+            var projectManagerMock = new Mock<IProjectManager>();
 
             var outputWriter = new OutputWriter(
                 fileManagerMock.Object,
-                Mock.Of<IProjectManager>());
+                projectManagerMock.Object);
 
             const string PROJECT_DIRECTORY = @"C:\Data\VisualStudio\BuildableExpressions";
             const string ROOT_NAMESPACE = "AgileObjects.BuildableExpressions";
@@ -68,6 +74,8 @@
                 OutputDirectory = PROJECT_DIRECTORY
             };
 
+            var fileName = doNothing.Classes.First().Name + ".cs";
+
             outputWriter.Write(new[] { doNothing }, config);
 
             var expectedOutputDirectory =
@@ -76,8 +84,10 @@
             fileManagerMock.Verify(fm => fm.EnsureDirectory(expectedOutputDirectory));
 
             fileManagerMock.Verify(fm => fm.Write(
-                @$"{expectedOutputDirectory}\{doNothing.Classes.First().Name}.cs",
+                Path.Combine(expectedOutputDirectory, fileName),
                 It.IsAny<string>()));
+
+            projectManagerMock.Verify(pm => pm.Add(Path.Combine("GeneratedCode", fileName)));
         }
     }
 }

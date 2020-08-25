@@ -11,21 +11,22 @@
     internal class OutputWriter
     {
         private readonly IFileManager _fileManager;
-        private readonly IProjectManager _projectManager;
 
         public OutputWriter(
             IFileManager fileManager,
             IProjectManager projectManager)
         {
             _fileManager = fileManager;
-            _projectManager = projectManager;
+            ProjectManager = projectManager;
         }
+
+        public IProjectManager ProjectManager { get; }
 
         public void Write(
             IEnumerable<SourceCodeExpression> sourceCodeExpressions,
             Config config)
         {
-            _projectManager.Load(config.ProjectPath);
+            ProjectManager.Load(config.ProjectPath);
             _fileManager.EnsureDirectory(config.OutputRoot);
 
             var rootNamespace = config.RootNamespace;
@@ -35,16 +36,21 @@
                 var @namespace = sourceCodeExpression.Namespace;
 
                 var outputDirectory = config.OutputRoot;
+                string relativeFilePath;
 
                 if (@namespace != rootNamespace &&
                     @namespace.StartsWith(rootNamespace, OrdinalIgnoreCase))
                 {
                     @namespace = @namespace.Substring(rootNamespace.Length + 1);
 
-                    outputDirectory = Path.Combine(
-                        new[] { config.OutputRoot }.Concat(@namespace.Split('.')).ToArray());
+                    relativeFilePath = Path.Combine(@namespace.Split('.'));
+                    outputDirectory = Path.Combine(config.OutputRoot, relativeFilePath);
 
                     _fileManager.EnsureDirectory(outputDirectory);
+                }
+                else
+                {
+                    relativeFilePath = string.Empty;
                 }
 
                 var fileName = sourceCodeExpression.Classes.First().Name + ".cs";
@@ -53,10 +59,10 @@
                 var sourceCode = sourceCodeExpression.ToSourceCode();
 
                 _fileManager.Write(filePath, sourceCode);
-                _projectManager.Add(filePath);
+                ProjectManager.Add(Path.Combine(relativeFilePath, fileName));
             }
 
-            _projectManager.Save();
+            ProjectManager.Save();
         }
     }
 }

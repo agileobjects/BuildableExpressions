@@ -11,15 +11,16 @@ namespace BuildXpr
     using MsBuildTask = Microsoft.Build.Utilities.Task;
 
     /// <summary>
-    /// An MSBuild Task to generate a source code file from a <see cref="SourceCodeExpression"/>.
+    /// An MSBuild Task to generate source code files from <see cref="SourceCodeExpression"/>s.
     /// </summary>
-    public class BuildExpressionsTask : MsBuildTask
+    public class BuildExpressionsTask : MsBuildTask, IRootNamespaceAccessor
     {
         private readonly ILogger _logger;
         private readonly IFileManager _fileManager;
         private readonly IConfigManager _configManager;
         private readonly InputFileProvider _inputFileProvider;
         private readonly ICompiler _compiler;
+        private readonly IRootNamespaceAccessor _rootNamespaceAccessor;
         private readonly OutputWriter _outputWriter;
 
         /// <summary>
@@ -51,7 +52,6 @@ namespace BuildXpr
 #endif
                     ))
         {
-            MsBuildTaskLogger.Instance.SetTask(this);
         }
 
         internal BuildExpressionsTask(
@@ -62,12 +62,17 @@ namespace BuildXpr
             ICompiler compiler,
             OutputWriter outputWriter)
         {
-            _logger = logger;
+            _logger = logger.WithTask(this);
             _fileManager = fileManager;
             _configManager = configManager;
             _inputFileProvider = inputFileProvider;
             _compiler = compiler;
             _outputWriter = outputWriter;
+#if  NETFRAMEWORK
+            _rootNamespaceAccessor = outputWriter.ProjectManager;
+#else
+            _rootNamespaceAccessor = this;
+#endif
         }
 
         /// <summary>
@@ -92,7 +97,7 @@ namespace BuildXpr
                 var config = new Config
                 {
                     ProjectPath = ProjectPath,
-                    RootNamespace = RootNamespace
+                    RootNamespace = _rootNamespaceAccessor.RootNamespace
                 };
 
                 _configManager.Populate(config);
@@ -104,7 +109,7 @@ namespace BuildXpr
 
                 var compilationFailed = _compiler.CompilationFailed(
                     expressionBuilderSource,
-                    _logger,
+                   _logger,
                     out var compilationResult);
 
                 if (compilationFailed)

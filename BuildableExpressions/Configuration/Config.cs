@@ -8,6 +8,7 @@
         private string _projectPath;
         private string _outputDirectory;
         private string _rootNamespace;
+        private string _inputFile;
 
         public string ProjectPath
         {
@@ -32,7 +33,17 @@
             }
         }
 
-        public string InputFile { get; set; }
+        public string InputFile
+        {
+            get
+            {
+                return string.IsNullOrEmpty(_inputFile)
+                    ? (_inputFile = DefaultInputFile)
+                    : _inputFile;
+            }
+
+            set => _inputFile = value;
+        }
 
         public string OutputDirectory
         {

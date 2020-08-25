@@ -10,7 +10,11 @@
 
         private MsBuildTask _task;
 
-        public void SetTask(MsBuildTask task) => _task = task;
+        public ILogger WithTask(MsBuildTask task)
+        {
+            _task = task;
+            return this;
+        }
 
         public void Info(string message)
             => _task.Log.LogMessage(MessageImportance.High, message);

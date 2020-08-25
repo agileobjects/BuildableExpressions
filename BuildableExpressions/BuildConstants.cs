@@ -10,6 +10,6 @@
 
         public const string DefaultInputFile = InputClass + ".cs";
         public const string DefaultInputFileNamespace = "DefaultNamespace";
-        public const string DefaultOutputDirectory = ".";
+        public const string DefaultOutputDirectory = "";
     }
 }
