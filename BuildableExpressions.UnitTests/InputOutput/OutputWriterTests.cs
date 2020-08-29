@@ -4,9 +4,14 @@
     using System.IO;
     using System.Linq;
     using BuildableExpressions.InputOutput;
+#if NETFRAMEWORK
+    using BuildableExpressions.ProjectManagement;
+#endif
     using Configuration;
     using Moq;
+#if NETCOREAPP
     using ProjectManagement;
+#endif
     using Xunit;
     using static System.Linq.Expressions.Expression;
     using static SourceCodeFactory;

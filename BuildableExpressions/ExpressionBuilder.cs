@@ -7,8 +7,8 @@
     using AgileObjects.BuildableExpressions.SourceCode;
 
     /// <summary>
-    /// Supplies an input <see cref="SourceCodeExpression"/> to compile to source code when this
-    /// project is built.
+    /// Supplies a set of input <see cref="SourceCodeExpression"/>s to compile to source code when
+    /// this project is built.
     /// </summary>
     public static class ExpressionBuilder
     {

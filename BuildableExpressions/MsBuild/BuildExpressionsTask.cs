@@ -46,7 +46,7 @@ namespace BuildXpr
                 new OutputWriter(
                     BclFileManager.Instance,
 #if NETFRAMEWORK
-                    new NetFrameworkProjectManager()
+                    new NetFrameworkProjectManager(BclFileManager.Instance)
 #else
                     new NullProjectManager()
 #endif

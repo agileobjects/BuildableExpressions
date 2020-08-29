@@ -5,11 +5,11 @@ namespace AgileObjects.BuildableExpressions.ProjectManagement
     {
         public string RootNamespace => null;
 
-        public void Load(string projectPath)
+        public void Load(string projectFilePath)
         {
         }
 
-        public void Add(string filePath)
+        public void Add(params string[] relativeFilePaths)
         {
         }
 
