@@ -2,6 +2,7 @@
 namespace BuildXpr
 {
     using System;
+    using System.Collections.Generic;
     using AgileObjects.BuildableExpressions.Compilation;
     using AgileObjects.BuildableExpressions.Configuration;
     using AgileObjects.BuildableExpressions.InputOutput;
@@ -16,9 +17,7 @@ namespace BuildXpr
     public class BuildExpressionsTask : MsBuildTask, IRootNamespaceAccessor
     {
         private readonly ILogger _logger;
-        private readonly IFileManager _fileManager;
-        private readonly IConfigManager _configManager;
-        private readonly InputFileProvider _inputFileProvider;
+        private readonly InputFilesFinder _inputFilesFinder;
         private readonly ICompiler _compiler;
         private readonly IRootNamespaceAccessor _rootNamespaceAccessor;
         private readonly OutputWriter _outputWriter;
@@ -29,13 +28,7 @@ namespace BuildXpr
         public BuildExpressionsTask()
             : this(
                 MsBuildTaskLogger.Instance,
-                BclFileManager.Instance,
-#if NETFRAMEWORK
-                new NetFrameworkConfigManager(BclFileManager.Instance),
-#else
-                new NetStandardConfigManager(BclFileManager.Instance),
-#endif
-                new InputFileProvider(
+                new InputFilesFinder(
                     BclFileManager.Instance,
                     MsBuildTaskLogger.Instance),
 #if NETFRAMEWORK
@@ -56,16 +49,12 @@ namespace BuildXpr
 
         internal BuildExpressionsTask(
             ILogger logger,
-            IFileManager fileManager,
-            IConfigManager configManager,
-            InputFileProvider inputFileProvider,
+            InputFilesFinder inputFilesFinder,
             ICompiler compiler,
             OutputWriter outputWriter)
         {
             _logger = logger.WithTask(this);
-            _fileManager = fileManager;
-            _configManager = configManager;
-            _inputFileProvider = inputFileProvider;
+            _inputFilesFinder = inputFilesFinder;
             _compiler = compiler;
             _outputWriter = outputWriter;
 #if  NETFRAMEWORK
@@ -100,26 +89,27 @@ namespace BuildXpr
                     RootNamespace = _rootNamespaceAccessor.RootNamespace
                 };
 
-                _configManager.Populate(config);
-                _inputFileProvider.EnsureInputFile(config);
+                var inputFiles = _inputFilesFinder.GetInputFiles(config);
+                var sourceCodeExpressions = new List<SourceCodeExpression>();
 
-                _logger.Info($"Compiling Expressions from {config.InputFile} to {config.OutputRoot}...");
-
-                var expressionBuilderSource = _fileManager.Read(config.InputFile);
-
-                var compilationFailed = _compiler.CompilationFailed(
-                    expressionBuilderSource,
-                   _logger,
-                    out var compilationResult);
-
-                if (compilationFailed)
+                foreach (var inputFile in inputFiles)
                 {
-                    return false;
+                    _logger.Info($"Compiling Expressions from {inputFile.FilePath} to {config.OutputRoot}...");
+
+                    var compilationFailed = _compiler.CompilationFailed(
+                        inputFile.Contents,
+                        _logger,
+                        out var compilationResult);
+
+                    if (compilationFailed)
+                    {
+                        return false;
+                    }
+
+                    _logger.Info("Expression compilation succeeded");
+
+                    sourceCodeExpressions.AddRange(compilationResult.ToSourceCodeExpressions());
                 }
-
-                _logger.Info("Expression compilation succeeded");
-
-                var sourceCodeExpressions = compilationResult.ToSourceCodeExpressions();
 
                 _outputWriter.Write(sourceCodeExpressions, config);
 

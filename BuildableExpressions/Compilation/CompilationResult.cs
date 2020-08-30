@@ -5,8 +5,8 @@
     using System.Linq;
     using System.Reflection;
     using NetStandardPolyfills;
+    using ReadableExpressions.Extensions;
     using SourceCode;
-    using static BuildConstants;
 
     internal class CompilationResult
     {
@@ -18,62 +18,40 @@
 
         public IEnumerable<SourceCodeExpression> ToSourceCodeExpressions()
         {
-            var builderType = GetBuilderTypeOrThrow();
-            var buildMethod = GetBuildMethodOrThrow(builderType);
-            var buildMethodResult = buildMethod.Invoke(null, Array.Empty<object>());
+            var allExpressions = new List<SourceCodeExpression>();
 
-            if (buildMethodResult == null)
+            foreach (var builder in GetBuildersOrThrow())
             {
-                throw new InvalidOperationException($"{InputClass}.{InputMethod} returned null");
+                var expressions = builder.Build();
+
+                if (expressions == null)
+                {
+                    throw new InvalidOperationException(
+                        $"{builder.GetType().GetFriendlyName()}.Build() returned null");
+                }
+
+                allExpressions.AddRange(expressions);
             }
 
-            return (IEnumerable<SourceCodeExpression>)buildMethodResult;
+            return allExpressions;
         }
 
-        private Type GetBuilderTypeOrThrow()
+        private IEnumerable<ISourceCodeExpressionBuilder> GetBuildersOrThrow()
         {
-            var builderTypes = CompiledAssembly
+            var builders = CompiledAssembly
                 .GetTypes()
-                .Where(t => t.Name == InputClass)
+                .Where(t => t.IsAssignableTo(typeof(ISourceCodeExpressionBuilder)))
+                .Select(Activator.CreateInstance)
+                .Cast<ISourceCodeExpressionBuilder>()
                 .ToList();
 
-            if (builderTypes.Count == 0)
-            {
-                throw new NotSupportedException($"Expected input Type {InputClass} not found");
-            }
-
-            if (builderTypes.Count > 1)
-            {
-                throw new NotSupportedException($"Multiple {InputClass} Types found");
-            }
-
-            return builderTypes[0];
-        }
-
-        private static MethodInfo GetBuildMethodOrThrow(Type builderType)
-        {
-            var buildMethod = builderType.GetPublicStaticMethod(InputMethod);
-
-            if (buildMethod == null)
+            if (builders.Count == 0)
             {
                 throw new NotSupportedException(
-                    $"Expected public, static method {InputClass}.{InputMethod} not found");
+                    $"No {nameof(ISourceCodeExpressionBuilder)} implementations found in project");
             }
 
-            if (buildMethod.GetParameters().Any())
-            {
-                throw new NotSupportedException(
-                    $"Expected method {InputClass}.{InputMethod} to be parameterless");
-            }
-
-            if (!buildMethod.ReturnType.IsAssignableTo(typeof(IEnumerable<SourceCodeExpression>)))
-            {
-                throw new NotSupportedException(
-                    $"Expected method {InputClass}.{InputMethod} to return " +
-                    $"IEnumerable<{nameof(SourceCodeExpression)}>");
-            }
-
-            return buildMethod;
+            return builders;
         }
     }
 }

@@ -2,13 +2,6 @@
 {
     internal static class BuildConstants
     {
-        public const string InputFileKey = "BuildableExpressionsInput";
-        public const string OutputDirectoryKey = "BuildableExpressionsOutput";
-
-        public const string InputClass = "ExpressionBuilder";
-        public const string InputMethod = "Build";
-
-        public const string DefaultInputFile = InputClass + ".cs";
         public const string DefaultInputFileNamespace = "DefaultNamespace";
         public const string DefaultOutputDirectory = "";
     }

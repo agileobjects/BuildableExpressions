@@ -46,8 +46,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="ExpressionBuilder*.cs" />
-    <Content Include="ExpressionBuilder*.cs" PackagePath="content\" />
+    <Content Remove="ExpressionBuilder.cs" />
+    <EmbeddedResource Include="ExpressionBuilder.cs" />
   </ItemGroup>
 
   <ItemGroup>
