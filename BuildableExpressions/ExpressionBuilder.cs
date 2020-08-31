@@ -10,14 +10,14 @@
     /// Supplies a set of input <see cref="SourceCodeExpression"/>s to compile to source code when
     /// this project is built.
     /// </summary>
-    public static class ExpressionBuilder
+    public class ExpressionBuilder : ISourceCodeExpressionBuilder
     {
         /// <summary>
         /// Builds the <see cref="SourceCodeExpression"/> to compile to a source code file when this
         /// project is built.
         /// </summary>
         /// <returns>The <see cref="SourceCodeExpression"/> to compile.</returns>
-        public static IEnumerable<SourceCodeExpression> Build()
+        public IEnumerable<SourceCodeExpression> Build()
         {
             // Replace this code with your own, building a SourceCodeExpression
             // to be compiled to a source code file:

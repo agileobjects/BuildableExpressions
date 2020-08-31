@@ -26,16 +26,13 @@
             IEnumerable<SourceCodeExpression> sourceCodeExpressions,
             Config config)
         {
-            ProjectManager.Load(config.ProjectPath);
-            _fileManager.EnsureDirectory(config.OutputRoot);
-
             var rootNamespace = config.RootNamespace;
 
             foreach (var sourceCodeExpression in sourceCodeExpressions)
             {
                 var @namespace = sourceCodeExpression.Namespace;
 
-                var outputDirectory = config.OutputRoot;
+                var outputDirectory = config.ContentRoot;
                 string relativeFilePath;
 
                 if (@namespace != rootNamespace &&
@@ -44,7 +41,7 @@
                     @namespace = @namespace.Substring(rootNamespace.Length + 1);
 
                     relativeFilePath = Path.Combine(@namespace.Split('.'));
-                    outputDirectory = Path.Combine(config.OutputRoot, relativeFilePath);
+                    outputDirectory = Path.Combine(outputDirectory, relativeFilePath);
 
                     _fileManager.EnsureDirectory(outputDirectory);
                 }

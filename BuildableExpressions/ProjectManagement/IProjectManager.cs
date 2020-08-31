@@ -1,8 +1,8 @@
 ﻿namespace AgileObjects.BuildableExpressions.ProjectManagement
 {
-    internal interface IProjectManager : IRootNamespaceAccessor
+    internal interface IProjectManager
     {
-        void Load(string projectFilePath);
+        void Init(string projectPath);
 
         void Add(params string[] relativeFilePaths);
 

@@ -55,8 +55,8 @@
 
             #endregion
 
-            var projectManager = new NetFrameworkProjectManager(fileManagerMock.Object);
-            projectManager.Load(_projectFile);
+            var projectManager = new ProjectManager(fileManagerMock.Object);
+            projectManager.Init(_projectFile);
 
             projectManager.RootNamespace.ShouldBe("AgileObjects.BuildableExpressions.Console");
         }
@@ -108,9 +108,9 @@
                 .Setup(fm => fm.Write(_projectFile, It.IsAny<string>()))
                 .Callback((string filePath, string content) => writtenProjectXml = content);
 
-            var projectManager = new NetFrameworkProjectManager(fileManagerMock.Object);
+            var projectManager = new ProjectManager(fileManagerMock.Object);
 
-            projectManager.Load(_projectFile);
+            projectManager.Init(_projectFile);
             projectManager.Add(NEW_FILE_PATH);
             projectManager.Save();
 
@@ -173,9 +173,9 @@
                 .Setup(fm => fm.Write(_projectFile, It.IsAny<string>()))
                 .Callback((string filePath, string content) => writtenProjectXml = content);
 
-            var projectManager = new NetFrameworkProjectManager(fileManagerMock.Object);
+            var projectManager = new ProjectManager(fileManagerMock.Object);
 
-            projectManager.Load(_projectFile);
+            projectManager.Init(_projectFile);
             projectManager.Add(_newFilePath);
             projectManager.Save();
 
@@ -231,9 +231,9 @@
                 .Setup(fm => fm.Write(_projectFile, It.IsAny<string>()))
                 .Callback((string filePath, string content) => writtenProjectXml = content);
 
-            var projectManager = new NetFrameworkProjectManager(fileManagerMock.Object);
+            var projectManager = new ProjectManager(fileManagerMock.Object);
             
-            projectManager.Load(_projectFile);
+            projectManager.Init(_projectFile);
             projectManager.Add(_newFilePath);
             projectManager.Save();
 

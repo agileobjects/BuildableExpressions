@@ -3,6 +3,7 @@ namespace BuildXpr
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using AgileObjects.BuildableExpressions.Compilation;
     using AgileObjects.BuildableExpressions.Configuration;
     using AgileObjects.BuildableExpressions.InputOutput;
@@ -14,12 +15,11 @@ namespace BuildXpr
     /// <summary>
     /// An MSBuild Task to generate source code files from <see cref="SourceCodeExpression"/>s.
     /// </summary>
-    public class BuildExpressionsTask : MsBuildTask, IRootNamespaceAccessor
+    public class BuildExpressionsTask : MsBuildTask
     {
         private readonly ILogger _logger;
         private readonly InputFilesFinder _inputFilesFinder;
         private readonly ICompiler _compiler;
-        private readonly IRootNamespaceAccessor _rootNamespaceAccessor;
         private readonly OutputWriter _outputWriter;
 
         /// <summary>
@@ -38,12 +38,7 @@ namespace BuildXpr
 #endif
                 new OutputWriter(
                     BclFileManager.Instance,
-#if NETFRAMEWORK
-                    new NetFrameworkProjectManager(BclFileManager.Instance)
-#else
-                    new NullProjectManager()
-#endif
-                    ))
+                    new ProjectManager(BclFileManager.Instance)))
         {
         }
 
@@ -57,11 +52,6 @@ namespace BuildXpr
             _inputFilesFinder = inputFilesFinder;
             _compiler = compiler;
             _outputWriter = outputWriter;
-#if  NETFRAMEWORK
-            _rootNamespaceAccessor = outputWriter.ProjectManager;
-#else
-            _rootNamespaceAccessor = this;
-#endif
         }
 
         /// <summary>
@@ -81,20 +71,25 @@ namespace BuildXpr
         /// </summary>
         public override bool Execute()
         {
+#if DEBUG
+            System.Diagnostics.Debugger.Launch();
+#endif
             try
             {
                 var config = new Config
                 {
-                    ProjectPath = ProjectPath,
-                    RootNamespace = _rootNamespaceAccessor.RootNamespace
+                    ContentRoot = Path.GetDirectoryName(ProjectPath),
+                    RootNamespace = RootNamespace
                 };
+
+                _outputWriter.ProjectManager.Init(ProjectPath);
 
                 var inputFiles = _inputFilesFinder.GetInputFiles(config);
                 var sourceCodeExpressions = new List<SourceCodeExpression>();
 
                 foreach (var inputFile in inputFiles)
                 {
-                    _logger.Info($"Compiling Expressions from {inputFile.FilePath} to {config.OutputRoot}...");
+                    _logger.Info($"Compiling Expressions from {inputFile.FilePath}...");
 
                     var compilationFailed = _compiler.CompilationFailed(
                         inputFile.Contents,
