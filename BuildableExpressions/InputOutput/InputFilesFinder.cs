@@ -13,11 +13,10 @@
 
     internal class InputFilesFinder
     {
-        private static readonly string _directoryCharacters = new string(
-            new[] { DirectorySeparatorChar, AltDirectorySeparatorChar });
+        private const string _directoryCharacter = @"[\\/]+";
 
         private static readonly Regex _binOrObjPathMatcher = new Regex(
-            $"[{_directoryCharacters}]{{1}}(?:bin|obj)[{_directoryCharacters}]{{1}}",
+            _directoryCharacter + "(?:bin|obj)" + _directoryCharacter,
             Compiled | IgnoreCase);
 
         private readonly IFileManager _fileManager;

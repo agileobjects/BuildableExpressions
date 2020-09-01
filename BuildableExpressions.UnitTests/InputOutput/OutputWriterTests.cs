@@ -26,15 +26,13 @@
                 Lambda<Action>(Default(typeof(void))),
                 cfg => cfg.WithNamespace(_rootNamespace));
 
-            var config = new Config
+            var fileName = doNothing.Classes.First().Name + ".cs";
+
+            outputWriter.Write(new[] { doNothing }, new Config
             {
                 ContentRoot = _projectDirectory,
                 RootNamespace = _rootNamespace
-            };
-
-            var fileName = doNothing.Classes.First().Name + ".cs";
-
-            outputWriter.Write(new[] { doNothing }, config);
+            });
 
             fileManagerMock.Verify(fm => fm.EnsureDirectory(_projectDirectory), Never);
 
@@ -53,15 +51,13 @@
                 Lambda<Action>(Default(typeof(void))),
                 cfg => cfg.WithNamespace($"{_rootNamespace}.GeneratedCode"));
 
-            var config = new Config
+            var fileName = doNothing.Classes.First().Name + ".cs";
+
+            outputWriter.Write(new[] { doNothing }, new Config
             {
                 ContentRoot = _projectDirectory,
                 RootNamespace = _rootNamespace
-            };
-
-            var fileName = doNothing.Classes.First().Name + ".cs";
-
-            outputWriter.Write(new[] { doNothing }, config);
+            });
 
             var expectedOutputDirectory =
                 Path.Combine(_projectDirectory, "GeneratedCode");
