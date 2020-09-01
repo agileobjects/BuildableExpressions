@@ -4,7 +4,6 @@
     using System.IO;
     using System.Linq;
     using Configuration;
-    using ProjectManagement;
     using SourceCode;
     using static System.StringComparison;
 
@@ -12,21 +11,17 @@
     {
         private readonly IFileManager _fileManager;
 
-        public OutputWriter(
-            IFileManager fileManager,
-            IProjectManager projectManager)
+        public OutputWriter(IFileManager fileManager)
         {
             _fileManager = fileManager;
-            ProjectManager = projectManager;
         }
 
-        public IProjectManager ProjectManager { get; }
-
-        public void Write(
+        public List<string> Write(
             IEnumerable<SourceCodeExpression> sourceCodeExpressions,
             Config config)
         {
             var rootNamespace = config.RootNamespace;
+            var newFilePaths = new List<string>();
 
             foreach (var sourceCodeExpression in sourceCodeExpressions)
             {
@@ -56,10 +51,10 @@
                 var sourceCode = sourceCodeExpression.ToSourceCode();
 
                 _fileManager.Write(filePath, sourceCode);
-                ProjectManager.Add(Path.Combine(relativeFilePath, fileName));
+                newFilePaths.Add(Path.Combine(relativeFilePath, fileName));
             }
 
-            ProjectManager.Save();
+            return newFilePaths;
         }
     }
 }

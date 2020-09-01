@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.ProjectManagement
 {
     using System;
+    using System.Collections.Generic;
     using System.Xml;
     using System.Xml.Linq;
     using InputOutput;
@@ -10,7 +11,6 @@
         private readonly IFileManager _fileManager;
         private string _projectFilePath;
         private ProjectBase _project;
-        private bool _filesAdded;
 
         public ProjectManager(IFileManager fileManager)
         {
@@ -43,12 +43,9 @@
 #endif
         }
 
-        public void Add(params string[] relativeFilePaths)
-            => _filesAdded = _project.Add(relativeFilePaths);
-
-        public void Save()
+        public void AddIfMissing(IEnumerable<string> relativeFilePaths)
         {
-            if (_filesAdded)
+            if (_project.AddIfMissing(relativeFilePaths))
             {
                 _fileManager.Write(_projectFilePath, _project.GetContent());
             }

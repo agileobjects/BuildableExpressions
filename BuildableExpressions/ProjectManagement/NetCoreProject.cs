@@ -1,5 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.ProjectManagement
 {
+    using System.Collections.Generic;
     using System.Xml.Linq;
 
     internal class NetCoreProject : ProjectBase
@@ -9,6 +10,6 @@
         {
         }
 
-        public override bool Add(string[] relativeFilePaths) => false;
+        public override bool AddIfMissing(IEnumerable<string> relativeFilePaths) => false;
     }
 }

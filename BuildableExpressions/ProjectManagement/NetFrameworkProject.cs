@@ -1,6 +1,7 @@
 ﻿#if NETFRAMEWORK
 namespace AgileObjects.BuildableExpressions.ProjectManagement
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Xml.Linq;
     using static System.Environment;
@@ -17,47 +18,25 @@ namespace AgileObjects.BuildableExpressions.ProjectManagement
             _projectXml = projectXml;
         }
 
-        public override bool Add(string[] relativeFilePaths)
+        public override bool AddIfMissing(IEnumerable<string> relativeFilePaths)
         {
-            var filesAdded = false;
+            var newCompileElementFilePaths = relativeFilePaths
+                .Select(filePath => new
+                {
+                    FilePath = filePath,
+                    ExistingCompileElement = ProjectElements
+                        .FirstOrDefault(e => IsCompileElementFor(e, filePath))
+                })
+                .Where(_ => _.ExistingCompileElement == null)
+                .Select(_ => _.FilePath)
+                .ToList();
 
-            foreach (var filePath in relativeFilePaths)
+            if (!newCompileElementFilePaths.Any())
             {
-                var existingCompileElement = ProjectElements
-                    .FirstOrDefault(e => IsCompileElementFor(e, filePath));
-
-                if (existingCompileElement != null)
-                {
-                    continue;
-                }
-
-                var newCompileItemGroup = new object[]
-                {
-                    new XText(NewLine + _indent),
-                    new XElement(
-                        "ItemGroup",
-                        new XText(NewLine + _indent + _indent),
-                        new XElement("Compile", new XAttribute("Include", filePath)),
-                        new XText(NewLine + _indent))
-                };
-
-                var finalExistingItemGroupElement = _projectXml
-                    .Descendants()
-                    .LastOrDefault(e => e.Name.LocalName == "ItemGroup");
-
-                if (finalExistingItemGroupElement != null)
-                {
-                    finalExistingItemGroupElement.AddAfterSelf(newCompileItemGroup);
-                }
-                else
-                {
-                    _projectXml.Root?.Add(newCompileItemGroup);
-                }
-
-                filesAdded = true;
+                return false;
             }
 
-            return filesAdded;
+            return AddNewCompileItemGroup(newCompileElementFilePaths);
         }
 
         private static bool IsCompileElementFor(XElement element, string filePath)
@@ -75,6 +54,36 @@ namespace AgileObjects.BuildableExpressions.ProjectManagement
             return element
                 .Descendants()
                 .Any(e => e.Name.LocalName == "Include" && e.Value == filePath);
+        }
+
+        private bool AddNewCompileItemGroup(IEnumerable<string> newCompileElementFilePaths)
+        {
+            var newCompileItemGroup = new object[]
+            {
+                new XText(NewLine + _indent),
+                new XElement(
+                    "ItemGroup",
+                    newCompileElementFilePaths
+                        .SelectMany(filePath => new object[]
+                        {
+                            new XText(NewLine + _indent + _indent),
+                            new XElement("Compile", new XAttribute("Include", filePath))
+                        })
+                        .Concat(new[] { new XText(NewLine + _indent) }))
+            };
+
+            var finalExistingItemGroupElement = _projectXml
+                .Descendants()
+                .LastOrDefault(e => e.Name.LocalName == "ItemGroup");
+
+            if (finalExistingItemGroupElement != null)
+            {
+                finalExistingItemGroupElement.AddAfterSelf(newCompileItemGroup);
+                return true;
+            }
+
+            _projectXml.Root?.Add(newCompileItemGroup);
+            return true;
         }
     }
 }

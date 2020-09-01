@@ -20,8 +20,6 @@
             $"[{_directoryCharacters}]{{1}}(?:bin|obj)[{_directoryCharacters}]{{1}}",
             Compiled | IgnoreCase);
 
-        private const string _defaultInputFileName = "ExpressionBuilder.cs";
-
         private readonly IFileManager _fileManager;
         private readonly ILogger _logger;
 
@@ -63,7 +61,7 @@
                     .Replace(DefaultInputFileNamespace, config.RootNamespace);
             }
 
-            var inputFilePath = Combine(config.ContentRoot, _defaultInputFileName);
+            var inputFilePath = Combine(config.ContentRoot, DefaultInputFileName);
 
             _fileManager.Write(inputFilePath, inputFileContent);
 
@@ -83,7 +81,7 @@
 
             var defaultInputFileResourceName = thisAssembly
                 .GetManifestResourceNames()
-                .First(name => name.EndsWith(_defaultInputFileName));
+                .First(name => name.EndsWith(DefaultInputFileName));
 
             var defaultInputFileResourceStream = thisAssembly
                 .GetManifestResourceStream(defaultInputFileResourceName);

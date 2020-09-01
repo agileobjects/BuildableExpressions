@@ -4,6 +4,7 @@ namespace BuildXpr
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using AgileObjects.BuildableExpressions.Compilation;
     using AgileObjects.BuildableExpressions.Configuration;
     using AgileObjects.BuildableExpressions.InputOutput;
@@ -21,6 +22,7 @@ namespace BuildXpr
         private readonly InputFilesFinder _inputFilesFinder;
         private readonly ICompiler _compiler;
         private readonly OutputWriter _outputWriter;
+        private readonly IProjectManager _projectManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BuildExpressionsTask"/> class.
@@ -36,9 +38,8 @@ namespace BuildXpr
 #else
                 new NetStandardCompiler(),
 #endif
-                new OutputWriter(
-                    BclFileManager.Instance,
-                    new ProjectManager(BclFileManager.Instance)))
+                new OutputWriter(BclFileManager.Instance),
+                new ProjectManager(BclFileManager.Instance))
         {
         }
 
@@ -46,12 +47,14 @@ namespace BuildXpr
             ILogger logger,
             InputFilesFinder inputFilesFinder,
             ICompiler compiler,
-            OutputWriter outputWriter)
+            OutputWriter outputWriter,
+            IProjectManager projectManager)
         {
             _logger = logger.WithTask(this);
             _inputFilesFinder = inputFilesFinder;
             _compiler = compiler;
             _outputWriter = outputWriter;
+            _projectManager = projectManager;
         }
 
         /// <summary>
@@ -82,7 +85,7 @@ namespace BuildXpr
                     RootNamespace = RootNamespace
                 };
 
-                _outputWriter.ProjectManager.Init(ProjectPath);
+                _projectManager.Init(ProjectPath);
 
                 var inputFiles = _inputFilesFinder.GetInputFiles(config);
                 var sourceCodeExpressions = new List<SourceCodeExpression>();
@@ -106,7 +109,11 @@ namespace BuildXpr
                     sourceCodeExpressions.AddRange(compilationResult.ToSourceCodeExpressions());
                 }
 
-                _outputWriter.Write(sourceCodeExpressions, config);
+                var writtenFiles = _outputWriter.Write(sourceCodeExpressions, config);
+
+                writtenFiles.Insert(0, Path.GetFileName(inputFiles.First().FilePath));
+
+                _projectManager.AddIfMissing(writtenFiles);
 
                 _logger.Info("Expression compilation output updated");
                 return true;

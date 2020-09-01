@@ -4,7 +4,6 @@
     using System.IO;
     using System.Linq;
     using BuildableExpressions.InputOutput;
-    using BuildableExpressions.ProjectManagement;
     using Configuration;
     using Moq;
     using Xunit;
@@ -21,11 +20,7 @@
         public void ShouldWriteToRootDirectory()
         {
             var fileManagerMock = new Mock<IFileManager>();
-            var projectManagerMock = new Mock<IProjectManager>();
-
-            var outputWriter = new OutputWriter(
-                fileManagerMock.Object,
-                projectManagerMock.Object);
+            var outputWriter = new OutputWriter(fileManagerMock.Object);
 
             var doNothing = SourceCode(
                 Lambda<Action>(Default(typeof(void))),
@@ -46,19 +41,13 @@
             fileManagerMock.Verify(fm => fm.Write(
                 Path.Combine(_projectDirectory, fileName),
                 It.IsAny<string>()));
-
-            projectManagerMock.Verify(pm => pm.Add(fileName));
         }
 
         [Fact]
         public void ShouldWriteToNamespaceDirectories()
         {
             var fileManagerMock = new Mock<IFileManager>();
-            var projectManagerMock = new Mock<IProjectManager>();
-
-            var outputWriter = new OutputWriter(
-                fileManagerMock.Object,
-                projectManagerMock.Object);
+            var outputWriter = new OutputWriter(fileManagerMock.Object);
 
             var doNothing = SourceCode(
                 Lambda<Action>(Default(typeof(void))),
@@ -82,8 +71,6 @@
             fileManagerMock.Verify(fm => fm.Write(
                 Path.Combine(expectedOutputDirectory, fileName),
                 It.IsAny<string>()));
-
-            projectManagerMock.Verify(pm => pm.Add(Path.Combine("GeneratedCode", fileName)));
         }
     }
 }

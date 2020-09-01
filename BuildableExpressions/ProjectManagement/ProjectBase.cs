@@ -20,7 +20,7 @@
         protected IEnumerable<XElement> ProjectElements
             => _projectXml.Descendants();
 
-        public abstract bool Add(string[] relativeFilePaths);
+        public abstract bool AddIfMissing(IEnumerable<string> relativeFilePaths);
 
         public string GetContent()
         {

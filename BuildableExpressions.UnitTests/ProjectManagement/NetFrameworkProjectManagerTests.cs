@@ -101,7 +101,6 @@
 
             #endregion
 
-            const string NEW_FILE_PATH = "GeneratedCode/Blah/NewClass.cs";
             var writtenProjectXml = default(string);
 
             fileManagerMock
@@ -111,8 +110,7 @@
             var projectManager = new ProjectManager(fileManagerMock.Object);
 
             projectManager.Init(_projectFile);
-            projectManager.Add(NEW_FILE_PATH);
-            projectManager.Save();
+            projectManager.AddIfMissing(new[] { _newFilePath });
 
             writtenProjectXml.ShouldNotBeNull();
 
@@ -122,7 +120,7 @@
                 .Elements()
                 .Where(e => e.Name.LocalName == "ItemGroup")
                 .SelectMany(ig => ig.Elements().Where(e => e.Name.LocalName == "Compile"))
-                .Single(ce => ce.Attribute("Include")?.Value == NEW_FILE_PATH)
+                .Single(ce => ce.Attribute("Include")?.Value == _newFilePath)
                 .ShouldNotBeNull();
         }
 
@@ -176,8 +174,7 @@
             var projectManager = new ProjectManager(fileManagerMock.Object);
 
             projectManager.Init(_projectFile);
-            projectManager.Add(_newFilePath);
-            projectManager.Save();
+            projectManager.AddIfMissing(new[] { _newFilePath });
 
             writtenProjectXml.ShouldBeNull();
         }
@@ -232,10 +229,9 @@
                 .Callback((string filePath, string content) => writtenProjectXml = content);
 
             var projectManager = new ProjectManager(fileManagerMock.Object);
-            
+
             projectManager.Init(_projectFile);
-            projectManager.Add(_newFilePath);
-            projectManager.Save();
+            projectManager.AddIfMissing(new[] { _newFilePath });
 
             writtenProjectXml.ShouldBeNull();
         }

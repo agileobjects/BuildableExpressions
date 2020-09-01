@@ -3,6 +3,6 @@
     internal static class BuildConstants
     {
         public const string DefaultInputFileNamespace = "DefaultNamespace";
-        public const string DefaultOutputDirectory = "";
+        public const string DefaultInputFileName = "ExpressionBuilder.cs";
     }
 }

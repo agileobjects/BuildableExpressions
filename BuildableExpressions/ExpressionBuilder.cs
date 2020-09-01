@@ -13,10 +13,10 @@
     public class ExpressionBuilder : ISourceCodeExpressionBuilder
     {
         /// <summary>
-        /// Builds the <see cref="SourceCodeExpression"/> to compile to a source code file when this
-        /// project is built.
+        /// Builds one or more <see cref="SourceCodeExpression"/>s to compile to source code files
+        /// when this project is built.
         /// </summary>
-        /// <returns>The <see cref="SourceCodeExpression"/> to compile.</returns>
+        /// <returns><see cref="SourceCodeExpression"/>s to compile to source code files.</returns>
         public IEnumerable<SourceCodeExpression> Build()
         {
             // Replace this code with your own, building a SourceCodeExpression
@@ -25,8 +25,8 @@
 
             yield return SourceCodeFactory
                 .SourceCode(sc => sc
-                    .WithNamespaceOf(typeof(ExpressionBuilder))
-                    .WithClass("MyClass", cls => cls
+                    .WithNamespaceOf<ExpressionBuilder>()
+                    .WithClass(typeof(ExpressionBuilder).Name + "OutputClass", cls => cls
                         .WithMethod("DoNothing", doNothing)));
         }
     }
