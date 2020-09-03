@@ -1,7 +1,9 @@
 ﻿namespace AgileObjects.BuildableExpressions.Compilation
 {
+    using System.Collections.Generic;
+
     internal interface ICompiler
     {
-        CompilationResult Compile(string expressionBuilderSource);
+        CompilationResult Compile(IEnumerable<string> expressionBuilderSources);
     }
 }

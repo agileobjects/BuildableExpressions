@@ -3,11 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using BuildableExpressions;
     using BuildableExpressions.Compilation;
     using Common;
     using NetStandardPolyfills;
-    using ReadableExpressions;
     using SourceCode;
     using Xunit;
 
@@ -29,7 +27,7 @@ namespace MyNamespace
         }
     }
 }";
-            var result = compiler.Compile(SOURCE);
+            var result = compiler.Compile(new[] { SOURCE });
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -40,6 +38,58 @@ namespace MyNamespace
             var testInstance = Activator.CreateInstance(testType).ShouldNotBeNull();
             var testMethod = testType.GetPublicInstanceMethod("SayHello").ShouldNotBeNull();
             testMethod.Invoke(testInstance, Array.Empty<object>()).ShouldBe("Hello!");
+        }
+
+        [Fact]
+        public void ShouldCompileMultipleSimpleSourceCodeFiles()
+        {
+            var compiler = CreateCompiler();
+
+            const string SOURCE1 = @"
+namespace MyNamespace
+{
+    public class MyClass1
+    {
+        public string SayHello()
+        {
+            return ""Hello!"";
+        }
+    }
+}";
+
+            const string SOURCE2 = @"
+namespace MyNamespace
+{
+    public class MyClass2
+    {
+        public string SayHello()
+        {
+            return ""Hello!"";
+        }
+    }
+}";
+
+            const string SOURCE3 = @"
+namespace MyNamespace
+{
+    public class MyClass3
+    {
+        public string SayHello()
+        {
+            return ""Hello!"";
+        }
+    }
+}";
+            var result = compiler.Compile(new[] { SOURCE1, SOURCE2, SOURCE3 });
+
+            var compiledAssembly = result
+                .ShouldNotBeNull()
+                .CompiledAssembly
+                .ShouldNotBeNull();
+
+            compiledAssembly.GetType("MyNamespace.MyClass1").ShouldNotBeNull();
+            compiledAssembly.GetType("MyNamespace.MyClass2").ShouldNotBeNull();
+            compiledAssembly.GetType("MyNamespace.MyClass3").ShouldNotBeNull();
         }
 
         [Fact]
@@ -61,7 +111,7 @@ namespace MyNamespace
         }
     }
 }";
-            var result = compiler.Compile(SOURCE);
+            var result = compiler.Compile(new[] { SOURCE });
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -113,7 +163,7 @@ namespace MyNamespace
 }
     ";
 
-            var result = compiler.Compile(SOURCE);
+            var result = compiler.Compile(new[] { SOURCE });
 
             var compiledAssembly = result
                 .ShouldNotBeNull()

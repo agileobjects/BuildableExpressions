@@ -1,10 +1,10 @@
 ﻿namespace AgileObjects.BuildableExpressions.ProjectManagement
 {
-    using System;
     using System.Collections.Generic;
     using System.Xml;
     using System.Xml.Linq;
     using InputOutput;
+    using static System.StringComparison;
 
     internal class ProjectManager : IProjectManager
     {
@@ -23,7 +23,7 @@
         {
             var projectContent = _fileManager.Read(projectFilePath);
 
-            var projectStartIndex = projectContent.IndexOf("<Project", StringComparison.Ordinal);
+            var projectStartIndex = projectContent.IndexOf("<Project", Ordinal);
 
             if (projectStartIndex == -1)
             {

@@ -30,11 +30,11 @@
 
         public static bool CompilationFailed(
             this ICompiler compiler,
-            string expressionBuilderSource,
+            IEnumerable<string> expressionBuilderSources,
             ILogger logger,
             out CompilationResult compilationResult)
         {
-            compilationResult = compiler.Compile(expressionBuilderSource);
+            compilationResult = compiler.Compile(expressionBuilderSources);
 
             if (!compilationResult.Failed)
             {

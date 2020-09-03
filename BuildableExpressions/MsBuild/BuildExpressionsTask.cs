@@ -2,7 +2,6 @@
 namespace BuildXpr
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using AgileObjects.BuildableExpressions.Compilation;
@@ -77,6 +76,11 @@ namespace BuildXpr
 #if DEBUG
             System.Diagnostics.Debugger.Launch();
 #endif
+            return CompileExpressions();
+        }
+
+        internal bool CompileExpressions()
+        {
             try
             {
                 var config = new Config
@@ -88,27 +92,22 @@ namespace BuildXpr
                 _projectManager.Init(ProjectPath);
 
                 var inputFiles = _inputFilesFinder.GetInputFiles(config);
-                var sourceCodeExpressions = new List<SourceCodeExpression>();
 
-                foreach (var inputFile in inputFiles)
+                _logger.Info("Compiling Expression files...");
+
+                var compilationFailed = _compiler.CompilationFailed(
+                    inputFiles.Select(f => f.Contents),
+                    _logger,
+                    out var compilationResult);
+
+                if (compilationFailed)
                 {
-                    _logger.Info($"Compiling Expressions from {inputFile.FilePath}...");
-
-                    var compilationFailed = _compiler.CompilationFailed(
-                        inputFile.Contents,
-                        _logger,
-                        out var compilationResult);
-
-                    if (compilationFailed)
-                    {
-                        return false;
-                    }
-
-                    _logger.Info("Expression compilation succeeded");
-
-                    sourceCodeExpressions.AddRange(compilationResult.ToSourceCodeExpressions());
+                    return false;
                 }
 
+                _logger.Info("Expression compilation succeeded");
+
+                var sourceCodeExpressions = compilationResult.ToSourceCodeExpressions();
                 var writtenFiles = _outputWriter.Write(sourceCodeExpressions, config);
 
                 writtenFiles.Insert(0, Path.GetFileName(inputFiles.First().FilePath));
