@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq.Expressions;
+    using BuildableExpressions.Extensions;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Interfaces;
@@ -26,8 +27,13 @@
             var bodyCodeBlock = context
                 .GetCodeBlockTranslationFor(method.Body)
                 .WithBraces()
-                .WithReturnKeyword()
+
                 .WithTermination();
+
+            if (method.HasReturnType())
+            {
+                bodyCodeBlock.WithReturnKeyword();
+            }
 
             _bodyTranslation = bodyCodeBlock;
 

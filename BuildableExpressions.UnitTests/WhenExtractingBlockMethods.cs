@@ -3,11 +3,12 @@
     using System;
     using BuildableExpressions;
     using Common;
+    using NetStandardPolyfills;
     using Xunit;
     using static System.Linq.Expressions.Expression;
     using static SourceCodeFactory;
 
-    public class WhenExtractingMultilineBlockMethods
+    public class WhenExtractingBlockMethods
     {
         [Fact]
         public void ShouldExtractAMultilineIfTestBlockToAPrivateMethod()
@@ -124,7 +125,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldExtractMultilineBinaryOperandBlocksToPrivateMethods()
+        public void ShouldExtractMultilineConditionTestOperandBlocksToPrivateMethods()
         {
             var intParameter1 = Parameter(typeof(int), "i");
             var intParameter2 = Parameter(typeof(int), "j");
@@ -251,5 +252,72 @@ namespace GeneratedExpressionCode
             EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
+
+        [Fact]
+        public void ShouldExtractSingleLineVariableAssignmentValueBlockToPrivateMethod()
+        {
+            var objectParam = Parameter(typeof(PublicProperty<int>), "obj");
+            var stringParam = Parameter(typeof(string), "str");
+            var intOutputVariable = Variable(typeof(int), "i");
+
+            var tryParseResultAssignment = Assign(
+                Property(objectParam, "Value"),
+                Block(
+                    new[] { intOutputVariable },
+                    Condition(
+                        Call(typeof(int).GetPublicStaticMethod(
+                            "TryParse",
+                            typeof(string),
+                            intOutputVariable.Type.MakeByRefType()),
+                            stringParam,
+                            intOutputVariable),
+                        intOutputVariable,
+                        Constant(0))));
+
+            var tryParseResultLambda = Lambda<Action<PublicProperty<int>, string>>(
+                tryParseResultAssignment,
+                objectParam,
+                stringParam);
+
+            var translated = tryParseResultLambda.ToSourceCode();
+
+            const string EXPECTED = @"
+using AgileObjects.BuildableExpressions.UnitTests;
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public void DoAction
+        (
+            WhenExtractingBlockMethods.PublicProperty<int> obj,
+            string str
+        )
+        {
+            obj.Value = this.GetInt(str);
+        }
+
+        private int GetInt
+        (
+            string str
+        )
+        {
+            int i;
+            return int.TryParse(str, out i) ? i : 0;
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        #region Helper Members
+
+        public class PublicProperty<T>
+        {
+            public T Value { get; set; }
+        }
+
+        #endregion
     }
 }

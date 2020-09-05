@@ -1,7 +1,8 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
-#if FEATURE_COMPILATION
     using System;
+    using NetStandardPolyfills;
+#if FEATURE_COMPILATION
     using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
@@ -12,23 +13,28 @@
 
     public static class CompilationAssertionExtensions
     {
-        public static void ShouldCompile(this string sourceCode)
+        public static void ShouldCompile(this string sourceCode, params Type[] dependedOnAssemblyTypes)
         {
 #if FEATURE_COMPILATION
 
             var syntaxTree = CSharpSyntaxTree.ParseText(sourceCode);
 
+            var references = new[]
+                {
+                    typeof(object),
+                    typeof(Enumerable),
+                    typeof(Regex),
+                    typeof(CompilationAssertionExtensions),
+                    typeof(FluentAssertionExtensions)
+                }
+                .Concat(dependedOnAssemblyTypes)
+                .Distinct()
+                .Select(t => MetadataReference.CreateFromFile(t.GetAssembly().Location));
+
             var compilation = CSharpCompilation.Create(
                 "BuildableExpressionsTestAssembly" + Guid.NewGuid(),
                 new[] { syntaxTree },
-                new[]
-                {
-                    MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(Regex).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(CompilationAssertionExtensions).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(FluentAssertionExtensions).Assembly.Location),
-                },
+                references,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
             using (var dllStream = new MemoryStream())

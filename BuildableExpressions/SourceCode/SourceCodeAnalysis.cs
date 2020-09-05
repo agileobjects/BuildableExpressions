@@ -153,7 +153,7 @@
                     goto default;
 
                 default:
-                    return block.Expressions.Count > 1;
+                    return block.Expressions.Any() || block.Variables.Any();
             }
         }
 
