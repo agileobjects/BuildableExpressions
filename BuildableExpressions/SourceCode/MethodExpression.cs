@@ -6,6 +6,7 @@
     using System.Linq.Expressions;
     using Api;
     using Extensions;
+    using ReadableExpressions;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations.Reflection;
 
@@ -22,13 +23,13 @@
         private MethodExpression(
             ClassExpression parent,
             string name,
-            IList<string> summaryLines,
+            CommentExpression summary,
             LambdaExpression definition,
             bool isPublic,
             SourceCodeTranslationSettings settings)
         {
             Parent = parent;
-            SummaryLines = summaryLines;
+            Summary = summary;
             Definition = definition;
             _settings = settings;
 
@@ -73,7 +74,7 @@
             return For(
                 parent,
                 name: null,
-                summaryLines: Enumerable<string>.EmptyArray,
+                summary: null,
                 expression,
                 settings,
                 isPublic);
@@ -82,7 +83,7 @@
         internal static MethodExpression For(
             ClassExpression parent,
             string name,
-            IList<string> summaryLines,
+            CommentExpression summary,
             Expression expression,
             SourceCodeTranslationSettings settings,
             bool isPublic = true)
@@ -92,7 +93,7 @@
             return new MethodExpression(
                 parent,
                 name,
-                summaryLines,
+                summary,
                 definition,
                 isPublic,
                 settings);
@@ -120,6 +121,8 @@
         /// <returns>This <see cref="MethodExpression"/>.</returns>
         protected override Expression Accept(ExpressionVisitor visitor)
         {
+            visitor.Visit(Summary);
+
             foreach (var parameter in Parameters)
             {
                 visitor.Visit(parameter);
@@ -135,9 +138,10 @@
         public ClassExpression Parent { get; }
 
         /// <summary>
-        /// Gets the summary text describing this <see cref="MethodExpression"/>, if set.
+        /// Gets a <see cref="CommentExpression"/> describing this <see cref="MethodExpression"/>,
+        /// if a summary has been set.
         /// </summary>
-        public IList<string> SummaryLines { get; }
+        public CommentExpression Summary { get; }
 
         /// <summary>
         /// Gets the name of this <see cref="MethodExpression"/>.

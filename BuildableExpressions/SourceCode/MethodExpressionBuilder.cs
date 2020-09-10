@@ -1,21 +1,20 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
-    using System.Collections.Generic;
     using System.Linq.Expressions;
-    using BuildableExpressions.Extensions;
+    using ReadableExpressions;
 
     internal class MethodExpressionBuilder
     {
-        private readonly IList<string> _summaryLines;
+        private readonly CommentExpression _summary;
 
         public MethodExpressionBuilder(
             string name,
-            string summary,
+            CommentExpression summary,
             Expression body)
         {
             Name = name;
+            _summary = summary;
             Definition = body.ToLambdaExpression();
-            _summaryLines = summary.SplitToLines();
         }
 
         public string Name { get; }
@@ -27,7 +26,7 @@
             SourceCodeTranslationSettings settings)
         {
             return MethodExpression
-                .For(parent, Name, _summaryLines, Definition, settings);
+                .For(parent, Name, _summary, Definition, settings);
         }
     }
 }

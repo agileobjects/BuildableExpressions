@@ -123,7 +123,7 @@
 
             var expressions = block.Expressions;
             var elementCount = expressions.Count;
-            var summaryLines = Enumerable<string>.EmptyArray;
+            var summary = default(CommentExpression);
 
             for (var i = 0; i < elementCount; ++i)
             {
@@ -131,12 +131,12 @@
 
                 if (expression.IsComment())
                 {
-                    summaryLines = ((CommentExpression)expression).TextLines.ToArray();
+                    summary = (CommentExpression)expression;
                     continue;
                 }
 
-                yield return new ClassExpression(this, summaryLines, expression, _settings);
-                summaryLines = Enumerable<string>.EmptyArray;
+                yield return new ClassExpression(this, summary, expression, _settings);
+                summary = null;
             }
         }
 

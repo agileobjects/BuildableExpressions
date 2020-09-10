@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Api;
+    using ReadableExpressions;
 
     internal class SourceCodeExpressionBuilder :
         SourceCodeTranslationSettings,
@@ -51,12 +52,27 @@
             string summary,
             Func<IClassExpressionSettings, IClassExpressionSettings> configuration)
         {
+            if (string.IsNullOrEmpty(summary))
+            {
+                throw new ArgumentException(
+                    "Null or empty method summary supplied",
+                    nameof(summary));
+            }
+
+            return AddClass(name, ReadableExpression.Comment(summary), configuration);
+        }
+
+        public ISourceCodeExpressionSettings WithClass(
+            string name,
+            CommentExpression summary,
+            Func<IClassExpressionSettings, IClassExpressionSettings> configuration)
+        {
             return AddClass(name, summary, configuration);
         }
 
         private ISourceCodeExpressionSettings AddClass(
             string name,
-            string summary,
+            CommentExpression summary,
             Func<IClassExpressionSettings, IClassExpressionSettings> configuration,
             bool allowNullName = false)
         {

@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using BuildableExpressions.Extensions;
+    using ReadableExpressions;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Interfaces;
@@ -40,8 +41,12 @@
 
         #region Factory Method
 
-        public static ITranslatable For(IList<string> textLines, ITranslationContext context)
-            => textLines.Any() ? new SummaryTranslation(textLines, context) : _empty;
+        public static ITranslatable For(CommentExpression summary, ITranslationContext context)
+        {
+            return summary?.TextLines.Any() == true
+                ? new SummaryTranslation(summary.TextLines.ToList(), context)
+                : _empty;
+        }
 
         #endregion
 

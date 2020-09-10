@@ -7,6 +7,7 @@
     using Api;
     using BuildableExpressions.Extensions;
     using Extensions;
+    using ReadableExpressions;
     using ReadableExpressions.Extensions;
 
     /// <summary>
@@ -31,16 +32,16 @@
             SourceCodeExpression parent,
             Expression body,
             SourceCodeTranslationSettings settings)
-            : this(parent, Enumerable<string>.EmptyArray, body, settings)
+            : this(parent, null, body, settings)
         {
         }
 
         internal ClassExpression(
             SourceCodeExpression parent,
-            IList<string> summaryLines,
+            CommentExpression summary,
             Expression body,
             SourceCodeTranslationSettings settings)
-            : this(parent, summaryLines, settings)
+            : this(parent, summary, settings)
         {
             Interfaces = Enumerable<Type>.EmptyReadOnlyCollection;
             _body = body;
@@ -58,7 +59,7 @@
             SourceCodeExpression parent,
             BlockExpression body,
             SourceCodeTranslationSettings settings)
-            : this(parent, Enumerable<string>.EmptyArray, settings)
+            : this(parent, default(CommentExpression), settings)
         {
             Interfaces = Enumerable<Type>.EmptyReadOnlyCollection;
             _body = body;
@@ -77,10 +78,10 @@
             SourceCodeExpression parent,
             string name,
             IList<Type> interfaceTypes,
-            IList<string> summaryLines,
+            CommentExpression summary,
             IList<MethodExpressionBuilder> methodBuilders,
             SourceCodeTranslationSettings settings)
-            : this(parent, summaryLines, settings)
+            : this(parent, summary, settings)
         {
             _name = name;
 
@@ -117,11 +118,11 @@
 
         private ClassExpression(
             SourceCodeExpression parent,
-            IList<string> summaryLines,
+            CommentExpression summary,
             SourceCodeTranslationSettings settings)
         {
             Parent = parent;
-            SummaryLines = summaryLines;
+            Summary = summary;
             _settings = settings;
         }
 
@@ -165,6 +166,8 @@
         /// <returns>This <see cref="ClassExpression"/>.</returns>
         protected override Expression Accept(ExpressionVisitor visitor)
         {
+            visitor.Visit(Summary);
+
             foreach (var method in Methods)
             {
                 visitor.Visit(method);
@@ -179,9 +182,10 @@
         public SourceCodeExpression Parent { get; }
 
         /// <summary>
-        /// Gets the summary text describing this <see cref="ClassExpression"/>, if set.
+        /// Gets a <see cref="CommentExpression"/> describing this <see cref="ClassExpression"/>, if
+        /// a summary has been set.
         /// </summary>
-        public IList<string> SummaryLines { get; }
+        public CommentExpression Summary { get; }
 
         /// <summary>
         /// Gets the name of this <see cref="ClassExpression"/>.

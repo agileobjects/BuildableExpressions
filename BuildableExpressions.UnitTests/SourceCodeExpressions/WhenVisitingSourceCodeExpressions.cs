@@ -14,7 +14,9 @@
         {
             var returnOneThousand = CreateLambda(() => 1000);
 
-            var sourceCode = SourceCodeFactory.SourceCode(returnOneThousand);
+            var sourceCode = SourceCodeFactory.SourceCode(sc => sc
+                .WithClass("MyClass", "This is my class", cls => cls
+                    .WithMethod(returnOneThousand)));
 
             var visitor = new VisitationHelper();
 

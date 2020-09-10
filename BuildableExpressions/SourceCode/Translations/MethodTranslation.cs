@@ -18,7 +18,7 @@
         public MethodTranslation(MethodExpression method, ITranslationContext context)
         {
             _method = method;
-            _summary = SummaryTranslation.For(method.SummaryLines, context);
+            _summary = SummaryTranslation.For(method.Summary, context);
 
             _definitionTranslation = new MethodDefinitionTranslation(
                 method.Method,

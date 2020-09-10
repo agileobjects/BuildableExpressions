@@ -5,19 +5,19 @@
     using System.Linq;
     using System.Linq.Expressions;
     using Api;
-    using BuildableExpressions.Extensions;
+    using ReadableExpressions;
 
     internal class ClassExpressionBuilder : IClassExpressionSettings
     {
         private readonly IList<MethodExpressionBuilder> _methodBuilders;
-        private readonly IList<string> _summaryLines;
+        private readonly CommentExpression _summary;
         private List<Type> _interfaceTypes;
 
-        public ClassExpressionBuilder(string name, string summary)
+        public ClassExpressionBuilder(string name, CommentExpression summary)
         {
             Name = name;
+            _summary = summary;
             _methodBuilders = new List<MethodExpressionBuilder>();
-            _summaryLines = summary.SplitToLines();
         }
 
         public string Name { get; }
@@ -57,12 +57,27 @@
             string summary,
             Expression body)
         {
+            if (string.IsNullOrEmpty(summary))
+            {
+                throw new ArgumentException(
+                    "Null or empty method summary supplied",
+                    nameof(summary));
+            }
+
+            return AddMethod(name, ReadableExpression.Comment(summary), body);
+        }
+
+        public IClassExpressionSettings WithMethod(
+            string name,
+            CommentExpression summary,
+            Expression body)
+        {
             return AddMethod(name, summary, body);
         }
 
         private IClassExpressionSettings AddMethod(
             string name,
-            string summary,
+            CommentExpression summary,
             Expression body,
             bool allowNullName = false)
         {
@@ -99,7 +114,7 @@
                 parent,
                 Name,
                 _interfaceTypes,
-                _summaryLines,
+                _summary,
                 _methodBuilders,
                 settings);
         }

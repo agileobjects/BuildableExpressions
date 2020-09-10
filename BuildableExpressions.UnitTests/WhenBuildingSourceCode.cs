@@ -2,6 +2,7 @@
 {
     using System;
     using Common;
+    using ReadableExpressions;
     using Xunit;
     using static System.Linq.Expressions.Expression;
     using static SourceCodeFactory;
@@ -74,6 +75,46 @@ It's even better.";
             var translated = SourceCode(cfg => cfg
                 .WithClass("MyClass", CLASS_SUMMARY.TrimStart(), cls => cls
                     .WithMethod("MyMethod", METHOD_SUMMARY.TrimStart(), doNothing)))
+                .ToSourceCode();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    /// <summary>
+    /// This is my class!
+    /// Isn't it great?
+    /// </summary>
+    public class MyClass
+    {
+        /// <summary>
+        /// This is my method!
+        /// It's even better.
+        /// </summary>
+        public void MyMethod()
+        {
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildNamedClassesAndMethodsWithCommentSummaries()
+        {
+            var doNothing = Lambda<Action>(Default(typeof(void)));
+
+            var classSummary = ReadableExpression.Comment(@"
+This is my class!
+Isn't it great?".TrimStart());
+
+            var methodSummary = ReadableExpression.Comment(@"
+This is my method!
+It's even better.".TrimStart());
+
+            var translated = SourceCode(cfg => cfg
+                    .WithClass("MyClass", classSummary, cls => cls
+                        .WithMethod("MyMethod", methodSummary, doNothing)))
                 .ToSourceCode();
 
             const string EXPECTED = @"

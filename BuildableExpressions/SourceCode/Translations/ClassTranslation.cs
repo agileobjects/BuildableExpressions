@@ -23,7 +23,7 @@
             ITranslationContext context)
         {
             _class = @class;
-            _summary = SummaryTranslation.For(@class.SummaryLines, context);
+            _summary = SummaryTranslation.For(@class.Summary, context);
             _interfaceCount = @class.Interfaces.Count;
 
             _methodCount = @class.Methods.Count;
