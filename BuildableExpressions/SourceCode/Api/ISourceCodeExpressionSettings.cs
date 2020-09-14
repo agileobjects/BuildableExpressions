@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Api
 {
     using System;
+    using System.Linq.Expressions;
     using ReadableExpressions;
 
     /// <summary>
@@ -76,7 +77,8 @@
         /// <param name="name">The name of the <see cref="ClassExpression"/> to create.</param>
         /// <param name="summary">
         /// A <see cref="CommentExpression"/> containing the summary documentation of the
-        /// <see cref="ClassExpression"/> to create.
+        /// <see cref="ClassExpression"/> to create. Use ReadableExpression.Comment() to create
+        /// Comment Expressions.
         /// </param>
         /// <param name="configuration">
         /// The configuration with which to generate the <see cref="ClassExpression"/>.

@@ -59,7 +59,7 @@
             SourceCodeExpression parent,
             BlockExpression body,
             SourceCodeTranslationSettings settings)
-            : this(parent, default(CommentExpression), settings)
+            : this(parent, default(Expression), settings)
         {
             Interfaces = Enumerable<Type>.EmptyReadOnlyCollection;
             _body = body;
@@ -182,8 +182,8 @@
         public SourceCodeExpression Parent { get; }
 
         /// <summary>
-        /// Gets a <see cref="CommentExpression"/> describing this <see cref="ClassExpression"/>, if
-        /// a summary has been set.
+        /// Gets a <see cref="CommentExpression"/> describing this <see cref="ClassExpression"/>,
+        /// if a summary has been set.
         /// </summary>
         public CommentExpression Summary { get; }
 

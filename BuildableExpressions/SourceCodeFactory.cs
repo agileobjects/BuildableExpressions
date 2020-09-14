@@ -29,7 +29,7 @@
         }
 
         /// <summary>
-        /// Create a <see cref="SourceCodeExpression"/> representing a complete piece of source code
+        /// Creates a <see cref="SourceCodeExpression"/> representing a complete piece of source code
         /// with the given <paramref name="content"/>.
         /// </summary>
         /// <param name="content">The content of the piece of source code to create.</param>
@@ -52,12 +52,12 @@
         }
 
         /// <summary>
-        /// Create a <see cref="CommentExpression"/> representing a code comment with the 
-        /// given <paramref name="text"/>.
+        /// Create a ConstantExpression containing a <see cref="Comment"/> representing a code comment
+        /// with the given <paramref name="text"/>.
         /// </summary>
         /// <param name="text">The text of the comment to create, without slashes or /* */.</param>
-        /// <returns>A <see cref="CommentExpression"/> representing a code comment.</returns>
-        public static CommentExpression Comment(string text) => ReadableExpression.Comment(text);
+        /// <returns>A ConstantExpression containing a <see cref="Comment"/> representing a code comment.</returns>
+        public static ConstantExpression Comment(string text) => ReadableExpression.Comment(text);
 
         private static SourceCodeTranslationSettings GetTranslationSettings<TConfiguration>(
             this TConfiguration configuration,

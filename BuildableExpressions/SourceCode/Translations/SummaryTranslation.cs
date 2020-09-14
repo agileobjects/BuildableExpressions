@@ -6,9 +6,9 @@
     using ReadableExpressions;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
+    using ReadableExpressions.Translations.Formatting;
     using ReadableExpressions.Translations.Interfaces;
     using static System.Environment;
-    using static ReadableExpressions.Translations.Formatting.TokenType;
 
     internal class SummaryTranslation : ITranslatable
     {
@@ -36,15 +36,15 @@
                 _summaryEnd.Length + NewLine.Length;
 
             FormattingSize =
-                GetLineCount() * context.GetFormattingSize(Comment);
+                GetLineCount() * context.GetFormattingSize(TokenType.Comment);
         }
 
         #region Factory Method
 
         public static ITranslatable For(CommentExpression summary, ITranslationContext context)
         {
-            return summary?.TextLines.Any() == true
-                ? new SummaryTranslation(summary.TextLines.ToList(), context)
+            return summary?.Comment.TextLines.Any() == true
+                ? new SummaryTranslation(summary.Comment.TextLines.ToList(), context)
                 : _empty;
         }
 
@@ -65,16 +65,16 @@
                 return;
             }
 
-            writer.WriteToTranslation(_summaryStart, Comment);
+            writer.WriteToTranslation(_summaryStart, TokenType.Comment);
             writer.WriteNewLineToTranslation();
 
             for (var i = 0; i < _lineCount; ++i)
             {
-                writer.WriteToTranslation(_textLines[i], Comment);
+                writer.WriteToTranslation(_textLines[i], TokenType.Comment);
                 writer.WriteNewLineToTranslation();
             }
 
-            writer.WriteToTranslation(_summaryEnd, Comment);
+            writer.WriteToTranslation(_summaryEnd, TokenType.Comment);
             writer.WriteNewLineToTranslation();
         }
     }

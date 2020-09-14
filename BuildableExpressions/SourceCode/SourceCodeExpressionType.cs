@@ -1,7 +1,5 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
-    using ReadableExpressions;
-
     /// <summary>
     /// Defines ExpressionType value options for source code Expressions.
     /// </summary>
@@ -25,11 +23,6 @@
         /// <summary>
         /// 1003. A source code method parameter.
         /// </summary>
-        MethodParameter = 1003,
-
-        /// <summary>
-        /// 1004. A source code comment.
-        /// </summary>
-        Comment = CommentExpression.ExpressionType
+        MethodParameter = 1003
     }
 }

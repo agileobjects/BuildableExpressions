@@ -63,7 +63,7 @@
 
         private static bool HasValidExpressions(BlockExpression block, out bool isNestedBlocks)
         {
-            const ExpressionType COMMENT = (ExpressionType)SourceCodeExpressionType.Comment;
+            const ExpressionType COMMENT = ExpressionType.Constant;
 
             isNestedBlocks = false;
             var isCommentsAndMethods = false;
@@ -85,7 +85,7 @@
                         isNestedBlocks = true;
                         continue;
 
-                    case COMMENT:
+                    case COMMENT when expression.IsComment():
                     case ExpressionType.Lambda:
                         if (isNestedBlocks)
                         {

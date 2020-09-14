@@ -74,7 +74,8 @@
         /// <param name="name">The name of the <see cref="MethodExpression"/> to create.</param>
         /// <param name="summary">
         /// A <see cref="CommentExpression"/> containing the summary documentation of the
-        /// <see cref="MethodExpression"/> to create.
+        /// <see cref="MethodExpression"/> to create. Use ReadableExpression.Comment() to create
+        /// Comment Expressions.
         /// </param>
         /// <param name="body">
         /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
