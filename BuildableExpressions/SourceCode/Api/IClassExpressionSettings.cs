@@ -44,6 +44,20 @@
 
         /// <summary>
         /// Add a <see cref="MethodExpression"/> to the <see cref="ClassExpression"/> being built,
+        /// using the given <paramref name="body"/>.
+        /// </summary>
+        /// <param name="body">
+        /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
+        /// body.
+        /// </param>
+        /// <param name="visibility">
+        /// The <see cref="MethodVisibility"/> specifying the <see cref="MethodExpression"/>'s accessibility.
+        /// </param>
+        /// <returns>These <see cref="IClassExpressionSettings"/>, to support a fluent interface.</returns>
+        IClassExpressionSettings WithMethod(Expression body, MethodVisibility visibility);
+
+        /// <summary>
+        /// Add a <see cref="MethodExpression"/> to the <see cref="ClassExpression"/> being built,
         /// using the given <paramref name="name"/> and <paramref name="body"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="MethodExpression"/> to create.</param>
