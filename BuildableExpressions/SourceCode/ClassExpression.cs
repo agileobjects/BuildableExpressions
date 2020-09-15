@@ -59,7 +59,7 @@
             SourceCodeExpression parent,
             BlockExpression body,
             SourceCodeTranslationSettings settings)
-            : this(parent, default(Expression), settings)
+            : this(parent, default(CommentExpression), settings)
         {
             Interfaces = Enumerable<Type>.EmptyReadOnlyCollection;
             _body = body;

@@ -43,8 +43,8 @@
 
         public static ITranslatable For(CommentExpression summary, ITranslationContext context)
         {
-            return summary?.TextLines.Any() == true
-                ? new SummaryTranslation(summary.TextLines.ToList(), context)
+            return summary?.Comment.TextLines.Any() == true
+                ? new SummaryTranslation(summary.Comment.TextLines.ToList(), context)
                 : _empty;
         }
 
