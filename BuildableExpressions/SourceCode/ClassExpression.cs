@@ -38,28 +38,9 @@
 
         internal ClassExpression(
             SourceCodeExpression parent,
-            CommentExpression summary,
-            Expression body,
-            SourceCodeTranslationSettings settings)
-            : this(parent, summary, settings)
-        {
-            Interfaces = Enumerable<Type>.EmptyReadOnlyCollection;
-            _body = body;
-
-            var method = MethodExpression.For(this, body, settings);
-            _methods = new List<MethodExpression> { method };
-
-            _methodsByReturnType = new Dictionary<Type, List<MethodExpression>>
-            {
-                { method.ReturnType, new List<MethodExpression> { method } }
-            };
-        }
-
-        internal ClassExpression(
-            SourceCodeExpression parent,
             BlockExpression body,
             SourceCodeTranslationSettings settings)
-            : this(parent, default(CommentExpression), settings)
+            : this(parent, ClassVisibility.Public, null, settings)
         {
             Interfaces = Enumerable<Type>.EmptyReadOnlyCollection;
             _body = body;
@@ -76,12 +57,32 @@
 
         internal ClassExpression(
             SourceCodeExpression parent,
+            CommentExpression summary,
+            Expression body,
+            SourceCodeTranslationSettings settings)
+            : this(parent, ClassVisibility.Public, summary, settings)
+        {
+            Interfaces = Enumerable<Type>.EmptyReadOnlyCollection;
+            _body = body;
+
+            var method = MethodExpression.For(this, body, settings);
+            _methods = new List<MethodExpression> { method };
+
+            _methodsByReturnType = new Dictionary<Type, List<MethodExpression>>
+            {
+                { method.ReturnType, new List<MethodExpression> { method } }
+            };
+        }
+
+        internal ClassExpression(
+            SourceCodeExpression parent,
+            ClassVisibility visibility,
             string name,
             IList<Type> interfaceTypes,
             CommentExpression summary,
             IList<MethodExpressionBuilder> methodBuilders,
             SourceCodeTranslationSettings settings)
-            : this(parent, summary, settings)
+            : this(parent, visibility, summary, settings)
         {
             _name = name;
 
@@ -118,10 +119,12 @@
 
         private ClassExpression(
             SourceCodeExpression parent,
+            ClassVisibility visibility,
             CommentExpression summary,
             SourceCodeTranslationSettings settings)
         {
             Parent = parent;
+            Visibility = visibility;
             Summary = summary;
             _settings = settings;
         }
@@ -180,6 +183,11 @@
         /// Gets this <see cref="ClassExpression"/>'s parent <see cref="SourceCodeExpression"/>.
         /// </summary>
         public SourceCodeExpression Parent { get; }
+
+        /// <summary>
+        /// The this <see cref="ClassExpression"/>'s <see cref="ClassVisibility">visibility</see>.
+        /// </summary>
+        public ClassVisibility Visibility { get; }
 
         /// <summary>
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="ClassExpression"/>,

@@ -3,6 +3,7 @@
     using System;
     using Common;
     using ReadableExpressions;
+    using SourceCode;
     using Xunit;
     using static System.Linq.Expressions.Expression;
     using static SourceCodeFactory;
@@ -51,6 +52,36 @@ namespace AgileObjects.BuildableExpressions.UnitTests
     public class MyClass
     {
         public void MyMethod()
+        {
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildANamedInternalClass()
+        {
+            var doNothing = Lambda<Action>(Default(typeof(void)));
+
+            var translated = SourceCode(cfg => cfg
+                    .WithNamespaceOf(GetType())
+                    .WithClass("MyClass", cls => cls
+                        .WithSummary(ReadableExpression.Comment("Class summary!"))
+                        .WithVisibility(ClassVisibility.Internal)
+                        .WithMethod(doNothing)))
+                .ToSourceCode();
+
+            const string EXPECTED = @"
+namespace AgileObjects.BuildableExpressions.UnitTests
+{
+    /// <summary>
+    /// Class summary!
+    /// </summary>
+    internal class MyClass
+    {
+        public void DoAction()
         {
         }
     }

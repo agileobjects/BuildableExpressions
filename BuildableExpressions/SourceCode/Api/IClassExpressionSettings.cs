@@ -5,29 +5,6 @@
     using ReadableExpressions;
 
     /// <summary>
-    /// Provides configuration options to control aspects of <see cref="MethodExpression"/> creation.
-    /// </summary>
-    public interface IMethodExpressionSettings
-    {
-        /// <summary>
-        /// Set the summary documentation of the <see cref="MethodExpression"/> being built.
-        /// </summary>
-        /// <param name="summary">The summary documentation of the <see cref="MethodExpression"/> being built.</param>
-        /// <returns>These <see cref="IMethodExpressionSettings"/>, to support a fluent interface.</returns>
-        IMethodExpressionSettings WithSummary(string summary);
-
-        /// <summary>
-        /// Set the summary documentation of the <see cref="MethodExpression"/> being built.
-        /// </summary>
-        /// <param name="summary">
-        /// A <see cref="CommentExpression"/> containing summary documentation of the
-        /// <see cref="MethodExpression"/> being built.
-        /// </param>
-        /// <returns>These <see cref="IMethodExpressionSettings"/>, to support a fluent interface.</returns>
-        IMethodExpressionSettings WithSummary(CommentExpression summary);
-    }
-
-    /// <summary>
     /// Provides configuration options to control aspects of <see cref="ClassExpression"/> creation.
     /// </summary>
     public interface IClassExpressionSettings
@@ -53,6 +30,17 @@
         /// </param>
         /// <returns>These <see cref="IClassExpressionSettings"/>, to support a fluent interface.</returns>
         IClassExpressionSettings Implementing(params Type[] interfaces);
+
+        /// <summary>
+        /// Set the visibility of the <see cref="ClassExpression"/> being built to the given
+        /// <paramref name="visibility"/>.
+        /// </summary>
+        /// <param name="visibility">
+        /// The <see cref="ClassVisibility"/> to use for the <see cref="ClassExpression"/> being
+        /// built.
+        /// </param>
+        /// <returns>These <see cref="IClassExpressionSettings"/>, to support a fluent interface.</returns>
+        IClassExpressionSettings WithVisibility(ClassVisibility visibility);
 
         /// <summary>
         /// Set the summary documentation of the <see cref="ClassExpression"/> being built.

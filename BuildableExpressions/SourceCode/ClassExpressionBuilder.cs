@@ -10,6 +10,7 @@
     internal class ClassExpressionBuilder : IClassExpressionSettings
     {
         private readonly IList<MethodExpressionBuilder> _methodBuilders;
+        private ClassVisibility _visibility;
         private CommentExpression _summary;
         private List<Type> _interfaceTypes;
 
@@ -26,6 +27,12 @@
 
         public IClassExpressionSettings Implementing(params Type[] interfaces)
             => AddInterfaces(interfaces);
+
+        public IClassExpressionSettings WithVisibility(ClassVisibility visibility)
+        {
+            _visibility = visibility;
+            return this;
+        }
 
         public IClassExpressionSettings WithSummary(string summary)
             => WithSummary(ReadableExpression.Comment(summary));
@@ -108,6 +115,7 @@
         {
             return new ClassExpression(
                 parent,
+                _visibility,
                 Name,
                 _interfaceTypes,
                 _summary,

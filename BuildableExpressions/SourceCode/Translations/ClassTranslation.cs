@@ -11,6 +11,7 @@
     {
         private const string _classString = "class ";
 
+        private readonly string _visibility;
         private readonly ClassExpression _class;
         private readonly ITranslatable _summary;
         private readonly IList<ITranslation> _interfaces;
@@ -22,6 +23,7 @@
             ClassExpression @class,
             ITranslationContext context)
         {
+            _visibility = @class.Visibility.ToString().ToLowerInvariant();
             _class = @class;
             _summary = SummaryTranslation.For(@class.Summary, context);
             _interfaceCount = @class.Interfaces.Count;
@@ -31,7 +33,7 @@
 
             var translationSize =
                 _summary.TranslationSize +
-                "public ".Length +
+                _visibility.Length + 1 +
                 _classString.Length +
                 @class.Name.Length +
                 6; // <- for opening and closing braces
@@ -131,7 +133,7 @@
         {
             _summary.WriteTo(writer);
 
-            writer.WriteKeywordToTranslation("public " + _classString);
+            writer.WriteKeywordToTranslation(_visibility + " " + _classString);
             writer.WriteTypeNameToTranslation(_class.Name);
 
             if (_interfaceCount != 0)
