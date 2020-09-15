@@ -1,25 +1,31 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System.Linq.Expressions;
+    using Api;
     using ReadableExpressions;
 
-    internal class MethodExpressionBuilder
+    internal class MethodExpressionBuilder : IMethodExpressionSettings
     {
-        private readonly CommentExpression _summary;
+        private CommentExpression _summary;
 
-        public MethodExpressionBuilder(
-            string name,
-            CommentExpression summary,
-            Expression body)
+        public MethodExpressionBuilder(string name, Expression body)
         {
             Name = name;
-            _summary = summary;
             Definition = body.ToLambdaExpression();
         }
 
         public string Name { get; }
 
         public LambdaExpression Definition { get; }
+
+        public IMethodExpressionSettings WithSummary(string summary)
+            => WithSummary(ReadableExpression.Comment(summary));
+
+        public IMethodExpressionSettings WithSummary(CommentExpression summary)
+        {
+            _summary = summary;
+            return this;
+        }
 
         public MethodExpression Build(
             ClassExpression parent,

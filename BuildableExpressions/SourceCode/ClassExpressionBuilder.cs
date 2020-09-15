@@ -10,13 +10,12 @@
     internal class ClassExpressionBuilder : IClassExpressionSettings
     {
         private readonly IList<MethodExpressionBuilder> _methodBuilders;
-        private readonly CommentExpression _summary;
+        private CommentExpression _summary;
         private List<Type> _interfaceTypes;
 
-        public ClassExpressionBuilder(string name, CommentExpression summary)
+        public ClassExpressionBuilder(string name)
         {
             Name = name;
-            _summary = summary;
             _methodBuilders = new List<MethodExpressionBuilder>();
         }
 
@@ -27,6 +26,15 @@
 
         public IClassExpressionSettings Implementing(params Type[] interfaces)
             => AddInterfaces(interfaces);
+
+        public IClassExpressionSettings WithSummary(string summary)
+            => WithSummary(ReadableExpression.Comment(summary));
+
+        public IClassExpressionSettings WithSummary(CommentExpression summary)
+        {
+            _summary = summary;
+            return this;
+        }
 
         private ClassExpressionBuilder AddInterfaces(IEnumerable<Type> interfaceTypes)
         {
@@ -42,54 +50,42 @@
             return this;
         }
 
-        IClassExpressionSettings IClassExpressionSettings.WithMethod(Expression body)
-            => AddMethod(name: null, summary: null, body, allowNullName: true);
+        public IClassExpressionSettings WithMethod(Expression body)
+            => AddMethod(name: null, body, throwIfNullName: false);
 
-        IClassExpressionSettings IClassExpressionSettings.WithMethod(
+        public IClassExpressionSettings WithMethod(
             string name,
             Expression body)
         {
-            return AddMethod(name, summary: null, body);
-        }
-
-        IClassExpressionSettings IClassExpressionSettings.WithMethod(
-            string name,
-            string summary,
-            Expression body)
-        {
-            if (string.IsNullOrEmpty(summary))
-            {
-                throw new ArgumentException(
-                    "Null or empty method summary supplied",
-                    nameof(summary));
-            }
-
-            return AddMethod(name, ReadableExpression.Comment(summary), body);
+            return AddMethod(name, body);
         }
 
         public IClassExpressionSettings WithMethod(
             string name,
-            CommentExpression summary,
-            Expression body)
+            Expression body,
+            Func<IMethodExpressionSettings, IMethodExpressionSettings> configuration)
         {
-            return AddMethod(name, summary, body);
+            return AddMethod(name, body, configuration);
         }
 
         private IClassExpressionSettings AddMethod(
             string name,
-            CommentExpression summary,
             Expression body,
-            bool allowNullName = false)
+            Func<IMethodExpressionSettings, IMethodExpressionSettings> configuration = null,
+            bool throwIfNullName = true)
         {
-            name.ThrowIfInvalidName<ArgumentException>("Method", allowNullName);
+            name.ThrowIfInvalidName<ArgumentException>("Method", throwIfNullName);
 
-            if (!allowNullName && _methodBuilders.Any(mb => mb.Name == name))
+            if (throwIfNullName && _methodBuilders.Any(mb => mb.Name == name))
             {
                 throw new InvalidOperationException(
                     $"Duplicate method name '{name}' specified.");
             }
 
-            _methodBuilders.Add(new MethodExpressionBuilder(name, summary, body));
+            var builder = new MethodExpressionBuilder(name, body);
+            configuration?.Invoke(builder);
+
+            _methodBuilders.Add(builder);
             return this;
         }
 

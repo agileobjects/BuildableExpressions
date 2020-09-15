@@ -3,6 +3,7 @@
     using System;
     using BuildableExpressions;
     using Common;
+    using ReadableExpressions;
     using Xunit;
     using static System.Linq.Expressions.Expression;
     using static SourceCodeFactory;
@@ -398,7 +399,7 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldTranslateACommentAndLambdaBlockToACommentedSingleMethodClass()
         {
-            var classComment = Comment("This is my generated class and I LOVE IT");
+            var classComment = ReadableExpression.Comment("This is my generated class and I LOVE IT");
             var getDefaultDateTime = Lambda<Func<DateTime>>(Default(typeof(DateTime)));
             var block = Block(classComment, getDefaultDateTime);
 

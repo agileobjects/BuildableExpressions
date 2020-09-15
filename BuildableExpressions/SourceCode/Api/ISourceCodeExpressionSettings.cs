@@ -1,7 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Api
 {
     using System;
-    using System.Linq.Expressions;
     using ReadableExpressions;
 
     /// <summary>
@@ -33,7 +32,7 @@
 
         /// <summary>
         /// Add a <see cref="ClassExpression"/> to the <see cref="SourceCodeExpression"/> being built,
-        /// using the given <paramref name="configuration"/>.
+        /// using an auto-generated name and the given <paramref name="configuration"/>.
         /// </summary>
         /// <param name="configuration">
         /// The configuration with which to generate the <see cref="ClassExpression"/>.
@@ -44,7 +43,7 @@
 
         /// <summary>
         /// Add a <see cref="ClassExpression"/> to the <see cref="SourceCodeExpression"/> being built,
-        /// using the given <paramref name="configuration"/>.
+        /// using the given <paramref name="name"/> and <paramref name="configuration"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="ClassExpression"/> to create.</param>
         /// <param name="configuration">
@@ -53,40 +52,6 @@
         /// <returns>These <see cref="ISourceCodeExpressionSettings"/>, to support a fluent interface.</returns>
         ISourceCodeExpressionSettings WithClass(
             string name,
-            Func<IClassExpressionSettings, IClassExpressionSettings> configuration);
-
-        /// <summary>
-        /// Add a <see cref="ClassExpression"/> to the <see cref="SourceCodeExpression"/> being built,
-        /// using the given <paramref name="configuration"/>.
-        /// </summary>
-        /// <param name="name">The name of the <see cref="ClassExpression"/> to create.</param>
-        /// <param name="summary">The summary documentation of the <see cref="ClassExpression"/> to create.</param>
-        /// <param name="configuration">
-        /// The configuration with which to generate the <see cref="ClassExpression"/>.
-        /// </param>
-        /// <returns>These <see cref="ISourceCodeExpressionSettings"/>, to support a fluent interface.</returns>
-        ISourceCodeExpressionSettings WithClass(
-            string name,
-            string summary,
-            Func<IClassExpressionSettings, IClassExpressionSettings> configuration);
-
-        /// <summary>
-        /// Add a <see cref="ClassExpression"/> to the <see cref="SourceCodeExpression"/> being built,
-        /// using the given <paramref name="configuration"/>.
-        /// </summary>
-        /// <param name="name">The name of the <see cref="ClassExpression"/> to create.</param>
-        /// <param name="summary">
-        /// A <see cref="CommentExpression"/> containing the summary documentation of the
-        /// <see cref="ClassExpression"/> to create. Use ReadableExpression.Comment() to create
-        /// Comment Expressions.
-        /// </param>
-        /// <param name="configuration">
-        /// The configuration with which to generate the <see cref="ClassExpression"/>.
-        /// </param>
-        /// <returns>These <see cref="ISourceCodeExpressionSettings"/>, to support a fluent interface.</returns>
-        ISourceCodeExpressionSettings WithClass(
-            string name,
-            CommentExpression summary,
             Func<IClassExpressionSettings, IClassExpressionSettings> configuration);
     }
 }

@@ -5,6 +5,29 @@
     using ReadableExpressions;
 
     /// <summary>
+    /// Provides configuration options to control aspects of <see cref="MethodExpression"/> creation.
+    /// </summary>
+    public interface IMethodExpressionSettings
+    {
+        /// <summary>
+        /// Set the summary documentation of the <see cref="MethodExpression"/> being built.
+        /// </summary>
+        /// <param name="summary">The summary documentation of the <see cref="MethodExpression"/> being built.</param>
+        /// <returns>These <see cref="IMethodExpressionSettings"/>, to support a fluent interface.</returns>
+        IMethodExpressionSettings WithSummary(string summary);
+
+        /// <summary>
+        /// Set the summary documentation of the <see cref="MethodExpression"/> being built.
+        /// </summary>
+        /// <param name="summary">
+        /// A <see cref="CommentExpression"/> containing summary documentation of the
+        /// <see cref="MethodExpression"/> being built.
+        /// </param>
+        /// <returns>These <see cref="IMethodExpressionSettings"/>, to support a fluent interface.</returns>
+        IMethodExpressionSettings WithSummary(CommentExpression summary);
+    }
+
+    /// <summary>
     /// Provides configuration options to control aspects of <see cref="ClassExpression"/> creation.
     /// </summary>
     public interface IClassExpressionSettings
@@ -32,8 +55,25 @@
         IClassExpressionSettings Implementing(params Type[] interfaces);
 
         /// <summary>
+        /// Set the summary documentation of the <see cref="ClassExpression"/> being built.
+        /// </summary>
+        /// <param name="summary">The summary documentation of the <see cref="ClassExpression"/> being built.</param>
+        /// <returns>These <see cref="IClassExpressionSettings"/>, to support a fluent interface.</returns>
+        IClassExpressionSettings WithSummary(string summary);
+
+        /// <summary>
+        /// Set the summary documentation of the <see cref="ClassExpression"/> being built.
+        /// </summary>
+        /// <param name="summary">
+        /// A <see cref="CommentExpression"/> containing summary documentation of the
+        /// <see cref="ClassExpression"/> being built.
+        /// </param>
+        /// <returns>These <see cref="IClassExpressionSettings"/>, to support a fluent interface.</returns>
+        IClassExpressionSettings WithSummary(CommentExpression summary);
+
+        /// <summary>
         /// Add a <see cref="MethodExpression"/> to the <see cref="ClassExpression"/> being built,
-        /// using the given <paramref name="body"/>.
+        /// with an auto-generated name and the given <paramref name="body"/>.
         /// </summary>
         /// <param name="body">
         /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
@@ -44,21 +84,7 @@
 
         /// <summary>
         /// Add a <see cref="MethodExpression"/> to the <see cref="ClassExpression"/> being built,
-        /// using the given <paramref name="body"/>.
-        /// </summary>
-        /// <param name="body">
-        /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
-        /// body.
-        /// </param>
-        /// <param name="visibility">
-        /// The <see cref="MethodVisibility"/> specifying the <see cref="MethodExpression"/>'s accessibility.
-        /// </param>
-        /// <returns>These <see cref="IClassExpressionSettings"/>, to support a fluent interface.</returns>
-        IClassExpressionSettings WithMethod(Expression body, MethodVisibility visibility);
-
-        /// <summary>
-        /// Add a <see cref="MethodExpression"/> to the <see cref="ClassExpression"/> being built,
-        /// using the given <paramref name="name"/> and <paramref name="body"/>.
+        /// with the given <paramref name="name"/> and <paramref name="body"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="MethodExpression"/> to create.</param>
         /// <param name="body">
@@ -70,32 +96,21 @@
 
         /// <summary>
         /// Add a <see cref="MethodExpression"/> to the <see cref="ClassExpression"/> being built,
-        /// using the given <paramref name="name"/> and <paramref name="body"/>.
+        /// with the given <paramref name="name"/>, <paramref name="body"/> and
+        /// <paramref name="configuration"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="MethodExpression"/> to create.</param>
-        /// <param name="summary">The summary documentation of the <see cref="MethodExpression"/> to create.</param>
         /// <param name="body">
         /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
         /// body.
         /// </param>
-        /// <returns>These <see cref="IClassExpressionSettings"/>, to support a fluent interface.</returns>
-        IClassExpressionSettings WithMethod(string name, string summary, Expression body);
-
-        /// <summary>
-        /// Add a <see cref="MethodExpression"/> to the <see cref="ClassExpression"/> being built,
-        /// using the given <paramref name="name"/> and <paramref name="body"/>.
-        /// </summary>
-        /// <param name="name">The name of the <see cref="MethodExpression"/> to create.</param>
-        /// <param name="summary">
-        /// A <see cref="CommentExpression"/> containing the summary documentation of the
-        /// <see cref="MethodExpression"/> to create. Use ReadableExpression.Comment() to create
-        /// Comment Expressions.
-        /// </param>
-        /// <param name="body">
-        /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
-        /// body.
+        /// <param name="configuration">
+        /// The configuration with which to generate the <see cref="MethodExpression"/>.
         /// </param>
         /// <returns>These <see cref="IClassExpressionSettings"/>, to support a fluent interface.</returns>
-        IClassExpressionSettings WithMethod(string name, CommentExpression summary, Expression body);
+        IClassExpressionSettings WithMethod(
+            string name,
+            Expression body,
+            Func<IMethodExpressionSettings, IMethodExpressionSettings> configuration);
     }
 }

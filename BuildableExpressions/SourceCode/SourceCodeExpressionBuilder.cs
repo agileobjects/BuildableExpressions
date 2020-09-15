@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using Api;
-    using ReadableExpressions;
 
     internal class SourceCodeExpressionBuilder :
         SourceCodeTranslationSettings,
@@ -37,54 +36,30 @@
         ISourceCodeExpressionSettings ISourceCodeExpressionSettings.WithClass(
             Func<IClassExpressionSettings, IClassExpressionSettings> configuration)
         {
-            return AddClass(name: null, summary: null, configuration, allowNullName: true);
+            return AddClass(name: null, configuration, throwIfNullName: false);
         }
 
         ISourceCodeExpressionSettings ISourceCodeExpressionSettings.WithClass(
             string name,
             Func<IClassExpressionSettings, IClassExpressionSettings> configuration)
         {
-            return AddClass(name, summary: null, configuration);
-        }
-
-        ISourceCodeExpressionSettings ISourceCodeExpressionSettings.WithClass(
-            string name,
-            string summary,
-            Func<IClassExpressionSettings, IClassExpressionSettings> configuration)
-        {
-            if (string.IsNullOrEmpty(summary))
-            {
-                throw new ArgumentException(
-                    "Null or empty method summary supplied",
-                    nameof(summary));
-            }
-
-            return AddClass(name, ReadableExpression.Comment(summary), configuration);
-        }
-
-        public ISourceCodeExpressionSettings WithClass(
-            string name,
-            CommentExpression summary,
-            Func<IClassExpressionSettings, IClassExpressionSettings> configuration)
-        {
-            return AddClass(name, summary, configuration);
+            return AddClass(name, configuration);
         }
 
         private ISourceCodeExpressionSettings AddClass(
             string name,
-            CommentExpression summary,
             Func<IClassExpressionSettings, IClassExpressionSettings> configuration,
-            bool allowNullName = false)
+            bool throwIfNullName = true)
         {
-            name.ThrowIfInvalidName<ArgumentException>("Class", allowNullName);
+            name.ThrowIfInvalidName<ArgumentException>("Class", throwIfNullName);
 
-            if (!allowNullName && _classBuilders.Any(b => b.Name == name))
+            if (throwIfNullName && _classBuilders.Any(b => b.Name == name))
             {
                 throw new InvalidOperationException(
                     $"Duplicate class name '{name}' specified.");
             }
 
-            var builder = new ClassExpressionBuilder(name, summary);
+            var builder = new ClassExpressionBuilder(name);
             configuration.Invoke(builder);
 
             builder.Validate();

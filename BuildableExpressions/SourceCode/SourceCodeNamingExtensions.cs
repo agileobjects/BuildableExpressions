@@ -8,17 +8,17 @@
         public static string ThrowIfInvalidName<TException>(
             this string name,
             string symbolType,
-            bool ignoreIfNull = false)
+            bool throwIfNull = true)
             where TException : Exception
         {
             if (name == null)
             {
-                if (ignoreIfNull)
+                if (throwIfNull)
                 {
-                    return null;
+                    throw Create<TException>(symbolType + " names cannot be null");
                 }
 
-                throw Create<TException>(symbolType + " names cannot be null");
+                return null;
             }
 
             if (name.Trim() == string.Empty)

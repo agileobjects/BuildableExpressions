@@ -2,7 +2,6 @@
 {
     using System;
     using System.Linq.Expressions;
-    using ReadableExpressions;
     using SourceCode;
     using SourceCode.Api;
 
@@ -50,14 +49,6 @@
 
             return new SourceCodeExpression(content, settings);
         }
-
-        /// <summary>
-        /// Create a ConstantExpression containing a <see cref="Comment"/> representing a code comment
-        /// with the given <paramref name="text"/>.
-        /// </summary>
-        /// <param name="text">The text of the comment to create, without slashes or /* */.</param>
-        /// <returns>A ConstantExpression containing a <see cref="Comment"/> representing a code comment.</returns>
-        public static ConstantExpression Comment(string text) => ReadableExpression.Comment(text);
 
         private static SourceCodeTranslationSettings GetTranslationSettings<TConfiguration>(
             this TConfiguration configuration,

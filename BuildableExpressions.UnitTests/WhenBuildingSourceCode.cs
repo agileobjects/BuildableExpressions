@@ -73,8 +73,10 @@ This is my method!
 It's even better.";
 
             var translated = SourceCode(cfg => cfg
-                .WithClass("MyClass", CLASS_SUMMARY.TrimStart(), cls => cls
-                    .WithMethod("MyMethod", METHOD_SUMMARY.TrimStart(), doNothing)))
+                .WithClass("MyClass", cls => cls
+                    .WithSummary(CLASS_SUMMARY)
+                    .WithMethod("MyMethod", doNothing, m => m
+                        .WithSummary(METHOD_SUMMARY))))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -113,8 +115,10 @@ This is my method!
 It's even better.".TrimStart());
 
             var translated = SourceCode(cfg => cfg
-                    .WithClass("MyClass", classSummary, cls => cls
-                        .WithMethod("MyMethod", methodSummary, doNothing)))
+                    .WithClass("MyClass", cls => cls
+                        .WithSummary(classSummary)
+                        .WithMethod("MyMethod", doNothing, m => m
+                            .WithSummary(methodSummary))))
                 .ToSourceCode();
 
             const string EXPECTED = @"
