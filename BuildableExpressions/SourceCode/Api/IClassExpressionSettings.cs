@@ -72,6 +72,23 @@
 
         /// <summary>
         /// Add a <see cref="MethodExpression"/> to the <see cref="ClassExpression"/> being built,
+        /// with an auto-generated name and the given <paramref name="body"/> and
+        /// <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="body">
+        /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
+        /// body.
+        /// </param>
+        /// <param name="configuration">
+        /// The configuration with which to generate the <see cref="MethodExpression"/>.
+        /// </param>
+        /// <returns>These <see cref="IClassExpressionSettings"/>, to support a fluent interface.</returns>
+        IClassExpressionSettings WithMethod(
+            Expression body,
+            Func<IMethodExpressionSettings, IMethodExpressionSettings> configuration);
+
+        /// <summary>
+        /// Add a <see cref="MethodExpression"/> to the <see cref="ClassExpression"/> being built,
         /// with the given <paramref name="name"/> and <paramref name="body"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="MethodExpression"/> to create.</param>

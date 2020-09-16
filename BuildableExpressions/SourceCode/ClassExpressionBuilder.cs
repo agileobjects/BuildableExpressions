@@ -61,6 +61,13 @@
             => AddMethod(name: null, body, throwIfNullName: false);
 
         public IClassExpressionSettings WithMethod(
+            Expression body,
+            Func<IMethodExpressionSettings, IMethodExpressionSettings> configuration)
+        {
+            return AddMethod(name: null, body, configuration, throwIfNullName: false);
+        }
+
+        public IClassExpressionSettings WithMethod(
             string name,
             Expression body)
         {

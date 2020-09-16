@@ -9,6 +9,7 @@
     using ReadableExpressions;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations.Reflection;
+    using static MethodVisibility;
 
     /// <summary>
     /// Represents a method in a class in a piece of source code.
@@ -22,13 +23,14 @@
 
         private MethodExpression(
             ClassExpression parent,
+            MethodVisibility visibility,
             string name,
             CommentExpression summary,
             LambdaExpression definition,
-            bool isPublic,
             SourceCodeTranslationSettings settings)
         {
             Parent = parent;
+            Visibility = visibility;
             Summary = summary;
             Definition = definition;
             _settings = settings;
@@ -57,9 +59,9 @@
 
             _method = new MethodExpressionMethod(
                 this,
+                visibility,
                 name,
                 parameters,
-                isPublic,
                 settings);
         }
 
@@ -69,33 +71,33 @@
             ClassExpression parent,
             Expression expression,
             SourceCodeTranslationSettings settings,
-            bool isPublic = true)
+            MethodVisibility visibility = MethodVisibility.Public)
         {
             return For(
                 parent,
+                visibility,
                 name: null,
                 summary: null,
                 expression,
-                settings,
-                isPublic);
+                settings);
         }
 
         internal static MethodExpression For(
             ClassExpression parent,
+            MethodVisibility visibility,
             string name,
             CommentExpression summary,
             Expression expression,
-            SourceCodeTranslationSettings settings,
-            bool isPublic = true)
+            SourceCodeTranslationSettings settings)
         {
             var definition = expression.ToLambdaExpression();
 
             return new MethodExpression(
                 parent,
+                visibility,
                 name,
                 summary,
                 definition,
-                isPublic,
                 settings);
         }
 
@@ -136,6 +138,11 @@
         /// Gets this <see cref="MethodExpression"/>'s parent <see cref="ClassExpression"/>.
         /// </summary>
         public ClassExpression Parent { get; }
+
+        /// <summary>
+        /// Gets the <see cref="MethodVisibility"/> of this <see cref="MethodExpression"/>.
+        /// </summary>
+        public MethodVisibility Visibility { get; }
 
         /// <summary>
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="MethodExpression"/>,
@@ -213,21 +220,22 @@
         internal class MethodExpressionMethod : IMethod
         {
             private readonly MethodExpression _method;
+            private readonly MethodVisibility _visibility;
             private readonly SourceCodeTranslationSettings _settings;
             private string _name;
             private List<IParameter> _parameters;
 
             public MethodExpressionMethod(
                 MethodExpression method,
+                MethodVisibility visibility,
                 string name,
                 List<IParameter> parameters,
-                bool isPublic,
                 SourceCodeTranslationSettings settings)
             {
                 _method = method;
+                _visibility = visibility;
                 _name = name;
                 _parameters = parameters;
-                IsPublic = isPublic;
                 _settings = settings;
             }
 
@@ -235,15 +243,15 @@
 
             public Type DeclaringType => null;
 
-            public bool IsPublic { get; }
+            public bool IsPublic => _visibility == Public;
 
-            public bool IsProtectedInternal => false;
+            public bool IsProtectedInternal => _visibility == ProtectedInternal;
 
-            public bool IsInternal => false;
+            public bool IsInternal => _visibility == Internal;
 
-            public bool IsProtected => false;
+            public bool IsProtected => _visibility == Protected;
 
-            public bool IsPrivate => !IsPublic;
+            public bool IsPrivate => _visibility == Private;
 
             public bool IsAbstract => false;
 

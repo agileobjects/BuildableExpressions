@@ -91,6 +91,59 @@ namespace AgileObjects.BuildableExpressions.UnitTests
         }
 
         [Fact]
+        public void ShouldBuildNamedClassesAndMethodsWithVisibilities()
+        {
+            var getIntFromString = Lambda<Func<string, int>>(Constant(1), Parameter(typeof(string), "str"));
+            var getIntFromLong = Lambda<Func<long, int>>(Constant(2), Parameter(typeof(long), "lng"));
+            var getIntFromDate = Lambda<Func<DateTime, int>>(Constant(3), Parameter(typeof(DateTime), "date"));
+
+            var translated = SourceCode(cfg => cfg
+                    .WithClass(cls => cls
+                        .WithMethod(getIntFromString, m => m
+                            .WithVisibility(MethodVisibility.Internal))
+                        .WithMethod(getIntFromLong, m => m
+                            .WithVisibility(MethodVisibility.Protected))
+                        .WithMethod(getIntFromDate, m => m
+                            .WithVisibility(MethodVisibility.Private))))
+                .ToSourceCode();
+
+            const string EXPECTED = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        internal int GetInt
+        (
+            string str
+        )
+        {
+            return 1;
+        }
+
+        protected int GetInt
+        (
+            long lng
+        )
+        {
+            return 2;
+        }
+
+        private int GetInt
+        (
+            DateTime date
+        )
+        {
+            return 3;
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildNamedClassesAndMethodsWithSummaries()
         {
             var doNothing = Lambda<Action>(Default(typeof(void)));

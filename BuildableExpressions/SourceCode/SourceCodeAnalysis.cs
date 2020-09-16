@@ -372,7 +372,7 @@
                     _method.Parent,
                     block,
                     _settings,
-                    isPublic: false);
+                    visibility: MethodVisibility.Private);
 
                 _method.Parent.AddMethod(blockMethod);
                 return blockMethod;

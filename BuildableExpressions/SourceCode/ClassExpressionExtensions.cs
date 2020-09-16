@@ -26,6 +26,27 @@
                 return method.GetName();
             }
 
+            if (methodCtx.MethodLambda.Parameters.Count == 0)
+            {
+                goto AddSuffix;
+            }
+
+            var methodParameterTypes = methodCtx
+                .MethodLambda
+                .Parameters
+                .Select(p => p.Type)
+                .ToList();
+
+            var matchingMethodExists = classMethods.Any(m =>
+                m != method &&
+                m.Parameters.Select(p => p.Type).SequenceEqual(methodParameterTypes));
+
+            if (!matchingMethodExists)
+            {
+                return method.GetName();
+            }
+
+        AddSuffix:
             var methodIndex = classMethods.IndexOf(method);
 
             return method.GetName() + (methodIndex + 1);

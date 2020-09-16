@@ -6,6 +6,7 @@
 
     internal class MethodExpressionBuilder : IMethodExpressionSettings
     {
+        private MethodVisibility _visibility;
         private CommentExpression _summary;
 
         public MethodExpressionBuilder(string name, Expression body)
@@ -17,6 +18,12 @@
         public string Name { get; }
 
         public LambdaExpression Definition { get; }
+
+        public IMethodExpressionSettings WithVisibility(MethodVisibility visibility)
+        {
+            _visibility = visibility;
+            return this;
+        }
 
         public IMethodExpressionSettings WithSummary(string summary)
             => WithSummary(ReadableExpression.Comment(summary));
@@ -31,8 +38,13 @@
             ClassExpression parent,
             SourceCodeTranslationSettings settings)
         {
-            return MethodExpression
-                .For(parent, Name, _summary, Definition, settings);
+            return MethodExpression.For(
+                parent, 
+                _visibility,
+                Name, 
+                _summary, 
+                Definition, 
+                settings);
         }
     }
 }
