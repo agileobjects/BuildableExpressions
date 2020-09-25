@@ -3,8 +3,10 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Linq;
     using System.Linq.Expressions;
     using Api;
+    using BuildableExpressions.Extensions;
     using Extensions;
     using ReadableExpressions;
     using ReadableExpressions.Extensions;
@@ -71,7 +73,7 @@
             ClassExpression parent,
             Expression expression,
             SourceCodeTranslationSettings settings,
-            MethodVisibility visibility = MethodVisibility.Public)
+            MethodVisibility visibility = Public)
         {
             return For(
                 parent,
@@ -172,37 +174,51 @@
         /// Gets the LambdaExpression describing the parameters and body of this
         /// <see cref="MethodExpression"/>.
         /// </summary>
-        public LambdaExpression Definition { get; }
+        public LambdaExpression Definition { get; private set; }
 
         /// <summary>
         /// Gets the Expression describing the body of this <see cref="MethodExpression"/>.
         /// </summary>
         public Expression Body => Definition.Body;
 
-        internal void AddParameters(IList<ParameterExpression> parameters)
-        {
-            var parameterCount = parameters.Count;
-            var methodParameters = new MethodParameterExpression[parameterCount];
-            var iParameters = new IParameter[parameterCount];
+        internal IMethod Method => _method;
 
-            for (var i = 0; i < parameterCount; ++i)
+        internal void Finalise(
+            Expression body,
+            IList<MethodParameterExpression> parameters)
+        {
+            var parametersUnchanged = _parameters.SequenceEqual(parameters);
+
+            if (parametersUnchanged && body == Body)
             {
-                iParameters[i] = methodParameters[i] =
-                    new MethodParameterExpression(parameters[i]);
+                return;
+            }
+
+            Definition = Definition.Update(
+                body,
+                parametersUnchanged
+                    ? (IEnumerable<ParameterExpression>)Definition.Parameters
+                    : parameters.ProjectToArray(p => p.ParameterExpression));
+
+            if (parametersUnchanged)
+            {
+                return;
             }
 
             if (_parameters.Count == 0)
             {
-                _parameters = new List<MethodParameterExpression>();
+                _parameters = new List<MethodParameterExpression>(parameters.Count);
+            }
+            else
+            {
+                _parameters.Clear();
             }
 
-            _parameters.AddRange(methodParameters);
+            _parameters.AddRange(parameters);
             _readOnlyParameters = null;
 
-            _method.AddParameters(iParameters);
+            _method.SetParameters(parameters);
         }
-
-        internal IMethod Method => _method;
 
         #region IMethodNamingContext Members
 
@@ -216,6 +232,8 @@
         int IMethodNamingContext.Index => Parent?.Methods.IndexOf(this) ?? 0;
 
         #endregion
+
+        #region Helper Class
 
         internal class MethodExpressionMethod : IMethod
         {
@@ -281,15 +299,21 @@
 
             public IList<IParameter> GetParameters() => _parameters;
 
-            public void AddParameters(IList<IParameter> parameters)
+            public void SetParameters(IList<MethodParameterExpression> parameters)
             {
                 if (_parameters.Count == 0)
                 {
                     _parameters = new List<IParameter>(parameters.Count);
                 }
+                else
+                {
+                    _parameters.Clear();
+                }
 
                 _parameters.AddRange(parameters);
             }
         }
+
+        #endregion
     }
 }

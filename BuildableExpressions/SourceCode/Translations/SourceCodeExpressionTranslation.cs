@@ -18,18 +18,14 @@
         public SourceCodeExpressionTranslation(
             SourceCodeExpression expression,
             SourceCodeTranslationSettings settings)
-            : this(
-                expression,
-                SourceCodeAnalysis.For(expression, settings),
-                settings)
+            : this(SourceCodeAnalysis.For(expression, settings), settings)
         {
         }
 
         private SourceCodeExpressionTranslation(
-            Expression expression,
             SourceCodeAnalysis analysis,
             SourceCodeTranslationSettings settings)
-            : base(expression, analysis, settings)
+            : base(analysis, settings)
         {
             _analysis = analysis;
         }

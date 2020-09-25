@@ -17,6 +17,8 @@
     public class SourceCodeExpression : Expression
     {
         private readonly SourceCodeTranslationSettings _settings;
+        private readonly List<ClassExpression> _classes;
+        private ReadOnlyCollection<ClassExpression> _readOnlyClasses;
 
         internal SourceCodeExpression(Expression content, SourceCodeTranslationSettings settings)
             : this(settings)
@@ -26,7 +28,7 @@
             switch (content.NodeType)
             {
                 case ExpressionType.Lambda:
-                    Classes = new ClassExpression(this, content, settings).ToReadOnlyCollection();
+                    _classes = new List<ClassExpression> { new ClassExpression(this, content, settings) };
                     break;
 
                 case ExpressionType.Block:
@@ -50,7 +52,7 @@
                         classes = EnumerateClasses(block);
                     }
 
-                    Classes = classes.ToList().ToReadOnlyCollection();
+                    _classes = classes.ToList();
                     break;
 
                 default:
@@ -161,19 +163,18 @@
             {
                 var @class = classBuilders[0].Build(this, settings);
                 Content = @class;
-                Classes = @class.ToReadOnlyCollection();
+                _classes = new List<ClassExpression> { @class };
                 return;
             }
 
-            var classes = new ClassExpression[classCount];
+            _classes = new List<ClassExpression>(classCount);
 
             for (var i = 0; i < classCount; ++i)
             {
-                classes[i] = classBuilders[i].Build(this, settings);
+                _classes.Add(classBuilders[i].Build(this, settings));
             }
 
-            Content = Block(classes.ProjectToArray(cls => (Expression)cls));
-            Classes = classes.ToReadOnlyCollection();
+            Content = Block(_classes.ProjectToArray(cls => (Expression)cls));
         }
 
         private SourceCodeExpression(SourceCodeTranslationSettings settings)
@@ -227,7 +228,19 @@
         /// Gets the <see cref="ClassExpression"/>s which describe the classes of this
         /// <see cref="SourceCodeExpression"/>.
         /// </summary>
-        public ReadOnlyCollection<ClassExpression> Classes { get; }
+        public ReadOnlyCollection<ClassExpression> Classes
+            => _readOnlyClasses ??= _classes.ToReadOnlyCollection();
+
+        internal void Finalise(IList<ClassExpression> classes)
+        {
+            if (_classes.SequenceEqual(classes))
+            {
+                return;
+            }
+
+            _classes.Clear();
+            _classes.AddRange(classes);
+        }
 
         /// <summary>
         /// Translates this <see cref="SourceCodeExpression"/> to a complete source-code string,

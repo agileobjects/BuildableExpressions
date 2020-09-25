@@ -17,7 +17,7 @@
         private readonly Stack<Expression> _expressions;
         private List<string> _requiredNamespaces;
         private MethodScope _currentMethodScope;
-        private Dictionary<BlockExpression, MethodExpression> _methodsByConvertedBlock;
+        private Dictionary<Expression, MethodExpression> _methodsByConvertedBlock;
 
         private SourceCodeAnalysis(SourceCodeTranslationSettings settings)
             : base(settings)
@@ -34,7 +34,7 @@
         {
             var analysis = new SourceCodeAnalysis(settings);
 
-            analysis.Visit(expression);
+            analysis.ResultExpression = analysis.VisitAndConvert((Expression)expression);
             analysis.Finalise();
 
             return analysis;
@@ -69,35 +69,39 @@
             return _methodsByConvertedBlock.TryGetValue(block, out blockMethod);
         }
 
-        protected override void Visit(Expression expression)
+        protected override Expression VisitAndConvert(Expression expression)
         {
             if (expression == null)
             {
-                return;
+                return null;
             }
 
-            _expressions.Push(expression);
+            var isParentNode = HasChildNodes(expression);
+
+            if (isParentNode)
+            {
+                _expressions.Push(expression);
+            }
 
             switch (expression.NodeType)
             {
-                case Block when ExtractToMethod((BlockExpression)expression, out var blockMethod):
-                    Visit(blockMethod);
+                case Block when ExtractToMethod((BlockExpression)expression):
                     goto SkipBaseVisit;
 
                 case Default:
-                    Visit((DefaultExpression)expression);
+                    AddNamespaceIfRequired(expression);
                     break;
 
                 case (ExpressionType)SourceCodeExpressionType.SourceCode:
-                    Visit(((SourceCodeExpression)expression).Classes);
+                    expression = VisitAndConvert((SourceCodeExpression)expression);
                     goto SkipBaseVisit;
 
                 case (ExpressionType)SourceCodeExpressionType.Class:
-                    Visit((ClassExpression)expression);
+                    expression = VisitAndConvert((ClassExpression)expression);
                     goto SkipBaseVisit;
 
                 case (ExpressionType)SourceCodeExpressionType.Method:
-                    Visit((MethodExpression)expression);
+                    expression = VisitAndConvert((MethodExpression)expression);
                     goto SkipBaseVisit;
 
                 case (ExpressionType)SourceCodeExpressionType.MethodParameter:
@@ -105,29 +109,50 @@
                     goto SkipBaseVisit;
             }
 
-            base.Visit(expression);
+            expression = base.VisitAndConvert(expression);
 
         SkipBaseVisit:
-            _expressions.Pop();
-        }
 
-        private bool ExtractToMethod(BlockExpression block, out MethodExpression blockMethod)
-        {
-            if (ExtractToMethod(block))
+            if (isParentNode)
             {
-                blockMethod = _currentMethodScope.CreateMethodFor(block);
-
-                (_methodsByConvertedBlock ??= new Dictionary<BlockExpression, MethodExpression>())
-                    .Add(block, blockMethod);
-
-                return true;
+                _expressions.Pop();
             }
 
-            blockMethod = null;
-            return false;
+            return expression;
         }
 
-        private bool ExtractToMethod(BlockExpression block)
+        private static bool HasChildNodes(Expression expression)
+        {
+            switch (expression.NodeType)
+            {
+                case Constant:
+                case Default:
+                case DebugInfo:
+                case Parameter:
+                    return false;
+
+                default:
+                    return true;
+            }
+        }
+
+        private bool ExtractToMethod(Expression block)
+        {
+            if (!Extract(block))
+            {
+                return false;
+            }
+
+            var blockMethod = _currentMethodScope.CreateMethodFor(block);
+            var updatedMethod = VisitAndConvert(blockMethod);
+
+            (_methodsByConvertedBlock ??= new Dictionary<Expression, MethodExpression>())
+                .Add(block, updatedMethod);
+
+            return true;
+        }
+
+        private bool Extract(Expression blockExpression)
         {
             var parentExpression = _expressions.ElementAt(1);
 
@@ -144,8 +169,8 @@
                 case Switch:
                     var @switch = (SwitchExpression)parentExpression;
 
-                    if (block == @switch.DefaultBody ||
-                        @switch.Cases.Any(@case => block == @case.Body))
+                    if (blockExpression == @switch.DefaultBody ||
+                        @switch.Cases.Any(@case => blockExpression == @case.Body))
                     {
                         return false;
                     }
@@ -153,14 +178,15 @@
                     goto default;
 
                 default:
+                    var block = (BlockExpression)blockExpression;
                     return block.Expressions.Any() || block.Variables.Any();
             }
         }
 
-        protected override void Visit(BlockExpression block)
+        protected override Expression VisitAndConvert(BlockExpression block)
         {
             _currentMethodScope.Add(block.Variables);
-            base.Visit(block);
+            return base.VisitAndConvert(block);
         }
 
         protected override bool IsAssignmentJoinable(ParameterExpression variable)
@@ -173,30 +199,41 @@
             return base.IsAssignmentJoinable(variable);
         }
 
-        private void Visit(ClassExpression @class)
+        private SourceCodeExpression VisitAndConvert(SourceCodeExpression sourceCode)
         {
-            AddNamespacesIfRequired(@class.Interfaces);
-            Visit(@class.Methods);
+            sourceCode.Finalise(VisitAndConvert(
+                sourceCode.Classes,
+                c => (ClassExpression)VisitAndConvert((Expression)c)));
+
+            return sourceCode;
         }
 
-        protected override void Visit(ConstantExpression constant)
+        private ClassExpression VisitAndConvert(ClassExpression @class)
+        {
+            AddNamespacesIfRequired(@class.Interfaces);
+
+            VisitAndConvert(
+                @class.Methods,
+                m => (MethodExpression)VisitAndConvert((Expression)m));
+
+            return @class;
+        }
+
+        protected override Expression VisitAndConvert(ConstantExpression constant)
         {
             if (constant.Type.IsEnum())
             {
                 AddNamespaceIfRequired(constant);
-                return;
             }
-
-            if (constant.Type.IsAssignableTo(typeof(Type)))
+            else if (constant.Type.IsAssignableTo(typeof(Type)))
             {
                 AddNamespaceIfRequired((Type)constant.Value);
             }
+
+            return constant;
         }
 
-        private void Visit(DefaultExpression @default)
-            => AddNamespaceIfRequired(@default);
-
-        protected override Expression Visit(MemberExpression memberAccess)
+        protected override Expression VisitAndConvert(MemberExpression memberAccess)
         {
             if (memberAccess.Expression == null)
             {
@@ -204,10 +241,10 @@
                 AddNamespaceIfRequired(memberAccess.Member.DeclaringType);
             }
 
-            return base.Visit(memberAccess);
+            return base.VisitAndConvert(memberAccess);
         }
 
-        protected override void Visit(MethodCallExpression methodCall)
+        protected override Expression VisitAndConvert(MethodCallExpression methodCall)
         {
             if (methodCall.Method.IsGenericMethod)
             {
@@ -220,52 +257,55 @@
                 AddNamespaceIfRequired(methodCall.Method.DeclaringType);
             }
 
-            base.Visit(methodCall);
+            return base.VisitAndConvert(methodCall);
         }
 
-        private void Visit(MethodExpression method)
+        private MethodExpression VisitAndConvert(MethodExpression method)
         {
             EnterMethodScope(method);
 
             AddNamespaceIfRequired(method);
 
-            Visit(method.Parameters);
-            Visit(method.Body);
+            var updatedParameters = VisitAndConvert(method.Parameters, Visit);
+            var updatedBody = VisitAndConvert(method.Body);
+
+            _currentMethodScope.Finalise(updatedBody, updatedParameters);
 
             ExitMethodScope();
+            return method;
         }
 
         private void EnterMethodScope(MethodExpression method)
             => _currentMethodScope = new MethodScope(method, _currentMethodScope, _settings);
 
         private void ExitMethodScope()
+            => _currentMethodScope = _currentMethodScope.Parent;
+
+        private MethodParameterExpression Visit(MethodParameterExpression methodParameter)
         {
-            _currentMethodScope.Finalise();
-            _currentMethodScope = _currentMethodScope.Parent;
+            AddNamespaceIfRequired(methodParameter);
+            return methodParameter;
         }
 
-        private void Visit(MethodParameterExpression methodParameter)
-            => AddNamespaceIfRequired(methodParameter);
-
-        protected override void Visit(NewArrayExpression newArray)
+        protected override Expression VisitAndConvert(NewArrayExpression newArray)
         {
             AddNamespaceIfRequired(newArray.Type.GetElementType());
-            base.Visit(newArray);
+            return base.VisitAndConvert(newArray);
         }
 
-        protected override void Visit(NewExpression newing)
+        protected override Expression VisitAndConvert(NewExpression newing)
         {
             AddNamespaceIfRequired(newing.Type);
-            base.Visit(newing);
+            return base.VisitAndConvert(newing);
         }
 
-        protected override void Visit(ParameterExpression variable)
+        protected override Expression VisitAndConvert(ParameterExpression variable)
         {
             _currentMethodScope.VariableAccessed(variable);
-            base.Visit(variable);
+            return base.VisitAndConvert(variable);
         }
 
-        protected override void Visit(CatchBlock @catch)
+        protected override CatchBlock VisitAndConvert(CatchBlock @catch)
         {
             var catchVariable = @catch.Variable;
 
@@ -275,7 +315,7 @@
                 _currentMethodScope.Add(catchVariable);
             }
 
-            base.Visit(@catch);
+            return base.VisitAndConvert(@catch);
         }
 
         private void AddNamespacesIfRequired(IEnumerable<Type> accessedTypes)
@@ -372,18 +412,31 @@
                     _method.Parent,
                     block,
                     _settings,
-                    visibility: MethodVisibility.Private);
+                    MethodVisibility.Private);
 
                 _method.Parent.AddMethod(blockMethod);
                 return blockMethod;
             }
 
-            public void Finalise()
+            public void Finalise(
+                Expression updatedBody,
+                IList<MethodParameterExpression> updatedParameters)
             {
                 if (_unscopedVariables.Any())
                 {
-                    _method.AddParameters(_unscopedVariables);
+                    if (updatedParameters.IsReadOnly)
+                    {
+                        updatedParameters = new List<MethodParameterExpression>(
+                            updatedParameters.Count + _unscopedVariables.Count);
+                    }
+
+                    foreach (var variable in _unscopedVariables)
+                    {
+                        updatedParameters.Add(new MethodParameterExpression(variable));
+                    }
                 }
+
+                _method.Finalise(updatedBody, updatedParameters);
             }
         }
     }
