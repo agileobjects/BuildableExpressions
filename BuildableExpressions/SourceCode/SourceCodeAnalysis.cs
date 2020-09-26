@@ -276,7 +276,7 @@
         }
 
         private void EnterMethodScope(MethodExpression method)
-            => _currentMethodScope = new MethodScope(method, _currentMethodScope, _settings);
+            => _currentMethodScope = new MethodScope(method, _currentMethodScope);
 
         private void ExitMethodScope()
             => _currentMethodScope = _currentMethodScope.Parent;
@@ -363,18 +363,13 @@
         private class MethodScope
         {
             private readonly MethodExpression _method;
-            private readonly SourceCodeTranslationSettings _settings;
             private readonly List<ParameterExpression> _inScopeVariables;
             private readonly IList<ParameterExpression> _unscopedVariables;
 
-            public MethodScope(
-                MethodExpression method,
-                MethodScope parent,
-                SourceCodeTranslationSettings settings)
+            public MethodScope(MethodExpression method, MethodScope parent)
             {
                 _method = method;
                 Parent = parent;
-                _settings = settings;
                 _inScopeVariables = new List<ParameterExpression>(method.Definition.Parameters);
                 _unscopedVariables = new List<ParameterExpression>();
             }
@@ -407,16 +402,7 @@
             }
 
             public MethodExpression CreateMethodFor(Expression block)
-            {
-                var blockMethod = MethodExpression.For(
-                    _method.Parent,
-                    block,
-                    _settings,
-                    MemberVisibility.Private);
-
-                _method.Parent.AddMethod(blockMethod);
-                return blockMethod;
-            }
+                => _method.Parent.AddMethod(block, MemberVisibility.Private);
 
             public void Finalise(
                 Expression updatedBody,

@@ -9,6 +9,7 @@
     using Extensions;
     using ReadableExpressions;
     using ReadableExpressions.Extensions;
+    using static MemberVisibility;
 
     /// <summary>
     /// Represents a class in a piece of source code.
@@ -213,13 +214,31 @@
         /// </summary>
         public ReadOnlyCollection<Type> Interfaces { get; }
 
-        internal void AddMethod(MethodExpression method)
+        /// <summary>
+        /// Adds a new method for the given <paramref name="expression"/> to this
+        /// <see cref="ClassExpression"/>.
+        /// </summary>
+        /// <param name="expression">
+        /// The expression from which to create the new <see cref="MethodExpression"/>.
+        /// </param>
+        /// <param name="visibility">
+        /// The <see cref="MemberVisibility"/> of the <see cref="MethodExpression"/> to create.
+        /// </param>
+        /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
+        public MethodExpression AddMethod(
+            Expression expression,
+            MemberVisibility visibility = Public)
         {
+            var method = MethodExpression
+                .For(this, expression, _settings, visibility);
+
             _methods.Add(method);
             _readOnlyMethods = null;
 
             AddTypedMethod(method);
             _readOnlyMethodsByReturnType = null;
+
+            return method;
         }
 
         /// <summary>
