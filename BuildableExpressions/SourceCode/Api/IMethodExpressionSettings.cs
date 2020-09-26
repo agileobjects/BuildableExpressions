@@ -12,11 +12,11 @@
         /// <paramref name="visibility"/>.
         /// </summary>
         /// <param name="visibility">
-        /// The <see cref="MethodVisibility"/> to use for the <see cref="MethodExpression"/> being
+        /// The <see cref="MemberVisibility"/> to use for the <see cref="MethodExpression"/> being
         /// built.
         /// </param>
         /// <returns>These <see cref="IMethodExpressionSettings"/>, to support a fluent interface.</returns>
-        IMethodExpressionSettings WithVisibility(MethodVisibility visibility);
+        IMethodExpressionSettings WithVisibility(MemberVisibility visibility);
 
         /// <summary>
         /// Set the summary documentation of the <see cref="MethodExpression"/> being built.

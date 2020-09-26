@@ -412,7 +412,7 @@
                     _method.Parent,
                     block,
                     _settings,
-                    MethodVisibility.Private);
+                    MemberVisibility.Private);
 
                 _method.Parent.AddMethod(blockMethod);
                 return blockMethod;

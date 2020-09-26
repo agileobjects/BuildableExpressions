@@ -100,11 +100,11 @@ namespace AgileObjects.BuildableExpressions.UnitTests
             var translated = SourceCode(cfg => cfg
                     .WithClass(cls => cls
                         .WithMethod(getIntFromString, m => m
-                            .WithVisibility(MethodVisibility.Internal))
+                            .WithVisibility(MemberVisibility.Internal))
                         .WithMethod(getIntFromLong, m => m
-                            .WithVisibility(MethodVisibility.Protected))
+                            .WithVisibility(MemberVisibility.Protected))
                         .WithMethod(getIntFromDate, m => m
-                            .WithVisibility(MethodVisibility.Private))))
+                            .WithVisibility(MemberVisibility.Private))))
                 .ToSourceCode();
 
             const string EXPECTED = @"

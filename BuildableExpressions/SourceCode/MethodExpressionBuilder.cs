@@ -6,7 +6,7 @@
 
     internal class MethodExpressionBuilder : IMethodExpressionSettings
     {
-        private MethodVisibility _visibility;
+        private MemberVisibility _visibility;
         private CommentExpression _summary;
 
         public MethodExpressionBuilder(string name, Expression body)
@@ -19,7 +19,7 @@
 
         public LambdaExpression Definition { get; }
 
-        public IMethodExpressionSettings WithVisibility(MethodVisibility visibility)
+        public IMethodExpressionSettings WithVisibility(MemberVisibility visibility)
         {
             _visibility = visibility;
             return this;

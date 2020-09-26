@@ -11,7 +11,7 @@
     using ReadableExpressions;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations.Reflection;
-    using static MethodVisibility;
+    using static MemberVisibility;
 
     /// <summary>
     /// Represents a method in a class in a piece of source code.
@@ -25,7 +25,7 @@
 
         private MethodExpression(
             ClassExpression parent,
-            MethodVisibility visibility,
+            MemberVisibility visibility,
             string name,
             CommentExpression summary,
             LambdaExpression definition,
@@ -73,7 +73,7 @@
             ClassExpression parent,
             Expression expression,
             SourceCodeTranslationSettings settings,
-            MethodVisibility visibility = Public)
+            MemberVisibility visibility = Public)
         {
             return For(
                 parent,
@@ -86,7 +86,7 @@
 
         internal static MethodExpression For(
             ClassExpression parent,
-            MethodVisibility visibility,
+            MemberVisibility visibility,
             string name,
             CommentExpression summary,
             Expression expression,
@@ -142,9 +142,9 @@
         public ClassExpression Parent { get; }
 
         /// <summary>
-        /// Gets the <see cref="MethodVisibility"/> of this <see cref="MethodExpression"/>.
+        /// Gets the <see cref="MemberVisibility"/> of this <see cref="MethodExpression"/>.
         /// </summary>
-        public MethodVisibility Visibility { get; }
+        public MemberVisibility Visibility { get; }
 
         /// <summary>
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="MethodExpression"/>,
@@ -238,14 +238,14 @@
         internal class MethodExpressionMethod : IMethod
         {
             private readonly MethodExpression _method;
-            private readonly MethodVisibility _visibility;
+            private readonly MemberVisibility _visibility;
             private readonly SourceCodeTranslationSettings _settings;
             private string _name;
             private List<IParameter> _parameters;
 
             public MethodExpressionMethod(
                 MethodExpression method,
-                MethodVisibility visibility,
+                MemberVisibility visibility,
                 string name,
                 List<IParameter> parameters,
                 SourceCodeTranslationSettings settings)
