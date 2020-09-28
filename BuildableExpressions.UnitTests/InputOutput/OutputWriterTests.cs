@@ -1,15 +1,12 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests.InputOutput
 {
-    using System;
     using System.IO;
-    using System.Linq;
     using BuildableExpressions.InputOutput;
     using Configuration;
     using Moq;
     using Xunit;
     using static System.Linq.Expressions.Expression;
     using static Moq.Times;
-    using static SourceCodeFactory;
 
     public class OutputWriterTests
     {
@@ -22,13 +19,16 @@
             var fileManagerMock = new Mock<IFileManager>();
             var outputWriter = new OutputWriter(fileManagerMock.Object);
 
-            var doNothing = SourceCode(
-                Lambda<Action>(Default(typeof(void))),
-                cfg => cfg.WithNamespace(_rootNamespace));
+            var sourceCode = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithNamespace(_rootNamespace));
 
-            var fileName = doNothing.Classes.First().Name + ".cs";
+            var @class = sourceCode.AddClass();
+            @class.AddMethod(Default(typeof(void)));
 
-            outputWriter.Write(new[] { doNothing }, new Config
+            var fileName = @class.Name + ".cs";
+
+            outputWriter.Write(new[] { sourceCode }, new Config
             {
                 ContentRoot = _projectDirectory,
                 RootNamespace = _rootNamespace
@@ -47,13 +47,16 @@
             var fileManagerMock = new Mock<IFileManager>();
             var outputWriter = new OutputWriter(fileManagerMock.Object);
 
-            var doNothing = SourceCode(
-                Lambda<Action>(Default(typeof(void))),
-                cfg => cfg.WithNamespace($"{_rootNamespace}.GeneratedCode"));
+            var sourceCode = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithNamespace($"{_rootNamespace}.GeneratedCode"));
 
-            var fileName = doNothing.Classes.First().Name + ".cs";
+            var @class = sourceCode.AddClass();
+            @class.AddMethod(Default(typeof(void)));
 
-            outputWriter.Write(new[] { doNothing }, new Config
+            var fileName = @class.Name + ".cs";
+
+            outputWriter.Write(new[] { sourceCode }, new Config
             {
                 ContentRoot = _projectDirectory,
                 RootNamespace = _rootNamespace

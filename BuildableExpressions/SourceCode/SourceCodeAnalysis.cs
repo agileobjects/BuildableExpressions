@@ -10,6 +10,7 @@
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations.Reflection;
     using static System.Linq.Expressions.ExpressionType;
+    using static MemberVisibility;
 
     internal class SourceCodeAnalysis : ExpressionAnalysis
     {
@@ -402,7 +403,7 @@
             }
 
             public MethodExpression CreateMethodFor(Expression block)
-                => _method.Parent.AddMethod(block, MemberVisibility.Private);
+                => _method.Parent.AddMethod(block, m => m.WithVisibility(Private));
 
             public void Finalise(
                 Expression updatedBody,

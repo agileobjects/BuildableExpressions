@@ -1,6 +1,5 @@
 ﻿namespace DefaultNamespace
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using AgileObjects.BuildableExpressions;
@@ -21,13 +20,18 @@
         {
             // Replace this code with your own, building a SourceCodeExpression
             // to be compiled to a source code file:
-            var doNothing = Expression.Lambda<Action>(Expression.Default(typeof(void)));
+            var factory = SourceCodeFactory.Default;
 
-            yield return SourceCodeFactory
-                .SourceCode(sc => sc
-                    .WithNamespaceOf<ExpressionBuilder>()
-                    .WithClass(typeof(ExpressionBuilder).Name + "OutputClass", cls => cls
-                        .WithMethod("DoNothing", doNothing)));
+            var sourceCode = factory.CreateSourceCode(sc => sc
+                .WithNamespaceOf<ExpressionBuilder>());
+
+            var @class = sourceCode.AddClass(cls => cls
+                .Named(typeof(ExpressionBuilder).Name + "OutputClass"));
+
+            var doNothing = Expression.Default(typeof(void));
+            @class.AddMethod(doNothing, m => m.Named("DoNothing"));
+
+            yield return sourceCode;
         }
     }
 }

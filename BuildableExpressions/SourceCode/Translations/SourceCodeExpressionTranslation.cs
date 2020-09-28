@@ -50,7 +50,7 @@
                     if (_currentMethod.Body != block &&
                         _analysis.IsMethodBlock(block, out var method))
                     {
-                        return MethodCallTranslation.For(method.Method, method.Parameters, this);
+                        return MethodCallTranslation.For(method, method.Parameters, this);
                     }
 
                     break;

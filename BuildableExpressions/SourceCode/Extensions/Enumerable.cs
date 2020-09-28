@@ -11,6 +11,6 @@
         public static readonly List<T> EmptyList = new List<T>();
 
         public static readonly ReadOnlyCollection<T> EmptyReadOnlyCollection =
-            EmptyArray.ToReadOnlyCollection();
+            new ReadOnlyCollection<T>(EmptyArray);
     }
 }

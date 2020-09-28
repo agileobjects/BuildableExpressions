@@ -7,9 +7,7 @@
 
     internal class SourceCodeTranslationSettings :
         TranslationSettings,
-        ISourceCodeTranslationSettings,
-        IClassTranslationSettings,
-        IMethodTranslationSettings
+        ISourceCodeTranslationSettings
     {
         public static readonly SourceCodeTranslationSettings Default = Create();
 
@@ -22,7 +20,6 @@
         {
             settings.CollectRequiredNamespaces = true;
             settings.CollectInlineBlocks = true;
-            settings.Namespace = "GeneratedExpressionCode";
             settings.ClassNameFactory = (sc, classCtx) => sc.GetClassName(classCtx);
             settings.MethodNameFactory = (sc, cls, methodCtx) => cls.GetMethodName(methodCtx);
 
@@ -35,27 +32,7 @@
 
         public bool CollectInlineBlocks { get; private set; }
 
-        ISourceCodeTranslationSettings ISourceCodeTranslationSettings.WithNamespaceOf<T>()
-            => SetNamespace(typeof(T).Namespace);
-
-        ISourceCodeTranslationSettings ISourceCodeTranslationSettings.WithNamespace(string @namespace)
-            => SetNamespace(@namespace);
-
-        protected ISourceCodeTranslationSettings SetNamespace(string @namespace)
-        {
-            Namespace = @namespace;
-            return this;
-        }
-
-        public string Namespace { get; private set; }
-
         #region Class Naming
-
-        IClassTranslationSettings IClassTranslationSettings<IClassTranslationSettings>.NameClassesUsing(
-            Func<IClassNamingContext, string> nameFactory)
-        {
-            return SetClassNamingFactory((sc, @class) => nameFactory.Invoke(@class));
-        }
 
         public ISourceCodeTranslationSettings NameClassesUsing(
             Func<SourceCodeExpression, IClassNamingContext, string> nameFactory)
@@ -63,16 +40,16 @@
             return SetClassNamingFactory(nameFactory);
         }
 
+        ISourceCodeTranslationSettings ISourceCodeTranslationSettings.NameClassesUsing(
+            Func<IClassNamingContext, string> nameFactory)
+        {
+            return SetClassNamingFactory((sc, @class) => nameFactory.Invoke(@class));
+        }
+
         private SourceCodeTranslationSettings SetClassNamingFactory(
             Func<SourceCodeExpression, IClassNamingContext, string> nameFactory)
         {
             ClassNameFactory = nameFactory;
-            return this;
-        }
-
-        public ISourceCodeTranslationSettings NameClassesUsing(Func<IClassNamingContext, string> nameFactory)
-        {
-            ClassNameFactory = (sc, exp) => nameFactory.Invoke(exp);
             return this;
         }
 
@@ -88,31 +65,13 @@
             return SetMethodNamingFactory(nameFactory);
         }
 
-        ISourceCodeTranslationSettings IClassTranslationSettings<ISourceCodeTranslationSettings>.NameMethodsUsing(
+        ISourceCodeTranslationSettings ISourceCodeTranslationSettings.NameMethodsUsing(
             Func<ClassExpression, IMethodNamingContext, string> nameFactory)
         {
             return SetMethodNamingFactory(nameFactory);
         }
 
-        IClassTranslationSettings IClassTranslationSettings<IClassTranslationSettings>.NameMethodsUsing(
-            Func<ClassExpression, IMethodNamingContext, string> nameFactory)
-        {
-            return SetMethodNamingFactory(nameFactory);
-        }
-
-        IClassTranslationSettings IMethodTranslationSettings<IClassTranslationSettings>.NameMethodsUsing(
-            Func<IMethodNamingContext, string> nameFactory)
-        {
-            return SetMethodNamingFactory(nameFactory);
-        }
-
-        IMethodTranslationSettings IMethodTranslationSettings<IMethodTranslationSettings>.NameMethodsUsing(
-            Func<IMethodNamingContext, string> nameFactory)
-        {
-            return SetMethodNamingFactory(nameFactory);
-        }
-
-        public ISourceCodeTranslationSettings NameMethodsUsing(
+        ISourceCodeTranslationSettings ISourceCodeTranslationSettings.NameMethodsUsing(
             Func<IMethodNamingContext, string> nameFactory)
         {
             return SetMethodNamingFactory(nameFactory);
@@ -145,16 +104,5 @@
         }
 
         #endregion
-
-        ISourceCodeTranslationSettings ISourceCodeTranslationSettings.CreateSingleClass
-        {
-            get
-            {
-                GenerateSingleClass = true;
-                return this;
-            }
-        }
-
-        internal bool GenerateSingleClass { get; private set; }
     }
 }

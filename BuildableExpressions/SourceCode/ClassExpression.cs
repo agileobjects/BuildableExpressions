@@ -3,148 +3,45 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Linq;
     using System.Linq.Expressions;
     using Api;
     using BuildableExpressions.Extensions;
     using Extensions;
     using ReadableExpressions;
     using ReadableExpressions.Extensions;
-    using static MemberVisibility;
 
     /// <summary>
     /// Represents a class in a piece of source code.
     /// </summary>
-    public class ClassExpression : Expression, IClassNamingContext
+    public class ClassExpression :
+        Expression,
+        IClassNamingContext,
+        IClassExpressionConfigurator
     {
-        private readonly Expression _body;
+        private Expression _body;
         private readonly SourceCodeTranslationSettings _settings;
         private readonly List<MethodExpression> _methods;
         private readonly Dictionary<Type, List<MethodExpression>> _methodsByReturnType;
         private ReadOnlyCollection<MethodExpression> _readOnlyMethods;
+        private List<Type> _interfaces;
+        private ReadOnlyCollection<Type> _readOnlyInterfaces;
 #if FEATURE_READONLYDICTIONARY
         private ReadOnlyDictionary<Type, ReadOnlyCollection<MethodExpression>> _readOnlyMethodsByReturnType;
 #else
         private IDictionary<Type, ReadOnlyCollection<MethodExpression>> _readOnlyMethodsByReturnType;
 #endif
         private string _name;
-        private Type _type;
 
         internal ClassExpression(
             SourceCodeExpression parent,
-            Expression body,
-            SourceCodeTranslationSettings settings)
-            : this(parent, null, body, settings)
-        {
-        }
-
-        internal ClassExpression(
-            SourceCodeExpression parent,
-            BlockExpression body,
-            SourceCodeTranslationSettings settings)
-            : this(parent, ClassVisibility.Public, null, settings)
-        {
-            Interfaces = Enumerable<Type>.EmptyReadOnlyCollection;
-            _body = body;
-            _methods = new List<MethodExpression>();
-            _methodsByReturnType = new Dictionary<Type, List<MethodExpression>>();
-
-            foreach (var expression in body.Expressions)
-            {
-                var method = MethodExpression.For(this, expression, settings);
-                _methods.Add(method);
-                AddTypedMethod(method);
-            }
-        }
-
-        internal ClassExpression(
-            SourceCodeExpression parent,
-            CommentExpression summary,
-            Expression body,
-            SourceCodeTranslationSettings settings)
-            : this(parent, ClassVisibility.Public, summary, settings)
-        {
-            Interfaces = Enumerable<Type>.EmptyReadOnlyCollection;
-            _body = body;
-
-            var method = MethodExpression.For(this, body, settings);
-            _methods = new List<MethodExpression> { method };
-
-            _methodsByReturnType = new Dictionary<Type, List<MethodExpression>>
-            {
-                { method.ReturnType, new List<MethodExpression> { method } }
-            };
-        }
-
-        internal ClassExpression(
-            SourceCodeExpression parent,
-            ClassVisibility visibility,
-            string name,
-            IList<Type> interfaceTypes,
-            CommentExpression summary,
-            IList<MethodExpressionBuilder> methodBuilders,
-            SourceCodeTranslationSettings settings)
-            : this(parent, visibility, summary, settings)
-        {
-            _name = name;
-
-            Interfaces = interfaceTypes != null
-                ? new ReadOnlyCollection<Type>(interfaceTypes)
-                : Enumerable<Type>.EmptyReadOnlyCollection;
-
-            var methodCount = methodBuilders.Count;
-
-            if (methodCount == 1)
-            {
-                var method = methodBuilders[0].Build(this, settings);
-                _body = method.Definition;
-                _methods = new List<MethodExpression> { method };
-                _methodsByReturnType = new Dictionary<Type, List<MethodExpression>>
-                {
-                    { method.ReturnType, new List<MethodExpression> { method } }
-                };
-                return;
-            }
-
-            _methods = new List<MethodExpression>();
-            _methodsByReturnType = new Dictionary<Type, List<MethodExpression>>();
-
-            foreach (var methodBuilder in methodBuilders)
-            {
-                var method = methodBuilder.Build(this, settings);
-                _methods.Add(method);
-                AddTypedMethod(method);
-            }
-
-            _body = Block(_methods.ProjectToArray(m => (Expression)m));
-        }
-
-        private ClassExpression(
-            SourceCodeExpression parent,
-            ClassVisibility visibility,
-            CommentExpression summary,
             SourceCodeTranslationSettings settings)
         {
             Parent = parent;
-            Visibility = visibility;
-            Summary = summary;
             _settings = settings;
+            _methods = new List<MethodExpression>();
+            _methodsByReturnType = new Dictionary<Type, List<MethodExpression>>();
         }
-
-        #region Setup
-
-        private void AddTypedMethod(MethodExpression method)
-        {
-            if (!_methodsByReturnType.TryGetValue(method.ReturnType, out var typedMethods))
-            {
-                _methodsByReturnType.Add(
-                    method.ReturnType,
-                    typedMethods = new List<MethodExpression>());
-            }
-
-            typedMethods.Add(method);
-        }
-
-        #endregion
 
         /// <summary>
         /// Gets the <see cref="SourceCodeExpressionType"/> value (1001) indicating the type of this
@@ -158,7 +55,7 @@
         /// Expression from which the main method of the class was created.
         /// </summary>
         public override Type Type
-            => _type ??= (_body as LambdaExpression)?.ReturnType ?? _body.Type;
+            => (_body as LambdaExpression)?.ReturnType ?? _body.Type;
 
         /// <summary>
         /// Visits each of this <see cref="ClassExpression"/>'s <see cref="Methods"/>.
@@ -186,15 +83,40 @@
         public SourceCodeExpression Parent { get; }
 
         /// <summary>
+        /// Gets the interface types implemented by this <see cref="ClassExpression"/>.
+        /// </summary>
+        public ReadOnlyCollection<Type> Interfaces
+            => _readOnlyInterfaces ??= _interfaces.ToReadOnlyCollection();
+
+        /// <summary>
+        /// Adds the given <paramref name="interfaces"/> to the list of interfaces implemented by
+        /// this <see cref="ClassExpression"/>.
+        /// </summary>
+        /// <param name="interfaces">The interface(s) to add.</param>
+        public void Implement(params Type[] interfaces)
+        {
+            if (_interfaces == null)
+            {
+                _interfaces = new List<Type>();
+            }
+            else
+            {
+                _readOnlyInterfaces = null;
+            }
+
+            _interfaces.AddRange(interfaces);
+        }
+
+        /// <summary>
         /// The this <see cref="ClassExpression"/>'s <see cref="ClassVisibility">visibility</see>.
         /// </summary>
-        public ClassVisibility Visibility { get; }
+        public ClassVisibility Visibility { get; private set; }
 
         /// <summary>
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="ClassExpression"/>,
         /// if a summary has been set.
         /// </summary>
-        public CommentExpression Summary { get; }
+        public CommentExpression Summary { get; private set; }
 
         /// <summary>
         /// Gets the name of this <see cref="ClassExpression"/>.
@@ -210,27 +132,31 @@
         }
 
         /// <summary>
-        /// Gets the interface types implemented by this <see cref="ClassExpression"/>.
+        /// Adds a new method with the given <paramref name="body"/> to this <see cref="ClassExpression"/>.
         /// </summary>
-        public ReadOnlyCollection<Type> Interfaces { get; }
-
-        /// <summary>
-        /// Adds a new method for the given <paramref name="expression"/> to this
-        /// <see cref="ClassExpression"/>.
-        /// </summary>
-        /// <param name="expression">
+        /// <param name="body">
         /// The expression from which to create the new <see cref="MethodExpression"/>.
         /// </param>
-        /// <param name="visibility">
-        /// The <see cref="MemberVisibility"/> of the <see cref="MethodExpression"/> to create.
+        /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
+        public MethodExpression AddMethod(Expression body)
+            => AddMethod(body, cfg => cfg);
+
+        /// <summary>
+        /// Adds a new method with the given <paramref name="body"/> to this <see cref="ClassExpression"/>.
+        /// </summary>
+        /// <param name="body">
+        /// The expression from which to create the new <see cref="MethodExpression"/>.
         /// </param>
+        /// <param name="configuration">
+        /// The configuration with which to configure the new <see cref="MethodExpression"/>
+        /// .</param>
         /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
         public MethodExpression AddMethod(
-            Expression expression,
-            MemberVisibility visibility = Public)
+            Expression body,
+            Func<IMethodExpressionConfigurator, IMethodExpressionConfigurator> configuration)
         {
-            var method = MethodExpression
-                .For(this, expression, _settings, visibility);
+            var method = new MethodExpression(this, body, _settings);
+            configuration.Invoke(method);
 
             _methods.Add(method);
             _readOnlyMethods = null;
@@ -238,7 +164,19 @@
             AddTypedMethod(method);
             _readOnlyMethodsByReturnType = null;
 
+            UpdateBody(method);
             return method;
+        }
+
+        private void UpdateBody(MethodExpression method)
+        {
+            if (_body == null)
+            {
+                _body = method.Definition;
+                return;
+            }
+
+            _body = Block(_methods.ProjectToArray(m => (Expression)m.Definition));
         }
 
         /// <summary>
@@ -282,10 +220,58 @@
                 ;
         }
 
+        private void AddTypedMethod(MethodExpression method)
+        {
+            if (!_methodsByReturnType.TryGetValue(method.ReturnType, out var typedMethods))
+            {
+                _methodsByReturnType.Add(
+                    method.ReturnType,
+                    typedMethods = new List<MethodExpression>());
+            }
+
+            typedMethods.Add(method);
+        }
+
         /// <summary>
         /// Gets the index of this <see cref="ClassExpression"/> in the set of generated classes.
         /// </summary>
         public int Index => Parent?.Classes.IndexOf(this) ?? 0;
+
+        internal void Validate()
+        {
+            ThrowIfNoMethods();
+            ThrowIfDuplicateMethodName();
+        }
+
+        private void ThrowIfNoMethods()
+        {
+            if (_methods.Any())
+            {
+                return;
+            }
+
+            throw new InvalidOperationException(
+                $"Class {Name}: at least one method must be specified");
+        }
+
+        private void ThrowIfDuplicateMethodName()
+        {
+            if (_methods.Count == 1)
+            {
+                return;
+            }
+
+            var duplicateMethodName = _methods
+                .GroupBy(m => $"{m.Name}({string.Join(",", m.Parameters.Select(p => p.Type.FullName))})")
+                .FirstOrDefault(nameGroup => nameGroup.Count() > 1)?
+                .Key;
+
+            if (duplicateMethodName != null)
+            {
+                throw new InvalidOperationException(
+                    $"Class '{Name}': duplicate method name '{duplicateMethodName}' specified.");
+            }
+        }
 
         #region IClassNamingContext Members
 
@@ -295,6 +281,67 @@
             => Type.GetVariableNameInPascalCase(_settings);
 
         Expression IClassNamingContext.Body => _body;
+
+        #endregion
+
+        #region IClassExpressionConfigurator Members
+
+        IClassExpressionConfigurator IClassExpressionConfigurator.WithVisibility(
+            ClassVisibility visibility)
+        {
+            Visibility = visibility;
+            return this;
+        }
+
+        IClassExpressionConfigurator IClassExpressionConfigurator.Named(
+            string name)
+        {
+            _name = name.ThrowIfInvalidName<ArgumentException>("Class");
+            return this;
+        }
+
+        IClassExpressionConfigurator IClassExpressionConfigurator.Implementing<TInterface>()
+            where TInterface : class
+        {
+            Implement(typeof(TInterface));
+            return this;
+        }
+
+        IClassExpressionConfigurator IClassExpressionConfigurator.Implementing(
+            params Type[] interfaces)
+        {
+            Implement(interfaces);
+            return this;
+        }
+
+        IClassExpressionConfigurator IClassExpressionConfigurator.WithSummary(
+            string summary)
+        {
+            Summary = ReadableExpression.Comment(summary);
+            return this;
+        }
+
+        IClassExpressionConfigurator IClassExpressionConfigurator.WithSummary(
+            CommentExpression summary)
+        {
+            Summary = summary;
+            return this;
+        }
+
+        IClassExpressionConfigurator IClassExpressionConfigurator.WithMethod(
+            Expression body)
+        {
+            AddMethod(body);
+            return this;
+        }
+
+        IClassExpressionConfigurator IClassExpressionConfigurator.WithMethod(
+            Expression body,
+            Func<IMethodExpressionConfigurator, IMethodExpressionConfigurator> configuration)
+        {
+            AddMethod(body, configuration);
+            return this;
+        }
 
         #endregion
     }

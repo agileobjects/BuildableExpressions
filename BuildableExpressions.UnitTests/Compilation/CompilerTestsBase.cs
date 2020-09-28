@@ -154,15 +154,16 @@ namespace MyNamespace
         {
             var doNothing = Expression.Lambda<Action>(Expression.Default(typeof(void)));
 
-            return SourceCodeFactory
-                .SourceCode(sc => sc
-                    .WithClass(""MyClass"", cls => cls
-                        .WithMethod(""DoNothing"", doNothing)));
+            return SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .Named(""MyClass"")
+                        .WithMethod(doNothing, m => m
+                            .Named(""DoNothing""))));
         }
     }
 }
     ";
-
             var result = compiler.Compile(new[] { SOURCE });
 
             var compiledAssembly = result

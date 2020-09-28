@@ -1,68 +1,56 @@
 ﻿namespace AgileObjects.BuildableExpressions
 {
     using System;
-    using System.Linq.Expressions;
     using SourceCode;
     using SourceCode.Api;
 
     /// <summary>
-    /// A factory class providing <see cref="SourceCodeExpression"/>-building methods.
+    /// A factory class with which to build <see cref="SourceCodeExpression"/>s.
     /// </summary>
-    public static class SourceCodeFactory
+    public class SourceCodeFactory
     {
         /// <summary>
-        /// Create a <see cref="SourceCodeExpression"/> representing a complete piece of source code
-        /// using the given <paramref name="configuration"/>.
+        /// Gets the default <see cref="SourceCodeFactory"/> instance.
         /// </summary>
-        /// <param name="configuration">
-        /// The configuration with which to generate the <see cref="SourceCodeExpression"/>.
-        /// </param>
-        /// <returns>A <see cref="SourceCodeExpression"/> representing a complete piece of source code.</returns>
-        public static SourceCodeExpression SourceCode(
-            Func<ISourceCodeExpressionSettings, ISourceCodeExpressionSettings> configuration)
-        {
-            var builder = new SourceCodeExpressionBuilder();
-            configuration.Invoke(builder);
+        public static readonly SourceCodeFactory Default = new SourceCodeFactory();
 
-            return builder.Build();
+        private readonly SourceCodeTranslationSettings _settings;
+
+        private SourceCodeFactory()
+        {
+            _settings = SourceCodeTranslationSettings.Default;
         }
 
         /// <summary>
-        /// Creates a <see cref="SourceCodeExpression"/> representing a complete piece of source code
-        /// with the given <paramref name="content"/>.
+        /// Initializes a new instance of the <see cref="SourceCodeFactory"/> class using the given
+        /// <paramref name="configuration"/>.
         /// </summary>
-        /// <param name="content">The content of the piece of source code to create.</param>
-        /// <param name="configuration">The configuration to use for the translation, if required.</param>
-        /// <returns>A <see cref="SourceCodeExpression"/> representing a complete piece of source code.</returns>
-        public static SourceCodeExpression SourceCode(
-            Expression content,
-            Func<ISourceCodeTranslationSettings, ISourceCodeTranslationSettings> configuration = null)
-        {
-            return content?.ToSourceCodeExpression(configuration);
-        }
-
-        internal static SourceCodeExpression ToSourceCodeExpression(
-            this Expression content,
+        /// <param name="configuration">The configuration to use.</param>
+        public SourceCodeFactory(
             Func<ISourceCodeTranslationSettings, ISourceCodeTranslationSettings> configuration)
         {
-            var settings = GetTranslationSettings(configuration, (cfg, s) => cfg.Invoke(s));
-
-            return new SourceCodeExpression(content, settings);
+            _settings = SourceCodeTranslationSettings.Create();
+            configuration.Invoke(_settings);
         }
 
-        private static SourceCodeTranslationSettings GetTranslationSettings<TConfiguration>(
-            this TConfiguration configuration,
-            Action<TConfiguration, SourceCodeTranslationSettings> configurator)
+        /// <summary>
+        /// Creates a <see cref="SourceCodeExpression"/> representing a complete piece of source code.
+        /// </summary>
+        /// <returns>A <see cref="SourceCodeExpression"/> representing a complete piece of source code.</returns>
+        public SourceCodeExpression CreateSourceCode() => CreateSourceCode(cfg => cfg);
+
+        /// <summary>
+        /// Creates a <see cref="SourceCodeExpression"/> representing a complete piece of source code.
+        /// </summary>
+        /// <param name="configuration">The configuration to use for the translation.</param>
+        /// <returns>A <see cref="SourceCodeExpression"/> representing a complete piece of source code.</returns>
+        public SourceCodeExpression CreateSourceCode(
+            Func<ISourceCodeExpressionConfigurator, ISourceCodeExpressionConfigurator> configuration)
         {
-            if (configuration == null)
-            {
-                return SourceCodeTranslationSettings.Default;
-            }
+            var sourceCode = new SourceCodeExpression(_settings);
+            configuration.Invoke(sourceCode);
 
-            var settings = SourceCodeTranslationSettings.Create();
-
-            configurator.Invoke(configuration, settings);
-            return settings;
+            return sourceCode;
         }
     }
 }

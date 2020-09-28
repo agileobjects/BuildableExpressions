@@ -16,94 +16,46 @@
     /// <summary>
     /// Represents a method in a class in a piece of source code.
     /// </summary>
-    public class MethodExpression : Expression, IMethodNamingContext
+    public class MethodExpression :
+        Expression,
+        IMethodNamingContext,
+        IMethodExpressionConfigurator,
+        IMethod
     {
         private readonly SourceCodeTranslationSettings _settings;
-        private readonly MethodExpressionMethod _method;
         private List<MethodParameterExpression> _parameters;
+        private List<IParameter> _methodParameters;
         private ReadOnlyCollection<MethodParameterExpression> _readOnlyParameters;
+        private string _name;
 
-        private MethodExpression(
+        internal MethodExpression(
             ClassExpression parent,
-            MemberVisibility visibility,
-            string name,
-            CommentExpression summary,
-            LambdaExpression definition,
+            Expression body,
             SourceCodeTranslationSettings settings)
         {
             Parent = parent;
-            Visibility = visibility;
-            Summary = summary;
-            Definition = definition;
+            Definition = body.ToLambdaExpression();
             _settings = settings;
 
-            List<IParameter> parameters;
+            var parameterCount = Definition.Parameters.Count;
 
-            var parameterCount = definition.Parameters.Count;
-
-            if (parameterCount != 0)
-            {
-                _parameters = new List<MethodParameterExpression>(parameterCount);
-                parameters = new List<IParameter>(parameterCount);
-
-                for (var i = 0; i < parameterCount; ++i)
-                {
-                    var parameter = new MethodParameterExpression(definition.Parameters[i]);
-                    parameters.Add(parameter);
-                    _parameters.Add(parameter);
-                }
-            }
-            else
+            if (parameterCount == 0)
             {
                 _parameters = Enumerable<MethodParameterExpression>.EmptyList;
-                parameters = Enumerable<IParameter>.EmptyList;
+                _methodParameters = Enumerable<IParameter>.EmptyList;
+                return;
             }
 
-            _method = new MethodExpressionMethod(
-                this,
-                visibility,
-                name,
-                parameters,
-                settings);
+            _parameters = new List<MethodParameterExpression>(parameterCount);
+            _methodParameters = new List<IParameter>(parameterCount);
+
+            for (var i = 0; i < parameterCount; ++i)
+            {
+                var parameter = new MethodParameterExpression(Definition.Parameters[i]);
+                _methodParameters.Add(parameter);
+                _parameters.Add(parameter);
+            }
         }
-
-        #region Factory Methods
-
-        internal static MethodExpression For(
-            ClassExpression parent,
-            Expression expression,
-            SourceCodeTranslationSettings settings,
-            MemberVisibility visibility = Public)
-        {
-            return For(
-                parent,
-                visibility,
-                name: null,
-                summary: null,
-                expression,
-                settings);
-        }
-
-        internal static MethodExpression For(
-            ClassExpression parent,
-            MemberVisibility visibility,
-            string name,
-            CommentExpression summary,
-            Expression expression,
-            SourceCodeTranslationSettings settings)
-        {
-            var definition = expression.ToLambdaExpression();
-
-            return new MethodExpression(
-                parent,
-                visibility,
-                name,
-                summary,
-                definition,
-                settings);
-        }
-
-        #endregion
 
         /// <summary>
         /// Gets the <see cref="SourceCodeExpressionType"/> value (1002) indicating the type of this
@@ -144,18 +96,26 @@
         /// <summary>
         /// Gets the <see cref="MemberVisibility"/> of this <see cref="MethodExpression"/>.
         /// </summary>
-        public MemberVisibility Visibility { get; }
+        public MemberVisibility Visibility { get; private set; }
 
         /// <summary>
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="MethodExpression"/>,
         /// if a summary has been set.
         /// </summary>
-        public CommentExpression Summary { get; }
+        public CommentExpression Summary { get; private set; }
 
         /// <summary>
         /// Gets the name of this <see cref="MethodExpression"/>.
         /// </summary>
-        public string Name => Method.Name;
+        public string Name => _name ??= GetName();
+
+        private string GetName()
+        {
+            return _settings
+                .MethodNameFactory
+                .Invoke(Parent?.Parent, Parent, this)
+                .ThrowIfInvalidName<InvalidOperationException>("Method");
+        }
 
         /// <summary>
         /// Gets the return type of this <see cref="MethodExpression"/>, which is the return type
@@ -181,8 +141,6 @@
         /// </summary>
         public Expression Body => Definition.Body;
 
-        internal IMethod Method => _method;
-
         internal void Finalise(
             Expression body,
             IList<MethodParameterExpression> parameters)
@@ -205,19 +163,22 @@
                 return;
             }
 
+            var parameterCount = parameters.Count;
+
             if (_parameters.Count == 0)
             {
-                _parameters = new List<MethodParameterExpression>(parameters.Count);
+                _parameters = new List<MethodParameterExpression>(parameterCount);
+                _methodParameters = new List<IParameter>(parameterCount);
             }
             else
             {
                 _parameters.Clear();
+                _methodParameters.Clear();
             }
 
             _parameters.AddRange(parameters);
+            _methodParameters.AddRange(parameters);
             _readOnlyParameters = null;
-
-            _method.SetParameters(parameters);
         }
 
         #region IMethodNamingContext Members
@@ -233,86 +194,67 @@
 
         #endregion
 
-        #region Helper Class
+        #region IMethodExpressionConfigurator Members
 
-        internal class MethodExpressionMethod : IMethod
+        IMethodExpressionConfigurator IMethodExpressionConfigurator.WithSummary(
+            string summary)
         {
-            private readonly MethodExpression _method;
-            private readonly MemberVisibility _visibility;
-            private readonly SourceCodeTranslationSettings _settings;
-            private string _name;
-            private List<IParameter> _parameters;
-
-            public MethodExpressionMethod(
-                MethodExpression method,
-                MemberVisibility visibility,
-                string name,
-                List<IParameter> parameters,
-                SourceCodeTranslationSettings settings)
-            {
-                _method = method;
-                _visibility = visibility;
-                _name = name;
-                _parameters = parameters;
-                _settings = settings;
-            }
-
-            private ClassExpression Parent => _method.Parent;
-
-            public Type DeclaringType => null;
-
-            public bool IsPublic => _visibility == Public;
-
-            public bool IsProtectedInternal => _visibility == ProtectedInternal;
-
-            public bool IsInternal => _visibility == Internal;
-
-            public bool IsProtected => _visibility == Protected;
-
-            public bool IsPrivate => _visibility == Private;
-
-            public bool IsAbstract => false;
-
-            public bool IsStatic => false;
-
-            public bool IsVirtual => false;
-
-            public string Name => _name ??= GetName();
-
-            private string GetName()
-            {
-                return _settings
-                    .MethodNameFactory
-                    .Invoke(Parent?.Parent, Parent, _method)
-                    .ThrowIfInvalidName<InvalidOperationException>("Method");
-            }
-
-            public bool IsGenericMethod => false;
-
-            public bool IsExtensionMethod => false;
-
-            public Type ReturnType => _method.Type;
-
-            public IMethod GetGenericMethodDefinition() => null;
-
-            public Type[] GetGenericArguments() => Enumerable<Type>.EmptyArray;
-
-            public IList<IParameter> GetParameters() => _parameters;
-
-            public void SetParameters(IList<MethodParameterExpression> parameters)
-            {
-                if (_parameters.Count == 0)
-                {
-                    _parameters = new List<IParameter>(parameters.Count);
-                }
-                else
-                {
-                    _parameters.Clear();
-                }
-
-                _parameters.AddRange(parameters);
-            }
+            Summary = ReadableExpression.Comment(summary);
+            return this;
         }
+
+        IMethodExpressionConfigurator IMethodExpressionConfigurator.WithSummary(
+            CommentExpression summary)
+        {
+            Summary = summary;
+            return this;
+        }
+
+        IMethodExpressionConfigurator IMethodExpressionConfigurator.Named(
+            string name)
+        {
+            _name = name.ThrowIfInvalidName<ArgumentException>("Method");
+            return this;
+        }
+
+        IMethodExpressionConfigurator IMethodExpressionConfigurator.WithVisibility(
+            MemberVisibility visibility)
+        {
+            Visibility = visibility;
+            return this;
+        }
+
+        #endregion
+
+        #region IMethod Members
+
+        Type IMethod.DeclaringType => null;
+
+        bool IMethod.IsPublic => Visibility == Public;
+
+        bool IMethod.IsProtectedInternal => Visibility == ProtectedInternal;
+
+        bool IMethod.IsInternal => Visibility == Internal;
+
+        bool IMethod.IsProtected => Visibility == Protected;
+
+        bool IMethod.IsPrivate => Visibility == Private;
+
+        bool IMethod.IsAbstract => false;
+
+        bool IMethod.IsStatic => false;
+
+        bool IMethod.IsVirtual => false;
+
+        bool IMethod.IsGenericMethod => false;
+
+        bool IMethod.IsExtensionMethod => false;
+
+        IMethod IMethod.GetGenericMethodDefinition() => null;
+
+        Type[] IMethod.GetGenericArguments() => Enumerable<Type>.EmptyArray;
+
+        IList<IParameter> IMethod.GetParameters() => _methodParameters;
 
         #endregion
     }

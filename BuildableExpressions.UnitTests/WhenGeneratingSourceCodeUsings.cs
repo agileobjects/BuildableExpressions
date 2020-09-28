@@ -19,7 +19,11 @@
         {
             var getDefaultDate = Lambda<Func<DateTime>>(Default(typeof(DateTime)));
 
-            var translated = getDefaultDate.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(getDefaultDate)))
+                .ToSourceCode();
 
             const string EXPECTED = @"
 using System;
@@ -43,7 +47,11 @@ namespace GeneratedExpressionCode
         {
             var getDefaultDate = Lambda<Func<Type>>(Constant(typeof(Stream)));
 
-            var translated = getDefaultDate.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(getDefaultDate)))
+                .ToSourceCode();
 
             const string EXPECTED = @"
 using System;
@@ -68,7 +76,11 @@ namespace GeneratedExpressionCode
         {
             var createStringBuilder = Lambda<Func<object>>(New(typeof(StringBuilder)));
 
-            var translated = createStringBuilder.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(createStringBuilder)))
+                .ToSourceCode();
 
             const string EXPECTED = @"
 using System.Text;
@@ -93,7 +105,11 @@ namespace GeneratedExpressionCode
             var createStreamArray = Lambda<Func<object>>(
                 NewArrayBounds(typeof(Stream), Constant(5)));
 
-            var translated = createStreamArray.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(createStreamArray)))
+                .ToSourceCode();
 
             const string EXPECTED = @"
 using System.IO;
@@ -117,7 +133,11 @@ namespace GeneratedExpressionCode
         {
             var getEnumIntValue = CreateLambda<object>(() => (OddNumber?)OddNumber.One);
 
-            var translated = getEnumIntValue.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(getEnumIntValue)))
+                .ToSourceCode();
 
             var expected = @$"
 using {typeof(OddNumber).Namespace};
@@ -144,7 +164,11 @@ namespace GeneratedExpressionCode
             var comparerNotNull = NotEqual(defaultComparer, Default(defaultComparer.Type));
             var comparerCheckLambda = Lambda<Func<bool>>(comparerNotNull);
 
-            var translated = comparerCheckLambda.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(comparerCheckLambda)))
+                .ToSourceCode();
 
             const string EXPECTED = @"
 using System.Collections.Generic;
@@ -179,7 +203,11 @@ namespace GeneratedExpressionCode
             var lambdaBody = Block(new[] { helperVariable }, populateHelper, methodCall);
             var lambda = Lambda<Func<string>>(lambdaBody);
 
-            var translated = lambda.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(lambda)))
+                .ToSourceCode();
 
             const string EXPECTED = @"
 using System.Text.RegularExpressions;
@@ -217,7 +245,11 @@ namespace GeneratedExpressionCode
             var lambdaBody = Block(new[] { helperVariable }, populateHelper, methodCall);
             var lambda = Lambda<Func<int>>(lambdaBody);
 
-            var translated = lambda.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(lambda)))
+                .ToSourceCode();
 
             const string EXPECTED = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -245,7 +277,11 @@ namespace GeneratedExpressionCode
             var dateTimeTicks = Property(dateTimeNow, nameof(DateTime.Ticks));
             var getDefaultDate = Lambda<Func<long>>(dateTimeTicks);
 
-            var translated = getDefaultDate.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(getDefaultDate)))
+                .ToSourceCode();
 
             const string EXPECTED = @"
 using System;
@@ -270,7 +306,11 @@ namespace GeneratedExpressionCode
             var stringBuilderMatchesRegex = CreateLambda(
                 (Regex re, StringBuilder sb) => re.IsMatch(sb.ToString()));
 
-            var translated = stringBuilderMatchesRegex.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(stringBuilderMatchesRegex)))
+                .ToSourceCode();
 
             const string EXPECTED = @"
 using System.Text;
@@ -300,7 +340,11 @@ namespace GeneratedExpressionCode
             var joinListItems = CreateLambda(
                 (Func<IList<string>> listFactory) => string.Join(", ", listFactory.Invoke().ToArray()));
 
-            var translated = joinListItems.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(joinListItems)))
+                .ToSourceCode();
 
             const string EXPECTED = @"
 using System;
@@ -330,7 +374,11 @@ namespace GeneratedExpressionCode
             var joinListItems = CreateLambda(
                 (string[] strings) => strings.Select(int.Parse).ToList());
 
-            var translated = joinListItems.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(joinListItems)))
+                .ToSourceCode();
 
             const string EXPECTED = @"
 using System;
@@ -361,7 +409,11 @@ namespace GeneratedExpressionCode
                 Call(typeof(Console), "ReadLine", Type.EmptyTypes),
                 Catch(Parameter(typeof(IOException), "ioEx"), Default(typeof(string))));
 
-            var translated = tryCatch.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(tryCatch)))
+                .ToSourceCode();
 
             const string EXPECTED = @"
 using System;
@@ -394,7 +446,11 @@ namespace GeneratedExpressionCode
             var stringBuilderContainsOther = CreateLambda(
                 (StringBuilder sb1, StringBuilder sb2) => sb1.ToString().Contains(sb2.ToString()));
 
-            var translated = stringBuilderContainsOther.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(stringBuilderContainsOther)))
+                .ToSourceCode();
 
             const string EXPECTED = @"
 using System.Text;

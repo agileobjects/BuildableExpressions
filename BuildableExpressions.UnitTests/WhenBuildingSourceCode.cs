@@ -6,7 +6,6 @@
     using SourceCode;
     using Xunit;
     using static System.Linq.Expressions.Expression;
-    using static SourceCodeFactory;
 
     public class WhenBuildingSourceCode
     {
@@ -15,10 +14,11 @@
         {
             var doNothing = Lambda<Action>(Default(typeof(void)));
 
-            var translated = SourceCode(cfg => cfg
-                .WithNamespace("GeneratedStuffs.Yo")
-                .WithClass(cls => cls
-                    .WithMethod(doNothing)))
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithNamespace("GeneratedStuffs.Yo")
+                    .WithClass(cls => cls
+                        .WithMethod(doNothing)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -40,10 +40,13 @@ namespace GeneratedStuffs.Yo
         {
             var doNothing = Lambda<Action>(Default(typeof(void)));
 
-            var translated = SourceCode(cfg => cfg
-                .WithNamespaceOf(GetType())
-                .WithClass("MyClass", cls => cls
-                    .WithMethod("MyMethod", doNothing)))
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithNamespaceOf(GetType())
+                    .WithClass(cls => cls
+                        .Named("MyClass")
+                        .WithMethod(doNothing, m => m
+                            .Named("MyMethod"))))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -65,11 +68,13 @@ namespace AgileObjects.BuildableExpressions.UnitTests
         {
             var doNothing = Lambda<Action>(Default(typeof(void)));
 
-            var translated = SourceCode(cfg => cfg
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
                     .WithNamespaceOf(GetType())
-                    .WithClass("MyClass", cls => cls
+                    .WithClass(cls => cls
                         .WithSummary(ReadableExpression.Comment("Class summary!"))
                         .WithVisibility(ClassVisibility.Internal)
+                        .Named("MyClass")
                         .WithMethod(doNothing)))
                 .ToSourceCode();
 
@@ -97,7 +102,8 @@ namespace AgileObjects.BuildableExpressions.UnitTests
             var getIntFromLong = Lambda<Func<long, int>>(Constant(2), Parameter(typeof(long), "lng"));
             var getIntFromDate = Lambda<Func<DateTime, int>>(Constant(3), Parameter(typeof(DateTime), "date"));
 
-            var translated = SourceCode(cfg => cfg
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
                     .WithClass(cls => cls
                         .WithMethod(getIntFromString, m => m
                             .WithVisibility(MemberVisibility.Internal))
@@ -156,11 +162,14 @@ Isn't it great?";
 This is my method!
 It's even better.";
 
-            var translated = SourceCode(cfg => cfg
-                .WithClass("MyClass", cls => cls
-                    .WithSummary(CLASS_SUMMARY)
-                    .WithMethod("MyMethod", doNothing, m => m
-                        .WithSummary(METHOD_SUMMARY))))
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithSummary(CLASS_SUMMARY)
+                        .Named("MyClass")
+                        .WithMethod(doNothing, m => m
+                            .WithSummary(METHOD_SUMMARY)
+                            .Named("MyMethod"))))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -192,17 +201,20 @@ namespace GeneratedExpressionCode
 
             var classSummary = ReadableExpression.Comment(@"
 This is my class!
-Isn't it great?".TrimStart());
+Isn't it great?");
 
             var methodSummary = ReadableExpression.Comment(@"
 This is my method!
 It's even better.".TrimStart());
 
-            var translated = SourceCode(cfg => cfg
-                    .WithClass("MyClass", cls => cls
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
                         .WithSummary(classSummary)
-                        .WithMethod("MyMethod", doNothing, m => m
-                            .WithSummary(methodSummary))))
+                        .Named("MyClass")
+                        .WithMethod(doNothing, m => m
+                            .WithSummary(methodSummary)
+                            .Named("MyMethod"))))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -235,9 +247,10 @@ namespace GeneratedExpressionCode
             var getOne = Lambda<Func<int>>(Constant(1));
             var getTen = Lambda<Func<int>>(Constant(10));
 
-            var translated = SourceCode(cfg => cfg
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
                     .WithClass(cls => cls
-                        .WithMethod("DoNothing", doNothing)
+                        .WithMethod(doNothing, m => m.Named("DoNothing"))
                         .WithMethod(getBlah))
                     .WithClass(cls => cls
                         .WithMethod(getOne)
@@ -281,10 +294,11 @@ namespace GeneratedExpressionCode
         {
             var sayHello = Lambda<Func<string>>(Constant("Hello!"));
 
-            var translated = SourceCode(cfg => cfg
-                .WithClass(cls => cls
-                    .Implementing<IMessager>()
-                    .WithMethod(sayHello)))
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .Implementing<IMessager>()
+                        .WithMethod(sayHello)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -310,11 +324,12 @@ namespace GeneratedExpressionCode
             var sayHello = Lambda<Func<string>>(Constant("Hello!"));
             var return123 = Lambda<Func<int>>(Constant(123));
 
-            var translated = SourceCode(cfg => cfg
-                .WithClass(cls => cls
-                    .Implementing(typeof(IMessager), typeof(INumberSource))
-                    .WithMethod(sayHello)
-                    .WithMethod(return123)))
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .Implementing(typeof(IMessager), typeof(INumberSource))
+                        .WithMethod(sayHello)
+                        .WithMethod(return123)))
                 .ToSourceCode();
 
             const string EXPECTED = @"

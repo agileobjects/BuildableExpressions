@@ -6,7 +6,6 @@
     using NetStandardPolyfills;
     using Xunit;
     using static System.Linq.Expressions.Expression;
-    using static SourceCodeFactory;
 
     public class WhenExtractingBlockMethods
     {
@@ -29,9 +28,10 @@
                     Constant("Yep")),
                 Constant("Nope"));
 
-            var translated = SourceCode(sc => sc
-                .WithClass(cls => cls
-                    .WithMethod(yepOrNopeBlock)))
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(yepOrNopeBlock)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -78,9 +78,10 @@ namespace GeneratedExpressionCode
                     Assign(intParameter2, Constant(3)),
                     Multiply(intParameter1, intParameter2)));
 
-            var translated = SourceCode(sc => sc
-                .WithClass(cls => cls
-                    .WithMethod(conditional)))
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(conditional)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -146,7 +147,11 @@ namespace GeneratedExpressionCode
                 Constant("Yep"),
                 Constant("Nope"));
 
-            var translated = yepOrNope.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(yepOrNope)))
+                .ToSourceCode();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -211,7 +216,11 @@ namespace GeneratedExpressionCode
 
             var assignmentLambda = Lambda<Func<int, int>>(assignNestedBlockResult, parameterI);
 
-            var translated = assignmentLambda.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(assignmentLambda)))
+                .ToSourceCode();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -279,7 +288,11 @@ namespace GeneratedExpressionCode
                 objectParam,
                 stringParam);
 
-            var translated = tryParseResultLambda.ToSourceCode();
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(tryParseResultLambda)))
+                .ToSourceCode();
 
             const string EXPECTED = @"
 using AgileObjects.BuildableExpressions.UnitTests;

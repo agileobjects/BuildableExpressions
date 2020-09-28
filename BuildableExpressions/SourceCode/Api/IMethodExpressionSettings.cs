@@ -15,14 +15,14 @@
         /// The <see cref="MemberVisibility"/> to use for the <see cref="MethodExpression"/> being
         /// built.
         /// </param>
-        /// <returns>These <see cref="IMethodExpressionSettings"/>, to support a fluent interface.</returns>
+        /// <returns>These <see cref="IMethodExpressionSettings"/>, to support a fluent API.</returns>
         IMethodExpressionSettings WithVisibility(MemberVisibility visibility);
 
         /// <summary>
         /// Set the summary documentation of the <see cref="MethodExpression"/> being built.
         /// </summary>
         /// <param name="summary">The summary documentation of the <see cref="MethodExpression"/> being built.</param>
-        /// <returns>These <see cref="IMethodExpressionSettings"/>, to support a fluent interface.</returns>
+        /// <returns>These <see cref="IMethodExpressionSettings"/>, to support a fluent API.</returns>
         IMethodExpressionSettings WithSummary(string summary);
 
         /// <summary>
@@ -32,7 +32,7 @@
         /// A <see cref="CommentExpression"/> containing summary documentation of the
         /// <see cref="MethodExpression"/> being built.
         /// </param>
-        /// <returns>These <see cref="IMethodExpressionSettings"/>, to support a fluent interface.</returns>
+        /// <returns>These <see cref="IMethodExpressionSettings"/>, to support a fluent API.</returns>
         IMethodExpressionSettings WithSummary(CommentExpression summary);
     }
 }
