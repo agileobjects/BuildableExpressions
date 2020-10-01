@@ -1,4 +1,4 @@
-﻿namespace AgileObjects.BuildableExpressions.UnitTests.SourceCodeExpressions
+﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System.Collections.Generic;
     using System.Linq.Expressions;
@@ -6,6 +6,7 @@
     using Common;
     using SourceCode;
     using Xunit;
+    using static System.Linq.Expressions.Expression;
 
     public class WhenVisitingSourceCodeExpressions : TestClassBase
     {
@@ -29,6 +30,23 @@
             visitor.SourceCodeVisited.ShouldBeTrue();
             visitor.ClassVisited.ShouldBeTrue();
             visitor.MethodVisited.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void ShouldVisitABuildableMethodCallExpression()
+        {
+            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
+            var @class = sourceCode.AddClass();
+            var method1 = @class.AddMethod(Default(typeof(void)));
+
+            var method1Call = BuildableExpression.Call(method1);
+            @class.AddMethod(method1Call);
+
+            var visitor = new VisitationHelper();
+
+            visitor.Visit(sourceCode);
+
+            visitor.VisitedExpressions.ShouldContain(method1Call);
         }
 
         #region Helper Members

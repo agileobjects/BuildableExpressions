@@ -403,7 +403,7 @@
             }
 
             public MethodExpression CreateMethodFor(Expression block)
-                => _method.Parent.AddMethod(block, m => m.WithVisibility(Private));
+                => _method.Class.AddMethod(block, m => m.WithVisibility(Private));
 
             public void Finalise(
                 Expression updatedBody,

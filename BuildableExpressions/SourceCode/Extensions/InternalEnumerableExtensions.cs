@@ -12,7 +12,7 @@
             return new ReadOnlyDictionary<TKey, TValue>(dictionary);
         }
 #endif
-        public static ReadOnlyCollection<T> ToReadOnlyCollection<T>(this List<T> items)
+        public static ReadOnlyCollection<T> ToReadOnlyCollection<T>(this IList<T> items)
         {
             if (items == null || items.Count == 0)
             {

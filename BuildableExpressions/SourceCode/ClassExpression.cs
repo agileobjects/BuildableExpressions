@@ -34,10 +34,10 @@
         private string _name;
 
         internal ClassExpression(
-            SourceCodeExpression parent,
+            SourceCodeExpression sourceCode,
             SourceCodeTranslationSettings settings)
         {
-            Parent = parent;
+            SourceCode = sourceCode;
             _settings = settings;
             _methods = new List<MethodExpression>();
             _methodsByReturnType = new Dictionary<Type, List<MethodExpression>>();
@@ -80,7 +80,7 @@
         /// <summary>
         /// Gets this <see cref="ClassExpression"/>'s parent <see cref="SourceCodeExpression"/>.
         /// </summary>
-        public SourceCodeExpression Parent { get; }
+        public SourceCodeExpression SourceCode { get; }
 
         /// <summary>
         /// Gets the interface types implemented by this <see cref="ClassExpression"/>.
@@ -127,7 +127,7 @@
         {
             return _settings
                 .ClassNameFactory
-                .Invoke(Parent, this)
+                .Invoke(SourceCode, this)
                 .ThrowIfInvalidName<InvalidOperationException>("Class");
         }
 
@@ -235,7 +235,7 @@
         /// <summary>
         /// Gets the index of this <see cref="ClassExpression"/> in the set of generated classes.
         /// </summary>
-        public int Index => Parent?.Classes.IndexOf(this) ?? 0;
+        public int Index => SourceCode?.Classes.IndexOf(this) ?? 0;
 
         internal void Validate()
         {

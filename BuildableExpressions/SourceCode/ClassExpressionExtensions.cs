@@ -61,13 +61,13 @@
 
         private static string GetName(this MethodExpression method)
         {
-            if (method.Parent.Interfaces.Count == 0)
+            if (method.Class.Interfaces.Count == 0)
             {
                 return method.GetDefaultName();
             }
 
             var parameterTypes = method.Parameters.ProjectToArray(p => p.Type);
-            var classInterfaces = method.Parent.Interfaces;
+            var classInterfaces = method.Class.Interfaces;
 
             var matchingInterfaceMethods = classInterfaces
                 .SelectMany(type => new[] { type }

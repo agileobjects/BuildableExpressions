@@ -29,11 +29,11 @@
         private string _name;
 
         internal MethodExpression(
-            ClassExpression parent,
+            ClassExpression @class,
             Expression body,
             SourceCodeTranslationSettings settings)
         {
-            Parent = parent;
+            Class = @class;
             Definition = body.ToLambdaExpression();
             _settings = settings;
 
@@ -91,7 +91,7 @@
         /// <summary>
         /// Gets this <see cref="MethodExpression"/>'s parent <see cref="ClassExpression"/>.
         /// </summary>
-        public ClassExpression Parent { get; }
+        public ClassExpression Class { get; }
 
         /// <summary>
         /// Gets the <see cref="MemberVisibility"/> of this <see cref="MethodExpression"/>.
@@ -113,7 +113,7 @@
         {
             return _settings
                 .MethodNameFactory
-                .Invoke(Parent?.Parent, Parent, this)
+                .Invoke(Class?.SourceCode, Class, this)
                 .ThrowIfInvalidName<InvalidOperationException>("Method");
         }
 
@@ -190,7 +190,7 @@
 
         LambdaExpression IMethodNamingContext.MethodLambda => Definition;
 
-        int IMethodNamingContext.Index => Parent?.Methods.IndexOf(this) ?? 0;
+        int IMethodNamingContext.Index => Class?.Methods.IndexOf(this) ?? 0;
 
         #endregion
 
