@@ -16,13 +16,19 @@
         Class = 1001,
 
         /// <summary>
-        /// 1002. A source code class method.
+        /// 1002. The instance of an object to which the 'this' keyword relates in the current
+        /// context.
         /// </summary>
-        Method = 1002,
+        ThisInstance = 1002,
 
         /// <summary>
-        /// 1003. A source code method parameter.
+        /// 1003. A source code class method.
         /// </summary>
-        MethodParameter = 1003
+        Method = 1003,
+
+        /// <summary>
+        /// 1004. A source code method parameter.
+        /// </summary>
+        MethodParameter = 1004
     }
 }

@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using System.Linq;
     using BuildableExpressions;
     using Common;
     using Xunit;
@@ -313,7 +314,7 @@ namespace {typeof(WhenTranslatingToSourceCode).Namespace}
             var doNothing = Default(typeof(void));
 
             var factory = new SourceCodeFactory(s => s
-                .NameClassesUsing((sc, ctx) => $"My{ctx.TypeName}Class_{ctx.Index}"));
+                .NameClassesUsing((sc, ctx) => $"My{ctx.Methods.First().Type.Name}Class_{ctx.Index}"));
 
             var translated = factory
                 .CreateSourceCode(sc => sc

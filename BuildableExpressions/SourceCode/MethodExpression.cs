@@ -58,7 +58,7 @@
         }
 
         /// <summary>
-        /// Gets the <see cref="SourceCodeExpressionType"/> value (1002) indicating the type of this
+        /// Gets the <see cref="SourceCodeExpressionType"/> value (1003) indicating the type of this
         /// <see cref="MethodExpression"/> as an ExpressionType.
         /// </summary>
         public override ExpressionType NodeType

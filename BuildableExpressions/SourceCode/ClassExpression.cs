@@ -9,7 +9,6 @@
     using BuildableExpressions.Extensions;
     using Extensions;
     using ReadableExpressions;
-    using ReadableExpressions.Extensions;
 
     /// <summary>
     /// Represents a class in a piece of source code.
@@ -19,7 +18,6 @@
         IClassNamingContext,
         IClassExpressionConfigurator
     {
-        private Expression _body;
         private readonly SourceCodeTranslationSettings _settings;
         private readonly List<MethodExpression> _methods;
         private readonly Dictionary<Type, List<MethodExpression>> _methodsByReturnType;
@@ -52,10 +50,10 @@
 
         /// <summary>
         /// Gets the type of this <see cref="ClassExpression"/>, which is the return type of the
-        /// Expression from which the main method of the class was created.
+        /// first of the class' <see cref="Methods"/>, or typeof(void) if this class has no methods.
         /// </summary>
         public override Type Type
-            => (_body as LambdaExpression)?.ReturnType ?? _body.Type;
+            => _methods.FirstOrDefault()?.Type ?? typeof(void);
 
         /// <summary>
         /// Visits each of this <see cref="ClassExpression"/>'s <see cref="Methods"/>.
@@ -163,20 +161,7 @@
 
             AddTypedMethod(method);
             _readOnlyMethodsByReturnType = null;
-
-            UpdateBody(method);
             return method;
-        }
-
-        private void UpdateBody(MethodExpression method)
-        {
-            if (_body == null)
-            {
-                _body = method.Definition;
-                return;
-            }
-
-            _body = Block(_methods.ProjectToArray(m => (Expression)m.Definition));
         }
 
         /// <summary>
@@ -272,17 +257,6 @@
                     $"Class '{Name}': duplicate method name '{duplicateMethodName}' specified.");
             }
         }
-
-        #region IClassNamingContext Members
-
-        ExpressionType IClassNamingContext.NodeType => _body.NodeType;
-
-        string IClassNamingContext.TypeName
-            => Type.GetVariableNameInPascalCase(_settings);
-
-        Expression IClassNamingContext.Body => _body;
-
-        #endregion
 
         #region IClassExpressionConfigurator Members
 

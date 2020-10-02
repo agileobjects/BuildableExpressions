@@ -45,8 +45,21 @@
             var visitor = new VisitationHelper();
 
             visitor.Visit(sourceCode);
-
             visitor.VisitedExpressions.ShouldContain(method1Call);
+        }
+
+        [Fact]
+        public void ShouldVisitAThisInstanceExpression()
+        {
+            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
+            var @class = sourceCode.AddClass();
+            var classInstance = BuildableExpression.ThisInstance(@class);
+            @class.AddMethod(classInstance);
+
+            var visitor = new VisitationHelper();
+
+            visitor.Visit(sourceCode);
+            visitor.VisitedExpressions.ShouldContain(classInstance);
         }
 
         #region Helper Members
