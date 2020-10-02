@@ -24,11 +24,6 @@
         /// <summary>
         /// 1003. A source code class method.
         /// </summary>
-        Method = 1003,
-
-        /// <summary>
-        /// 1004. A source code method parameter.
-        /// </summary>
-        MethodParameter = 1004
+        Method = 1003
     }
 }

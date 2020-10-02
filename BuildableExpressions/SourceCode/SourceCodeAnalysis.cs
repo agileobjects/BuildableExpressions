@@ -104,10 +104,6 @@
                 case (ExpressionType)SourceCodeExpressionType.Method:
                     expression = VisitAndConvert((MethodExpression)expression);
                     goto SkipBaseVisit;
-
-                case (ExpressionType)SourceCodeExpressionType.MethodParameter:
-                    Visit((MethodParameterExpression)expression);
-                    goto SkipBaseVisit;
             }
 
             expression = base.VisitAndConvert(expression);
@@ -265,14 +261,19 @@
         {
             EnterMethodScope(method);
 
-            AddNamespaceIfRequired(method);
-
-            var updatedParameters = VisitAndConvert(method.Parameters, Visit);
+            var updatedParameters = VisitAndConvert(method.Parameters);
             var updatedBody = VisitAndConvert(method.Body);
 
             _currentMethodScope.Finalise(updatedBody, updatedParameters);
 
             ExitMethodScope();
+
+            foreach (var parameter in updatedParameters)
+            {
+                AddNamespaceIfRequired(parameter);
+            }
+
+            AddNamespaceIfRequired(method);
             return method;
         }
 
@@ -281,12 +282,6 @@
 
         private void ExitMethodScope()
             => _currentMethodScope = _currentMethodScope.Parent;
-
-        private MethodParameterExpression Visit(MethodParameterExpression methodParameter)
-        {
-            AddNamespaceIfRequired(methodParameter);
-            return methodParameter;
-        }
 
         protected override Expression VisitAndConvert(NewArrayExpression newArray)
         {
@@ -407,19 +402,19 @@
 
             public void Finalise(
                 Expression updatedBody,
-                IList<MethodParameterExpression> updatedParameters)
+                IList<ParameterExpression> updatedParameters)
             {
                 if (_unscopedVariables.Any())
                 {
                     if (updatedParameters.IsReadOnly)
                     {
-                        updatedParameters = new List<MethodParameterExpression>(
+                        updatedParameters = new List<ParameterExpression>(
                             updatedParameters.Count + _unscopedVariables.Count);
                     }
 
                     foreach (var variable in _unscopedVariables)
                     {
-                        updatedParameters.Add(new MethodParameterExpression(variable));
+                        updatedParameters.Add(variable);
                     }
                 }
 

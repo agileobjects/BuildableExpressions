@@ -23,9 +23,7 @@
         IMethod
     {
         private readonly SourceCodeTranslationSettings _settings;
-        private List<MethodParameterExpression> _parameters;
-        private List<IParameter> _methodParameters;
-        private ReadOnlyCollection<MethodParameterExpression> _readOnlyParameters;
+        private MethodParameter[] _methodParameters;
         private string _name;
 
         internal MethodExpression(
@@ -36,25 +34,6 @@
             Class = @class;
             Definition = body.ToLambdaExpression();
             _settings = settings;
-
-            var parameterCount = Definition.Parameters.Count;
-
-            if (parameterCount == 0)
-            {
-                _parameters = Enumerable<MethodParameterExpression>.EmptyList;
-                _methodParameters = Enumerable<IParameter>.EmptyList;
-                return;
-            }
-
-            _parameters = new List<MethodParameterExpression>(parameterCount);
-            _methodParameters = new List<IParameter>(parameterCount);
-
-            for (var i = 0; i < parameterCount; ++i)
-            {
-                var parameter = new MethodParameterExpression(Definition.Parameters[i]);
-                _methodParameters.Add(parameter);
-                _parameters.Add(parameter);
-            }
         }
 
         /// <summary>
@@ -124,17 +103,17 @@
         public Type ReturnType => Definition.ReturnType;
 
         /// <summary>
-        /// Gets the <see cref="MethodParameterExpression"/>s describing the parameters of this
-        /// <see cref="MethodExpression"/>.
-        /// </summary>
-        public ReadOnlyCollection<MethodParameterExpression> Parameters
-            => _readOnlyParameters ??= _parameters.ToReadOnlyCollection();
-
-        /// <summary>
         /// Gets the LambdaExpression describing the parameters and body of this
         /// <see cref="MethodExpression"/>.
         /// </summary>
         public LambdaExpression Definition { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ParameterExpression"/>s describing the parameters of this
+        /// <see cref="MethodExpression"/>.
+        /// </summary>
+        public ReadOnlyCollection<ParameterExpression> Parameters
+            => Definition.Parameters;
 
         /// <summary>
         /// Gets the Expression describing the body of this <see cref="MethodExpression"/>.
@@ -143,42 +122,22 @@
 
         internal void Finalise(
             Expression body,
-            IList<MethodParameterExpression> parameters)
+            IList<ParameterExpression> parameters)
         {
-            var parametersUnchanged = _parameters.SequenceEqual(parameters);
-
-            if (parametersUnchanged && body == Body)
-            {
-                return;
-            }
-
-            Definition = Definition.Update(
-                body,
-                parametersUnchanged
-                    ? (IEnumerable<ParameterExpression>)Definition.Parameters
-                    : parameters.ProjectToArray(p => p.ParameterExpression));
+            var parametersUnchanged = Parameters.SequenceEqual(parameters);
 
             if (parametersUnchanged)
             {
-                return;
+                if (body == Body)
+                {
+                    return;
+                }
+
+                parameters = Definition.Parameters;
+                _methodParameters = null;
             }
 
-            var parameterCount = parameters.Count;
-
-            if (_parameters.Count == 0)
-            {
-                _parameters = new List<MethodParameterExpression>(parameterCount);
-                _methodParameters = new List<IParameter>(parameterCount);
-            }
-            else
-            {
-                _parameters.Clear();
-                _methodParameters.Clear();
-            }
-
-            _parameters.AddRange(parameters);
-            _methodParameters.AddRange(parameters);
-            _readOnlyParameters = null;
+            Definition = Definition.Update(body, parameters);
         }
 
         #region IMethodNamingContext Members
@@ -254,7 +213,29 @@
 
         Type[] IMethod.GetGenericArguments() => Enumerable<Type>.EmptyArray;
 
-        IList<IParameter> IMethod.GetParameters() => _methodParameters;
+        IList<IParameter> IMethod.GetParameters()
+            => _methodParameters ??= Parameters.ProjectToArray(p => new MethodParameter(p));
+
+        #endregion
+
+        #region Helper Class
+
+        private class MethodParameter : IParameter
+        {
+            public MethodParameter(ParameterExpression parameter)
+            {
+                Type = parameter.Type;
+                Name = parameter.Name;
+            }
+
+            public Type Type { get; }
+
+            public string Name { get; }
+
+            public bool IsOut => false;
+
+            public bool IsParamsArray => false;
+        }
 
         #endregion
     }
