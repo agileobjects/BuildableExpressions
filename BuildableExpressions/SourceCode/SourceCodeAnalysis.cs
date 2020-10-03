@@ -18,7 +18,6 @@
         private readonly Stack<Expression> _expressions;
         private List<string> _requiredNamespaces;
         private MethodScope _currentMethodScope;
-        private Dictionary<Expression, MethodExpression> _methodsByConvertedBlock;
 
         private SourceCodeAnalysis(SourceCodeTranslationSettings settings)
             : base(settings)
@@ -59,17 +58,6 @@
 
         public IList<string> RequiredNamespaces => _requiredNamespaces;
 
-        public bool IsMethodBlock(BlockExpression block, out MethodExpression blockMethod)
-        {
-            if (_methodsByConvertedBlock == null)
-            {
-                blockMethod = null;
-                return false;
-            }
-
-            return _methodsByConvertedBlock.TryGetValue(block, out blockMethod);
-        }
-
         protected override Expression VisitAndConvert(Expression expression)
         {
             if (expression == null)
@@ -86,7 +74,8 @@
 
             switch (expression.NodeType)
             {
-                case Block when ExtractToMethod((BlockExpression)expression):
+                case Block when ExtractToMethod((BlockExpression)expression, out var extractedMethod):
+                    expression = BuildableExpression.Call(extractedMethod, extractedMethod.Parameters);
                     goto SkipBaseVisit;
 
                 case Default:
@@ -133,19 +122,16 @@
             }
         }
 
-        private bool ExtractToMethod(Expression block)
+        private bool ExtractToMethod(Expression block, out MethodExpression extractedMethod)
         {
             if (!Extract(block))
             {
+                extractedMethod = null;
                 return false;
             }
 
-            var blockMethod = _currentMethodScope.CreateMethodFor(block);
-            var updatedMethod = VisitAndConvert(blockMethod);
-
-            (_methodsByConvertedBlock ??= new Dictionary<Expression, MethodExpression>())
-                .Add(block, updatedMethod);
-
+            extractedMethod = _currentMethodScope.CreateMethodFor(block);
+            extractedMethod = VisitAndConvert(extractedMethod);
             return true;
         }
 
@@ -268,7 +254,7 @@
 
             ExitMethodScope();
 
-            foreach (var parameter in updatedParameters)
+            foreach (var parameter in method.Parameters)
             {
                 AddNamespaceIfRequired(parameter);
             }

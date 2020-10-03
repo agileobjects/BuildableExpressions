@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using Interfaces;
+    using ReadableExpressions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Interfaces;
     using static System.Linq.Expressions.ExpressionType;
@@ -13,7 +14,6 @@
         ISourceCodeTranslationContext
     {
         private readonly SourceCodeAnalysis _analysis;
-        private MethodExpression _currentMethod;
 
         public SourceCodeExpressionTranslation(
             SourceCodeExpression expression,
@@ -24,7 +24,7 @@
 
         private SourceCodeExpressionTranslation(
             SourceCodeAnalysis analysis,
-            SourceCodeTranslationSettings settings)
+            TranslationSettings settings)
             : base(analysis, settings)
         {
             _analysis = analysis;
@@ -44,16 +44,8 @@
 
             switch (expression.NodeType)
             {
-                case Block:
-                    var block = (BlockExpression)expression;
-
-                    if (_currentMethod.Body != block &&
-                        _analysis.IsMethodBlock(block, out var method))
-                    {
-                        return MethodCallTranslation.For(method, method.Parameters, this);
-                    }
-
-                    break;
+                case Call when expression is BuildableMethodCallExpression methodCall:
+                    return MethodCallTranslation.For(methodCall.Method, methodCall.Arguments, this);
 
                 case (ExpressionType)SourceCode:
                     return new SourceCodeTranslation((SourceCodeExpression)expression, this);
@@ -62,7 +54,7 @@
                     return new ClassTranslation((ClassExpression)expression, this);
 
                 case (ExpressionType)Method:
-                    return new MethodTranslation(_currentMethod = (MethodExpression)expression, this);
+                    return new MethodTranslation((MethodExpression)expression, this);
             }
 
             return base.GetTranslationFor(expression);
