@@ -5,11 +5,14 @@
     using System.Collections.ObjectModel;
     using System.Linq.Expressions;
     using Extensions;
+    using ReadableExpressions.Translations;
 
     /// <summary>
     /// Represents a call to a generated <see cref="MethodExpression"/>.
     /// </summary>
-    public sealed class BuildableMethodCallExpression : Expression
+    public sealed class BuildableMethodCallExpression :
+        Expression,
+        ICustomTranslationExpression
     {
         internal BuildableMethodCallExpression(
             Expression @object,
@@ -68,5 +71,8 @@
         /// Expressions representing the method call arguments.
         /// </summary>
         public ReadOnlyCollection<Expression> Arguments { get; }
+
+        ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
+            => MethodCallTranslation.For(Method, Arguments, context);
     }
 }

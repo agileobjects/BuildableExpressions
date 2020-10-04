@@ -10,7 +10,9 @@
     using Extensions;
     using ReadableExpressions;
     using ReadableExpressions.Extensions;
+    using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
+    using Translations;
     using static MemberVisibility;
 
     /// <summary>
@@ -20,7 +22,8 @@
         Expression,
         IMethodNamingContext,
         IMethodExpressionConfigurator,
-        IMethod
+        IMethod,
+        ICustomTranslationExpression
     {
         private readonly SourceCodeTranslationSettings _settings;
         private MethodParameter[] _methodParameters;
@@ -217,6 +220,9 @@
             => _methodParameters ??= Parameters.ProjectToArray(p => new MethodParameter(p));
 
         #endregion
+
+        ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
+            => new MethodTranslation(this, context);
 
         #region Helper Class
 

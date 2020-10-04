@@ -6,9 +6,10 @@
     using System.Linq;
     using System.Linq.Expressions;
     using Api;
-    using BuildableExpressions.Extensions;
     using Extensions;
     using ReadableExpressions;
+    using ReadableExpressions.Translations;
+    using Translations;
 
     /// <summary>
     /// Represents a class in a piece of source code.
@@ -16,7 +17,8 @@
     public class ClassExpression :
         Expression,
         IClassNamingContext,
-        IClassExpressionConfigurator
+        IClassExpressionConfigurator,
+        ICustomTranslationExpression
     {
         private readonly SourceCodeTranslationSettings _settings;
         private readonly List<MethodExpression> _methods;
@@ -318,5 +320,8 @@
         }
 
         #endregion
+
+        ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
+            => new ClassTranslation(this, context);
     }
 }

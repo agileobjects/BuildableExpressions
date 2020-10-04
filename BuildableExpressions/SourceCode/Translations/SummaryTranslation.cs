@@ -7,7 +7,6 @@
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Formatting;
-    using ReadableExpressions.Translations.Interfaces;
     using static System.Environment;
 
     internal class SummaryTranslation : ITranslatable

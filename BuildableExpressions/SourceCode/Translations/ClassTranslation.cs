@@ -5,7 +5,6 @@
     using System.Linq.Expressions;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
-    using ReadableExpressions.Translations.Interfaces;
 
     internal class ClassTranslation : ITranslation
     {

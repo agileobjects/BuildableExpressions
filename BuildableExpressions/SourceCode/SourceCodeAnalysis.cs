@@ -1,28 +1,22 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using Extensions;
-    using NetStandardPolyfills;
     using ReadableExpressions;
-    using ReadableExpressions.Extensions;
-    using ReadableExpressions.Translations.Reflection;
     using static System.Linq.Expressions.ExpressionType;
     using static MemberVisibility;
 
     internal class SourceCodeAnalysis : ExpressionAnalysis
     {
-        private readonly SourceCodeTranslationSettings _settings;
+        private readonly NamespaceAnalysis _namespaceAnalysis;
         private readonly Stack<Expression> _expressions;
-        private List<string> _requiredNamespaces;
         private MethodScope _currentMethodScope;
 
         private SourceCodeAnalysis(SourceCodeTranslationSettings settings)
             : base(settings)
         {
-            _settings = settings;
+            _namespaceAnalysis = new NamespaceAnalysis(settings);
             _expressions = new Stack<Expression>();
         }
 
@@ -42,21 +36,14 @@
 
         protected override ExpressionAnalysis Finalise()
         {
-            if (_requiredNamespaces != null)
-            {
-                _requiredNamespaces.Sort(UsingsComparer.Instance);
-            }
-            else if (_settings.CollectRequiredNamespaces)
-            {
-                _requiredNamespaces = Enumerable<string>.EmptyList;
-            }
-
+            _namespaceAnalysis.Finalise();
             return base.Finalise();
         }
 
         #endregion
 
-        public IList<string> RequiredNamespaces => _requiredNamespaces;
+        public IList<string> RequiredNamespaces
+            => _namespaceAnalysis.RequiredNamespaces;
 
         protected override Expression VisitAndConvert(Expression expression)
         {
@@ -79,7 +66,7 @@
                     goto SkipBaseVisit;
 
                 case Default:
-                    AddNamespaceIfRequired(expression);
+                    _namespaceAnalysis.Visit((DefaultExpression)expression);
                     break;
 
                 case (ExpressionType)SourceCodeExpressionType.SourceCode:
@@ -193,7 +180,7 @@
 
         private ClassExpression VisitAndConvert(ClassExpression @class)
         {
-            AddNamespacesIfRequired(@class.Interfaces);
+            _namespaceAnalysis.Visit(@class);
 
             VisitAndConvert(
                 @class.Methods,
@@ -204,42 +191,19 @@
 
         protected override Expression VisitAndConvert(ConstantExpression constant)
         {
-            if (constant.Type.IsEnum())
-            {
-                AddNamespaceIfRequired(constant);
-            }
-            else if (constant.Type.IsAssignableTo(typeof(Type)))
-            {
-                AddNamespaceIfRequired((Type)constant.Value);
-            }
-
-            return constant;
+            _namespaceAnalysis.Visit(constant);
+            return base.VisitAndConvert(constant);
         }
 
         protected override Expression VisitAndConvert(MemberExpression memberAccess)
         {
-            if (memberAccess.Expression == null)
-            {
-                // Static member access
-                AddNamespaceIfRequired(memberAccess.Member.DeclaringType);
-            }
-
+            _namespaceAnalysis.Visit(memberAccess);
             return base.VisitAndConvert(memberAccess);
         }
 
         protected override Expression VisitAndConvert(MethodCallExpression methodCall)
         {
-            if (methodCall.Method.IsGenericMethod)
-            {
-                AddNamespacesIfRequired(new BclMethodWrapper(methodCall.Method)
-                    .GetRequiredExplicitGenericArguments(_settings));
-            }
-
-            if (methodCall.Method.IsStatic)
-            {
-                AddNamespaceIfRequired(methodCall.Method.DeclaringType);
-            }
-
+            _namespaceAnalysis.Visit(methodCall);
             return base.VisitAndConvert(methodCall);
         }
 
@@ -251,15 +215,9 @@
             var updatedBody = VisitAndConvert(method.Body);
 
             _currentMethodScope.Finalise(updatedBody, updatedParameters);
+            _namespaceAnalysis.Visit(method);
 
             ExitMethodScope();
-
-            foreach (var parameter in method.Parameters)
-            {
-                AddNamespaceIfRequired(parameter);
-            }
-
-            AddNamespaceIfRequired(method);
             return method;
         }
 
@@ -271,13 +229,13 @@
 
         protected override Expression VisitAndConvert(NewArrayExpression newArray)
         {
-            AddNamespaceIfRequired(newArray.Type.GetElementType());
+            _namespaceAnalysis.Visit(newArray);
             return base.VisitAndConvert(newArray);
         }
 
         protected override Expression VisitAndConvert(NewExpression newing)
         {
-            AddNamespaceIfRequired(newing.Type);
+            _namespaceAnalysis.Visit(newing);
             return base.VisitAndConvert(newing);
         }
 
@@ -289,57 +247,16 @@
 
         protected override CatchBlock VisitAndConvert(CatchBlock @catch)
         {
+            _namespaceAnalysis.Visit(@catch);
+
             var catchVariable = @catch.Variable;
 
             if (catchVariable != null)
             {
-                AddNamespaceIfRequired(catchVariable);
                 _currentMethodScope.Add(catchVariable);
             }
 
             return base.VisitAndConvert(@catch);
-        }
-
-        private void AddNamespacesIfRequired(IEnumerable<Type> accessedTypes)
-        {
-            foreach (var type in accessedTypes)
-            {
-                AddNamespaceIfRequired(type);
-            }
-        }
-
-        private void AddNamespaceIfRequired(Expression expression)
-            => AddNamespaceIfRequired(expression.Type);
-
-        private void AddNamespaceIfRequired(Type accessedType)
-        {
-            if (!_settings.CollectRequiredNamespaces ||
-                (accessedType == typeof(void)) ||
-                (accessedType == typeof(string)) ||
-                (accessedType == typeof(object)) ||
-                accessedType.IsPrimitive())
-            {
-                return;
-            }
-
-            if (accessedType.IsGenericType())
-            {
-                AddNamespacesIfRequired(accessedType.GetGenericTypeArguments());
-            }
-
-            var @namespace = accessedType.Namespace;
-
-            if (@namespace == null)
-            {
-                return;
-            }
-
-            _requiredNamespaces ??= new List<string>();
-
-            if (!_requiredNamespaces.Contains(@namespace))
-            {
-                _requiredNamespaces.Add(@namespace);
-            }
         }
 
         private class MethodScope

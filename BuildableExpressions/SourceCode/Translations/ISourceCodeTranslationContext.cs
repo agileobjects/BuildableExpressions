@@ -1,7 +1,7 @@
-﻿namespace AgileObjects.BuildableExpressions.SourceCode.Translations.Interfaces
+﻿namespace AgileObjects.BuildableExpressions.SourceCode.Translations
 {
     using System.Collections.Generic;
-    using ReadableExpressions.Translations.Interfaces;
+    using ReadableExpressions.Translations;
 
     internal interface ISourceCodeTranslationContext : ITranslationContext
     {

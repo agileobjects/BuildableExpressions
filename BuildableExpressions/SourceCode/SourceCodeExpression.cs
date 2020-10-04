@@ -7,12 +7,16 @@
     using System.Linq.Expressions;
     using Api;
     using Extensions;
+    using ReadableExpressions.Translations;
     using Translations;
 
     /// <summary>
     /// Represents a piece of complete source code.
     /// </summary>
-    public class SourceCodeExpression : Expression, ISourceCodeExpressionConfigurator
+    public class SourceCodeExpression :
+        Expression,
+        ISourceCodeExpressionConfigurator,
+        ICustomTranslationExpression
     {
         private readonly SourceCodeTranslationSettings _settings;
         private readonly List<ClassExpression> _classes;
@@ -54,11 +58,6 @@
 
             return this;
         }
-
-        /// <summary>
-        /// Gets the Expression on which this <see cref="SourceCodeExpression"/> is based.
-        /// </summary>
-        public Expression Content { get; }
 
         /// <summary>
         /// Gets the namespace to which the source code represented by this
@@ -186,5 +185,17 @@
         }
 
         #endregion
+
+        ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
+        {
+            if (!(context is ISourceCodeTranslationContext sourceCodeContext))
+            {
+                sourceCodeContext = new CompositeSourceCodeTranslationContext(
+                    NamespaceAnalysis.For(this, _settings), 
+                    context);
+            }
+
+            return new SourceCodeTranslation(this, sourceCodeContext);
+        }
     }
 }
