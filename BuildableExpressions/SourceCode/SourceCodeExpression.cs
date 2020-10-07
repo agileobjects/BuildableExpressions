@@ -7,6 +7,7 @@
     using System.Linq.Expressions;
     using Api;
     using Extensions;
+    using ReadableExpressions;
     using ReadableExpressions.Translations;
     using Translations;
 
@@ -16,7 +17,8 @@
     public class SourceCodeExpression :
         Expression,
         ISourceCodeExpressionConfigurator,
-        ICustomTranslationExpression
+        ICustomTranslationExpression,
+        ICustomAnalysableExpression
     {
         private readonly SourceCodeTranslationSettings _settings;
         private readonly List<ClassExpression> _classes;
@@ -191,11 +193,14 @@
             if (!(context is ISourceCodeTranslationContext sourceCodeContext))
             {
                 sourceCodeContext = new CompositeSourceCodeTranslationContext(
-                    NamespaceAnalysis.For(this, _settings), 
+                    NamespaceAnalysis.For(this, _settings),
                     context);
             }
 
             return new SourceCodeTranslation(this, sourceCodeContext);
         }
+
+        IEnumerable<Expression> ICustomAnalysableExpression.Expressions
+            => Classes.Cast<ICustomAnalysableExpression>().SelectMany(c => c.Expressions);
     }
 }

@@ -18,7 +18,8 @@
         Expression,
         IClassNamingContext,
         IClassExpressionConfigurator,
-        ICustomTranslationExpression
+        ICustomTranslationExpression,
+        ICustomAnalysableExpression
     {
         private readonly SourceCodeTranslationSettings _settings;
         private readonly List<MethodExpression> _methods;
@@ -323,5 +324,8 @@
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => new ClassTranslation(this, context);
+
+        IEnumerable<Expression> ICustomAnalysableExpression.Expressions
+            => Methods.Cast<ICustomAnalysableExpression>().SelectMany(m => m.Expressions);
     }
 }

@@ -23,7 +23,8 @@
         IMethodNamingContext,
         IMethodExpressionConfigurator,
         IMethod,
-        ICustomTranslationExpression
+        ICustomTranslationExpression,
+        ICustomAnalysableExpression
     {
         private readonly SourceCodeTranslationSettings _settings;
         private MethodParameter[] _methodParameters;
@@ -223,6 +224,11 @@
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => new MethodTranslation(this, context);
+
+        IEnumerable<Expression> ICustomAnalysableExpression.Expressions
+        {
+            get { yield return Definition; }
+        }
 
         #region Helper Class
 
