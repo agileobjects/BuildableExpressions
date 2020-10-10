@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
     using Extensions;
     using NetStandardPolyfills;
@@ -10,12 +11,11 @@
 
     internal class NamespaceAnalysis : ExpressionVisitor
     {
-        private readonly SourceCodeTranslationSettings _settings;
         private List<string> _requiredNamespaces;
 
         public NamespaceAnalysis(SourceCodeTranslationSettings settings)
         {
-            _settings = settings;
+            Settings = settings;
         }
 
         public static NamespaceAnalysis For(
@@ -29,19 +29,9 @@
             return analysis;
         }
 
-        public IList<string> RequiredNamespaces => _requiredNamespaces;
+        public SourceCodeTranslationSettings Settings { get; }
 
-        public void Finalise()
-        {
-            if (_requiredNamespaces != null)
-            {
-                _requiredNamespaces.Sort(UsingsComparer.Instance);
-            }
-            else if (_settings.CollectRequiredNamespaces)
-            {
-                _requiredNamespaces = Enumerable<string>.EmptyList;
-            }
-        }
+        public IList<string> RequiredNamespaces => _requiredNamespaces;
 
         public void Visit(ClassExpression @class)
             => AddNamespacesIfRequired(@class.Interfaces);
@@ -98,7 +88,7 @@
             if (methodCall.Method.IsGenericMethod)
             {
                 AddNamespacesIfRequired(new BclMethodWrapper(methodCall.Method)
-                    .GetRequiredExplicitGenericArguments(_settings));
+                    .GetRequiredExplicitGenericArguments(Settings));
             }
 
             if (methodCall.Method.IsStatic)
@@ -164,7 +154,7 @@
 
         private void AddNamespaceIfRequired(Type accessedType)
         {
-            if (!_settings.CollectRequiredNamespaces ||
+            if (!Settings.CollectRequiredNamespaces ||
                 (accessedType == typeof(void)) ||
                 (accessedType == typeof(string)) ||
                 (accessedType == typeof(object)) ||
@@ -190,6 +180,34 @@
             if (!_requiredNamespaces.Contains(@namespace))
             {
                 _requiredNamespaces.Add(@namespace);
+            }
+        }
+
+        public void Merge(NamespaceAnalysis otherAnalysis)
+        {
+            if ((otherAnalysis._requiredNamespaces?.Any()) != true)
+            {
+                return;
+            }
+
+            if (_requiredNamespaces?.Any() != true)
+            {
+                _requiredNamespaces = new List<string>();
+            }
+
+            _requiredNamespaces.AddRange(otherAnalysis._requiredNamespaces
+                .Except(_requiredNamespaces));
+        }
+
+        public void Finalise()
+        {
+            if (_requiredNamespaces != null)
+            {
+                _requiredNamespaces.Sort(UsingsComparer.Instance);
+            }
+            else if (Settings.CollectRequiredNamespaces)
+            {
+                _requiredNamespaces = Enumerable<string>.EmptyList;
             }
         }
     }

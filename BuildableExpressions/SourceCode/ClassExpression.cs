@@ -156,6 +156,16 @@
             Expression body,
             Func<IMethodExpressionConfigurator, IMethodExpressionConfigurator> configuration)
         {
+            var method = AddMethodWithoutAnalysis(body, configuration);
+            MethodExpressionAnalysis.For(method, _settings);
+
+            return method;
+        }
+
+        internal MethodExpression AddMethodWithoutAnalysis(
+            Expression body,
+            Func<IMethodExpressionConfigurator, IMethodExpressionConfigurator> configuration)
+        {
             var method = new MethodExpression(this, body, _settings);
             configuration.Invoke(method);
 

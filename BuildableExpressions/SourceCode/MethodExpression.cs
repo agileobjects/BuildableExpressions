@@ -71,6 +71,8 @@
             return this;
         }
 
+        internal MethodExpressionAnalysis Analysis { get; set; }
+
         /// <summary>
         /// Gets this <see cref="MethodExpression"/>'s parent <see cref="ClassExpression"/>.
         /// </summary>

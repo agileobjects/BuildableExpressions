@@ -1,8 +1,11 @@
 ﻿namespace AgileObjects.BuildableExpressions
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using NetStandardPolyfills;
+    using ReadableExpressions.Extensions;
     using SourceCode;
     using SourceCode.Extensions;
 
@@ -57,10 +60,41 @@
             MethodExpression method,
             params Expression[] arguments)
         {
-            return new BuildableMethodCallExpression(
-                ThisInstance(method.Class),
-                method,
-                arguments);
+            ThrowIfParameterCountMismatch(method, arguments);
+            ThrowIfParameterTypeMismatch(method, arguments);
+
+            var thisInstance = ThisInstance(method.Class);
+
+            return new BuildableMethodCallExpression(thisInstance, method, arguments);
+        }
+
+        private static void ThrowIfParameterCountMismatch(
+            MethodExpression method,
+            ICollection<Expression> arguments)
+        {
+            if (method.Parameters.Count != arguments.Count)
+            {
+                throw new ArgumentException(
+                    $"Expected {method.Parameters.Count} argument(s), got {arguments.Count}");
+            }
+        }
+
+        private static void ThrowIfParameterTypeMismatch(
+            MethodExpression method,
+            IList<Expression> arguments)
+        {
+            var typedMismatchParameter = method
+                .Parameters
+                .Select((p, i) => new { p.Type, Index = i })
+                .FirstOrDefault(_ => !arguments[_.Index].Type.IsAssignableTo(_.Type));
+
+            if (typedMismatchParameter != null)
+            {
+                throw new ArgumentException(
+                    $"Parameter {typedMismatchParameter.Index + 1} requires an Expression of Type " +
+                    $"'{typedMismatchParameter.Type.GetFriendlyName()}' - the supplied argument is " +
+                    $"of Type '{arguments[typedMismatchParameter.Index].Type.GetFriendlyName()}'");
+            }
         }
     }
 }

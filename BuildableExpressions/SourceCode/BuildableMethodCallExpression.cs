@@ -5,6 +5,7 @@
     using System.Collections.ObjectModel;
     using System.Linq.Expressions;
     using Extensions;
+    using ReadableExpressions;
     using ReadableExpressions.Translations;
 
     /// <summary>
@@ -12,6 +13,7 @@
     /// </summary>
     public sealed class BuildableMethodCallExpression :
         Expression,
+        ICustomAnalysableExpression,
         ICustomTranslationExpression
     {
         internal BuildableMethodCallExpression(
@@ -74,5 +76,18 @@
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => MethodCallTranslation.For(Method, Arguments, context);
+
+        IEnumerable<Expression> ICustomAnalysableExpression.Expressions
+        {
+            get
+            {
+                yield return Object;
+
+                foreach (var argument in Arguments)
+                {
+                    yield return argument;
+                }
+            }
+        }
     }
 }

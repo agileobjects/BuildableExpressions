@@ -159,6 +159,22 @@
         }
 
         [Fact]
+        public void ShouldErrorIfMethodAccessesUnscopedVariable()
+        {
+            var methodEx = Should.Throw<NotSupportedException>(() =>
+            {
+                var int1Variable = Parameter(typeof(int), "int1");
+                var int2Variable = Variable(typeof(int), "int2");
+                var addInts = Add(int1Variable, int2Variable);
+
+                var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
+                sourceCode.AddClass(cls => cls.WithMethod(addInts));
+            });
+
+            methodEx.Message.ShouldContain("undefined variable(s) 'int int1', 'int int2'");
+        }
+
+        [Fact]
         public void ShouldErrorIfAmbiguousInterfacesImplemented()
         {
             var interfaceEx = Should.Throw<AmbiguousMatchException>(() =>

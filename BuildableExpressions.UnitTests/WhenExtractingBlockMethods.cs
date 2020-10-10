@@ -78,10 +78,15 @@ namespace GeneratedExpressionCode
                     Assign(intParameter2, Constant(3)),
                     Multiply(intParameter1, intParameter2)));
 
+            var conditionalLambda = Lambda<Func<int, int, int>>(
+                conditional,
+                intParameter1,
+                intParameter2);
+
             var translated = SourceCodeFactory.Default
                 .CreateSourceCode(sc => sc
                     .WithClass(cls => cls
-                        .WithMethod(conditional)))
+                        .WithMethod(conditionalLambda)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -147,10 +152,15 @@ namespace GeneratedExpressionCode
                 Constant("Yep"),
                 Constant("Nope"));
 
+            var yepOrNopeLambda = Lambda<Func<int, int, string>>(
+                yepOrNope,
+                intParameter1,
+                intParameter2);
+
             var translated = SourceCodeFactory.Default
                 .CreateSourceCode(sc => sc
                     .WithClass(cls => cls
-                        .WithMethod(yepOrNope)))
+                        .WithMethod(yepOrNopeLambda)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
