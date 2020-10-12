@@ -59,6 +59,13 @@
         IClassExpressionConfigurator WithVisibility(ClassVisibility visibility);
 
         /// <summary>
+        /// Mark the <see cref="ClassExpression"/> as static. Added methods will be made static
+        /// automatically.
+        /// </summary>
+        /// <returns>This <see cref="IClassExpressionConfigurator"/>, to support a fluent API.</returns>
+        IClassExpressionConfigurator AsStatic();
+
+        /// <summary>
         /// Set the name of the <see cref="ClassExpression"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="ClassExpression"/>.</param>

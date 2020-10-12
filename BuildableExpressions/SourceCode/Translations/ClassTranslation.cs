@@ -8,6 +8,7 @@
 
     internal class ClassTranslation : ITranslation
     {
+        private const string _staticString = "static ";
         private const string _classString = "class ";
 
         private readonly string _visibility;
@@ -33,6 +34,7 @@
             var translationSize =
                 _summary.TranslationSize +
                 _visibility.Length + 1 +
+                _staticString.Length + 1 +
                 _classString.Length +
                 @class.Name.Length +
                 6; // <- for opening and closing braces
@@ -40,9 +42,8 @@
             var keywordFormattingSize = context.GetKeywordFormattingSize();
 
             var formattingSize =
-               _summary.FormattingSize +
-                keywordFormattingSize + // <- for accessibility
-                keywordFormattingSize; // <- for 'class'
+                _summary.FormattingSize +
+                keywordFormattingSize; // <- for accessibility + 'class'
 
             if (_interfaceCount != 0)
             {
@@ -132,7 +133,16 @@
         {
             _summary.WriteTo(writer);
 
-            writer.WriteKeywordToTranslation(_visibility + " " + _classString);
+            var declaration = _visibility + " ";
+
+            if (_class.IsStatic)
+            {
+                declaration += _staticString;
+            }
+
+            declaration += _classString;
+
+            writer.WriteKeywordToTranslation(declaration);
             writer.WriteTypeNameToTranslation(_class.Name);
 
             if (_interfaceCount != 0)

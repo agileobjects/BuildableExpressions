@@ -109,9 +109,14 @@
         }
 
         /// <summary>
-        /// The this <see cref="ClassExpression"/>'s <see cref="ClassVisibility">visibility</see>.
+        /// Gets this <see cref="ClassExpression"/>'s <see cref="ClassVisibility" />.
         /// </summary>
         public ClassVisibility Visibility { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="ClassExpression"/> is static.
+        /// </summary>
+        public bool IsStatic { get; private set; }
 
         /// <summary>
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="ClassExpression"/>,
@@ -168,6 +173,11 @@
         {
             var method = new MethodExpression(this, body, _settings);
             configuration.Invoke(method);
+
+            if (IsStatic)
+            {
+                ((IMethodExpressionConfigurator)method).AsStatic();
+            }
 
             _methods.Add(method);
             _readOnlyMethods = null;
@@ -272,6 +282,12 @@
         }
 
         #region IClassExpressionConfigurator Members
+
+        IClassExpressionConfigurator IClassExpressionConfigurator.AsStatic()
+        {
+            IsStatic = true;
+            return this;
+        }
 
         IClassExpressionConfigurator IClassExpressionConfigurator.WithVisibility(
             ClassVisibility visibility)

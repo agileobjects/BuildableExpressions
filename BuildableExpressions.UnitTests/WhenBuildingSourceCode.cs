@@ -354,6 +354,37 @@ namespace GeneratedExpressionCode
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
+        [Fact]
+        public void ShouldBuildAStaticClassAndMethods()
+        {
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .AsStatic()
+                        .WithMethod(Default(typeof(string)))
+                        .WithMethod(Default(typeof(int)))))
+                .ToSourceCode();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public static class GeneratedExpressionClass
+    {
+        public static string GetString()
+        {
+            return null;
+        }
+
+        public static int GetInt()
+        {
+            return default(int);
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
         #region Helper Members
 
         public interface IMessager

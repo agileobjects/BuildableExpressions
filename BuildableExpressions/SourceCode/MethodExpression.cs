@@ -79,15 +79,20 @@
         public ClassExpression Class { get; }
 
         /// <summary>
+        /// Gets a <see cref="CommentExpression"/> describing this <see cref="MethodExpression"/>,
+        /// if a summary has been set.
+        /// </summary>
+        public CommentExpression Summary { get; private set; }
+
+        /// <summary>
         /// Gets the <see cref="MemberVisibility"/> of this <see cref="MethodExpression"/>.
         /// </summary>
         public MemberVisibility Visibility { get; private set; }
 
         /// <summary>
-        /// Gets a <see cref="CommentExpression"/> describing this <see cref="MethodExpression"/>,
-        /// if a summary has been set.
+        /// Gets a value indicating whether this <see cref="MethodExpression"/> is static.
         /// </summary>
-        public CommentExpression Summary { get; private set; }
+        public bool IsStatic { get; private set; }
 
         /// <summary>
         /// Gets the name of this <see cref="MethodExpression"/>.
@@ -175,6 +180,12 @@
             return this;
         }
 
+        IMethodExpressionConfigurator IMethodExpressionConfigurator.AsStatic()
+        {
+            IsStatic = true;
+            return this;
+        }
+
         IMethodExpressionConfigurator IMethodExpressionConfigurator.Named(
             string name)
         {
@@ -206,8 +217,6 @@
         bool IMethod.IsPrivate => Visibility == Private;
 
         bool IMethod.IsAbstract => false;
-
-        bool IMethod.IsStatic => false;
 
         bool IMethod.IsVirtual => false;
 
