@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using BuildableExpressions.Extensions;
     using Extensions;
     using NetStandardPolyfills;
     using ReadableExpressions.Extensions;
@@ -88,7 +89,8 @@
             if (methodCall.Method.IsGenericMethod)
             {
                 AddNamespacesIfRequired(new BclMethodWrapper(methodCall.Method)
-                    .GetRequiredExplicitGenericArguments(Settings));
+                    .GetRequiredExplicitGenericArguments(Settings)
+                    .Project(arg => arg.Type));
             }
 
             if (methodCall.Method.IsStatic)

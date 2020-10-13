@@ -27,7 +27,7 @@
         ICustomAnalysableExpression
     {
         private readonly SourceCodeTranslationSettings _settings;
-        private MethodParameter[] _methodParameters;
+        private ReadOnlyCollection<IParameter> _methodParameters;
         private string _name;
 
         internal MethodExpression(
@@ -226,10 +226,15 @@
 
         IMethod IMethod.GetGenericMethodDefinition() => null;
 
-        Type[] IMethod.GetGenericArguments() => Enumerable<Type>.EmptyArray;
+        ReadOnlyCollection<IGenericArgument> IMethod.GetGenericArguments()
+            => Enumerable<IGenericArgument>.EmptyReadOnlyCollection;
 
-        IList<IParameter> IMethod.GetParameters()
-            => _methodParameters ??= Parameters.ProjectToArray(p => new MethodParameter(p));
+        ReadOnlyCollection<IParameter> IMethod.GetParameters()
+        {
+            return _methodParameters ??= Parameters
+                .ProjectToArray<ParameterExpression, IParameter>(p => new MethodParameter(p))
+                .ToReadOnlyCollection();
+        }
 
         #endregion
 
