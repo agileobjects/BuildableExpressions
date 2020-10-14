@@ -17,8 +17,8 @@
     public class SourceCodeExpression :
         Expression,
         ISourceCodeExpressionConfigurator,
-        ICustomTranslationExpression,
-        ICustomAnalysableExpression
+        ICustomAnalysableExpression,
+        ICustomTranslationExpression
     {
         private readonly SourceCodeTranslationSettings _settings;
         private readonly List<ClassExpression> _classes;
@@ -188,6 +188,9 @@
 
         #endregion
 
+        IEnumerable<Expression> ICustomAnalysableExpression.Expressions
+            => Classes.Cast<ICustomAnalysableExpression>().SelectMany(c => c.Expressions);
+
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
         {
             if (!(context is ISourceCodeTranslationContext sourceCodeContext))
@@ -199,8 +202,5 @@
 
             return new SourceCodeTranslation(this, sourceCodeContext);
         }
-
-        IEnumerable<Expression> ICustomAnalysableExpression.Expressions
-            => Classes.Cast<ICustomAnalysableExpression>().SelectMany(c => c.Expressions);
     }
 }

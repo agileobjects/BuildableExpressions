@@ -49,6 +49,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="BuildableExpression.*.cs">
+      <DependentUpon>BuildableExpression.cs</DependentUpon>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AgileObjects.ReadableExpressions" Version="3.0.0-preview1" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.6.85" />
   </ItemGroup>

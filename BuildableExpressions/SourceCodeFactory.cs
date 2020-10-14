@@ -42,7 +42,7 @@
         /// <summary>
         /// Creates a <see cref="SourceCodeExpression"/> representing a complete piece of source code.
         /// </summary>
-        /// <param name="configuration">The configuration to use for the translation.</param>
+        /// <param name="configuration">The configuration to use for the <see cref="SourceCodeExpression"/>.</param>
         /// <returns>A <see cref="SourceCodeExpression"/> representing a complete piece of source code.</returns>
         public SourceCodeExpression CreateSourceCode(
             Func<ISourceCodeExpressionConfigurator, ISourceCodeExpressionConfigurator> configuration)

@@ -45,5 +45,12 @@
         /// <param name="name">The name to give the <see cref="MethodExpression"/>.</param>
         /// <returns>This <see cref="IMethodExpressionConfigurator"/>, to support a fluent API.</returns>
         IMethodExpressionConfigurator Named(string name);
+
+        /// <summary>
+        /// Adds the given <paramref name="parameter"/> to the <see cref="MethodExpression"/>.
+        /// </summary>
+        /// <param name="parameter">The <see cref="GenericParameterExpression"/> to add.</param>
+        /// <returns>This <see cref="IMethodExpressionConfigurator"/>, to support a fluent API.</returns>
+        IMethodExpressionConfigurator WithGenericParameter(GenericParameterExpression parameter);
     }
 }

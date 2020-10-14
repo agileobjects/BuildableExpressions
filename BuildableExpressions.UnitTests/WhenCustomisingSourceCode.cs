@@ -367,6 +367,37 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldUseStaticMethodScope()
+        {
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(Default(typeof(string)), m => m
+                            .AsStatic())
+                        .WithMethod(Default(typeof(int)))))
+                .ToSourceCode();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public static string GetString()
+        {
+            return null;
+        }
+
+        public int GetInt()
+        {
+            return default(int);
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldUseStaticClassAndMethodScopes()
         {
             var translated = SourceCodeFactory.Default
@@ -389,37 +420,6 @@ namespace GeneratedExpressionCode
         }
 
         public static int GetInt()
-        {
-            return default(int);
-        }
-    }
-}";
-            EXPECTED.ShouldCompile();
-            translated.ShouldBe(EXPECTED.TrimStart());
-        }
-
-        [Fact]
-        public void ShouldUseStaticMethodScope()
-        {
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(Default(typeof(string)), m => m
-                            .AsStatic())
-                        .WithMethod(Default(typeof(int)))))
-                .ToSourceCode();
-
-            const string EXPECTED = @"
-namespace GeneratedExpressionCode
-{
-    public class GeneratedExpressionClass
-    {
-        public static string GetString()
-        {
-            return null;
-        }
-
-        public int GetInt()
         {
             return default(int);
         }

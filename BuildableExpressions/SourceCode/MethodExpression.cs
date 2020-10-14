@@ -23,11 +23,13 @@
         IMethodNamingContext,
         IMethodExpressionConfigurator,
         IMethod,
-        ICustomTranslationExpression,
-        ICustomAnalysableExpression
+        ICustomAnalysableExpression,
+        ICustomTranslationExpression
     {
         private readonly SourceCodeTranslationSettings _settings;
-        private ReadOnlyCollection<IParameter> _methodParameters;
+        private List<IGenericArgument> _genericArguments;
+        private ReadOnlyCollection<IGenericArgument> _readonlyGenericArguments;
+        private ReadOnlyCollection<IParameter> _parameters;
         private string _name;
 
         internal MethodExpression(
@@ -131,25 +133,7 @@
         /// </summary>
         public Expression Body => Definition.Body;
 
-        internal void Finalise(
-            Expression body,
-            IList<ParameterExpression> parameters)
-        {
-            var parametersUnchanged = Parameters.SequenceEqual(parameters);
-
-            if (parametersUnchanged)
-            {
-                if (body == Body)
-                {
-                    return;
-                }
-
-                parameters = Definition.Parameters;
-                _methodParameters = null;
-            }
-
-            Definition = Definition.Update(body, parameters);
-        }
+        private bool HasGenericArguments => _genericArguments?.Any() == true;
 
         #region IMethodNamingContext Members
 
@@ -180,6 +164,13 @@
             return this;
         }
 
+        IMethodExpressionConfigurator IMethodExpressionConfigurator.WithVisibility(
+            MemberVisibility visibility)
+        {
+            Visibility = visibility;
+            return this;
+        }
+
         IMethodExpressionConfigurator IMethodExpressionConfigurator.AsStatic()
         {
             IsStatic = true;
@@ -193,10 +184,11 @@
             return this;
         }
 
-        IMethodExpressionConfigurator IMethodExpressionConfigurator.WithVisibility(
-            MemberVisibility visibility)
+        IMethodExpressionConfigurator IMethodExpressionConfigurator.WithGenericParameter(
+            GenericParameterExpression parameter)
         {
-            Visibility = visibility;
+            (_genericArguments ??= new List<IGenericArgument>()).Add(parameter);
+            _readonlyGenericArguments = null;
             return this;
         }
 
@@ -220,30 +212,54 @@
 
         bool IMethod.IsVirtual => false;
 
-        bool IMethod.IsGenericMethod => false;
+        bool IMethod.IsGenericMethod => HasGenericArguments;
 
         bool IMethod.IsExtensionMethod => false;
 
         IMethod IMethod.GetGenericMethodDefinition() => null;
 
         ReadOnlyCollection<IGenericArgument> IMethod.GetGenericArguments()
-            => Enumerable<IGenericArgument>.EmptyReadOnlyCollection;
+        {
+            return _readonlyGenericArguments ??= HasGenericArguments
+                ? _genericArguments.ToReadOnlyCollection()
+                : Enumerable<IGenericArgument>.EmptyReadOnlyCollection;
+        }
 
         ReadOnlyCollection<IParameter> IMethod.GetParameters()
         {
-            return _methodParameters ??= Parameters
+            return _parameters ??= Parameters
                 .ProjectToArray<ParameterExpression, IParameter>(p => new MethodParameter(p))
                 .ToReadOnlyCollection();
         }
 
         #endregion
 
-        ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
-            => new MethodTranslation(this, context);
-
         IEnumerable<Expression> ICustomAnalysableExpression.Expressions
         {
             get { yield return Definition; }
+        }
+
+        ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
+            => new MethodTranslation(this, context);
+
+        internal void Finalise(
+            Expression body,
+            IList<ParameterExpression> parameters)
+        {
+            var parametersUnchanged = Parameters.SequenceEqual(parameters);
+
+            if (parametersUnchanged)
+            {
+                if (body == Body)
+                {
+                    return;
+                }
+
+                parameters = Definition.Parameters;
+                _parameters = null;
+            }
+
+            Definition = Definition.Update(body, parameters);
         }
 
         #region Helper Class

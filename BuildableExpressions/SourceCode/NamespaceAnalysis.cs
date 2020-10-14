@@ -88,7 +88,7 @@
         {
             if (methodCall.Method.IsGenericMethod)
             {
-                AddNamespacesIfRequired(new BclMethodWrapper(methodCall.Method)
+                AddNamespacesIfRequired(new BclMethodWrapper(methodCall.Method, Settings)
                     .GetRequiredExplicitGenericArguments(Settings)
                     .Project(arg => arg.Type));
             }

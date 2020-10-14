@@ -244,6 +244,36 @@ namespace GeneratedExpressionCode
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
+        [Fact]
+        public void ShouldBuildAGenericMethod()
+        {
+            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
+            var @class = sourceCode.AddClass();
+            var param = BuildableExpression.GenericParameter(p => p.Named("TParam"));
+            var paramType = BuildableExpression.TypeOf(param);
+
+            @class.AddMethod(paramType, m => m
+                .WithGenericParameter(param));
+
+            var translated = sourceCode.ToSourceCode();
+
+            const string EXPECTED = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public Type GetType<TParam>()
+        {
+            return typeof(TParam);
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
         #region Helper Members
 
         public interface IMessager
