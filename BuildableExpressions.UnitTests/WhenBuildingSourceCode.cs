@@ -1,28 +1,26 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using BuildableExpressions;
     using Common;
-    using ReadableExpressions;
-    using SourceCode;
     using Xunit;
     using static System.Linq.Expressions.Expression;
 
-    public class WhenBuildingSourceCode
+    public class WhenBuildingSourceCode : TestClassBase
     {
         [Fact]
-        public void ShouldBuildFromAnEmptyParameterlessLambdaAction()
+        public void ShouldBuildAMethodFromAParameterlessLambdaAction()
         {
             var doNothing = Lambda<Action>(Default(typeof(void)));
 
             var translated = SourceCodeFactory.Default
                 .CreateSourceCode(sc => sc
-                    .WithNamespace("GeneratedStuffs.Yo")
                     .WithClass(cls => cls
                         .WithMethod(doNothing)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
-namespace GeneratedStuffs.Yo
+namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
@@ -36,55 +34,20 @@ namespace GeneratedStuffs.Yo
         }
 
         [Fact]
-        public void ShouldBuildANamedClassAndMethod()
+        public void ShouldBuildAMethodFromADefaultVoidExpression()
         {
-            var doNothing = Lambda<Action>(Default(typeof(void)));
+            var doNothing = Default(typeof(void));
 
             var translated = SourceCodeFactory.Default
                 .CreateSourceCode(sc => sc
-                    .WithNamespaceOf(GetType())
                     .WithClass(cls => cls
-                        .Named("MyClass")
-                        .WithMethod(doNothing, m => m
-                            .Named("MyMethod"))))
-                .ToSourceCode();
-
-            const string EXPECTED = @"
-namespace AgileObjects.BuildableExpressions.UnitTests
-{
-    public class MyClass
-    {
-        public void MyMethod()
-        {
-        }
-    }
-}";
-            EXPECTED.ShouldCompile();
-            translated.ShouldBe(EXPECTED.TrimStart());
-        }
-
-        [Fact]
-        public void ShouldBuildANamedInternalClass()
-        {
-            var doNothing = Lambda<Action>(Default(typeof(void)));
-
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithNamespaceOf(GetType())
-                    .WithClass(cls => cls
-                        .WithSummary(ReadableExpression.Comment("Class summary!"))
-                        .WithVisibility(ClassVisibility.Internal)
-                        .Named("MyClass")
                         .WithMethod(doNothing)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
-namespace AgileObjects.BuildableExpressions.UnitTests
+namespace GeneratedExpressionCode
 {
-    /// <summary>
-    /// Class summary!
-    /// </summary>
-    internal class MyClass
+    public class GeneratedExpressionClass
     {
         public void DoAction()
         {
@@ -96,52 +59,24 @@ namespace AgileObjects.BuildableExpressions.UnitTests
         }
 
         [Fact]
-        public void ShouldBuildNamedClassesAndMethodsWithVisibilities()
+        public void ShouldBuildAMethodFromAParameterlessLambdaFunc()
         {
-            var getIntFromString = Lambda<Func<string, int>>(Constant(1), Parameter(typeof(string), "str"));
-            var getIntFromLong = Lambda<Func<long, int>>(Constant(2), Parameter(typeof(long), "lng"));
-            var getIntFromDate = Lambda<Func<DateTime, int>>(Constant(3), Parameter(typeof(DateTime), "date"));
+            var returnOneThousand = CreateLambda(() => 1000);
 
             var translated = SourceCodeFactory.Default
                 .CreateSourceCode(sc => sc
                     .WithClass(cls => cls
-                        .WithMethod(getIntFromString, m => m
-                            .WithVisibility(MemberVisibility.Internal))
-                        .WithMethod(getIntFromLong, m => m
-                            .WithVisibility(MemberVisibility.Protected))
-                        .WithMethod(getIntFromDate, m => m
-                            .WithVisibility(MemberVisibility.Private))))
+                        .WithMethod(returnOneThousand)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
-using System;
-
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        internal int GetInt
-        (
-            string str
-        )
+        public int GetInt()
         {
-            return 1;
-        }
-
-        protected int GetInt
-        (
-            long lng
-        )
-        {
-            return 2;
-        }
-
-        private int GetInt
-        (
-            DateTime date
-        )
-        {
-            return 3;
+            return 1000;
         }
     }
 }";
@@ -150,43 +85,27 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildNamedClassesAndMethodsWithSummaries()
+        public void ShouldBuildAMethodFromSingleParameterLambdaFunc()
         {
-            var doNothing = Lambda<Action>(Default(typeof(void)));
-
-            const string CLASS_SUMMARY = @"
-This is my class!
-Isn't it great?";
-
-            const string METHOD_SUMMARY = @"
-This is my method!
-It's even better.";
+            var returnGivenLong = CreateLambda((long arg) => arg);
 
             var translated = SourceCodeFactory.Default
                 .CreateSourceCode(sc => sc
                     .WithClass(cls => cls
-                        .WithSummary(CLASS_SUMMARY)
-                        .Named("MyClass")
-                        .WithMethod(doNothing, m => m
-                            .WithSummary(METHOD_SUMMARY)
-                            .Named("MyMethod"))))
+                        .WithMethod(returnGivenLong)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
 {
-    /// <summary>
-    /// This is my class!
-    /// Isn't it great?
-    /// </summary>
-    public class MyClass
+    public class GeneratedExpressionClass
     {
-        /// <summary>
-        /// This is my method!
-        /// It's even better.
-        /// </summary>
-        public void MyMethod()
+        public long GetLong
+        (
+            long arg
+        )
         {
+            return arg;
         }
     }
 }";
@@ -195,43 +114,28 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildNamedClassesAndMethodsWithCommentSummaries()
+        public void ShouldBuildAMethodFromATwoParameterLambdaAction()
         {
-            var doNothing = Lambda<Action>(Default(typeof(void)));
-
-            var classSummary = ReadableExpression.Comment(@"
-This is my class!
-Isn't it great?");
-
-            var methodSummary = ReadableExpression.Comment(@"
-This is my method!
-It's even better.".TrimStart());
+            var subtractShortFromInt = CreateLambda((int value1, short value2) => value1 - value2);
 
             var translated = SourceCodeFactory.Default
                 .CreateSourceCode(sc => sc
                     .WithClass(cls => cls
-                        .WithSummary(classSummary)
-                        .Named("MyClass")
-                        .WithMethod(doNothing, m => m
-                            .WithSummary(methodSummary)
-                            .Named("MyMethod"))))
+                        .WithMethod(subtractShortFromInt)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
 {
-    /// <summary>
-    /// This is my class!
-    /// Isn't it great?
-    /// </summary>
-    public class MyClass
+    public class GeneratedExpressionClass
     {
-        /// <summary>
-        /// This is my method!
-        /// It's even better.
-        /// </summary>
-        public void MyMethod()
+        public int GetInt
+        (
+            int value1,
+            short value2
+        )
         {
+            return value1 - ((int)value2);
         }
     }
 }";
@@ -240,48 +144,34 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildMultipleClassesAndMethods()
+        public void ShouldRecogniseBlockVariablesAsInScope()
         {
-            var doNothing = Lambda<Action>(Default(typeof(void)));
-            var getBlah = Lambda<Func<string>>(Constant("Blah"));
-            var getOne = Lambda<Func<int>>(Constant(1));
-            var getTen = Lambda<Func<int>>(Constant(10));
+            var intParameter = Parameter(typeof(int), "scopedInt");
+            var intVariable = Variable(typeof(int), "blockScopedInt");
+            var assignBlockInt = Assign(intVariable, Constant(1));
+            var addInts = Add(intVariable, intParameter);
+            var block = Block(new[] { intVariable }, assignBlockInt, addInts);
+            var addIntsLambda = Lambda<Func<int, int>>(block, intParameter);
 
             var translated = SourceCodeFactory.Default
                 .CreateSourceCode(sc => sc
                     .WithClass(cls => cls
-                        .WithMethod(doNothing, m => m.Named("DoNothing"))
-                        .WithMethod(getBlah))
-                    .WithClass(cls => cls
-                        .WithMethod(getOne)
-                        .WithMethod(getTen)))
+                        .WithMethod(addIntsLambda)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
 {
-    public class GeneratedExpressionClass1
+    public class GeneratedExpressionClass
     {
-        public void DoNothing()
+        public int GetInt
+        (
+            int scopedInt
+        )
         {
-        }
+            var blockScopedInt = 1;
 
-        public string GetString()
-        {
-            return ""Blah"";
-        }
-    }
-
-    public class GeneratedExpressionClass2
-    {
-        public int GetInt1()
-        {
-            return 1;
-        }
-
-        public int GetInt2()
-        {
-            return 10;
+            return blockScopedInt + scopedInt;
         }
     }
 }";
@@ -347,37 +237,6 @@ namespace GeneratedExpressionCode
         public int GetNumber()
         {
             return 123;
-        }
-    }
-}";
-            EXPECTED.ShouldCompile();
-            translated.ShouldBe(EXPECTED.TrimStart());
-        }
-
-        [Fact]
-        public void ShouldBuildAStaticClassAndMethods()
-        {
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .AsStatic()
-                        .WithMethod(Default(typeof(string)))
-                        .WithMethod(Default(typeof(int)))))
-                .ToSourceCode();
-
-            const string EXPECTED = @"
-namespace GeneratedExpressionCode
-{
-    public static class GeneratedExpressionClass
-    {
-        public static string GetString()
-        {
-            return null;
-        }
-
-        public static int GetInt()
-        {
-            return default(int);
         }
     }
 }";
