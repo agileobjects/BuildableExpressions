@@ -222,61 +222,6 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldUseCustomClassAndMethodVisibilities()
-        {
-            var getIntFromString = Lambda<Func<string, int>>(Constant(1), Parameter(typeof(string), "str"));
-            var getIntFromLong = Lambda<Func<long, int>>(Constant(2), Parameter(typeof(long), "lng"));
-            var getIntFromDate = Lambda<Func<DateTime, int>>(Constant(3), Parameter(typeof(DateTime), "date"));
-
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithVisibility(ClassVisibility.Internal)
-                        .WithMethod(getIntFromString, m => m
-                            .WithVisibility(MemberVisibility.Internal))
-                        .WithMethod(getIntFromLong, m => m
-                            .WithVisibility(MemberVisibility.Protected))
-                        .WithMethod(getIntFromDate, m => m
-                            .WithVisibility(MemberVisibility.Private))))
-                .ToSourceCode();
-
-            const string EXPECTED = @"
-using System;
-
-namespace GeneratedExpressionCode
-{
-    internal class GeneratedExpressionClass
-    {
-        internal int GetInt
-        (
-            string str
-        )
-        {
-            return 1;
-        }
-
-        protected int GetInt
-        (
-            long lng
-        )
-        {
-            return 2;
-        }
-
-        private int GetInt
-        (
-            DateTime date
-        )
-        {
-            return 3;
-        }
-    }
-}";
-            EXPECTED.ShouldCompile();
-            translated.ShouldBe(EXPECTED.TrimStart());
-        }
-
-        [Fact]
         public void ShouldUseCustomClassAndMethodNamesAndStringSummaries()
         {
             var doNothing = Lambda<Action>(Default(typeof(void)));
@@ -367,7 +312,62 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldUseStaticClassAndMethodScope()
+        public void ShouldUseCustomClassAndMethodVisibilities()
+        {
+            var getIntFromString = Lambda<Func<string, int>>(Constant(1), Parameter(typeof(string), "str"));
+            var getIntFromLong = Lambda<Func<long, int>>(Constant(2), Parameter(typeof(long), "lng"));
+            var getIntFromDate = Lambda<Func<DateTime, int>>(Constant(3), Parameter(typeof(DateTime), "date"));
+
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithVisibility(ClassVisibility.Internal)
+                        .WithMethod(getIntFromString, m => m
+                            .WithVisibility(MemberVisibility.Internal))
+                        .WithMethod(getIntFromLong, m => m
+                            .WithVisibility(MemberVisibility.Protected))
+                        .WithMethod(getIntFromDate, m => m
+                            .WithVisibility(MemberVisibility.Private))))
+                .ToSourceCode();
+
+            const string EXPECTED = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    internal class GeneratedExpressionClass
+    {
+        internal int GetInt
+        (
+            string str
+        )
+        {
+            return 1;
+        }
+
+        protected int GetInt
+        (
+            long lng
+        )
+        {
+            return 2;
+        }
+
+        private int GetInt
+        (
+            DateTime date
+        )
+        {
+            return 3;
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldUseStaticClassAndMethodScopes()
         {
             var translated = SourceCodeFactory.Default
                 .CreateSourceCode(sc => sc
@@ -389,6 +389,37 @@ namespace GeneratedExpressionCode
         }
 
         public static int GetInt()
+        {
+            return default(int);
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldUseStaticMethodScope()
+        {
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(Default(typeof(string)), m => m
+                            .AsStatic())
+                        .WithMethod(Default(typeof(int)))))
+                .ToSourceCode();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public static string GetString()
+        {
+            return null;
+        }
+
+        public int GetInt()
         {
             return default(int);
         }
