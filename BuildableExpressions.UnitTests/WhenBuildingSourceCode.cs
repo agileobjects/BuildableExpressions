@@ -247,6 +247,15 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldBuildAnEmptyClass()
+        {
+            SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls.Named("EmptyClass")))
+                .ToSourceCode();
+        }
+
+        [Fact]
         public void ShouldBuildAGenericParameterMethod()
         {
             var sourceCode = SourceCodeFactory.Default.CreateSourceCode();

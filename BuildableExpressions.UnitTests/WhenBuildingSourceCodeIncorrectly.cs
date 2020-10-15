@@ -145,20 +145,6 @@
         }
 
         [Fact]
-        public void ShouldErrorIfNoMethods()
-        {
-            var methodEx = Should.Throw<InvalidOperationException>(() =>
-            {
-                SourceCodeFactory.Default
-                    .CreateSourceCode(sc => sc
-                        .WithClass(cls => cls))
-                    .ToSourceCode();
-            });
-
-            methodEx.Message.ShouldContain("method must be specified");
-        }
-
-        [Fact]
         public void ShouldErrorIfMethodAccessesUnscopedVariable()
         {
             var methodEx = Should.Throw<NotSupportedException>(() =>

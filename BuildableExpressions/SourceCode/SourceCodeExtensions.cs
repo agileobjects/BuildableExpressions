@@ -21,7 +21,7 @@
 
             Type lambdaType;
 
-            if (parameters == null)
+            if ((parameters?.Count ?? 0) == 0)
             {
                 lambdaType = isAction
                     ? GetActionType()

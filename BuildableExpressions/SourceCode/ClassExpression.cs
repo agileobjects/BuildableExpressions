@@ -171,8 +171,10 @@
             Expression body,
             Func<IMethodExpressionConfigurator, IMethodExpressionConfigurator> configuration)
         {
-            var method = new MethodExpression(this, body, _settings);
+            var method = new MethodExpression(this, _settings);
             configuration.Invoke(method);
+
+            method.SetBody(body);
 
             if (IsStatic)
             {
@@ -247,24 +249,7 @@
 
         internal void Validate()
         {
-            ThrowIfNoMethods();
             ThrowIfDuplicateMethodName();
-
-            foreach (var method in _methods)
-            {
-                method.Validate();
-            }
-        }
-
-        private void ThrowIfNoMethods()
-        {
-            if (_methods.Any())
-            {
-                return;
-            }
-
-            throw new InvalidOperationException(
-                $"Class {Name}: at least one method must be specified");
         }
 
         private void ThrowIfDuplicateMethodName()

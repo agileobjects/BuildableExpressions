@@ -4,6 +4,6 @@
 
     internal interface ICompiler
     {
-        CompilationResult Compile(IEnumerable<string> expressionBuilderSources);
+        CompilationResult Compile(IEnumerable<string> sourceCodes);
     }
 }

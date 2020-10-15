@@ -9,10 +9,10 @@ namespace AgileObjects.BuildableExpressions.Compilation
 
     internal class NetFrameworkCompiler : ICompiler
     {
-        public CompilationResult Compile(IEnumerable<string> expressionBuilderSources)
+        public CompilationResult Compile(IEnumerable<string> sourceCodes)
         {
             var codeProvider = new CSharpCodeProvider();
-            var sources = expressionBuilderSources.ToArray();
+            var sources = sourceCodes.ToArray();
 
             var parameters = new CompilerParameters
             {

@@ -7,6 +7,7 @@
     using System.Linq.Expressions;
     using Api;
     using BuildableExpressions.Extensions;
+    using Compilation;
     using Extensions;
     using ReadableExpressions;
     using ReadableExpressions.Extensions;
@@ -32,13 +33,9 @@
         private ReadOnlyCollection<IParameter> _parameters;
         private string _name;
 
-        internal MethodExpression(
-            ClassExpression @class,
-            Expression body,
-            SourceCodeTranslationSettings settings)
+        internal MethodExpression(ClassExpression @class, SourceCodeTranslationSettings settings)
         {
             Class = @class;
-            Definition = body.ToLambdaExpression();
             Settings = settings;
         }
 
@@ -154,31 +151,6 @@
         /// </summary>
         public Expression Body => Definition.Body;
 
-        internal void Validate()
-        {
-            ThrowIfDuplicateGenericArgumentNames();
-        }
-
-        private void ThrowIfDuplicateGenericArgumentNames()
-        {
-            if (!(_genericArguments?.Count > 1))
-            {
-                return;
-            }
-
-            var duplicateParameterName = _genericArguments
-                .GroupBy(arg => arg.Name)
-                .FirstOrDefault(nameGroup => nameGroup.Count() > 1)?
-                .Key;
-
-            if (duplicateParameterName != null)
-            {
-                throw new InvalidOperationException(
-                    $"Method '{Class.Name}.{Name}': " +
-                    $"duplicate generic parameter name '{duplicateParameterName}' specified.");
-            }
-        }
-
         #region IMethodNamingContext Members
 
         Type IMethodNamingContext.ReturnType => Type;
@@ -250,7 +222,7 @@
             foreach (var parameter in parameters)
             {
                 _genericArguments.Add(parameter);
-                parameter.Finalise(this);
+                parameter.SetMethod(this);
             }
 
             return this;
@@ -305,6 +277,61 @@
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => new MethodTranslation(this, context);
+
+        internal void SetBody(Expression body)
+        {
+            if (IsGeneric)
+            {
+                FinaliseGenericArguments();
+            }
+
+            Definition = body.ToLambdaExpression();
+        }
+
+        private void FinaliseGenericArguments()
+        {
+            ThrowIfDuplicateGenericArgumentNames();
+
+            var parametersSource = SourceCodeFactory.Default.CreateSourceCode(sc => sc
+                .WithNamespace(BuildConstants.GenericParameterTypeNamespace));
+
+            foreach (IGenericArgument argument in _genericArguments)
+            {
+                parametersSource.AddClass(cls => cls.Named(argument.TypeName));
+            }
+
+            var parametersSourceCode = parametersSource.ToSourceCode();
+
+            var parameterTypes = Compiler.Instance
+                .Compile(new[] { parametersSourceCode })
+                .CompiledAssembly
+                .GetTypes();
+
+            foreach (var argument in _genericArguments)
+            {
+                argument.SetType(parameterTypes.First(t => t.Name == argument.Name));
+            }
+        }
+
+        private void ThrowIfDuplicateGenericArgumentNames()
+        {
+            if (!(_genericArguments?.Count > 1))
+            {
+                return;
+            }
+
+            var duplicateParameterName = _genericArguments
+                .GroupBy(arg => arg.Name)
+                .FirstOrDefault(nameGroup => nameGroup.Count() > 1)?
+                .Key;
+
+            if (duplicateParameterName != null)
+            {
+                throw new InvalidOperationException(
+                    $"Method '{Class.Name}.{Name}': " +
+                    $"duplicate generic parameter name '{duplicateParameterName}' specified.");
+            }
+        }
 
         internal void Finalise(
             Expression body,

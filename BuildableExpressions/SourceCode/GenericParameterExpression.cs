@@ -26,6 +26,7 @@
         private bool _hasNewableConstraint;
         private List<Type> _typeConstraints;
         private ReadOnlyCollection<Type> _readonlyTypeConstraints;
+        private Type _type;
 
         /// <summary>
         /// Gets the <see cref="SourceCodeExpressionType"/> value (1004) indicating the type of this
@@ -38,7 +39,7 @@
         /// Gets the type of this <see cref="GenericParameterExpression"/>, which is 'void', as this
         /// class represents an open generic argument.
         /// </summary>
-        public override Type Type => typeof(void);
+        public override Type Type => _type;
 
         /// <summary>
         /// Visits this <see cref="GenericParameterExpression"/>.
@@ -147,21 +148,22 @@
 
         #endregion
 
-        internal void Finalise(MethodExpression owningMethod)
+        internal void SetMethod(MethodExpression owningMethod)
         {
-            if (Method != null)
+            if (Method == null)
             {
-                throw new InvalidOperationException(
-                     "Unable to add generic parameter to method " +
-                    $"'{owningMethod.Class.Name}.{owningMethod.Name}' - " +
-                     "this parameter has already been added to method " +
-                    $"'{Method.Class.Name}.{Method.Name}'");
+                Method = owningMethod;
+                return;
             }
 
-            Method = Method;
-
-
+            throw new InvalidOperationException(
+                 "Unable to add generic parameter to method " +
+                $"'{owningMethod.Class.Name}.{owningMethod.Name}' - " +
+                 "this parameter has already been added to method " +
+                $"'{Method.Class.Name}.{Method.Name}'");
         }
+
+        internal void SetType(Type type) => _type = type;
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => GenericArgumentTranslation.For(this, context.Settings);

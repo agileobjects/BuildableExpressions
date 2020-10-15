@@ -25,7 +25,7 @@
         public override ExpressionType NodeType => ExpressionType.Default;
 
         /// <inheritdoc />
-        public override Type Type => Operand.Type;
+        public override Type Type => Operand.Type ?? typeof(void);
 
         /// <summary>
         /// Visits this <see cref="DefaultOperatorExpression"/>.

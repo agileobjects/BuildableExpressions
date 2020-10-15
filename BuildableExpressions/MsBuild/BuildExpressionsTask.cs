@@ -32,11 +32,7 @@ namespace BuildXpr
                 new InputFilesFinder(
                     BclFileManager.Instance,
                     MsBuildTaskLogger.Instance),
-#if NETFRAMEWORK
-                new NetFrameworkCompiler(),
-#else
-                new NetStandardCompiler(),
-#endif
+                Compiler.Instance,
                 new OutputWriter(BclFileManager.Instance),
                 new ProjectManager(BclFileManager.Instance))
         {

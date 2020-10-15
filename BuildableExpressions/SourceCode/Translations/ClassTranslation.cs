@@ -67,20 +67,23 @@
                 }
             }
 
-            for (var i = 0; ;)
+            if (_methodCount != 0)
             {
-                var method = _methods[i] = context.GetTranslationFor(@class.Methods[i]);
-                translationSize += method.TranslationSize;
-                formattingSize += method.FormattingSize;
-
-                ++i;
-
-                if (i == _methodCount)
+                for (var i = 0; ;)
                 {
-                    break;
-                }
+                    var method = _methods[i] = context.GetTranslationFor(@class.Methods[i]);
+                    translationSize += method.TranslationSize;
+                    formattingSize += method.FormattingSize;
 
-                translationSize += 2; // <- for new line
+                    ++i;
+
+                    if (i == _methodCount)
+                    {
+                        break;
+                    }
+
+                    translationSize += 2; // <- for new line
+                }
             }
 
             TranslationSize = translationSize;
@@ -97,6 +100,11 @@
 
         public int GetIndentSize()
         {
+            if (_methodCount == 0)
+            {
+                return 0;
+            }
+
             var indentSize = 0;
 
             for (var i = 0; ;)
@@ -115,6 +123,11 @@
         public int GetLineCount()
         {
             var lineCount = _summary.GetLineCount();
+
+            if (_methodCount == 0)
+            {
+                return lineCount;
+            }
 
             for (var i = 0; ;)
             {
@@ -166,19 +179,22 @@
 
             writer.WriteOpeningBraceToTranslation();
 
-            for (var i = 0; ;)
+            if (_methodCount != 0)
             {
-                _methods[i].WriteTo(writer);
-
-                ++i;
-
-                if (i == _methodCount)
+                for (var i = 0; ;)
                 {
-                    break;
-                }
+                    _methods[i].WriteTo(writer);
 
-                writer.WriteNewLineToTranslation();
-                writer.WriteNewLineToTranslation();
+                    ++i;
+
+                    if (i == _methodCount)
+                    {
+                        break;
+                    }
+
+                    writer.WriteNewLineToTranslation();
+                    writer.WriteNewLineToTranslation();
+                }
             }
 
             writer.WriteClosingBraceToTranslation();

@@ -14,9 +14,9 @@ namespace AgileObjects.BuildableExpressions.Compilation
 
     internal class NetStandardCompiler : ICompiler
     {
-        public CompilationResult Compile(IEnumerable<string> expressionBuilderSources)
+        public CompilationResult Compile(IEnumerable<string> sourceCodes)
         {
-            var sources = expressionBuilderSources.ToList();
+            var sources = sourceCodes.ToList();
 
             var assemblyReferences = CreateReferences(sources
                 .SelectMany(s => s.GetReferenceAssemblyTypes())

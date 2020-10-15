@@ -169,7 +169,8 @@
                 (accessedType == typeof(void)) ||
                 (accessedType == typeof(string)) ||
                 (accessedType == typeof(object)) ||
-                 accessedType.IsPrimitive())
+                 accessedType.IsPrimitive() ||
+                (accessedType.Namespace == BuildConstants.GenericParameterTypeNamespace))
             {
                 return;
             }
