@@ -48,7 +48,7 @@
                     .WithNamespace(BuildConstants.GenericParameterTypeNamespace)
                     .WithClass(cls =>
                     {
-                        if (!_hasClassConstraint)
+                        if (_hasStructConstraint)
                         {
                             cls.AsValueType();
                         }
