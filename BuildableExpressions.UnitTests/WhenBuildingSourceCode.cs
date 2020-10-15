@@ -3,6 +3,7 @@
     using System;
     using BuildableExpressions;
     using Common;
+    using NetStandardPolyfills;
     using Xunit;
     using static System.Linq.Expressions.Expression;
 
@@ -245,7 +246,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildAGenericMethod()
+        public void ShouldBuildAGenericParameterMethod()
         {
             var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
             var @class = sourceCode.AddClass();
@@ -273,7 +274,51 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildANamedGenericMethod()
+        public void ShouldBuildAMultipleGenericParameterMethod()
+        {
+            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
+            var @class = sourceCode.AddClass();
+            var param1 = BuildableExpression.GenericParameter();
+            var param2 = BuildableExpression.GenericParameter(p => p.Named("TParam2"));
+            var param3 = BuildableExpression.GenericParameter();
+            var param1Name = BuildableExpression.NameOf(param1);
+            var param2Name = BuildableExpression.NameOf(param2);
+            var param3Name = BuildableExpression.NameOf(param3);
+
+            var concatMethod = typeof(string).GetPublicStaticMethod(
+                nameof(string.Concat),
+                typeof(string),
+                typeof(string),
+                typeof(string));
+
+            var nameConcatCall = Call(
+                concatMethod,
+                param1Name,
+                param2Name,
+                param3Name);
+
+            @class.AddMethod(nameConcatCall, m => m
+                .WithGenericParameters(param1, param2, param3));
+
+            var translated = sourceCode.ToSourceCode();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public string GetString<T1, TParam2, T3>()
+        {
+            return nameof(T1) + nameof(TParam2) + nameof(T3);
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildANamedGenericParameterMethod()
         {
             var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
             var @class = sourceCode.AddClass();
