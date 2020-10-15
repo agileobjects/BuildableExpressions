@@ -4,6 +4,7 @@
     using System.Collections.ObjectModel;
     using System.Linq.Expressions;
     using Api;
+    using Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
 
@@ -19,6 +20,10 @@
     {
         private string _name;
         private MethodExpression _method;
+        private bool _hasConstraints;
+        private bool _hasStructConstraint;
+        private bool _hasClassConstraint;
+        private bool _hasNewableConstraint;
 
         /// <summary>
         /// Gets the <see cref="SourceCodeExpressionType"/> value (1004) indicating the type of this
@@ -90,6 +95,24 @@
             return this;
         }
 
+        IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithStructConstraint()
+        {
+            _hasConstraints = _hasStructConstraint = true;
+            return this;
+        }
+
+        IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithClassConstraint()
+        {
+            _hasConstraints = _hasClassConstraint = true;
+            return this;
+        }
+
+        IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithNewableConstraint()
+        {
+            _hasConstraints = _hasNewableConstraint = true;
+            return this;
+        }
+
         #endregion
 
         #region IGenericArgument Members
@@ -99,15 +122,16 @@
         /// <inheritdoc />
         public bool IsClosed => false;
 
-        bool IGenericArgument.HasConstraints { get; }
+        bool IGenericArgument.HasConstraints => _hasConstraints;
 
-        bool IGenericArgument.HasClassConstraint { get; }
+        bool IGenericArgument.HasClassConstraint => _hasClassConstraint;
 
-        bool IGenericArgument.HasStructConstraint { get; }
+        bool IGenericArgument.HasStructConstraint => _hasStructConstraint;
 
-        bool IGenericArgument.HasNewableConstraint { get; }
+        bool IGenericArgument.HasNewableConstraint => _hasNewableConstraint;
 
-        ReadOnlyCollection<Type> IGenericArgument.TypeConstraints { get; }
+        ReadOnlyCollection<Type> IGenericArgument.TypeConstraints
+            => Enumerable<Type>.EmptyReadOnlyCollection;
 
         #endregion
 

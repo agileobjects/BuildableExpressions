@@ -347,6 +347,67 @@ namespace GeneratedExpressionCode
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
+        [Fact]
+        public void ShouldBuildAStructConstrainedGenericParameterMethod()
+        {
+            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
+            var @class = sourceCode.AddClass();
+
+            var param = BuildableExpression.GenericParameter(gp => gp
+                .WithStructConstraint());
+
+            @class.AddMethod(Default(typeof(object)), m => m
+                .WithGenericParameter(param));
+
+            var translated = sourceCode.ToSourceCode();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public object GetObject<T>()
+            where T : struct
+        {
+            return null;
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildANewableClassConstrainedGenericParameterMethod()
+        {
+            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
+            var @class = sourceCode.AddClass();
+
+            var param = BuildableExpression.GenericParameter(gp => gp
+                .WithClassConstraint()
+                .WithNewableConstraint());
+
+            @class.AddMethod(Default(typeof(object)), m => m
+                .WithGenericParameter(param));
+
+            var translated = sourceCode.ToSourceCode();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public object GetObject<T>()
+            where T : class, new()
+        {
+            return null;
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
         #region Helper Members
 
         public interface IMessager
