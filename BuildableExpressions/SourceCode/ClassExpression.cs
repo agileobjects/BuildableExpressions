@@ -243,7 +243,7 @@
         /// <summary>
         /// Gets the index of this <see cref="ClassExpression"/> in the set of generated classes.
         /// </summary>
-        public int Index => SourceCode?.Classes.IndexOf(this) ?? 0;
+        public int Index => SourceCode.Classes.IndexOf(this);
 
         internal void Validate()
         {

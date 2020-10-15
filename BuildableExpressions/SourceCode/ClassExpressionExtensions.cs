@@ -13,11 +13,6 @@
             this ClassExpression classExpression,
             IMethodNamingContext methodCtx)
         {
-            if (classExpression == null)
-            {
-                return methodCtx.GetDefaultName();
-            }
-
             var classMethods = classExpression.MethodsByReturnType[methodCtx.ReturnType];
             var method = (MethodExpression)methodCtx;
 

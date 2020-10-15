@@ -107,7 +107,7 @@
         {
             return Settings
                 .MethodNameFactory
-                .Invoke(Class?.SourceCode, Class, this)
+                .Invoke(Class.SourceCode, Class, this)
                 .ThrowIfInvalidName<InvalidOperationException>("Method");
         }
 
@@ -160,7 +160,7 @@
 
         LambdaExpression IMethodNamingContext.MethodLambda => Definition;
 
-        int IMethodNamingContext.Index => Class?.Methods.IndexOf(this) ?? 0;
+        int IMethodNamingContext.Index => Class.Methods.IndexOf(this);
 
         #endregion
 
