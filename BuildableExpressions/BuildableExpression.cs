@@ -27,7 +27,7 @@
         /// argument.
         /// </returns>
         public static GenericParameterExpression GenericParameter() 
-            => GenericParameter(cfg => cfg);
+            => GenericParameter(gp => gp);
 
         /// <summary>
         /// Create a <see cref="GenericParameterExpression"/> that represents a class or method

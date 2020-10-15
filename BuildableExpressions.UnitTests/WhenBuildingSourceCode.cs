@@ -279,7 +279,7 @@ namespace GeneratedExpressionCode
             var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
             var @class = sourceCode.AddClass();
             var param1 = BuildableExpression.GenericParameter();
-            var param2 = BuildableExpression.GenericParameter(p => p.Named("TParam2"));
+            var param2 = BuildableExpression.GenericParameter(gp => gp.Named("TParam2"));
             var param3 = BuildableExpression.GenericParameter();
             var param1Name = BuildableExpression.NameOf(param1);
             var param2Name = BuildableExpression.NameOf(param2);
@@ -322,7 +322,7 @@ namespace GeneratedExpressionCode
         {
             var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
             var @class = sourceCode.AddClass();
-            var param = BuildableExpression.GenericParameter(p => p.Named("TParam"));
+            var param = BuildableExpression.GenericParameter(gp => gp.Named("TParam"));
             var paramType = BuildableExpression.TypeOf(param);
 
             @class.AddMethod(paramType, m => m

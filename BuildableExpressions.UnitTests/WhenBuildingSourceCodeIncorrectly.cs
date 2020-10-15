@@ -44,7 +44,7 @@
             {
                 var doNothing = Default(typeof(void));
 
-                var factory = new SourceCodeFactory(s => s
+                var factory = new SourceCodeFactory(scf => scf
                     .NameClassesUsing((sc, ctx) => null));
 
                 factory.CreateSourceCode(sc => sc
@@ -63,7 +63,7 @@
             {
                 var doNothing = Lambda<Action>(Default(typeof(void)));
 
-                var factory = new SourceCodeFactory(s => s
+                var factory = new SourceCodeFactory(scf => scf
                     .NameClassesUsing((sc, ctx) => string.Empty));
 
                 factory.CreateSourceCode(sc => sc
@@ -110,7 +110,7 @@
             {
                 var doNothing = Lambda<Action>(Default(typeof(void)));
 
-                var factory = new SourceCodeFactory(s => s
+                var factory = new SourceCodeFactory(scf => scf
                     .NameClassesUsing((sc, ctx) => $"1_Class_{ctx.Index}"));
 
                 factory.CreateSourceCode(sc => sc
@@ -217,7 +217,7 @@
             {
                 var doNothing = Lambda<Action>(Default(typeof(void)));
 
-                var factory = new SourceCodeFactory(s => s
+                var factory = new SourceCodeFactory(scf => scf
                     .NameMethodsUsing((sc, cls, ctx) => null));
 
                 factory.CreateSourceCode(sc => sc
@@ -236,7 +236,7 @@
             {
                 var doNothing = Lambda<Action>(Default(typeof(void)));
 
-                var factory = new SourceCodeFactory(s => s
+                var factory = new SourceCodeFactory(scf => scf
                     .NameMethodsUsing((sc, cls, ctx) => string.Empty));
 
                 factory.CreateSourceCode(sc => sc
@@ -289,12 +289,12 @@
             {
                 var doNothing = Default(typeof(void));
 
-                var factory = new SourceCodeFactory(s => s
+                var factory = new SourceCodeFactory(scf => scf
                     .NameMethodsUsing((sc, cls, ctx) => $"Method {ctx.Index}"));
 
                 factory.CreateSourceCode(sc => sc
-                        .WithClass(cls => cls
-                            .WithMethod(doNothing)))
+                    .WithClass(cls => cls
+                        .WithMethod(doNothing)))
                     .ToSourceCode();
             });
 
@@ -308,18 +308,140 @@
             {
                 var doNothing = Default(typeof(void));
 
-                SourceCodeFactory.Default
-                    .CreateSourceCode(sc => sc
-                        .WithClass(cls => cls
-                            .WithMethod(doNothing, m => m
-                                .Named("MyMethod"))
-                            .WithMethod(doNothing, m => m
-                                .Named("MyMethod"))))
+                SourceCodeFactory.Default.CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(doNothing, m => m
+                            .Named("MyMethod"))
+                        .WithMethod(doNothing, m => m
+                            .Named("MyMethod"))))
                     .ToSourceCode();
             });
 
             configEx.Message.ShouldContain("duplicate method name");
             configEx.Message.ShouldContain("MyMethod");
+        }
+
+        [Fact]
+        public void ShouldErrorIfNullGenericParameterName()
+        {
+            var paramNameEx = Should.Throw<ArgumentException>(() =>
+            {
+                BuildableExpression.GenericParameter(gp => gp.Named(null));
+            });
+
+            paramNameEx.Message.ShouldContain("cannot be null");
+        }
+
+        [Fact]
+        public void ShouldErrorIfNullCustomGenericParameterName()
+        {
+            var paramNameEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                var doNothing = Default(typeof(void));
+
+                var factory = new SourceCodeFactory(scf => scf
+                    .NameGenericParametersUsing((m, ctx) => null));
+
+                var param = BuildableExpression.GenericParameter();
+
+                factory.CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(doNothing, m => m
+                            .WithGenericParameter(param))))
+                    .ToSourceCode();
+            });
+
+            paramNameEx.Message.ShouldContain("cannot be null");
+        }
+
+        [Fact]
+        public void ShouldErrorIfBlankGenericParameterName()
+        {
+            var paramNameEx = Should.Throw<ArgumentException>(() =>
+            {
+                BuildableExpression.GenericParameter(gp => gp.Named(string.Empty));
+            });
+
+            paramNameEx.Message.ShouldContain("cannot be blank");
+        }
+
+        [Fact]
+        public void ShouldErrorIfBlankCustomGenericParameterName()
+        {
+            var paramNameEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                var doNothing = Default(typeof(void));
+
+                var factory = new SourceCodeFactory(scf => scf
+                    .NameGenericParametersUsing((m, ctx) => string.Empty));
+
+                var param = BuildableExpression.GenericParameter();
+
+                factory.CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(doNothing, m => m
+                            .WithGenericParameter(param))))
+                    .ToSourceCode();
+            });
+
+            paramNameEx.Message.ShouldContain("cannot be blank");
+        }
+
+        [Fact]
+        public void ShouldErrorIfWhitespaceGenericParameterName()
+        {
+            var paramNameEx = Should.Throw<ArgumentException>(() =>
+            {
+                BuildableExpression.GenericParameter(gp => gp.Named("   "));
+            });
+
+            paramNameEx.Message.ShouldContain("cannot be blank");
+        }
+
+        [Fact]
+        public void ShouldErrorIfInvalidGenericParameterName()
+        {
+            var paramNameEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                var doNothing = Default(typeof(void));
+
+                var factory = new SourceCodeFactory(scf => scf
+                    .NameGenericParametersUsing((m, ctx) => $"Param{ctx.Index}!"));
+
+                var param = BuildableExpression.GenericParameter();
+
+                factory.CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .WithMethod(doNothing, m => m
+                            .WithGenericParameter(param))))
+                    .ToSourceCode();
+            });
+
+            paramNameEx.Message.ShouldContain("invalid generic parameter name");
+        }
+
+        [Fact]
+        public void ShouldErrorIfDuplicateGenericParameterNames()
+        {
+            var configEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                var doNothing = Default(typeof(void));
+
+                var param1 = BuildableExpression.GenericParameter(p => p.Named("T1"));
+                var param2 = BuildableExpression.GenericParameter(p => p.Named("T1"));
+
+                SourceCodeFactory.Default.CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .Named("Class1")
+                        .WithMethod(doNothing, m => m
+                            .Named("Method1")
+                            .WithGenericParameters(param1, param2))))
+                    .ToSourceCode();
+            });
+
+            configEx.Message.ShouldContain("Class1.Method1");
+            configEx.Message.ShouldContain("duplicate generic parameter name");
+            configEx.Message.ShouldContain("T1");
         }
 
         #region Helper Members

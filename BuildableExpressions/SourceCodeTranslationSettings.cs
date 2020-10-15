@@ -108,6 +108,13 @@
 
         #region Generic Parameter Naming
 
+        ISourceCodeTranslationSettings ISourceCodeTranslationSettings.NameGenericParametersUsing(
+            Func<MethodExpression, IGenericParameterNamingContext, string> nameFactory)
+        {
+            GenericParameterNameFactory = nameFactory;
+            return this;
+        }
+
         public Func<MethodExpression, IGenericParameterNamingContext, string> GenericParameterNameFactory
         {
             get;

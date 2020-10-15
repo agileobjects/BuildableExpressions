@@ -151,6 +151,31 @@
 
         private bool HasGenericArguments => _genericArguments?.Any() == true;
 
+        internal void Validate()
+        {
+            ThrowIfDuplicateGenericArgumentNames();
+        }
+
+        private void ThrowIfDuplicateGenericArgumentNames()
+        {
+            if (!(_genericArguments?.Count > 1))
+            {
+                return;
+            }
+
+            var duplicateParameterName = _genericArguments
+                .GroupBy(arg => arg.Name)
+                .FirstOrDefault(nameGroup => nameGroup.Count() > 1)?
+                .Key;
+
+            if (duplicateParameterName != null)
+            {
+                throw new InvalidOperationException(
+                    $"Method '{Class.Name}.{Name}': " +
+                    $"duplicate generic parameter name '{duplicateParameterName}' specified.");
+            }
+        }
+
         #region IMethodNamingContext Members
 
         Type IMethodNamingContext.ReturnType => Type;
