@@ -105,8 +105,8 @@
                 case Block when ExtractToMethod((BlockExpression)expression, out var extractedMethod):
                     return BuildableExpression.Call(extractedMethod, extractedMethod.Parameters);
 
-                case Default:
-                    NamespaceAnalysis?.Visit((DefaultExpression)expression);
+                case Default when expression is DefaultExpression @default:
+                    NamespaceAnalysis?.Visit(@default);
                     goto default;
 
                 case (ExpressionType)SourceCodeExpressionType.Method:

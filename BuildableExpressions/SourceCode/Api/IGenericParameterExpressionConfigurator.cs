@@ -47,5 +47,13 @@
         /// <param name="type">The Type to which to constrain the <see cref="GenericParameterExpression"/>.</param>
         /// <returns>This <see cref="IGenericParameterExpressionConfigurator"/>, to support a fluent API.</returns>
         IGenericParameterExpressionConfigurator WithTypeConstraint(Type type);
+
+        /// <summary>
+        /// Set the <see cref="GenericParameterExpression"/> to be constrained to the given
+        /// <paramref name="types"/>.
+        /// </summary>
+        /// <param name="types">The Type(s) to which to constrain the <see cref="GenericParameterExpression"/>.</param>
+        /// <returns>This <see cref="IGenericParameterExpressionConfigurator"/>, to support a fluent API.</returns>
+        IGenericParameterExpressionConfigurator WithTypeConstraints(params Type[] types);
     }
 }

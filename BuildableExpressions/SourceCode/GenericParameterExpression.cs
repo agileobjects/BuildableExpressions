@@ -20,7 +20,6 @@
         ICustomTranslationExpression
     {
         private string _name;
-        private MethodExpression _method;
         private bool _hasConstraints;
         private bool _hasStructConstraint;
         private bool _hasClassConstraint;
@@ -53,22 +52,7 @@
         /// <summary>
         /// Gets this <see cref="GenericParameterExpression"/>'s parent <see cref="MethodExpression"/>.
         /// </summary>
-        public MethodExpression Method
-        {
-            get => _method;
-            internal set
-            {
-                if (_method == null)
-                {
-                    _method = value;
-                    return;
-                }
-
-                throw new InvalidOperationException(
-                    $"Unable to add generic parameter to method '{value.Class.Name}.{value.Name}' " +
-                    $"as it has already been added to method '{_method.Class.Name}.{_method.Name}'");
-            }
-        }
+        public MethodExpression Method { get; private set; }
 
         /// <summary>
         /// Gets the name of this <see cref="GenericParameterExpression"/>
@@ -117,16 +101,19 @@
         }
 
         IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithTypeConstraint<T>()
-            => AddTypeConstraint(typeof(T));
+            => AddTypeConstraints(typeof(T));
 
         IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithTypeConstraint(Type type)
-            => AddTypeConstraint(type);
+            => AddTypeConstraints(type);
 
-        private IGenericParameterExpressionConfigurator AddTypeConstraint(Type type)
+        IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithTypeConstraints(params Type[] types)
+            => AddTypeConstraints(types);
+
+        private IGenericParameterExpressionConfigurator AddTypeConstraints(params Type[] types)
         {
             _hasConstraints = true;
             _typeConstraints ??= new List<Type>();
-            _typeConstraints.Add(type);
+            _typeConstraints.AddRange(types);
             _readonlyTypeConstraints = null;
             return this;
         }
@@ -159,6 +146,22 @@
         }
 
         #endregion
+
+        internal void Finalise(MethodExpression owningMethod)
+        {
+            if (Method != null)
+            {
+                throw new InvalidOperationException(
+                     "Unable to add generic parameter to method " +
+                    $"'{owningMethod.Class.Name}.{owningMethod.Name}' - " +
+                     "this parameter has already been added to method " +
+                    $"'{Method.Class.Name}.{Method.Name}'");
+            }
+
+            Method = Method;
+
+
+        }
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => GenericArgumentTranslation.For(this, context.Settings);

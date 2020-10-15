@@ -231,31 +231,29 @@
         IMethodExpressionConfigurator IMethodExpressionConfigurator.WithGenericParameter(
             GenericParameterExpression parameter)
         {
-            InitializeGenericParameters();
-            _genericArguments.Add(parameter);
-            parameter.Method = this;
-            return this;
+            return AddGenericParameters(parameter);
         }
 
         IMethodExpressionConfigurator IMethodExpressionConfigurator.WithGenericParameters(
             params GenericParameterExpression[] parameters)
         {
-            InitializeGenericParameters();
-
-            foreach (var parameter in parameters)
-            {
-                _genericArguments.Add(parameter);
-                parameter.Method = this;
-            }
-
-            return this;
+            return AddGenericParameters(parameters);
         }
 
-        private void InitializeGenericParameters()
+        private IMethodExpressionConfigurator AddGenericParameters(
+            params GenericParameterExpression[] parameters)
         {
             _genericArguments ??= new List<GenericParameterExpression>();
             _readonlyGenericParameters = null;
             _readonlyGenericArguments = null;
+
+            foreach (var parameter in parameters)
+            {
+                _genericArguments.Add(parameter);
+                parameter.Finalise(this);
+            }
+
+            return this;
         }
 
         #endregion

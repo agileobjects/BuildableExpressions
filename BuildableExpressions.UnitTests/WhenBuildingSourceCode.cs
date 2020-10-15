@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using System.IO;
     using BuildableExpressions;
     using Common;
     using NetStandardPolyfills;
@@ -434,6 +435,66 @@ namespace GeneratedExpressionCode
             where T : struct, IDisposable
         {
             return null;
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAClassAndInterfaceConstrainedGenericParameterMethod()
+        {
+            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
+            var @class = sourceCode.AddClass();
+
+            var param = BuildableExpression.GenericParameter(gp => gp
+                .WithTypeConstraints(typeof(Stream), typeof(INumberSource), typeof(IMessager)));
+
+            @class.AddMethod(Default(typeof(object)), m => m
+                .WithGenericParameter(param));
+
+            var translated = sourceCode.ToSourceCode();
+
+            const string EXPECTED = @"
+using System.IO;
+using AgileObjects.BuildableExpressions.UnitTests;
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public object GetObject<T>()
+            where T : Stream, WhenBuildingSourceCode.INumberSource, WhenBuildingSourceCode.IMessager
+        {
+            return null;
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildADefaultGenericParameterValueMethod()
+        {
+            var param = BuildableExpression.GenericParameter();
+            var paramDefault = BuildableExpression.Default(param);
+
+            var translated = SourceCodeFactory.Default.CreateSourceCode(sc => sc
+                .WithClass(cls => cls
+                    .WithMethod(paramDefault, m => m
+                        .WithGenericParameter(param))))
+                .ToSourceCode();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public T GetT<T>()
+        {
+            return default(T);
         }
     }
 }";

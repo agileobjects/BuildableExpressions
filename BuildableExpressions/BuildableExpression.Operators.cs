@@ -35,10 +35,25 @@
         /// applied.
         /// </param>
         /// <returns>
-        /// A <see cref="TypeOfOperatorExpression"/> representing use of the nameof operator on
+        /// A <see cref="NameOfOperatorExpression"/> representing use of the nameof operator on
         /// the given <paramref name="parameter"/>
         /// </returns>
         public static NameOfOperatorExpression NameOf(GenericParameterExpression parameter)
             => new NameOfOperatorExpression(parameter);
+
+        /// <summary>
+        /// Create a <see cref="DefaultOperatorExpression"/> that represents use of the default
+        /// operator on the given <paramref name="parameter"/>
+        /// </summary>
+        /// <param name="parameter">
+        /// The <see cref="GenericParameterExpression"/> to which the default operator is being
+        /// applied.
+        /// </param>
+        /// <returns>
+        /// A <see cref="DefaultOperatorExpression"/> representing use of the default operator on
+        /// the given <paramref name="parameter"/>
+        /// </returns>
+        public static DefaultOperatorExpression Default(GenericParameterExpression parameter)
+            => new DefaultOperatorExpression(parameter);
     }
 }
