@@ -258,8 +258,6 @@ namespace GeneratedExpressionCode
             var translated = sourceCode.ToSourceCode();
 
             const string EXPECTED = @"
-using System;
-
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass

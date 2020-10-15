@@ -22,6 +22,7 @@
             settings.CollectInlineBlocks = true;
             settings.ClassNameFactory = (sc, classCtx) => sc.GetClassName(classCtx);
             settings.MethodNameFactory = (sc, cls, methodCtx) => cls.GetMethodName(methodCtx);
+            settings.GenericParameterNameFactory = (m, paramCtx) => m.GetGenericParameterName(paramCtx);
 
             return settings;
         }
@@ -98,6 +99,16 @@
         }
 
         public Func<SourceCodeExpression, ClassExpression, IMethodNamingContext, string> MethodNameFactory
+        {
+            get;
+            private set;
+        }
+
+        #endregion
+
+        #region Generic Parameter Naming
+
+        public Func<MethodExpression, IGenericParameterNamingContext, string> GenericParameterNameFactory
         {
             get;
             private set;

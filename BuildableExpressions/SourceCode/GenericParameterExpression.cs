@@ -12,10 +12,13 @@
     /// </summary>
     public class GenericParameterExpression :
         Expression,
+        IGenericParameterNamingContext,
         IGenericParameterExpressionConfigurator,
         IGenericArgument,
         ICustomTranslationExpression
     {
+        private string _name;
+
         /// <summary>
         /// Gets the <see cref="SourceCodeExpressionType"/> value (1004) indicating the type of this
         /// <see cref="GenericParameterExpression"/> as an ExpressionType.
@@ -39,9 +42,39 @@
         protected override Expression Accept(ExpressionVisitor visitor) => this;
 
         /// <summary>
+        /// Gets this <see cref="GenericParameterExpression"/>'s parent <see cref="MethodExpression"/>.
+        /// </summary>
+        public MethodExpression Method { get; internal set; }
+
+        /// <summary>
         /// Gets the name of this <see cref="GenericParameterExpression"/>
         /// </summary>
-        public string Name { get; private set; }
+        public string Name => _name ??= GetName();
+
+        private string GetName()
+        {
+            return Method.Settings
+                .GenericParameterNameFactory
+                .Invoke(Method, this)
+                .ThrowIfInvalidName<InvalidOperationException>("Generic Parameter");
+        }
+
+        #region IGenericParameterNamingContext Members
+
+        int IGenericParameterNamingContext.Index => Method?.GenericArguments.IndexOf(this) ?? 0;
+
+        #endregion
+
+        #region IGenericParameterExpressionConfigurator Members
+
+        IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.Named(
+            string name)
+        {
+            _name = name.ThrowIfInvalidName<ArgumentException>("Generic Parameter");
+            return this;
+        }
+
+        #endregion
 
         #region IGenericArgument Members
 
@@ -59,17 +92,6 @@
         bool IGenericArgument.HasNewableConstraint { get; }
 
         ReadOnlyCollection<Type> IGenericArgument.TypeConstraints { get; }
-
-        #endregion
-
-        #region IGenericParameterExpressionConfigurator Members
-
-        IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.Named(
-            string name)
-        {
-            Name = name;
-            return this;
-        }
 
         #endregion
 

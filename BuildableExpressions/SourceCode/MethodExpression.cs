@@ -26,8 +26,8 @@
         ICustomAnalysableExpression,
         ICustomTranslationExpression
     {
-        private readonly SourceCodeTranslationSettings _settings;
-        private List<IGenericArgument> _genericArguments;
+        private List<GenericParameterExpression> _genericArguments;
+        private ReadOnlyCollection<GenericParameterExpression> _readonlyGenericParameters;
         private ReadOnlyCollection<IGenericArgument> _readonlyGenericArguments;
         private ReadOnlyCollection<IParameter> _parameters;
         private string _name;
@@ -39,7 +39,7 @@
         {
             Class = @class;
             Definition = body.ToLambdaExpression();
-            _settings = settings;
+            Settings = settings;
         }
 
         /// <summary>
@@ -73,6 +73,8 @@
             return this;
         }
 
+        internal SourceCodeTranslationSettings Settings { get; }
+
         internal MethodExpressionAnalysis Analysis { get; set; }
 
         /// <summary>
@@ -103,7 +105,7 @@
 
         private string GetName()
         {
-            return _settings
+            return Settings
                 .MethodNameFactory
                 .Invoke(Class?.SourceCode, Class, this)
                 .ThrowIfInvalidName<InvalidOperationException>("Method");
@@ -122,8 +124,22 @@
         public LambdaExpression Definition { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="IGenericArgument"/>s describing the generic arguments of this
+        /// <see cref="MethodExpression"/>, if any.
+        /// </summary>
+        public ReadOnlyCollection<GenericParameterExpression> GenericArguments
+        {
+            get
+            {
+                return _readonlyGenericParameters ??= HasGenericArguments
+                    ? _genericArguments.ToReadOnlyCollection()
+                    : Enumerable<GenericParameterExpression>.EmptyReadOnlyCollection;
+            }
+        }
+
+        /// <summary>
         /// Gets the <see cref="ParameterExpression"/>s describing the parameters of this
-        /// <see cref="MethodExpression"/>.
+        /// <see cref="MethodExpression"/>, if any.
         /// </summary>
         public ReadOnlyCollection<ParameterExpression> Parameters
             => Definition.Parameters;
@@ -140,7 +156,7 @@
         Type IMethodNamingContext.ReturnType => Type;
 
         string IMethodNamingContext.ReturnTypeName
-            => Type.GetVariableNameInPascalCase(_settings);
+            => Type.GetVariableNameInPascalCase(Settings);
 
         LambdaExpression IMethodNamingContext.MethodLambda => Definition;
 
@@ -187,7 +203,9 @@
         IMethodExpressionConfigurator IMethodExpressionConfigurator.WithGenericParameter(
             GenericParameterExpression parameter)
         {
-            (_genericArguments ??= new List<IGenericArgument>()).Add(parameter);
+            parameter.Method = this;
+            (_genericArguments ??= new List<GenericParameterExpression>()).Add(parameter);
+            _readonlyGenericParameters = null;
             _readonlyGenericArguments = null;
             return this;
         }
@@ -221,7 +239,7 @@
         ReadOnlyCollection<IGenericArgument> IMethod.GetGenericArguments()
         {
             return _readonlyGenericArguments ??= HasGenericArguments
-                ? _genericArguments.ToReadOnlyCollection()
+                ? _genericArguments.ProjectToArray(arg => (IGenericArgument)arg).ToReadOnlyCollection()
                 : Enumerable<IGenericArgument>.EmptyReadOnlyCollection;
         }
 
