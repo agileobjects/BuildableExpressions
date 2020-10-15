@@ -444,6 +444,33 @@
             configEx.Message.ShouldContain("T1");
         }
 
+        [Fact]
+        public void ShouldErrorIfGenericParameterReused()
+        {
+            var paramEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                var doNothing = Default(typeof(void));
+
+                var param = BuildableExpression.GenericParameter();
+
+                SourceCodeFactory.Default.CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .Named("Class1")
+                        .WithMethod(doNothing, m => m
+                            .Named("Method1")
+                            .WithGenericParameter(param))
+                        .WithMethod(doNothing, m => m
+                            .Named("Method2")
+                            .WithGenericParameter(param))))
+                    .ToSourceCode();
+            });
+
+            paramEx.Message.ShouldContain("Unable to add generic parameter");
+            paramEx.Message.ShouldContain("Class1.Method1");
+            paramEx.Message.ShouldContain("already been added");
+            paramEx.Message.ShouldContain("Class1.Method2");
+        }
+
         #region Helper Members
 
         public interface IMessager

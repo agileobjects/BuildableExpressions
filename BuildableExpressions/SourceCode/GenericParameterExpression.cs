@@ -18,6 +18,7 @@
         ICustomTranslationExpression
     {
         private string _name;
+        private MethodExpression _method;
 
         /// <summary>
         /// Gets the <see cref="SourceCodeExpressionType"/> value (1004) indicating the type of this
@@ -44,7 +45,22 @@
         /// <summary>
         /// Gets this <see cref="GenericParameterExpression"/>'s parent <see cref="MethodExpression"/>.
         /// </summary>
-        public MethodExpression Method { get; internal set; }
+        public MethodExpression Method
+        {
+            get => _method;
+            internal set
+            {
+                if (_method == null)
+                {
+                    _method = value;
+                    return;
+                }
+
+                throw new InvalidOperationException(
+                    $"Unable to add generic parameter to method '{value.Class.Name}.{value.Name}' " +
+                    $"as it has already been added to method '{_method.Class.Name}.{_method.Name}'");
+            }
+        }
 
         /// <summary>
         /// Gets the name of this <see cref="GenericParameterExpression"/>
