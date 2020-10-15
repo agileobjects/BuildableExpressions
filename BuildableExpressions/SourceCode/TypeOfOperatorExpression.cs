@@ -4,6 +4,7 @@
     using System.Linq.Expressions;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
+    using ReadableExpressions.Translations.Formatting;
 
     /// <summary>
     /// Represents a use of the typeof operator.
@@ -28,12 +29,21 @@
         }
 
         /// <summary>
-        /// Gets the ExpressionType describing the type of this Expression - ExpressionType.Constant.
+        /// Gets the ExpressionType describing the type of this Expression - ExpressionType.Extension.
         /// </summary>
         public override ExpressionType NodeType => ExpressionType.Extension;
 
         /// <inheritdoc />
         public override Type Type => typeof(Type);
+
+        /// <summary>
+        /// Visits this <see cref="TypeOfOperatorExpression"/>.
+        /// </summary>
+        /// <param name="visitor">
+        /// The visitor with which to visit this <see cref="TypeOfOperatorExpression"/>.
+        /// </param>
+        /// <returns>This <see cref="TypeOfOperatorExpression"/>.</returns>
+        protected override Expression Accept(ExpressionVisitor visitor) => this;
 
         /// <summary>
         /// Gets the type to which the typeof operator is being applied. If this Expression represents
@@ -49,9 +59,16 @@
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
         {
-            return _hasOperandType
-                ? new TypeofOperatorTranslation(OperandType, context.Settings)
-                : new TypeofOperatorTranslation(OperandTypeName, context.Settings);
+            var operandTranslation = _hasOperandType
+                ? (ITranslatable)context.GetTranslationFor(OperandType)
+                : new FixedValueTranslation(
+                    NodeType,
+                    OperandTypeName,
+                    Type,
+                    TokenType.TypeName,
+                    context);
+
+            return new TypeOfOperatorTranslation(operandTranslation, context.Settings);
         }
     }
 }

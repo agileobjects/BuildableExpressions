@@ -249,6 +249,36 @@ namespace GeneratedExpressionCode
         {
             var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
             var @class = sourceCode.AddClass();
+            var param = BuildableExpression.GenericParameter();
+            var paramName = BuildableExpression.NameOf(param);
+
+            @class.AddMethod(paramName, m => m
+                .WithGenericParameter(param));
+
+            var translated = sourceCode.ToSourceCode();
+
+            const string EXPECTED = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public string GetString<T>()
+        {
+            return nameof(T);
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildANamedGenericMethod()
+        {
+            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
+            var @class = sourceCode.AddClass();
             var param = BuildableExpression.GenericParameter(p => p.Named("TParam"));
             var paramType = BuildableExpression.TypeOf(param);
 

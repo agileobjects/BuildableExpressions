@@ -20,6 +20,17 @@
 
         /// <summary>
         /// Create a <see cref="GenericParameterExpression"/> that represents a class or method
+        /// open generic argument, with an auto-generated name and no type contraints.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="GenericParameterExpression"/> representing a class or method open generic
+        /// argument.
+        /// </returns>
+        public static GenericParameterExpression GenericParameter() 
+            => GenericParameter(cfg => cfg);
+
+        /// <summary>
+        /// Create a <see cref="GenericParameterExpression"/> that represents a class or method
         /// open generic argument.
         /// </summary>
         /// <param name="configuration">The configuration to use for the <see cref="GenericParameterExpression"/>.</param>
