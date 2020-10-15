@@ -295,9 +295,9 @@
             var parametersSource = SourceCodeFactory.Default.CreateSourceCode(sc => sc
                 .WithNamespace(BuildConstants.GenericParameterTypeNamespace));
 
-            foreach (IGenericArgument argument in _genericArguments)
+            foreach (var argument in _genericArguments)
             {
-                parametersSource.AddClass(cls => cls.Named(argument.TypeName));
+                parametersSource.AddClass(cls => cls.Named(argument.Name));
             }
 
             var parametersSourceCode = parametersSource.ToSourceCode();

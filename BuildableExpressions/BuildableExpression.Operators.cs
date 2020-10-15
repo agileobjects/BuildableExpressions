@@ -9,7 +9,7 @@
     {
         /// <summary>
         /// Create a <see cref="TypeOfOperatorExpression"/> that represents use of the typeof
-        /// operator on the given <paramref name="parameter"/>
+        /// operator on the given <paramref name="parameter"/>.
         /// </summary>
         /// <param name="parameter">
         /// The <see cref="GenericParameterExpression"/> to which the typeof operator is being
@@ -28,7 +28,7 @@
 
         /// <summary>
         /// Create a <see cref="NameOfOperatorExpression"/> that represents use of the nameof
-        /// operator on the given <paramref name="parameter"/>
+        /// operator on the given <paramref name="parameter"/>.
         /// </summary>
         /// <param name="parameter">
         /// The <see cref="GenericParameterExpression"/> to which the nameof operator is being
@@ -43,7 +43,7 @@
 
         /// <summary>
         /// Create a <see cref="DefaultOperatorExpression"/> that represents use of the default
-        /// operator on the given <paramref name="parameter"/>
+        /// operator on the given <paramref name="parameter"/>.
         /// </summary>
         /// <param name="parameter">
         /// The <see cref="GenericParameterExpression"/> to which the default operator is being
