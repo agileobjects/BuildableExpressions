@@ -312,29 +312,7 @@
         {
             var paramNameEx = Should.Throw<ArgumentException>(() =>
             {
-                BuildableExpression.GenericParameter(gp => gp.Named(null));
-            });
-
-            paramNameEx.Message.ShouldContain("cannot be null");
-        }
-
-        [Fact]
-        public void ShouldErrorIfNullCustomGenericParameterName()
-        {
-            var paramNameEx = Should.Throw<InvalidOperationException>(() =>
-            {
-                var doNothing = Default(typeof(void));
-
-                var factory = new SourceCodeFactory(scf => scf
-                    .NameGenericParametersUsing((m, ctx) => null));
-
-                var param = BuildableExpression.GenericParameter();
-
-                factory.CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(doNothing, m => m
-                            .WithGenericParameter(param))))
-                    .ToSourceCode();
+                BuildableExpression.GenericParameter(null);
             });
 
             paramNameEx.Message.ShouldContain("cannot be null");
@@ -345,29 +323,7 @@
         {
             var paramNameEx = Should.Throw<ArgumentException>(() =>
             {
-                BuildableExpression.GenericParameter(gp => gp.Named(string.Empty));
-            });
-
-            paramNameEx.Message.ShouldContain("cannot be blank");
-        }
-
-        [Fact]
-        public void ShouldErrorIfBlankCustomGenericParameterName()
-        {
-            var paramNameEx = Should.Throw<InvalidOperationException>(() =>
-            {
-                var doNothing = Default(typeof(void));
-
-                var factory = new SourceCodeFactory(scf => scf
-                    .NameGenericParametersUsing((m, ctx) => string.Empty));
-
-                var param = BuildableExpression.GenericParameter();
-
-                factory.CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(doNothing, m => m
-                            .WithGenericParameter(param))))
-                    .ToSourceCode();
+                BuildableExpression.GenericParameter(string.Empty);
             });
 
             paramNameEx.Message.ShouldContain("cannot be blank");
@@ -378,7 +334,7 @@
         {
             var paramNameEx = Should.Throw<ArgumentException>(() =>
             {
-                BuildableExpression.GenericParameter(gp => gp.Named("   "));
+                BuildableExpression.GenericParameter("   ");
             });
 
             paramNameEx.Message.ShouldContain("cannot be blank");
@@ -387,20 +343,9 @@
         [Fact]
         public void ShouldErrorIfInvalidGenericParameterName()
         {
-            var paramNameEx = Should.Throw<InvalidOperationException>(() =>
+            var paramNameEx = Should.Throw<ArgumentException>(() =>
             {
-                var doNothing = Default(typeof(void));
-
-                var factory = new SourceCodeFactory(scf => scf
-                    .NameGenericParametersUsing((m, ctx) => $"Param{ctx.Index}!"));
-
-                var param = BuildableExpression.GenericParameter();
-
-                factory.CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(doNothing, m => m
-                            .WithGenericParameter(param))))
-                    .ToSourceCode();
+                BuildableExpression.GenericParameter("Param1!");
             });
 
             paramNameEx.Message.ShouldContain("invalid generic parameter name");
@@ -413,8 +358,8 @@
             {
                 var doNothing = Default(typeof(void));
 
-                var param1 = BuildableExpression.GenericParameter(p => p.Named("T1"));
-                var param2 = BuildableExpression.GenericParameter(p => p.Named("T1"));
+                var param1 = BuildableExpression.GenericParameter("T1");
+                var param2 = BuildableExpression.GenericParameter("T1");
 
                 SourceCodeFactory.Default.CreateSourceCode(sc => sc
                     .WithClass(cls => cls
@@ -437,7 +382,7 @@
             {
                 var doNothing = Default(typeof(void));
 
-                var param = BuildableExpression.GenericParameter();
+                var param = BuildableExpression.GenericParameter("T");
 
                 SourceCodeFactory.Default.CreateSourceCode(sc => sc
                     .WithClass(cls => cls

@@ -5,7 +5,9 @@
     using System.Collections.ObjectModel;
     using System.Linq.Expressions;
     using Api;
+    using Compilation;
     using Extensions;
+    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
 
@@ -19,14 +21,51 @@
         IGenericArgument,
         ICustomTranslationExpression
     {
-        private string _name;
         private bool _hasConstraints;
         private bool _hasStructConstraint;
         private bool _hasClassConstraint;
         private bool _hasNewableConstraint;
         private List<Type> _typeConstraints;
         private ReadOnlyCollection<Type> _readonlyTypeConstraints;
-        private Type _type;
+
+        internal GenericParameterExpression(
+            string name,
+            Func<IGenericParameterExpressionConfigurator, IGenericParameterExpressionConfigurator> configuration)
+        {
+            Name = name.ThrowIfInvalidName<ArgumentException>("Generic Parameter");
+
+            configuration.Invoke(this);
+
+            Type = CreateType();
+        }
+
+        #region Setup
+
+        private Type CreateType()
+        {
+            var parametersSourceCode = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithNamespace(BuildConstants.GenericParameterTypeNamespace)
+                    .WithClass(cls =>
+                    {
+                        if (!_hasClassConstraint)
+                        {
+                            cls.AsValueType();
+                        }
+
+                        return cls.Named(Name);
+                    }))
+                .ToSourceCode();
+
+            var compiledTypes = Compiler.Instance
+                .Compile(new[] { parametersSourceCode })
+                .CompiledAssembly
+                .GetTypes();
+
+            return compiledTypes[0];
+        }
+
+        #endregion
 
         /// <summary>
         /// Gets the <see cref="SourceCodeExpressionType"/> value (1004) indicating the type of this
@@ -39,7 +78,7 @@
         /// Gets the type of this <see cref="GenericParameterExpression"/>, which is 'void', as this
         /// class represents an open generic argument.
         /// </summary>
-        public override Type Type => _type;
+        public override Type Type { get; }
 
         /// <summary>
         /// Visits this <see cref="GenericParameterExpression"/>.
@@ -58,15 +97,7 @@
         /// <summary>
         /// Gets the name of this <see cref="GenericParameterExpression"/>
         /// </summary>
-        public string Name => _name ??= GetName();
-
-        private string GetName()
-        {
-            return Method.Settings
-                .GenericParameterNameFactory
-                .Invoke(Method, this)
-                .ThrowIfInvalidName<InvalidOperationException>("Generic Parameter");
-        }
+        public string Name { get; }
 
         #region IGenericParameterNamingContext Members
 
@@ -75,13 +106,6 @@
         #endregion
 
         #region IGenericParameterExpressionConfigurator Members
-
-        IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.Named(
-            string name)
-        {
-            _name = name.ThrowIfInvalidName<ArgumentException>("Generic Parameter");
-            return this;
-        }
 
         IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithStructConstraint()
         {
@@ -123,8 +147,6 @@
 
         #region IGenericArgument Members
 
-        string IGenericArgument.TypeName => Name;
-
         /// <inheritdoc />
         public bool IsClosed => false;
 
@@ -163,9 +185,7 @@
                 $"'{Method.Class.Name}.{Method.Name}'");
         }
 
-        internal void SetType(Type type) => _type = type;
-
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
-            => GenericArgumentTranslation.For(this, context.Settings);
+            => context.GetTranslationFor(Type);
     }
 }

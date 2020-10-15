@@ -251,8 +251,34 @@ namespace GeneratedExpressionCode
         {
             SourceCodeFactory.Default
                 .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls.Named("EmptyClass")))
+                    .WithClass(cls => cls
+                        .Named("EmptyClass")))
                 .ToSourceCode();
+        }
+
+        [Fact]
+        public void ShouldBuildAValueType()
+        {
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .AsValueType()
+                        .Named("MyValueType")
+                        .WithMethod(Default(typeof(void)))))
+                .ToSourceCode();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public struct MyValueType
+    {
+        public void DoAction()
+        {
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
         }
 
         [Fact]
@@ -260,22 +286,24 @@ namespace GeneratedExpressionCode
         {
             var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
             var @class = sourceCode.AddClass();
-            var param = BuildableExpression.GenericParameter();
-            var paramName = BuildableExpression.NameOf(param);
+            var param = BuildableExpression.GenericParameter("T");
+            var paramType = BuildableExpression.TypeOf(param);
 
-            @class.AddMethod(paramName, m => m
+            @class.AddMethod(paramType, m => m
                 .WithGenericParameter(param));
 
             var translated = sourceCode.ToSourceCode();
 
             const string EXPECTED = @"
+using System;
+
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public string GetString<T>()
+        public Type GetType<T>()
         {
-            return nameof(T);
+            return typeof(T);
         }
     }
 }";
@@ -288,9 +316,9 @@ namespace GeneratedExpressionCode
         {
             var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
             var @class = sourceCode.AddClass();
-            var param1 = BuildableExpression.GenericParameter();
-            var param2 = BuildableExpression.GenericParameter(gp => gp.Named("TParam2"));
-            var param3 = BuildableExpression.GenericParameter();
+            var param1 = BuildableExpression.GenericParameter("T1");
+            var param2 = BuildableExpression.GenericParameter("TParam2");
+            var param3 = BuildableExpression.GenericParameter("T3");
             var param1Name = BuildableExpression.NameOf(param1);
             var param2Name = BuildableExpression.NameOf(param2);
             var param3Name = BuildableExpression.NameOf(param3);
@@ -328,42 +356,12 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildANamedGenericParameterMethod()
-        {
-            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
-            var @class = sourceCode.AddClass();
-            var param = BuildableExpression.GenericParameter(gp => gp.Named("TParam"));
-            var paramType = BuildableExpression.TypeOf(param);
-
-            @class.AddMethod(paramType, m => m
-                .WithGenericParameter(param));
-
-            var translated = sourceCode.ToSourceCode();
-
-            const string EXPECTED = @"
-using System;
-
-namespace GeneratedExpressionCode
-{
-    public class GeneratedExpressionClass
-    {
-        public Type GetType<TParam>()
-        {
-            return typeof(TParam);
-        }
-    }
-}";
-            EXPECTED.ShouldCompile();
-            translated.ShouldBe(EXPECTED.TrimStart());
-        }
-
-        [Fact]
         public void ShouldBuildAStructConstrainedGenericParameterMethod()
         {
             var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
             var @class = sourceCode.AddClass();
 
-            var param = BuildableExpression.GenericParameter(gp => gp
+            var param = BuildableExpression.GenericParameter("TStruct", gp => gp
                 .WithStructConstraint());
 
             @class.AddMethod(Default(typeof(object)), m => m
@@ -376,8 +374,8 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public object GetObject<T>()
-            where T : struct
+        public object GetObject<TStruct>()
+            where TStruct : struct
         {
             return null;
         }
@@ -393,7 +391,7 @@ namespace GeneratedExpressionCode
             var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
             var @class = sourceCode.AddClass();
 
-            var param = BuildableExpression.GenericParameter(gp => gp
+            var param = BuildableExpression.GenericParameter("TNewable", gp => gp
                 .WithClassConstraint()
                 .WithNewableConstraint());
 
@@ -407,8 +405,8 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public object GetObject<T>()
-            where T : class, new()
+        public object GetObject<TNewable>()
+            where TNewable : class, new()
         {
             return null;
         }
@@ -424,7 +422,7 @@ namespace GeneratedExpressionCode
             var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
             var @class = sourceCode.AddClass();
 
-            var param = BuildableExpression.GenericParameter(gp => gp
+            var param = BuildableExpression.GenericParameter("TDisposable", gp => gp
                 .WithStructConstraint()
                 .WithTypeConstraint<IDisposable>());
 
@@ -440,8 +438,8 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public object GetObject<T>()
-            where T : struct, IDisposable
+        public object GetObject<TDisposable>()
+            where TDisposable : struct, IDisposable
         {
             return null;
         }
@@ -457,7 +455,7 @@ namespace GeneratedExpressionCode
             var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
             var @class = sourceCode.AddClass();
 
-            var param = BuildableExpression.GenericParameter(gp => gp
+            var param = BuildableExpression.GenericParameter("TStream", gp => gp
                 .WithTypeConstraints(typeof(Stream), typeof(INumberSource), typeof(IMessager)));
 
             @class.AddMethod(Default(typeof(object)), m => m
@@ -473,8 +471,8 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public object GetObject<T>()
-            where T : Stream, WhenBuildingSourceCode.INumberSource, WhenBuildingSourceCode.IMessager
+        public object GetObject<TStream>()
+            where TStream : Stream, WhenBuildingSourceCode.INumberSource, WhenBuildingSourceCode.IMessager
         {
             return null;
         }
@@ -487,8 +485,8 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildADefaultGenericParameterValueMethod()
         {
-            var param = BuildableExpression.GenericParameter();
-            var paramDefault = BuildableExpression.Default(param);
+            var param = BuildableExpression.GenericParameter("T");
+            var paramDefault = Default(param.Type);
 
             var translated = SourceCodeFactory.Default.CreateSourceCode(sc => sc
                 .WithClass(cls => cls

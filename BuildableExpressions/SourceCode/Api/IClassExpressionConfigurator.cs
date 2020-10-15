@@ -66,6 +66,12 @@
         IClassExpressionConfigurator AsStatic();
 
         /// <summary>
+        /// Create the <see cref="ClassExpression"/> as a value type.
+        /// </summary>
+        /// <returns>This <see cref="IClassExpressionConfigurator"/>, to support a fluent API.</returns>
+        IClassExpressionConfigurator AsValueType();
+
+        /// <summary>
         /// Set the name of the <see cref="ClassExpression"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="ClassExpression"/>.</param>

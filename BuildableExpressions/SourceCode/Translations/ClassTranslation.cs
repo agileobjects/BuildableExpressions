@@ -10,9 +10,11 @@
     {
         private const string _staticString = "static ";
         private const string _classString = "class ";
+        private const string _structString = "struct ";
 
         private readonly string _visibility;
         private readonly ClassExpression _class;
+        private readonly string _typeString;
         private readonly ITranslatable _summary;
         private readonly IList<ITranslation> _interfaces;
         private readonly IList<ITranslation> _methods;
@@ -23,9 +25,10 @@
             ClassExpression @class,
             ITranslationContext context)
         {
-            _visibility = @class.Visibility.ToString().ToLowerInvariant();
             _class = @class;
             _summary = SummaryTranslation.For(@class.Summary, context);
+            _visibility = @class.Visibility.ToString().ToLowerInvariant();
+            _typeString = @class.IsValueType ? _structString : _classString;
             _interfaceCount = @class.Interfaces.Count;
 
             _methodCount = @class.Methods.Count;
@@ -35,7 +38,7 @@
                 _summary.TranslationSize +
                 _visibility.Length + 1 +
                 _staticString.Length + 1 +
-                _classString.Length +
+                _typeString.Length +
                 @class.Name.Length +
                 6; // <- for opening and closing braces
 
@@ -153,7 +156,7 @@
                 declaration += _staticString;
             }
 
-            declaration += _classString;
+            declaration += _typeString;
 
             writer.WriteKeywordToTranslation(declaration);
             writer.WriteTypeNameToTranslation(_class.Name);

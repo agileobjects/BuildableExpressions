@@ -7,7 +7,6 @@
     using System.Linq.Expressions;
     using Api;
     using BuildableExpressions.Extensions;
-    using Compilation;
     using Extensions;
     using ReadableExpressions;
     using ReadableExpressions.Extensions;
@@ -33,9 +32,13 @@
         private ReadOnlyCollection<IParameter> _parameters;
         private string _name;
 
-        internal MethodExpression(ClassExpression @class, SourceCodeTranslationSettings settings)
+        internal MethodExpression(
+            ClassExpression @class,
+            Expression body,
+            SourceCodeTranslationSettings settings)
         {
             Class = @class;
+            Definition = body.ToLambdaExpression();
             Settings = settings;
         }
 
@@ -278,38 +281,11 @@
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => new MethodTranslation(this, context);
 
-        internal void SetBody(Expression body)
+        internal void Validate()
         {
             if (IsGeneric)
             {
-                FinaliseGenericArguments();
-            }
-
-            Definition = body.ToLambdaExpression();
-        }
-
-        private void FinaliseGenericArguments()
-        {
-            ThrowIfDuplicateGenericArgumentNames();
-
-            var parametersSource = SourceCodeFactory.Default.CreateSourceCode(sc => sc
-                .WithNamespace(BuildConstants.GenericParameterTypeNamespace));
-
-            foreach (var argument in _genericArguments)
-            {
-                parametersSource.AddClass(cls => cls.Named(argument.Name));
-            }
-
-            var parametersSourceCode = parametersSource.ToSourceCode();
-
-            var parameterTypes = Compiler.Instance
-                .Compile(new[] { parametersSourceCode })
-                .CompiledAssembly
-                .GetTypes();
-
-            foreach (var argument in _genericArguments)
-            {
-                argument.SetType(parameterTypes.First(t => t.Name == argument.Name));
+                ThrowIfDuplicateGenericArgumentNames();
             }
         }
 

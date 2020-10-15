@@ -119,6 +119,11 @@
         public bool IsStatic { get; private set; }
 
         /// <summary>
+        /// Gets a value indicating whether this <see cref="ClassExpression"/> is a value type.
+        /// </summary>
+        public bool IsValueType { get; private set; }
+
+        /// <summary>
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="ClassExpression"/>,
         /// if a summary has been set.
         /// </summary>
@@ -171,10 +176,10 @@
             Expression body,
             Func<IMethodExpressionConfigurator, IMethodExpressionConfigurator> configuration)
         {
-            var method = new MethodExpression(this, _settings);
+            var method = new MethodExpression(this, body, _settings);
             configuration.Invoke(method);
 
-            method.SetBody(body);
+            method.Validate();
 
             if (IsStatic)
             {
@@ -273,16 +278,22 @@
 
         #region IClassExpressionConfigurator Members
 
+        IClassExpressionConfigurator IClassExpressionConfigurator.WithVisibility(
+            ClassVisibility visibility)
+        {
+            Visibility = visibility;
+            return this;
+        }
+
         IClassExpressionConfigurator IClassExpressionConfigurator.AsStatic()
         {
             IsStatic = true;
             return this;
         }
 
-        IClassExpressionConfigurator IClassExpressionConfigurator.WithVisibility(
-            ClassVisibility visibility)
+        IClassExpressionConfigurator IClassExpressionConfigurator.AsValueType()
         {
-            Visibility = visibility;
+            IsValueType = true;
             return this;
         }
 

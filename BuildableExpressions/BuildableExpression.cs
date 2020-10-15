@@ -20,31 +20,31 @@
 
         /// <summary>
         /// Create a <see cref="GenericParameterExpression"/> that represents a class or method
-        /// open generic argument, with an auto-generated name and no type contraints.
+        /// open generic argument, with the given <paramref name="name"/> and no type contraints.
         /// </summary>
+        /// <param name="name">The name of the <see cref="GenericParameterExpression"/>.</param>
         /// <returns>
         /// The <see cref="GenericParameterExpression"/> representing a class or method open generic
         /// argument.
         /// </returns>
-        public static GenericParameterExpression GenericParameter() 
-            => GenericParameter(gp => gp);
+        public static GenericParameterExpression GenericParameter(string name)
+            => GenericParameter(name, gp => gp);
 
         /// <summary>
         /// Create a <see cref="GenericParameterExpression"/> that represents a class or method
-        /// open generic argument.
+        /// open generic argument, with the given <paramref name="name"/>.
         /// </summary>
+        /// <param name="name">The name of the <see cref="GenericParameterExpression"/>.</param>
         /// <param name="configuration">The configuration to use for the <see cref="GenericParameterExpression"/>.</param>
         /// <returns>
         /// The <see cref="GenericParameterExpression"/> representing a class or method open generic
         /// argument.
         /// </returns>
         public static GenericParameterExpression GenericParameter(
+            string name,
             Func<IGenericParameterExpressionConfigurator, IGenericParameterExpressionConfigurator> configuration)
         {
-            var parameter = new GenericParameterExpression();
-            configuration.Invoke(parameter);
-
-            return parameter;
+            return new GenericParameterExpression(name, configuration);
         }
     }
 }
