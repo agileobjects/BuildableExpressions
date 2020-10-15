@@ -101,6 +101,15 @@
 
         public void Visit(MethodExpression method)
         {
+            if (method.IsGeneric)
+            {
+                AddNamespacesIfRequired(method
+                    .GenericArguments
+                    .Cast<IGenericArgument>()
+                    .Filter(ga => ga.HasConstraints)
+                    .SelectMany(ga => ga.TypeConstraints));
+            }
+
             foreach (var parameter in method.Parameters)
             {
                 AddNamespaceIfRequired(parameter);

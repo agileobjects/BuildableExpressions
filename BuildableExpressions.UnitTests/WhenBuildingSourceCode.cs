@@ -408,6 +408,39 @@ namespace GeneratedExpressionCode
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
+        [Fact]
+        public void ShouldBuildAStructInterfaceConstrainedGenericParameterMethod()
+        {
+            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
+            var @class = sourceCode.AddClass();
+
+            var param = BuildableExpression.GenericParameter(gp => gp
+                .WithStructConstraint()
+                .WithTypeConstraint<IDisposable>());
+
+            @class.AddMethod(Default(typeof(object)), m => m
+                .WithGenericParameter(param));
+
+            var translated = sourceCode.ToSourceCode();
+
+            const string EXPECTED = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public object GetObject<T>()
+            where T : struct, IDisposable
+        {
+            return null;
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
         #region Helper Members
 
         public interface IMessager

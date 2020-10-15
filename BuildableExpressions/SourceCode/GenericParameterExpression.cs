@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq.Expressions;
     using Api;
@@ -24,6 +25,8 @@
         private bool _hasStructConstraint;
         private bool _hasClassConstraint;
         private bool _hasNewableConstraint;
+        private List<Type> _typeConstraints;
+        private ReadOnlyCollection<Type> _readonlyTypeConstraints;
 
         /// <summary>
         /// Gets the <see cref="SourceCodeExpressionType"/> value (1004) indicating the type of this
@@ -113,6 +116,21 @@
             return this;
         }
 
+        IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithTypeConstraint<T>()
+            => AddTypeConstraint(typeof(T));
+
+        IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithTypeConstraint(Type type)
+            => AddTypeConstraint(type);
+
+        private IGenericParameterExpressionConfigurator AddTypeConstraint(Type type)
+        {
+            _hasConstraints = true;
+            _typeConstraints ??= new List<Type>();
+            _typeConstraints.Add(type);
+            _readonlyTypeConstraints = null;
+            return this;
+        }
+
         #endregion
 
         #region IGenericArgument Members
@@ -131,7 +149,14 @@
         bool IGenericArgument.HasNewableConstraint => _hasNewableConstraint;
 
         ReadOnlyCollection<Type> IGenericArgument.TypeConstraints
-            => Enumerable<Type>.EmptyReadOnlyCollection;
+        {
+            get
+            {
+                return _readonlyTypeConstraints ??=
+                       _typeConstraints?.ToReadOnlyCollection() ??
+                       Enumerable<Type>.EmptyReadOnlyCollection;
+            }
+        }
 
         #endregion
 

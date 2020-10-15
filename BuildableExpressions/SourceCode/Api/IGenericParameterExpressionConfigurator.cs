@@ -1,5 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Api
 {
+    using System;
+
     /// <summary>
     /// Provides options to configure a <see cref="GenericParameterExpression"/>.
     /// </summary>
@@ -29,5 +31,21 @@
         /// </summary>
         /// <returns>This <see cref="IGenericParameterExpressionConfigurator"/>, to support a fluent API.</returns>
         IGenericParameterExpressionConfigurator WithNewableConstraint();
+
+        /// <summary>
+        /// Set the <see cref="GenericParameterExpression"/> to be constrained to the given
+        /// <typeparamref name="T"/> Type.
+        /// </summary>
+        /// <typeparam name="T">The Type to which to constrain the <see cref="GenericParameterExpression"/>.</typeparam>
+        /// <returns>This <see cref="IGenericParameterExpressionConfigurator"/>, to support a fluent API.</returns>
+        IGenericParameterExpressionConfigurator WithTypeConstraint<T>();
+
+        /// <summary>
+        /// Set the <see cref="GenericParameterExpression"/> to be constrained to the given
+        /// <paramref name="type"/>.
+        /// </summary>
+        /// <param name="type">The Type to which to constrain the <see cref="GenericParameterExpression"/>.</param>
+        /// <returns>This <see cref="IGenericParameterExpressionConfigurator"/>, to support a fluent API.</returns>
+        IGenericParameterExpressionConfigurator WithTypeConstraint(Type type);
     }
 }

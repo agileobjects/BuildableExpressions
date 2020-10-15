@@ -99,6 +99,11 @@
         public bool IsStatic { get; private set; }
 
         /// <summary>
+        /// Gets a value indicating whether this <see cref="MethodExpression"/> is generic.
+        /// </summary>
+        public bool IsGeneric => _genericArguments?.Any() == true;
+
+        /// <summary>
         /// Gets the name of this <see cref="MethodExpression"/>.
         /// </summary>
         public string Name => _name ??= GetName();
@@ -131,7 +136,7 @@
         {
             get
             {
-                return _readonlyGenericParameters ??= HasGenericArguments
+                return _readonlyGenericParameters ??= IsGeneric
                     ? _genericArguments.ToReadOnlyCollection()
                     : Enumerable<GenericParameterExpression>.EmptyReadOnlyCollection;
             }
@@ -148,8 +153,6 @@
         /// Gets the Expression describing the body of this <see cref="MethodExpression"/>.
         /// </summary>
         public Expression Body => Definition.Body;
-
-        private bool HasGenericArguments => _genericArguments?.Any() == true;
 
         internal void Validate()
         {
@@ -275,7 +278,7 @@
 
         bool IMethod.IsVirtual => false;
 
-        bool IMethod.IsGenericMethod => HasGenericArguments;
+        bool IMethod.IsGenericMethod => IsGeneric;
 
         bool IMethod.IsExtensionMethod => false;
 
@@ -283,7 +286,7 @@
 
         ReadOnlyCollection<IGenericArgument> IMethod.GetGenericArguments()
         {
-            return _readonlyGenericArguments ??= HasGenericArguments
+            return _readonlyGenericArguments ??= IsGeneric
                 ? _genericArguments.ProjectToArray(arg => (IGenericArgument)arg).ToReadOnlyCollection()
                 : Enumerable<IGenericArgument>.EmptyReadOnlyCollection;
         }
