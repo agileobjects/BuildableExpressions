@@ -1,7 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
-    using NetStandardPolyfills;
 #if FEATURE_COMPILATION
     using System.IO;
     using System.Linq;
@@ -9,6 +8,7 @@
     using Common;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
+    using NetStandardPolyfills;
 #endif
 
     public static class CompilationAssertionExtensions
