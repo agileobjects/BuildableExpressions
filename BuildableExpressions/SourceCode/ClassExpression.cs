@@ -8,6 +8,7 @@
     using Api;
     using Extensions;
     using ReadableExpressions;
+    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using Translations;
 
@@ -33,6 +34,7 @@
         private IDictionary<Type, ReadOnlyCollection<MethodExpression>> _readOnlyMethodsByReturnType;
 #endif
         private string _name;
+        private Type _baseType;
 
         internal ClassExpression(
             SourceCodeExpression sourceCode,
@@ -40,7 +42,7 @@
         {
             SourceCode = sourceCode;
             _settings = settings;
-            BaseType = typeof(object);
+            _baseType = typeof(object);
             _methods = new List<MethodExpression>();
             _methodsByReturnType = new Dictionary<Type, List<MethodExpression>>();
         }
@@ -93,7 +95,7 @@
         /// Gets or sets a value indicating whether this <see cref="ClassExpression"/> is static.
         /// </summary>
         public bool IsStatic { get; set; }
-        
+
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="ClassExpression"/> is abstract.
         /// </summary>
@@ -107,7 +109,22 @@
         /// <summary>
         /// Gets or sets the base type from which this <see cref="ClassExpression"/> derives.
         /// </summary>
-        public Type BaseType { get; set; }
+        public Type BaseType
+        {
+            get => _baseType;
+            set
+            {
+                if (_baseType == typeof(object))
+                {
+                    _baseType = value;
+                    return;
+                }
+
+                throw new InvalidOperationException(
+                    $"Unable to set class base type to {value.GetFriendlyName()} " +
+                    $"as it has already been set to {_baseType.GetFriendlyName()}");
+            }
+        }
 
         /// <summary>
         /// Gets the interface types implemented by this <see cref="ClassExpression"/>.

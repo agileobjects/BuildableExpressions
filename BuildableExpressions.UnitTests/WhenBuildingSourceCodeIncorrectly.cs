@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using System.IO;
     using System.Reflection;
     using Common;
     using ReadableExpressions;
@@ -145,19 +146,18 @@
         }
 
         [Fact]
-        public void ShouldErrorIfMethodAccessesUnscopedVariable()
+        public void ShouldErrorIfClassGivenMultipleBaseTypes()
         {
-            var methodEx = Should.Throw<NotSupportedException>(() =>
+            var baseTypeEx = Should.Throw<InvalidOperationException>(() =>
             {
-                var int1Variable = Parameter(typeof(int), "int1");
-                var int2Variable = Variable(typeof(int), "int2");
-                var addInts = Add(int1Variable, int2Variable);
-
                 var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
-                sourceCode.AddClass(cls => cls.WithMethod(addInts));
+                var @class = sourceCode.AddClass();
+                @class.BaseType = typeof(Stream);
+                @class.BaseType = typeof(TestClassBase);
             });
 
-            methodEx.Message.ShouldContain("undefined variable(s) 'int int1', 'int int2'");
+            baseTypeEx.Message.ShouldContain("Unable to set class base type");
+            baseTypeEx.Message.ShouldContain("already been set to Stream");
         }
 
         [Fact]
@@ -177,6 +177,22 @@
 
             interfaceEx.Message.ShouldContain("'(): string'");
             interfaceEx.Message.ShouldContain("matches multiple interface methods");
+        }
+
+        [Fact]
+        public void ShouldErrorIfMethodAccessesUnscopedVariable()
+        {
+            var methodEx = Should.Throw<NotSupportedException>(() =>
+            {
+                var int1Variable = Parameter(typeof(int), "int1");
+                var int2Variable = Variable(typeof(int), "int2");
+                var addInts = Add(int1Variable, int2Variable);
+
+                var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
+                sourceCode.AddClass(cls => cls.WithMethod(addInts));
+            });
+
+            methodEx.Message.ShouldContain("undefined variable(s) 'int int1', 'int int2'");
         }
 
         [Fact]
