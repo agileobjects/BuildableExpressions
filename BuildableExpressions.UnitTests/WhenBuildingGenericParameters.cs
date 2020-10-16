@@ -66,7 +66,7 @@
         }
 
         [Fact]
-        public void ShouldBuildAnInterfaceConstrainedParameterWithAutoImplementedMethods()
+        public void ShouldBuildAnInterfaceConstrainedParameter()
         {
             var param = BuildableExpression.GenericParameter("TDisposable", gp => gp
                 .WithTypeConstraint(typeof(IDisposable)));
@@ -83,7 +83,7 @@
         }
 
         [Fact]
-        public void ShouldBuildATypeConstrainedParameterWithAutoImplementedMethods()
+        public void ShouldBuildAnAbstractTypeConstrainedParameter()
         {
             var param = BuildableExpression.GenericParameter("TDerived", gp => gp
                 .WithTypeConstraint(typeof(AbstractBaseType)));

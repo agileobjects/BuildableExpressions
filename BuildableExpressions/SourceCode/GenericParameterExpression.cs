@@ -203,12 +203,14 @@
 
         IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithClassConstraint()
         {
+            ThrowIfHasStructConstraint(conflictingConstraint: "class");
             _hasConstraints = _hasClassConstraint = true;
             return this;
         }
 
         IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithNewableConstraint()
         {
+            ThrowIfHasStructConstraint(conflictingConstraint: "new()");
             _hasConstraints = _hasNewableConstraint = true;
             return this;
         }
@@ -224,11 +226,61 @@
 
         private IGenericParameterExpressionConfigurator AddTypeConstraints(params Type[] types)
         {
-            _hasConstraints = true;
             _typeConstraints ??= new List<Type>();
-            _typeConstraints.AddRange(types);
+
+            foreach (var type in types)
+            {
+                if (type.IsClass())
+                {
+                    var typeName = type.GetFriendlyName();
+
+                    ThrowIfHasStructConstraint(conflictingConstraint: typeName);
+                    ThrowIfHasClassConstraint(conflictingConstraint: typeName);
+                    ThrowIfAlreadyHasTypeConstraint(conflictingTypeConstraint: typeName);
+                }
+
+                _typeConstraints.Add(type);
+            }
+
+            _hasConstraints = true;
             _readonlyTypeConstraints = null;
             return this;
+        }
+
+        private void ThrowIfHasStructConstraint(string conflictingConstraint)
+        {
+            if (_hasStructConstraint)
+            {
+                ThrowConstraintConflict("struct", conflictingConstraint);
+            }
+        }
+
+        private void ThrowIfHasClassConstraint(string conflictingConstraint)
+        {
+            if (_hasClassConstraint)
+            {
+                ThrowConstraintConflict("class", conflictingConstraint);
+            }
+        }
+
+        private void ThrowIfAlreadyHasTypeConstraint(string conflictingTypeConstraint)
+        {
+            var existingClassConstraint = _typeConstraints
+                .FirstOrDefault(t => t.IsClass());
+
+            if (existingClassConstraint != null)
+            {
+                ThrowConstraintConflict(
+                    existingClassConstraint.GetFriendlyName(),
+                    conflictingTypeConstraint);
+            }
+        }
+
+        private void ThrowConstraintConflict(string constraint, string conflictingConstraint)
+        {
+            throw new InvalidOperationException(
+                $"Generic Parameter '{Name}' cannot have both " +
+                $"{constraint} and {conflictingConstraint} constraints.");
         }
 
         #endregion
