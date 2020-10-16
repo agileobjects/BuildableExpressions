@@ -6,6 +6,7 @@
     using System.Linq.Expressions;
     using System.Reflection;
     using Api;
+    using BuildableExpressions.Extensions;
     using Compilation;
     using Extensions;
     using NetStandardPolyfills;
@@ -71,6 +72,7 @@
                     if (type.IsInterface())
                     {
                         paramClass.Implement(type);
+                        AddDefaultImplementations(paramClass, type.GetPublicInstanceMethods());
                         continue;
                     }
 
@@ -97,6 +99,7 @@
             {
                 AddAssemblyFor(type, assemblies);
 
+                // ReSharper disable once PossibleNullReferenceException
                 var baseType = type.BaseType;
 
                 while (baseType != null && baseType != typeof(object))
@@ -122,6 +125,22 @@
             if (!assemblies.Contains(assembly))
             {
                 assemblies.Add(assembly);
+            }
+        }
+
+        private static void AddDefaultImplementations(
+            ClassExpression @class,
+            IEnumerable<MethodInfo> methods)
+        {
+            foreach (var method in methods)
+            {
+                var parameters = method
+                    .GetParameters()
+                    .ProjectToArray(p => Parameter(p.ParameterType, p.Name));
+
+                var methodLambda = Default(method.ReturnType).ToLambdaExpression(parameters);
+
+                @class.AddMethod(methodLambda, m => m.Named(method.Name));
             }
         }
 

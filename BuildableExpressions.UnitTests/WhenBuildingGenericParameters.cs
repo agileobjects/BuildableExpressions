@@ -65,6 +65,22 @@
             param.Type.BaseType.ShouldBe(typeof(BaseType));
         }
 
+        [Fact]
+        public void ShouldBuildAnInterfaceConstrainedParameter()
+        {
+            var param = BuildableExpression.GenericParameter("TDisposable", gp => gp
+                .WithTypeConstraint(typeof(IDisposable)));
+
+            param.Name.ShouldBe("TDisposable");
+            param.IsClosed.ShouldBeFalse();
+            param.Method.ShouldBeNull();
+            param.Type.ShouldNotBeNull().Name.ShouldBe("TDisposable");
+            param.Type.IsClass().ShouldBeTrue();
+            param.Type.IsValueType().ShouldBeFalse();
+            param.Type.BaseType.ShouldBe(typeof(object));
+            param.Type.GetAllInterfaces().ShouldHaveSingleItem().ShouldBe(typeof(IDisposable));
+        }
+
         #region Helper Members
 
         public class BaseType
