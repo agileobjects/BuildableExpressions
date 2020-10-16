@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <Compile Remove="..\BuildableExpressions.UnitTests\FluentAssertionExtensions.cs" />
+    <Compile Remove="..\BuildableExpressions.UnitTests\WhenBuildingGenericArguments.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -85,30 +85,49 @@
         public SourceCodeExpression SourceCode { get; }
 
         /// <summary>
-        /// Gets this <see cref="ClassExpression"/>'s <see cref="ClassVisibility" />.
+        /// Gets or sets this <see cref="ClassExpression"/>'s <see cref="ClassVisibility" />.
         /// </summary>
-        public ClassVisibility Visibility { get; private set; }
+        public ClassVisibility Visibility { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether this <see cref="ClassExpression"/> is static.
+        /// Gets or sets a value indicating whether this <see cref="ClassExpression"/> is static.
         /// </summary>
-        public bool IsStatic { get; private set; }
+        public bool IsStatic { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether this <see cref="ClassExpression"/> is a value type.
+        /// Gets or sets a value indicating whether this <see cref="ClassExpression"/> is a value type.
         /// </summary>
-        public bool IsValueType { get; private set; }
+        public bool IsValueType { get; set; }
 
         /// <summary>
-        /// Gets the base type from which this <see cref="ClassExpression"/> derives.
+        /// Gets or sets the base type from which this <see cref="ClassExpression"/> derives.
         /// </summary>
-        public Type BaseType { get; private set; }
+        public Type BaseType { get; set; }
 
         /// <summary>
         /// Gets the interface types implemented by this <see cref="ClassExpression"/>.
         /// </summary>
         public ReadOnlyCollection<Type> Interfaces
             => _readOnlyInterfaces ??= _interfaces.ToReadOnlyCollection();
+
+        /// <summary>
+        /// Adds the given <paramref name="interfaces"/> to the list of interfaces implemented by
+        /// this <see cref="ClassExpression"/>.
+        /// </summary>
+        /// <param name="interfaces">The interface(s) to add.</param>
+        public void Implement(params Type[] interfaces)
+        {
+            if (_interfaces == null)
+            {
+                _interfaces = new List<Type>();
+            }
+            else
+            {
+                _readOnlyInterfaces = null;
+            }
+
+            _interfaces.AddRange(interfaces);
+        }
 
         /// <summary>
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="ClassExpression"/>,
@@ -306,27 +325,14 @@
         IClassExpressionConfigurator IClassExpressionConfigurator.Implementing<TInterface>()
             where TInterface : class
         {
-            return Implement(typeof(TInterface));
+            Implement(typeof(TInterface));
+            return this;
         }
 
         IClassExpressionConfigurator IClassExpressionConfigurator.Implementing(
             params Type[] interfaces)
         {
-            return Implement(interfaces);
-        }
-
-        private IClassExpressionConfigurator Implement(params Type[] interfaces)
-        {
-            if (_interfaces == null)
-            {
-                _interfaces = new List<Type>();
-            }
-            else
-            {
-                _readOnlyInterfaces = null;
-            }
-
-            _interfaces.AddRange(interfaces);
+            Implement(interfaces);
             return this;
         }
 

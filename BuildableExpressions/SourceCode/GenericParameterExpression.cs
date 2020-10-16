@@ -4,9 +4,11 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq.Expressions;
+    using System.Reflection;
     using Api;
     using Compilation;
     using Extensions;
+    using NetStandardPolyfills;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
@@ -43,33 +45,84 @@
 
         private Type CreateType()
         {
-            var parametersSourceCode = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithNamespace(BuildConstants.GenericParameterTypeNamespace)
-                    .WithClass(cls =>
+            var paramSourceCode = SourceCodeFactory.Default.CreateSourceCode(sc => sc
+                .WithNamespace(BuildConstants.GenericParameterTypeNamespace));
+
+            var paramClass = paramSourceCode.AddClass(cls => cls.Named(Name));
+
+            if (_hasStructConstraint)
+            {
+                paramClass.IsValueType = true;
+            }
+
+            IList<Assembly> referenceAssemblies;
+
+            if (_typeConstraints != null)
+            {
+                referenceAssemblies = new List<Assembly>();
+
+                foreach (var type in _typeConstraints)
+                {
+#if NETFRAMEWORK
+                    AddAssembliesFor(type, referenceAssemblies);
+#else
+                    AddAssemblyFor(type, referenceAssemblies);
+#endif
+                    if (type.IsInterface())
                     {
-                        if (_hasStructConstraint)
-                        {
-                            cls.AsValueType();
-                        }
+                        paramClass.Implement(type);
+                        continue;
+                    }
 
-                        if (_typeConstraints != null)
-                        {
-                            foreach (var type in _typeConstraints)
-                            {
-                            }
-                        }
-
-                        return cls.Named(Name);
-                    }))
-                .ToSourceCode();
+                    paramClass.BaseType = type;
+                }
+            }
+            else
+            {
+                referenceAssemblies = Enumerable<Assembly>.EmptyArray;
+            }
 
             var compiledTypes = Compiler.Instance
-                .Compile(new[] { parametersSourceCode })
+                .Compile(referenceAssemblies, paramSourceCode)
                 .CompiledAssembly
                 .GetTypes();
 
             return compiledTypes[0];
+        }
+
+#if NETFRAMEWORK
+        private static void AddAssembliesFor(Type type, ICollection<Assembly> assemblies)
+        {
+            while (true)
+            {
+                AddAssemblyFor(type, assemblies);
+
+                var baseType = type.BaseType;
+
+                while (baseType != null && baseType != typeof(object))
+                {
+                    AddAssemblyFor(baseType, assemblies);
+                    baseType = baseType.BaseType;
+                }
+
+                if (type.IsNested)
+                {
+                    type = type.DeclaringType;
+                    continue;
+                }
+
+                return;
+            }
+        }
+#endif
+        private static void AddAssemblyFor(Type type, ICollection<Assembly> assemblies)
+        {
+            var assembly = type.GetAssembly();
+
+            if (!assemblies.Contains(assembly))
+            {
+                assemblies.Add(assembly);
+            }
         }
 
         #endregion

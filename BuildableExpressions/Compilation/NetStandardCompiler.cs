@@ -14,16 +14,16 @@ namespace AgileObjects.BuildableExpressions.Compilation
 
     internal class NetStandardCompiler : ICompiler
     {
-        public CompilationResult Compile(IEnumerable<string> sourceCodes)
+        public CompilationResult Compile(
+            IEnumerable<Assembly> referenceAssemblies,
+            params string[] sourceCodes)
         {
-            var sources = sourceCodes.ToList();
-
-            var assemblyReferences = CreateReferences(sources
+            var assemblyReferences = CreateReferences(referenceAssemblies, sourceCodes
                 .SelectMany(s => s.GetReferenceAssemblyTypes())
                 .Distinct()
                 .ToList());
 
-            var sourceTrees = sources.Select(s => SyntaxFactory.ParseSyntaxTree(s));
+            var sourceTrees = sourceCodes.Select(s => SyntaxFactory.ParseSyntaxTree(s));
 
             using var outputStream = new MemoryStream();
 
@@ -53,6 +53,7 @@ namespace AgileObjects.BuildableExpressions.Compilation
         }
 
         private static IEnumerable<MetadataReference> CreateReferences(
+            IEnumerable<Assembly> passedInAssemblies,
             ICollection<Type> passedInTypes)
         {
             var referencedAssemblyTypes = new List<Type>(passedInTypes);
@@ -67,7 +68,7 @@ namespace AgileObjects.BuildableExpressions.Compilation
                 referencedAssemblyTypes.Add(typeof(List<>));
             }
 
-            var assemblies = new List<Assembly>();
+            var assemblies = new List<Assembly>(passedInAssemblies);
             CollectAssemblies(referencedAssemblyTypes, assemblies);
 
             return assemblies.Select(CreateReference);
@@ -79,11 +80,13 @@ namespace AgileObjects.BuildableExpressions.Compilation
         {
             foreach (var assemblyType in assemblyTypes.Distinct())
             {
-                CollectAssemblies(assemblyType.GetAssembly(), assemblies);
+                CollectReferencedAssemblies(assemblyType.GetAssembly(), assemblies);
             }
         }
 
-        private static void CollectAssemblies(Assembly assembly, ICollection<Assembly> assemblies)
+        private static void CollectReferencedAssemblies(
+            Assembly assembly,
+            ICollection<Assembly> assemblies)
         {
             if (assemblies.Contains(assembly))
             {
@@ -94,7 +97,7 @@ namespace AgileObjects.BuildableExpressions.Compilation
 
             foreach (var referencedAssembly in assembly.GetReferencedAssemblies())
             {
-                CollectAssemblies(Assembly.Load(referencedAssembly), assemblies);
+                CollectReferencedAssemblies(Assembly.Load(referencedAssembly), assemblies);
             }
         }
 

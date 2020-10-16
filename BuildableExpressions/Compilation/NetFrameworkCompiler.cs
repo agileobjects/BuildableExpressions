@@ -1,18 +1,19 @@
 ﻿#if NETFRAMEWORK
 namespace AgileObjects.BuildableExpressions.Compilation
 {
-    using System;
     using System.CodeDom.Compiler;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using Microsoft.CSharp;
 
     internal class NetFrameworkCompiler : ICompiler
     {
-        public CompilationResult Compile(IEnumerable<string> sourceCodes)
+        public CompilationResult Compile(
+            IEnumerable<Assembly> referenceAssemblies,
+            params string[] sourceCodes)
         {
             var codeProvider = new CSharpCodeProvider();
-            var sources = sourceCodes.ToArray();
 
             var parameters = new CompilerParameters
             {
@@ -20,16 +21,19 @@ namespace AgileObjects.BuildableExpressions.Compilation
                 TreatWarningsAsErrors = false
             };
 
-            var referenceAssemblyPaths = sources
-                .SelectMany(ebs => ebs.GetReferenceAssemblyTypes())
+            var referenceAssemblyPaths = sourceCodes
+                .SelectMany(sc => sc.GetReferenceAssemblyTypes())
                 .Distinct()
-                .Select(GetAssemblyFilePath)
+                .Select(t => t.Assembly)
+                .Concat(referenceAssemblies)
+                .Select(GetFilePath)
+                .Distinct()
                 .ToArray();
 
             parameters.ReferencedAssemblies.AddRange(referenceAssemblyPaths);
 
             var compilationResult = codeProvider
-                .CompileAssemblyFromSource(parameters, sources);
+                .CompileAssemblyFromSource(parameters, sourceCodes);
 
             if (compilationResult.Errors.HasErrors)
             {
@@ -49,7 +53,7 @@ namespace AgileObjects.BuildableExpressions.Compilation
             };
         }
 
-        private static string GetAssemblyFilePath(Type type) => type.Assembly.Location;
+        private static string GetFilePath(Assembly assembly) => assembly.Location;
     }
 }
 #endif

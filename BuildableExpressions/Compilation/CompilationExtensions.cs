@@ -3,12 +3,48 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
+    using Extensions;
     using Logging;
     using NetStandardPolyfills;
     using ReadableExpressions;
+    using SourceCode;
+    using SourceCode.Extensions;
 
     internal static class CompilationExtensions
     {
+        public static CompilationResult Compile(
+            this ICompiler compiler,
+            IEnumerable<string> sourceCodes)
+        {
+            return compiler.Compile(sourceCodes.ToArray());
+        }
+
+        public static CompilationResult Compile(
+            this ICompiler compiler,
+            params string[] sourceCodes)
+        {
+            return compiler.Compile(Enumerable<Assembly>.EmptyArray, sourceCodes);
+        }
+
+        public static CompilationResult Compile(
+            this ICompiler compiler,
+            IEnumerable<Assembly> referenceAssemblies,
+            params SourceCodeExpression[] sourceCodes)
+        {
+            return compiler.Compile(
+                referenceAssemblies,
+                sourceCodes.Project(sc => sc.ToSourceCode()));
+        }
+
+        public static CompilationResult Compile(
+            this ICompiler compiler,
+            IEnumerable<Assembly> referenceAssemblies,
+            IEnumerable<string> sourceCodes)
+        {
+            return compiler.Compile(referenceAssemblies, sourceCodes.ToArray());
+        }
+
         public static ICollection<Type> GetReferenceAssemblyTypes(
             this string expressionBuilderSource)
         {

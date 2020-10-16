@@ -15,10 +15,10 @@
         private readonly string _visibility;
         private readonly ClassExpression _class;
         private readonly string _typeString;
+        private readonly int _typeListCount;
+        private readonly IList<ITranslation> _typeList;
         private readonly ITranslatable _summary;
-        private readonly IList<ITranslation> _interfaces;
         private readonly IList<ITranslation> _methods;
-        private readonly int _interfaceCount;
         private readonly int _methodCount;
 
         public ClassTranslation(
@@ -29,7 +29,14 @@
             _summary = SummaryTranslation.For(@class.Summary, context);
             _visibility = @class.Visibility.ToString().ToLowerInvariant();
             _typeString = @class.IsValueType ? _structString : _classString;
-            _interfaceCount = @class.Interfaces.Count;
+            _typeListCount = @class.Interfaces.Count;
+
+            var hasBaseType = @class.BaseType != typeof(object);
+
+            if (hasBaseType)
+            {
+                ++_typeListCount;
+            }
 
             _methodCount = @class.Methods.Count;
             _methods = new ITranslation[_methodCount];
@@ -48,25 +55,28 @@
                 _summary.FormattingSize +
                 keywordFormattingSize; // <- for accessibility + 'class'
 
-            if (_interfaceCount != 0)
+            if (_typeListCount != 0)
             {
                 translationSize += 3; // <- for ' : '
-                _interfaces = new ITranslation[_interfaceCount];
+                translationSize += ((_typeListCount - 1) * 2); // <- for separators
+                _typeList = new ITranslation[_typeListCount];
+                var typeIndex = 0;
 
-                for (var i = 0; ;)
+                if (hasBaseType)
                 {
-                    var @interface = _interfaces[i] = context.GetTranslationFor(@class.Interfaces[i]);
-                    translationSize += @interface.TranslationSize;
-                    formattingSize += @interface.FormattingSize;
+                    var baseType = _typeList[0] = context.GetTranslationFor(@class.BaseType);
+                    translationSize += baseType.TranslationSize;
+                    formattingSize += baseType.FormattingSize;
+                    typeIndex = 1;
+                }
 
-                    ++i;
-
-                    if (i == _interfaceCount)
-                    {
-                        break;
-                    }
-
-                    translationSize += 2; // <- for separator
+                foreach (var @interface in @class.Interfaces)
+                {
+                    var interfaceTranslation = context.GetTranslationFor(@interface);
+                    _typeList[typeIndex] = interfaceTranslation;
+                    translationSize += interfaceTranslation.TranslationSize;
+                    formattingSize += interfaceTranslation.FormattingSize;
+                    ++typeIndex;
                 }
             }
 
@@ -161,17 +171,16 @@
             writer.WriteKeywordToTranslation(declaration);
             writer.WriteTypeNameToTranslation(_class.Name);
 
-            if (_interfaceCount != 0)
+            if (_typeListCount != 0)
             {
                 writer.WriteToTranslation(" : ");
 
                 for (var i = 0; ;)
                 {
-                    _interfaces[i].WriteTo(writer);
-
+                    _typeList[i].WriteTo(writer);
                     ++i;
 
-                    if (i == _interfaceCount)
+                    if (i == _typeListCount)
                     {
                         break;
                     }
@@ -187,7 +196,6 @@
                 for (var i = 0; ;)
                 {
                     _methods[i].WriteTo(writer);
-
                     ++i;
 
                     if (i == _methodCount)

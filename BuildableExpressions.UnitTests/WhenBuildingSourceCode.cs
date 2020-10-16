@@ -1,7 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
-    using System.IO;
     using BuildableExpressions;
     using Common;
     using NetStandardPolyfills;
@@ -450,9 +449,9 @@ namespace GeneratedExpressionCode
             var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
             var @class = sourceCode.AddClass();
 
-            var param = BuildableExpression.GenericParameter("TDisposable", gp => gp
+            var param = BuildableExpression.GenericParameter("TMarker", gp => gp
                 .WithStructConstraint()
-                .WithTypeConstraint<IDisposable>());
+                .WithTypeConstraint<IMarker1>());
 
             @class.AddMethod(Default(typeof(object)), m => m
                 .WithGenericParameter(param));
@@ -460,14 +459,14 @@ namespace GeneratedExpressionCode
             var translated = sourceCode.ToSourceCode();
 
             const string EXPECTED = @"
-using System;
+using AgileObjects.BuildableExpressions.UnitTests;
 
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public object GetObject<TDisposable>()
-            where TDisposable : struct, IDisposable
+        public object GetObject<TMarker>()
+            where TMarker : struct, WhenBuildingSourceCode.IMarker1
         {
             return null;
         }
@@ -483,8 +482,8 @@ namespace GeneratedExpressionCode
             var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
             var @class = sourceCode.AddClass();
 
-            var param = BuildableExpression.GenericParameter("TStream", gp => gp
-                .WithTypeConstraints(typeof(Stream), typeof(INumberSource), typeof(IMessager)));
+            var param = BuildableExpression.GenericParameter("TDerived", gp => gp
+                .WithTypeConstraints(typeof(BaseType), typeof(IMarker1), typeof(IMarker2)));
 
             @class.AddMethod(Default(typeof(object)), m => m
                 .WithGenericParameter(param));
@@ -492,15 +491,14 @@ namespace GeneratedExpressionCode
             var translated = sourceCode.ToSourceCode();
 
             const string EXPECTED = @"
-using System.IO;
 using AgileObjects.BuildableExpressions.UnitTests;
 
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public object GetObject<TStream>()
-            where TStream : Stream, WhenBuildingSourceCode.INumberSource, WhenBuildingSourceCode.IMessager
+        public object GetObject<TDerived>()
+            where TDerived : WhenBuildingSourceCode.BaseType, WhenBuildingSourceCode.IMarker1, WhenBuildingSourceCode.IMarker2
         {
             return null;
         }
@@ -539,9 +537,11 @@ namespace GeneratedExpressionCode
 
         #region Helper Members
 
-        public class BaseType
-        {
-        }
+        public class BaseType { }
+
+        public interface IMarker1 { }
+
+        public interface IMarker2 { }
 
         public interface IMessager
         {

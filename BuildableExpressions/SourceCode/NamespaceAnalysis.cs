@@ -35,7 +35,10 @@
         public IList<string> RequiredNamespaces => _requiredNamespaces;
 
         public void Visit(ClassExpression @class)
-            => AddNamespacesIfRequired(@class.Interfaces);
+        {
+            AddNamespaceIfRequired(@class.BaseType);
+            AddNamespacesIfRequired(@class.Interfaces);
+        }
 
         protected override Expression VisitConstant(ConstantExpression constant)
         {
