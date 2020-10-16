@@ -93,6 +93,11 @@
         /// Gets or sets a value indicating whether this <see cref="ClassExpression"/> is static.
         /// </summary>
         public bool IsStatic { get; set; }
+        
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="ClassExpression"/> is abstract.
+        /// </summary>
+        public bool IsAbstract { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="ClassExpression"/> is a value type.

@@ -66,7 +66,7 @@
         }
 
         [Fact]
-        public void ShouldBuildAnInterfaceConstrainedParameter()
+        public void ShouldBuildAnInterfaceConstrainedParameterWithAutoImplementedMethods()
         {
             var param = BuildableExpression.GenericParameter("TDisposable", gp => gp
                 .WithTypeConstraint(typeof(IDisposable)));
@@ -81,10 +81,34 @@
             param.Type.GetAllInterfaces().ShouldHaveSingleItem().ShouldBe(typeof(IDisposable));
         }
 
+        [Fact]
+        public void ShouldBuildATypeConstrainedParameterWithAutoImplementedMethods()
+        {
+            var param = BuildableExpression.GenericParameter("TDerived", gp => gp
+                .WithTypeConstraint(typeof(AbstractBaseType)));
+
+            param.Name.ShouldBe("TDerived");
+            param.IsClosed.ShouldBeFalse();
+            param.Method.ShouldBeNull();
+            param.Type.ShouldNotBeNull().Name.ShouldBe("TDerived");
+            param.Type.IsClass().ShouldBeTrue();
+            param.Type.IsValueType().ShouldBeFalse();
+            param.Type.BaseType.ShouldBe(typeof(AbstractBaseType));
+        }
+
         #region Helper Members
 
         public class BaseType
         {
+        }
+
+        public abstract class AbstractBaseType
+        {
+            public void DoNothing()
+            {
+            }
+
+            protected abstract void ImplementThis(string value1, int value2);
         }
 
         #endregion

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using Api;
@@ -72,11 +73,16 @@
                     if (type.IsInterface())
                     {
                         paramClass.Implement(type);
-                        AddDefaultImplementations(paramClass, type.GetPublicInstanceMethods());
+                        AddDefaultImplementations(paramClass, type);
                         continue;
                     }
 
                     paramClass.BaseType = type;
+
+                    if (type.IsAbstract())
+                    {
+                        paramClass.IsAbstract = true;
+                    }
                 }
             }
             else
@@ -128,10 +134,13 @@
             }
         }
 
-        private static void AddDefaultImplementations(
-            ClassExpression @class,
-            IEnumerable<MethodInfo> methods)
+        private static void AddDefaultImplementations(ClassExpression @class, Type type)
         {
+            var methods = type
+                .GetPublicInstanceMethods()
+                .Concat(type.GetNonPublicInstanceMethods())
+                .Filter(m => m.IsAbstract);
+
             foreach (var method in methods)
             {
                 var parameters = method

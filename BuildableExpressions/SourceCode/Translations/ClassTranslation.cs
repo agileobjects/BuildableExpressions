@@ -9,6 +9,7 @@
     internal class ClassTranslation : ITranslation
     {
         private const string _staticString = "static ";
+        private const string _abstractString = "abstract ";
         private const string _classString = "class ";
         private const string _structString = "struct ";
 
@@ -44,10 +45,18 @@
             var translationSize =
                 _summary.TranslationSize +
                 _visibility.Length + 1 +
-                _staticString.Length + 1 +
                 _typeString.Length +
                 @class.Name.Length +
                 6; // <- for opening and closing braces
+
+            if (@class.IsStatic)
+            {
+                translationSize += _staticString.Length;
+            }
+            else if (@class.IsAbstract)
+            {
+                translationSize += _abstractString.Length;
+            }
 
             var keywordFormattingSize = context.GetKeywordFormattingSize();
 
@@ -164,6 +173,10 @@
             if (_class.IsStatic)
             {
                 declaration += _staticString;
+            }
+            else if (_class.IsAbstract)
+            {
+                declaration += _abstractString;
             }
 
             declaration += _typeString;
