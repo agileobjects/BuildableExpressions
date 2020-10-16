@@ -247,6 +247,34 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldBuildAClassWithABaseType()
+        {
+            var translated = SourceCodeFactory.Default
+                .CreateSourceCode(sc => sc
+                    .WithClass(cls => cls
+                        .DerivedFrom<BaseType>()
+                        .Named("DerivedType")
+                        .WithMethod(Constant("Hello!"))))
+                .ToSourceCode();
+
+            const string EXPECTED = @"
+using AgileObjects.BuildableExpressions.UnitTests;
+
+namespace GeneratedExpressionCode
+{
+    public class DerivedType : WhenBuildingSourceCode.BaseType
+    {
+        public string GetString()
+        {
+            return ""Hello!"";
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAnEmptyClass()
         {
             SourceCodeFactory.Default
@@ -510,6 +538,10 @@ namespace GeneratedExpressionCode
         }
 
         #region Helper Members
+
+        public class BaseType
+        {
+        }
 
         public interface IMessager
         {

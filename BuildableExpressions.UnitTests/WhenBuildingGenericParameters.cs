@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using System.IO;
     using Common;
     using NetStandardPolyfills;
     using Xunit;
@@ -48,6 +49,21 @@
             param.Type.ShouldNotBeNull().Name.ShouldBe("TStruct");
             param.Type.IsClass().ShouldBeFalse();
             param.Type.IsValueType().ShouldBeTrue();
+        }
+
+        [Fact]
+        public void ShouldBuildATypeConstrainedParameter()
+        {
+            var param = BuildableExpression.GenericParameter("TStream", gp => gp
+                .WithTypeConstraint(typeof(Stream)));
+
+            param.Name.ShouldBe("TStream");
+            param.IsClosed.ShouldBeFalse();
+            param.Method.ShouldBeNull();
+            param.Type.ShouldNotBeNull().Name.ShouldBe("TStream");
+            param.Type.IsClass().ShouldBeTrue();
+            param.Type.IsValueType().ShouldBeFalse();
+            param.Type.BaseType.ShouldBe(typeof(Stream));
         }
     }
 }

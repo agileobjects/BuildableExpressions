@@ -53,6 +53,13 @@
                             cls.AsValueType();
                         }
 
+                        if (_typeConstraints != null)
+                        {
+                            foreach (var type in _typeConstraints)
+                            {
+                            }
+                        }
+
                         return cls.Named(Name);
                     }))
                 .ToSourceCode();

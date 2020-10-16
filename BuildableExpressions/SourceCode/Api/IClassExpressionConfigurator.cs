@@ -10,6 +10,26 @@
     public interface IClassExpressionConfigurator
     {
         /// <summary>
+        /// Configures the <see cref="ClassExpression"/> to derive from the given
+        /// <typeparamref name="TBase"/>.
+        /// </summary>
+        /// <typeparam name="TBase">
+        /// The base type from which the <see cref="ClassExpression"/> being built should derive.
+        /// </typeparam>
+        /// <returns>This <see cref="IClassExpressionConfigurator"/>, to support a fluent API.</returns>
+        IClassExpressionConfigurator DerivedFrom<TBase>() where TBase : class;
+
+        /// <summary>
+        /// Configures the <see cref="ClassExpression"/> to derive from the given
+        /// <paramref name="baseType"/>.
+        /// </summary>
+        /// <param name="baseType">
+        /// The base type from which the <see cref="ClassExpression"/> being built should derive.
+        /// </param>
+        /// <returns>This <see cref="IClassExpressionConfigurator"/>, to support a fluent API.</returns>
+        IClassExpressionConfigurator DerivedFrom(Type baseType);
+
+        /// <summary>
         /// Configures the <see cref="ClassExpression"/> to implement the given
         /// <typeparamref name="TInterface"/>. If a single configured Method matches a single
         /// interface method declaration, it will be named after that interface method.

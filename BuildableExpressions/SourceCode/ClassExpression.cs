@@ -40,6 +40,7 @@
         {
             SourceCode = sourceCode;
             _settings = settings;
+            BaseType = typeof(object);
             _methods = new List<MethodExpression>();
             _methodsByReturnType = new Dictionary<Type, List<MethodExpression>>();
         }
@@ -84,31 +85,6 @@
         public SourceCodeExpression SourceCode { get; }
 
         /// <summary>
-        /// Gets the interface types implemented by this <see cref="ClassExpression"/>.
-        /// </summary>
-        public ReadOnlyCollection<Type> Interfaces
-            => _readOnlyInterfaces ??= _interfaces.ToReadOnlyCollection();
-
-        /// <summary>
-        /// Adds the given <paramref name="interfaces"/> to the list of interfaces implemented by
-        /// this <see cref="ClassExpression"/>.
-        /// </summary>
-        /// <param name="interfaces">The interface(s) to add.</param>
-        public void Implement(params Type[] interfaces)
-        {
-            if (_interfaces == null)
-            {
-                _interfaces = new List<Type>();
-            }
-            else
-            {
-                _readOnlyInterfaces = null;
-            }
-
-            _interfaces.AddRange(interfaces);
-        }
-
-        /// <summary>
         /// Gets this <see cref="ClassExpression"/>'s <see cref="ClassVisibility" />.
         /// </summary>
         public ClassVisibility Visibility { get; private set; }
@@ -122,6 +98,17 @@
         /// Gets a value indicating whether this <see cref="ClassExpression"/> is a value type.
         /// </summary>
         public bool IsValueType { get; private set; }
+
+        /// <summary>
+        /// Gets the base type from which this <see cref="ClassExpression"/> derives.
+        /// </summary>
+        public Type BaseType { get; private set; }
+
+        /// <summary>
+        /// Gets the interface types implemented by this <see cref="ClassExpression"/>.
+        /// </summary>
+        public ReadOnlyCollection<Type> Interfaces
+            => _readOnlyInterfaces ??= _interfaces.ToReadOnlyCollection();
 
         /// <summary>
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="ClassExpression"/>,
@@ -304,17 +291,42 @@
             return this;
         }
 
+        IClassExpressionConfigurator IClassExpressionConfigurator.DerivedFrom<TBase>()
+            => DeriveFrom(typeof(TBase));
+
+        IClassExpressionConfigurator IClassExpressionConfigurator.DerivedFrom(Type baseType)
+            => DeriveFrom(baseType);
+
+        private IClassExpressionConfigurator DeriveFrom(Type baseType)
+        {
+            BaseType = baseType;
+            return this;
+        }
+
         IClassExpressionConfigurator IClassExpressionConfigurator.Implementing<TInterface>()
             where TInterface : class
         {
-            Implement(typeof(TInterface));
-            return this;
+            return Implement(typeof(TInterface));
         }
 
         IClassExpressionConfigurator IClassExpressionConfigurator.Implementing(
             params Type[] interfaces)
         {
-            Implement(interfaces);
+            return Implement(interfaces);
+        }
+
+        private IClassExpressionConfigurator Implement(params Type[] interfaces)
+        {
+            if (_interfaces == null)
+            {
+                _interfaces = new List<Type>();
+            }
+            else
+            {
+                _readOnlyInterfaces = null;
+            }
+
+            _interfaces.AddRange(interfaces);
             return this;
         }
 
