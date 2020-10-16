@@ -197,6 +197,7 @@
 
         IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithStructConstraint()
         {
+            ThrowIfHasClassConstraint(conflictingConstraint: "struct");
             _hasConstraints = _hasStructConstraint = true;
             return this;
         }

@@ -21,6 +21,19 @@
         }
 
         [Fact]
+        public void ShouldErrorIfConstrainedToClassAndStruct()
+        {
+            var configEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.GenericParameter("T", gp => gp
+                    .WithClassConstraint()
+                    .WithStructConstraint());
+            });
+
+            configEx.Message.ShouldContain("both class and struct constraints");
+        }
+
+        [Fact]
         public void ShouldErrorIfConstrainedToStructAndNewable()
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
