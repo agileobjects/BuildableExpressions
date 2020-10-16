@@ -75,6 +75,7 @@
             param.IsClosed.ShouldBeFalse();
             param.Method.ShouldBeNull();
             param.Type.ShouldNotBeNull().Name.ShouldBe("TDisposable");
+            param.Type.IsAbstract().ShouldBeFalse();
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
             param.Type.BaseType.ShouldBe(typeof(object));
@@ -91,6 +92,7 @@
             param.IsClosed.ShouldBeFalse();
             param.Method.ShouldBeNull();
             param.Type.ShouldNotBeNull().Name.ShouldBe("TDerived");
+            param.Type.IsAbstract().ShouldBeTrue();
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
             param.Type.BaseType.ShouldBe(typeof(AbstractBaseType));
