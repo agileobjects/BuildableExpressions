@@ -37,20 +37,8 @@
         void SetVisibility(TypeVisibility visibility);
 
         /// <summary>
-        /// Add a <see cref="MethodExpression"/> to the <see cref="TypeExpression"/>, with an
-        /// auto-generated name and the given <paramref name="body"/>.
-        /// </summary>
-        /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
-        /// <param name="body">
-        /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
-        /// body.
-        /// </param>
-        /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
-        MethodExpression AddMethod(string name, Expression body);
-
-        /// <summary>
-        /// Add a <see cref="MethodExpression"/> to the <see cref="TypeExpression"/>, with an
-        /// auto-generated name and the given <paramref name="body"/>.
+        /// Add a <see cref="MethodExpression"/> to the <see cref="TypeExpression"/>, with the
+        /// given <paramref name="name"/>, <paramref name="body"/> and <paramref name="configuration"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
         /// <param name="body">

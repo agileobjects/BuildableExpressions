@@ -1,5 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions
 {
+    using System.Linq.Expressions;
     using ReadableExpressions;
     using SourceCode;
     using SourceCode.Api;
@@ -34,6 +35,25 @@
             where TInterface : class
         {
             typeConfig.SetImplements(typeof(TInterface));
+        }
+
+        /// <summary>
+        /// Add a public <see cref="MethodExpression"/> to the <see cref="TypeExpression"/>, with
+        /// the given <paramref name="name"/> and <paramref name="body"/>.
+        /// </summary>
+        /// <param name="typeConfig">The <see cref="ITypeExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
+        /// <param name="body">
+        /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
+        /// body.
+        /// </param>
+        /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
+        public static MethodExpression AddMethod(
+            this ITypeExpressionConfigurator typeConfig,
+            string name,
+            Expression body)
+        {
+            return typeConfig.AddMethod(name, body, cfg => { });
         }
     }
 }

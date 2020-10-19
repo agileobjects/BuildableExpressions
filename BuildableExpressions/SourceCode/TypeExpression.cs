@@ -223,9 +223,6 @@
         #region ITypeExpressionConfigurator Members
 
         void ITypeExpressionConfigurator.SetImplements(params Type[] interfaces)
-            => Implement(interfaces);
-
-        private void Implement(params Type[] interfaces)
         {
             if (_interfaces == null)
             {
@@ -245,18 +242,7 @@
         void ITypeExpressionConfigurator.SetVisibility(TypeVisibility visibility)
             => Visibility = visibility;
 
-        MethodExpression ITypeExpressionConfigurator.AddMethod(string name, Expression body)
-            => AddMethod(name, body, cfg => { });
-
         MethodExpression ITypeExpressionConfigurator.AddMethod(
-            string name,
-            Expression body,
-            Action<IMethodExpressionConfigurator> configuration)
-        {
-            return AddMethod(name, body, configuration);
-        }
-
-        private MethodExpression AddMethod(
             string name,
             Expression body,
             Action<IMethodExpressionConfigurator> configuration)
