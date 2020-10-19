@@ -11,29 +11,12 @@
     {
         /// <summary>
         /// Configures the <see cref="TypeExpression"/> to implement the given
-        /// <typeparamref name="TInterface"/>. If a single configured Method matches a single
-        /// interface method declaration, it will be named after that interface method.
-        /// </summary>
-        /// <typeparam name="TInterface">
-        /// The type of interface the <see cref="TypeExpression"/> being built should implement.
-        /// </typeparam>
-        void SetImplements<TInterface>() where TInterface : class;
-
-        /// <summary>
-        /// Configures the <see cref="TypeExpression"/> to implement the given
-        /// <paramref name="interfaces"/>. If a single configured Method matches a single
-        /// interface method declaration, it will be named after that interface method.
+        /// <paramref name="interfaces"/>.
         /// </summary>
         /// <param name="interfaces">
         /// The type of interfaces the <see cref="TypeExpression"/> being built should implement.
         /// </param>
         void SetImplements(params Type[] interfaces);
-
-        /// <summary>
-        /// Set the summary documentation of the <see cref="TypeExpression"/>.
-        /// </summary>
-        /// <param name="summary">The summary documentation of the <see cref="TypeExpression"/>.</param>
-        void SetSummary(string summary);
 
         /// <summary>
         /// Set the summary documentation of the <see cref="TypeExpression"/>.

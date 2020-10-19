@@ -3,7 +3,7 @@
     using System;
     using System.Linq;
 
-    internal static class SourceCodeNamingExtensions
+    internal static class NameValidationExtensions
     {
         public static string ThrowIfInvalidName<TException>(
             this string name,

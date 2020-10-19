@@ -222,9 +222,6 @@
 
         #region ITypeExpressionConfigurator Members
 
-        void ITypeExpressionConfigurator.SetImplements<TInterface>()
-            => Implement(typeof(TInterface));
-
         void ITypeExpressionConfigurator.SetImplements(params Type[] interfaces)
             => Implement(interfaces);
 
@@ -241,9 +238,6 @@
 
             _interfaces.AddRange(interfaces);
         }
-
-        void ITypeExpressionConfigurator.SetSummary(string summary)
-            => Summary = ReadableExpression.Comment(summary);
 
         void ITypeExpressionConfigurator.SetSummary(CommentExpression summary)
             => Summary = summary;
