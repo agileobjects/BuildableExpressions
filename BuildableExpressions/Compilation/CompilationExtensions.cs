@@ -12,6 +12,18 @@
 
     internal static class CompilationExtensions
     {
+        public static readonly Assembly[] CompilationAssemblies =
+        {
+            typeof(object).GetAssembly(),
+#if NET_STANDARD
+            typeof(List<>).GetAssembly(),
+#endif
+            typeof(Enumerable).GetAssembly(),
+            typeof(AssemblyExtensionsPolyfill).GetAssembly(),
+            typeof(ReadableExpression).GetAssembly(),
+            typeof(BuildableExpression).GetAssembly()
+        };
+
         public static CompilationResult Compile(
             this ICompiler compiler,
             IEnumerable<string> sourceCodes)
@@ -41,25 +53,6 @@
             IEnumerable<string> sourceCodes)
         {
             return compiler.Compile(referenceAssemblies, sourceCodes.ToArray());
-        }
-
-        public static ICollection<Assembly> GetReferenceAssemblies(
-            this string expressionBuilderSource)
-        {
-            var referenceAssemblies = new List<Assembly>
-            {
-                typeof(object).GetAssembly(),
-                typeof(AssemblyExtensionsPolyfill).GetAssembly(),
-                typeof(ReadableExpression).GetAssembly(),
-                typeof(BuildableExpression).GetAssembly()
-            };
-
-            if (expressionBuilderSource.Contains("using System.Linq"))
-            {
-                referenceAssemblies.Add(typeof(Enumerable).GetAssembly());
-            }
-
-            return referenceAssemblies;
         }
 
         public static bool CompilationFailed(

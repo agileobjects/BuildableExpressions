@@ -32,6 +32,15 @@
 
             configuration.Invoke(this);
 
+            Analysis = SourceCodeAnalysis.For(this);
+            ReferencedAssemblies = GetReferenceAssemblies().ToReadOnlyCollection();
+        }
+
+        #region Setup
+
+
+        private IList<Assembly> GetReferenceAssemblies()
+        {
             var referenceAssemblies = new List<Assembly>();
 
             foreach (var type in Types.SelectMany(t => t.ImplementedTypes).Distinct())
@@ -43,10 +52,8 @@
 #endif
             }
 
-            ReferencedAssemblies = referenceAssemblies.ToReadOnlyCollection();
+            return referenceAssemblies;
         }
-
-        #region Setup
 
 #if NETFRAMEWORK
         private static void AddAssembliesFor(Type type, ICollection<Assembly> assemblies)
@@ -85,20 +92,7 @@
 
         #endregion
 
-        #region Factory Methods
-
-        /// <summary>
-        /// Creates a <see cref="SourceCodeExpression"/> representing a complete piece of source code.
-        /// </summary>
-        /// <param name="configuration">The configuration to use for the <see cref="SourceCodeExpression"/>.</param>
-        /// <returns>A <see cref="SourceCodeExpression"/> representing a complete piece of source code.</returns>
-        public static SourceCodeExpression Create(
-            Action<ISourceCodeExpressionConfigurator> configuration)
-        {
-            return new SourceCodeExpression(configuration);
-        }
-
-        #endregion
+        internal SourceCodeAnalysis Analysis { get; }
 
         /// <summary>
         /// Gets the <see cref="SourceCodeExpressionType"/> value (1000) indicating the type of this
@@ -254,15 +248,6 @@
             => Types.Cast<ICustomAnalysableExpression>().SelectMany(c => c.Expressions);
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
-        {
-            if (!(context is ISourceCodeTranslationContext sourceCodeContext))
-            {
-                sourceCodeContext = new CompositeSourceCodeTranslationContext(
-                    NamespaceAnalysis.For(this),
-                    context);
-            }
-
-            return new SourceCodeTranslation(this, sourceCodeContext);
-        }
+            => new SourceCodeTranslation(this, context);
     }
 }

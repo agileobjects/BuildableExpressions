@@ -8,7 +8,7 @@ namespace AgileObjects.BuildableExpressions.Compilation
     using System.Runtime.Loader;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
-    using NetStandardPolyfills;
+    using static CompilationExtensions;
     using static Microsoft.CodeAnalysis.OutputKind;
 
     internal class NetStandardCompiler : ICompiler
@@ -17,11 +17,7 @@ namespace AgileObjects.BuildableExpressions.Compilation
             IEnumerable<Assembly> referenceAssemblies,
             params string[] sourceCodes)
         {
-            var assemblyReferences = CreateReferences(referenceAssemblies, sourceCodes
-                .SelectMany(sc => sc.GetReferenceAssemblies())
-                .Distinct()
-                .ToList());
-
+            var assemblyReferences = CreateReferences(referenceAssemblies);
             var sourceTrees = sourceCodes.Select(s => SyntaxFactory.ParseSyntaxTree(s));
 
             using var outputStream = new MemoryStream();
@@ -52,30 +48,21 @@ namespace AgileObjects.BuildableExpressions.Compilation
         }
 
         private static IEnumerable<MetadataReference> CreateReferences(
-            IEnumerable<Assembly> passedInAssemblies,
-            ICollection<Assembly> sourceCodeAssemblies)
+            IEnumerable<Assembly> passedInAssemblies)
         {
-            var objectAssembly = typeof(object).GetAssembly();
-            var collectionsAssembly = typeof(List<>).GetAssembly();
+            var referencedAssemblies = CompilationAssemblies
+                .Concat(passedInAssemblies)
+                .Distinct()
+                .ToList();
 
-            if (!sourceCodeAssemblies.Contains(objectAssembly))
+            var requiredAssemblies = new List<Assembly>();
+
+            foreach (var assembly in referencedAssemblies)
             {
-                sourceCodeAssemblies.Add(objectAssembly);
+                CollectReferencedAssemblies(assembly, requiredAssemblies);
             }
 
-            if (!sourceCodeAssemblies.Contains(collectionsAssembly))
-            {
-                sourceCodeAssemblies.Add(collectionsAssembly);
-            }
-
-            var referencedAssemblies = new List<Assembly>(passedInAssemblies);
-
-            foreach (var assembly in sourceCodeAssemblies)
-            {
-                CollectReferencedAssemblies(assembly, referencedAssemblies);
-            }
-
-            return referencedAssemblies.Select(CreateReference);
+            return requiredAssemblies.Select(CreateReference);
         }
 
         private static void CollectReferencedAssemblies(

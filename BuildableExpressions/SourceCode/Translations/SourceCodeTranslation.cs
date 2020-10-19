@@ -15,19 +15,19 @@
         private readonly int _namespaceCount;
         private readonly bool _hasNamespace;
         private readonly SourceCodeExpression _sourceCode;
-        private readonly IList<ITranslation> _classes;
-        private readonly int _classCount;
+        private readonly IList<ITranslation> _types;
+        private readonly int _typeCount;
 
         public SourceCodeTranslation(
             SourceCodeExpression sourceCode,
-            ISourceCodeTranslationContext context)
+            ITranslationContext context)
         {
-            _namespaces = context.RequiredNamespaces;
-            _namespaceCount = context.RequiredNamespaces.Count;
+            _namespaces = sourceCode.Analysis.RequiredNamespaces;
+            _namespaceCount = sourceCode.Analysis.RequiredNamespaces.Count;
             _hasNamespace = !string.IsNullOrWhiteSpace(sourceCode.Namespace);
             _sourceCode = sourceCode;
-            _classCount = sourceCode.Types.Count;
-            _classes = new ITranslation[_classCount];
+            _typeCount = sourceCode.Types.Count;
+            _types = new ITranslation[_typeCount];
 
             var translationSize = 6; // <- for opening and closing braces
 
@@ -61,14 +61,14 @@
 
             for (var i = 0; ;)
             {
-                var @class = _classes[i] = context.GetTranslationFor(sourceCode.Types[i]);
+                var @class = _types[i] = context.GetTranslationFor(sourceCode.Types[i]);
 
                 translationSize += @class.TranslationSize;
                 formattingSize += @class.FormattingSize;
 
                 ++i;
 
-                if (i == _classCount)
+                if (i == _typeCount)
                 {
                     break;
                 }
@@ -94,11 +94,11 @@
 
             for (var i = 0; ;)
             {
-                indentSize += _classes[i].GetIndentSize();
+                indentSize += _types[i].GetIndentSize();
 
                 ++i;
 
-                if (i == _classCount)
+                if (i == _typeCount)
                 {
                     return indentSize;
                 }
@@ -118,11 +118,11 @@
 
             for (var i = 0; ;)
             {
-                lineCount += _classes[i].GetLineCount();
+                lineCount += _types[i].GetLineCount();
 
                 ++i;
 
-                if (i == _classCount)
+                if (i == _typeCount)
                 {
                     return lineCount;
                 }
@@ -153,11 +153,11 @@
 
             for (var i = 0; ;)
             {
-                _classes[i].WriteTo(writer);
+                _types[i].WriteTo(writer);
 
                 ++i;
 
-                if (i == _classCount)
+                if (i == _typeCount)
                 {
                     break;
                 }

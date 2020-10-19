@@ -6,6 +6,7 @@ namespace AgileObjects.BuildableExpressions.Compilation
     using System.Linq;
     using System.Reflection;
     using Microsoft.CSharp;
+    using static CompilationExtensions;
 
     internal class NetFrameworkCompiler : ICompiler
     {
@@ -21,11 +22,10 @@ namespace AgileObjects.BuildableExpressions.Compilation
                 TreatWarningsAsErrors = false
             };
 
-            var referenceAssemblyPaths = sourceCodes
-                .SelectMany(sc => sc.GetReferenceAssemblies())
+            var referenceAssemblyPaths = CompilationAssemblies
                 .Concat(referenceAssemblies)
-                .Select(GetFilePath)
                 .Distinct()
+                .Select(GetFilePath)
                 .ToArray();
 
             parameters.ReferencedAssemblies.AddRange(referenceAssemblyPaths);

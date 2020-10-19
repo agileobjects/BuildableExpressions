@@ -165,7 +165,7 @@ namespace MyNamespace
     }
 }
     ";
-            var result = compiler.Compile(new[] { SOURCE });
+            var result = compiler.Compile(SOURCE);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
