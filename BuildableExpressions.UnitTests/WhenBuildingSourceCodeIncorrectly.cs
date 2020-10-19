@@ -140,6 +140,42 @@
         }
 
         [Fact]
+        public void ShouldErrorIfClassMarkedStaticAndAbstract()
+        {
+            var classEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetStatic();
+                        cls.SetAbstract();
+                    });
+                });
+            });
+
+            classEx.Message.ShouldContain("");
+        }
+
+        [Fact]
+        public void ShouldErrorIfClassMarkedAbstractAndStatic()
+        {
+            var classEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetAbstract();
+                        cls.SetStatic();
+                    });
+                });
+            });
+
+            classEx.Message.ShouldContain("");
+        }
+
+        [Fact]
         public void ShouldErrorIfMethodAccessesUnscopedVariable()
         {
             var methodEx = Should.Throw<NotSupportedException>(() =>

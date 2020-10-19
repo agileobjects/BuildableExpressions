@@ -372,5 +372,34 @@ namespace GeneratedExpressionCode
             EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
+
+        [Fact]
+        public void ShouldBuildAnAbstractClass()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetAbstract();
+                        cls.AddMethod("GetString", Default(typeof(string)));
+                    });
+                })
+                .ToSourceCode();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public abstract class GeneratedExpressionClass
+    {
+        public string GetString()
+        {
+            return null;
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
     }
 }

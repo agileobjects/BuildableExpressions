@@ -63,9 +63,31 @@
 
         #region IClassExpressionConfigurator Members
 
-        void IClassExpressionConfigurator.SetStatic() => IsStatic = true;
+        void IClassExpressionConfigurator.SetStatic()
+        {
+            if (IsAbstract)
+            {
+                ThrowModifierConflict("abstract", "static");
+            }
 
-        void IClassExpressionConfigurator.SetAbstract() => IsAbstract = true;
+            IsStatic = true;
+        }
+
+        void IClassExpressionConfigurator.SetAbstract()
+        {
+            if (IsStatic)
+            {
+                ThrowModifierConflict("static", "abstract");
+            }
+
+            IsAbstract = true;
+        }
+
+        private void ThrowModifierConflict(string modifier, string conflictingModifier)
+        {
+            throw new InvalidOperationException(
+                $"Class '{Name}' cannot be both {modifier} and {conflictingModifier}.");
+        }
 
         void IClassExpressionConfigurator.SetBaseType<TBase>() where TBase : class
             => DeriveFrom(typeof(TBase));
