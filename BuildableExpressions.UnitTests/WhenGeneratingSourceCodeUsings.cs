@@ -9,6 +9,7 @@
     using BuildableExpressions;
     using Common;
     using NetStandardPolyfills;
+    using SourceCode;
     using Xunit;
     using static System.Linq.Expressions.Expression;
 
@@ -19,10 +20,10 @@
         {
             var getDefaultDate = Lambda<Func<DateTime>>(Default(typeof(DateTime)));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(getDefaultDate)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("GetDateTime", getDefaultDate)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -47,10 +48,10 @@ namespace GeneratedExpressionCode
         {
             var getDefaultDate = Lambda<Func<Type>>(Constant(typeof(Stream)));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(getDefaultDate)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("GetStreamType", getDefaultDate)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -61,7 +62,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public Type GetType()
+        public Type GetStreamType()
         {
             return typeof(Stream);
         }
@@ -76,10 +77,10 @@ namespace GeneratedExpressionCode
         {
             var createStringBuilder = Lambda<Func<object>>(New(typeof(StringBuilder)));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(createStringBuilder)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("MakeStringBuilder", createStringBuilder)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -89,7 +90,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public object GetObject()
+        public object MakeStringBuilder()
         {
             return new StringBuilder();
         }
@@ -105,10 +106,10 @@ namespace GeneratedExpressionCode
             var createStreamArray = Lambda<Func<object>>(
                 NewArrayBounds(typeof(Stream), Constant(5)));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(createStreamArray)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("GetStreamObject", createStreamArray)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -118,7 +119,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public object GetObject()
+        public object GetStreamObject()
         {
             return new Stream[5];
         }
@@ -133,10 +134,10 @@ namespace GeneratedExpressionCode
         {
             var getEnumIntValue = CreateLambda<object>(() => (OddNumber?)OddNumber.One);
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(getEnumIntValue)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("GetOddOne", getEnumIntValue)))
                 .ToSourceCode();
 
             var expected = @$"
@@ -146,7 +147,7 @@ namespace GeneratedExpressionCode
 {{
     public class GeneratedExpressionClass
     {{
-        public object GetObject()
+        public object GetOddOne()
         {{
             return (OddNumber?)OddNumber.One;
         }}
@@ -164,10 +165,10 @@ namespace GeneratedExpressionCode
             var comparerNotNull = NotEqual(defaultComparer, Default(defaultComparer.Type));
             var comparerCheckLambda = Lambda<Func<bool>>(comparerNotNull);
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(comparerCheckLambda)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("GetNotNull", comparerCheckLambda)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -178,7 +179,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public bool GetBool()
+        public bool GetNotNull()
         {
             return Comparer<StringBuilder>.Default != null;
         }
@@ -203,10 +204,10 @@ namespace GeneratedExpressionCode
             var lambdaBody = Block(new[] { helperVariable }, populateHelper, methodCall);
             var lambda = Lambda<Func<string>>(lambdaBody);
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(lambda)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("GetTypeName", lambda)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -217,7 +218,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public string GetString()
+        public string GetTypeName()
         {
             var helper = new WhenGeneratingSourceCodeUsings.TestHelper();
 
@@ -245,10 +246,10 @@ namespace GeneratedExpressionCode
             var lambdaBody = Block(new[] { helperVariable }, populateHelper, methodCall);
             var lambda = Lambda<Func<int>>(lambdaBody);
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(lambda)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("GetHash", lambda)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -258,7 +259,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public int GetInt()
+        public int GetHash()
         {
             var helper = new WhenGeneratingSourceCodeUsings.TestHelper();
 
@@ -277,10 +278,10 @@ namespace GeneratedExpressionCode
             var dateTimeTicks = Property(dateTimeNow, nameof(DateTime.Ticks));
             var getDefaultDate = Lambda<Func<long>>(dateTimeTicks);
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(getDefaultDate)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("GetNowTicks", getDefaultDate)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -290,7 +291,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public long GetLong()
+        public long GetNowTicks()
         {
             return DateTime.Now.Ticks;
         }
@@ -306,10 +307,10 @@ namespace GeneratedExpressionCode
             var stringBuilderMatchesRegex = CreateLambda(
                 (Regex re, StringBuilder sb) => re.IsMatch(sb.ToString()));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(stringBuilderMatchesRegex)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("IsMatch", stringBuilderMatchesRegex)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -320,7 +321,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public bool GetBool
+        public bool IsMatch
         (
             Regex re,
             StringBuilder sb
@@ -340,10 +341,10 @@ namespace GeneratedExpressionCode
             var joinListItems = CreateLambda(
                 (Func<IList<string>> listFactory) => string.Join(", ", listFactory.Invoke().ToArray()));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(joinListItems)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("InvokeFactory", joinListItems)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -355,7 +356,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public string GetString
+        public string InvokeFactory
         (
             Func<IList<string>> listFactory
         )
@@ -374,10 +375,10 @@ namespace GeneratedExpressionCode
             var joinListItems = CreateLambda(
                 (string[] strings) => strings.Select(int.Parse).ToList());
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(joinListItems)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("GetInts", joinListItems)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -409,10 +410,10 @@ namespace GeneratedExpressionCode
                 Call(typeof(Console), "ReadLine", Type.EmptyTypes),
                 Catch(Parameter(typeof(IOException), "ioEx"), Default(typeof(string))));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(tryCatch)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("ReadFromConsole", tryCatch)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -423,7 +424,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public string GetString()
+        public string ReadFromConsole()
         {
             try
             {
@@ -446,10 +447,10 @@ namespace GeneratedExpressionCode
             var stringBuilderContainsOther = CreateLambda(
                 (StringBuilder sb1, StringBuilder sb2) => sb1.ToString().Contains(sb2.ToString()));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(stringBuilderContainsOther)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("GetContains", stringBuilderContainsOther)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -459,7 +460,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public bool GetBool
+        public bool GetContains
         (
             StringBuilder sb1,
             StringBuilder sb2

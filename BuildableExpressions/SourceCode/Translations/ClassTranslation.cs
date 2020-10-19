@@ -6,86 +6,56 @@
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
 
-    internal class ClassTranslation : ITranslation
+    internal class TypeTranslation
     {
-        private const string _staticString = "static ";
-        private const string _abstractString = "abstract ";
-        private const string _classString = "class ";
-        private const string _structString = "struct ";
-
-        private readonly string _visibility;
-        private readonly ClassExpression _class;
+        private readonly TypeExpression _type;
         private readonly string _typeString;
-        private readonly int _typeListCount;
-        private readonly IList<ITranslation> _typeList;
-        private readonly ITranslatable _summary;
-        private readonly IList<ITranslation> _methods;
+        private readonly ITranslatable _summaryTranslation;
+        private readonly string _visibility;
+        private readonly IList<ITranslation> _interfaceTypeTranslations;
+        private readonly int _interfaceTypeCount;
+        private readonly IList<ITranslation> _methodTranslations;
         private readonly int _methodCount;
 
-        public ClassTranslation(
-            ClassExpression @class,
+        public TypeTranslation(
+            TypeExpression type,
+            string typeString,
             ITranslationContext context)
         {
-            _class = @class;
-            _summary = SummaryTranslation.For(@class.Summary, context);
-            _visibility = @class.Visibility.ToString().ToLowerInvariant();
-            _typeString = @class.IsValueType ? _structString : _classString;
-            _typeListCount = @class.Interfaces.Count;
+            _type = type;
+            _typeString = typeString;
+            _summaryTranslation = SummaryTranslation.For(type.Summary, context);
+            _visibility = type.Visibility.ToString().ToLowerInvariant();
+            _interfaceTypeCount = type.Interfaces.Count;
 
-            var hasBaseType = @class.BaseType != typeof(object);
-
-            if (hasBaseType)
-            {
-                ++_typeListCount;
-            }
-
-            _methodCount = @class.Methods.Count;
-            _methods = new ITranslation[_methodCount];
+            _methodCount = type.Methods.Count;
+            _methodTranslations = new ITranslation[_methodCount];
 
             var translationSize =
-                _summary.TranslationSize +
+                _summaryTranslation.TranslationSize +
                 _visibility.Length + 1 +
-                _typeString.Length +
-                @class.Name.Length +
+                typeString.Length +
+                type.Name.Length +
                 6; // <- for opening and closing braces
-
-            if (@class.IsStatic)
-            {
-                translationSize += _staticString.Length;
-            }
-            else if (@class.IsAbstract)
-            {
-                translationSize += _abstractString.Length;
-            }
 
             var keywordFormattingSize = context.GetKeywordFormattingSize();
 
             var formattingSize =
-                _summary.FormattingSize +
-                keywordFormattingSize; // <- for accessibility + 'class'
+                _summaryTranslation.FormattingSize +
+                keywordFormattingSize; // <- for accessibility + type name
 
-            if (_typeListCount != 0)
+            if (_interfaceTypeCount != 0)
             {
                 translationSize += 3; // <- for ' : '
-                translationSize += ((_typeListCount - 1) * 2); // <- for separators
-                _typeList = new ITranslation[_typeListCount];
-                var typeIndex = 0;
+                translationSize += ((_interfaceTypeCount - 1) * 2); // <- for separators
+                _interfaceTypeTranslations = new ITranslation[_interfaceTypeCount];
 
-                if (hasBaseType)
+                for (var i = 0; i < _interfaceTypeCount; ++i)
                 {
-                    var baseType = _typeList[0] = context.GetTranslationFor(@class.BaseType);
-                    translationSize += baseType.TranslationSize;
-                    formattingSize += baseType.FormattingSize;
-                    typeIndex = 1;
-                }
-
-                foreach (var @interface in @class.Interfaces)
-                {
-                    var interfaceTranslation = context.GetTranslationFor(@interface);
-                    _typeList[typeIndex] = interfaceTranslation;
+                    var interfaceTranslation = context.GetTranslationFor(type.Interfaces[i]);
+                    _interfaceTypeTranslations[i] = interfaceTranslation;
                     translationSize += interfaceTranslation.TranslationSize;
                     formattingSize += interfaceTranslation.FormattingSize;
-                    ++typeIndex;
                 }
             }
 
@@ -93,7 +63,7 @@
             {
                 for (var i = 0; ;)
                 {
-                    var method = _methods[i] = context.GetTranslationFor(@class.Methods[i]);
+                    var method = _methodTranslations[i] = context.GetTranslationFor(type.Methods[i]);
                     translationSize += method.TranslationSize;
                     formattingSize += method.FormattingSize;
 
@@ -112,10 +82,6 @@
             FormattingSize = formattingSize;
         }
 
-        public ExpressionType NodeType => _class.NodeType;
-
-        public Type Type => _class.Type;
-
         public int TranslationSize { get; }
 
         public int FormattingSize { get; }
@@ -131,7 +97,7 @@
 
             for (var i = 0; ;)
             {
-                indentSize += _methods[i].GetIndentSize();
+                indentSize += _methodTranslations[i].GetIndentSize();
 
                 ++i;
 
@@ -144,7 +110,7 @@
 
         public int GetLineCount()
         {
-            var lineCount = _summary.GetLineCount();
+            var lineCount = _summaryTranslation.GetLineCount();
 
             if (_methodCount == 0)
             {
@@ -153,7 +119,7 @@
 
             for (var i = 0; ;)
             {
-                lineCount += _methods[i].GetLineCount();
+                lineCount += _methodTranslations[i].GetLineCount();
 
                 ++i;
 
@@ -164,51 +130,67 @@
             }
         }
 
-        public void WriteTo(TranslationWriter writer)
+        public void WriteTypeDeclarationTo(
+            TranslationWriter writer,
+            string modifiers = null)
         {
-            _summary.WriteTo(writer);
+            _summaryTranslation.WriteTo(writer);
 
-            var declaration = _visibility + " ";
-
-            if (_class.IsStatic)
-            {
-                declaration += _staticString;
-            }
-            else if (_class.IsAbstract)
-            {
-                declaration += _abstractString;
-            }
-
-            declaration += _typeString;
+            var declaration = _visibility + " " + modifiers + _typeString;
 
             writer.WriteKeywordToTranslation(declaration);
-            writer.WriteTypeNameToTranslation(_class.Name);
+            writer.WriteTypeNameToTranslation(_type.Name);
+        }
 
-            if (_typeListCount != 0)
+        public void WriteTypeListTo(
+            TranslationWriter writer,
+            ITranslatable extraTypeTranslation = null)
+        {
+            var hasExtraType = extraTypeTranslation != null;
+            var hasNoInterfaces = _interfaceTypeCount == 0;
+
+            if (!hasExtraType && hasNoInterfaces)
             {
-                writer.WriteToTranslation(" : ");
-
-                for (var i = 0; ;)
-                {
-                    _typeList[i].WriteTo(writer);
-                    ++i;
-
-                    if (i == _typeListCount)
-                    {
-                        break;
-                    }
-
-                    writer.WriteToTranslation(", ");
-                }
+                return;
             }
 
+            writer.WriteToTranslation(" : ");
+
+            if (hasExtraType)
+            {
+                extraTypeTranslation.WriteTo(writer);
+
+                if (hasNoInterfaces)
+                {
+                    return;
+                }
+
+                writer.WriteToTranslation(", ");
+            }
+
+            for (var i = 0; ;)
+            {
+                _interfaceTypeTranslations[i].WriteTo(writer);
+                ++i;
+
+                if (i == _interfaceTypeCount)
+                {
+                    break;
+                }
+
+                writer.WriteToTranslation(", ");
+            }
+        }
+
+        public void WriteMethodsTo(TranslationWriter writer)
+        {
             writer.WriteOpeningBraceToTranslation();
 
             if (_methodCount != 0)
             {
                 for (var i = 0; ;)
                 {
-                    _methods[i].WriteTo(writer);
+                    _methodTranslations[i].WriteTo(writer);
                     ++i;
 
                     if (i == _methodCount)
@@ -222,6 +204,109 @@
             }
 
             writer.WriteClosingBraceToTranslation();
+        }
+    }
+
+    internal class StructTranslation : ITranslation
+    {
+        private const string _structString = "struct ";
+
+        private readonly TypeTranslation _typeTranslation;
+        private readonly StructExpression _struct;
+
+        public StructTranslation(StructExpression type, ITranslationContext context)
+        {
+            _struct = type;
+            _typeTranslation = new TypeTranslation(type, _structString, context);
+        }
+
+        public ExpressionType NodeType => _struct.NodeType;
+
+        public Type Type => _struct.Type;
+
+        public int TranslationSize => _typeTranslation.TranslationSize;
+
+        public int FormattingSize => _typeTranslation.FormattingSize;
+
+        public int GetIndentSize() => _typeTranslation.GetIndentSize();
+
+        public int GetLineCount() => _typeTranslation.GetLineCount();
+
+        public void WriteTo(TranslationWriter writer)
+        {
+            _typeTranslation.WriteTypeDeclarationTo(writer);
+            _typeTranslation.WriteTypeListTo(writer);
+            _typeTranslation.WriteMethodsTo(writer);
+        }
+    }
+
+    internal class ClassTranslation : ITranslation
+    {
+        private const string _staticString = "static ";
+        private const string _abstractString = "abstract ";
+        private const string _classString = "class ";
+
+        private readonly TypeTranslation _typeTranslation;
+        private readonly ClassExpression _class;
+        private readonly ITranslatable _baseTypeTranslation;
+
+        public ClassTranslation(ClassExpression type, ITranslationContext context)
+        {
+            _class = type;
+            _typeTranslation = new TypeTranslation(type, _classString, context);
+            var hasBaseType = type.BaseType != typeof(object);
+
+            var translationSize = _typeTranslation.TranslationSize;
+            var formattingSize = _typeTranslation.FormattingSize;
+
+            if (type.IsStatic)
+            {
+                translationSize += _staticString.Length;
+            }
+            else if (type.IsAbstract)
+            {
+                translationSize += _abstractString.Length;
+            }
+
+            if (hasBaseType)
+            {
+                _baseTypeTranslation = context.GetTranslationFor(type.BaseType);
+                translationSize += _baseTypeTranslation.TranslationSize;
+                formattingSize += _baseTypeTranslation.FormattingSize;
+            }
+
+            TranslationSize = translationSize;
+            FormattingSize = formattingSize;
+        }
+
+        public ExpressionType NodeType => _class.NodeType;
+
+        public Type Type => _class.Type;
+
+        public int TranslationSize { get; }
+
+        public int FormattingSize { get; }
+
+        public int GetIndentSize() => _typeTranslation.GetIndentSize();
+
+        public int GetLineCount() => _typeTranslation.GetLineCount();
+
+        public void WriteTo(TranslationWriter writer)
+        {
+            var declarationModifiers = string.Empty;
+
+            if (_class.IsStatic)
+            {
+                declarationModifiers += _staticString;
+            }
+            else if (_class.IsAbstract)
+            {
+                declarationModifiers += _abstractString;
+            }
+
+            _typeTranslation.WriteTypeDeclarationTo(writer, declarationModifiers);
+            _typeTranslation.WriteTypeListTo(writer, _baseTypeTranslation);
+            _typeTranslation.WriteMethodsTo(writer);
         }
     }
 }

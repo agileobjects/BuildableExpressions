@@ -4,6 +4,7 @@
     using BuildableExpressions;
     using Common;
     using NetStandardPolyfills;
+    using SourceCode;
     using Xunit;
     using static System.Linq.Expressions.Expression;
 
@@ -14,10 +15,10 @@
         {
             var doNothing = Lambda<Action>(Default(typeof(void)));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(doNothing)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod(doNothing)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -39,10 +40,10 @@ namespace GeneratedExpressionCode
         {
             var doNothing = Default(typeof(void));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(doNothing)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod(doNothing)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -64,10 +65,10 @@ namespace GeneratedExpressionCode
         {
             var returnOneThousand = CreateLambda(() => 1000);
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(returnOneThousand)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("Get1000", returnOneThousand)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -75,7 +76,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public int GetInt()
+        public int Get1000()
         {
             return 1000;
         }
@@ -90,10 +91,10 @@ namespace GeneratedExpressionCode
         {
             var returnGivenLong = CreateLambda((long arg) => arg);
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(returnGivenLong)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("GetLong", returnGivenLong)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -119,10 +120,10 @@ namespace GeneratedExpressionCode
         {
             var subtractShortFromInt = CreateLambda((int value1, short value2) => value1 - value2);
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(subtractShortFromInt)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("Subtract", subtractShortFromInt)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -130,7 +131,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public int GetInt
+        public int Subtract
         (
             int value1,
             short value2
@@ -154,10 +155,10 @@ namespace GeneratedExpressionCode
             var block = Block(new[] { intVariable }, assignBlockInt, addInts);
             var addIntsLambda = Lambda<Func<int, int>>(block, intParameter);
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(addIntsLambda)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("AddInts", addIntsLambda)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -165,7 +166,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public int GetInt
+        public int AddInts
         (
             int scopedInt
         )
@@ -185,11 +186,13 @@ namespace GeneratedExpressionCode
         {
             var sayHello = Lambda<Func<string>>(Constant("Hello!"));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .Implementing<IMessager>()
-                        .WithMethod(sayHello)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass("Messager", cls =>
+                    {
+                        cls.SetImplements<IMessager>();
+                        cls.AddMethod(nameof(IMessager.GetMessage), sayHello);
+                    }))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -215,12 +218,14 @@ namespace GeneratedExpressionCode
             var sayHello = Lambda<Func<string>>(Constant("Hello!"));
             var return123 = Lambda<Func<int>>(Constant(123));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .Implementing(typeof(IMessager), typeof(INumberSource))
-                        .WithMethod(sayHello)
-                        .WithMethod(return123)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls =>
+                    {
+                        cls.SetImplements(typeof(IMessager), typeof(INumberSource));
+                        cls.AddMethod(nameof(IMessager.GetMessage), sayHello);
+                        cls.AddMethod(nameof(INumberSource.GetNumber), return123);
+                    }))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -248,12 +253,13 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildAClassWithABaseType()
         {
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .DerivedFrom<BaseType>()
-                        .Named("DerivedType")
-                        .WithMethod(Constant("Hello!"))))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass("DerivedType", cls =>
+                    {
+                        cls.SetBaseType<BaseType>();
+                        cls.AddMethod("SayHello", Constant("Hello!"));
+                    }))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -263,7 +269,7 @@ namespace GeneratedExpressionCode
 {
     public class DerivedType : WhenBuildingSourceCode.BaseType
     {
-        public string GetString()
+        public string SayHello()
         {
             return ""Hello!"";
         }
@@ -276,28 +282,25 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildAnEmptyClass()
         {
-            SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .Named("EmptyClass")))
+            BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass("EmptyClass", cls => { }))
                 .ToSourceCode();
         }
 
         [Fact]
         public void ShouldBuildAValueType()
         {
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .AsValueType()
-                        .Named("MyValueType")
-                        .WithMethod(Default(typeof(void)))))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddStruct("MyStruct", cls => cls
+                        .AddMethod(Default(typeof(void)))))
                 .ToSourceCode();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
 {
-    public struct MyValueType
+    public struct MyStruct
     {
         public void DoAction()
         {
@@ -311,13 +314,17 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildAGenericParameterMethod()
         {
-            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
-            var @class = sourceCode.AddClass();
-            var param = BuildableExpression.GenericParameter("T");
-            var paramType = BuildableExpression.TypeOf(param);
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    var param = BuildableExpression.GenericParameter("T");
+                    var paramType = BuildableExpression.TypeOf(param);
 
-            @class.AddMethod(paramType, m => m
-                .WithGenericParameter(param));
+                    cls.AddMethod("GetType", paramType, m => m
+                        .AddGenericParameter(param));
+                });
+            });
 
             var translated = sourceCode.ToSourceCode();
 
@@ -341,29 +348,33 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildAMultipleGenericParameterMethod()
         {
-            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
-            var @class = sourceCode.AddClass();
-            var param1 = BuildableExpression.GenericParameter("T1");
-            var param2 = BuildableExpression.GenericParameter("TParam2");
-            var param3 = BuildableExpression.GenericParameter("T3");
-            var param1Name = BuildableExpression.NameOf(param1);
-            var param2Name = BuildableExpression.NameOf(param2);
-            var param3Name = BuildableExpression.NameOf(param3);
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    var param1 = BuildableExpression.GenericParameter("T1");
+                    var param2 = BuildableExpression.GenericParameter("TParam2");
+                    var param3 = BuildableExpression.GenericParameter("T3");
+                    var param1Name = BuildableExpression.NameOf(param1);
+                    var param2Name = BuildableExpression.NameOf(param2);
+                    var param3Name = BuildableExpression.NameOf(param3);
 
-            var concatMethod = typeof(string).GetPublicStaticMethod(
-                nameof(string.Concat),
-                typeof(string),
-                typeof(string),
-                typeof(string));
+                    var concatMethod = typeof(string).GetPublicStaticMethod(
+                        nameof(string.Concat),
+                        typeof(string),
+                        typeof(string),
+                        typeof(string));
 
-            var nameConcatCall = Call(
-                concatMethod,
-                param1Name,
-                param2Name,
-                param3Name);
+                    var nameConcatCall = Call(
+                        concatMethod,
+                        param1Name,
+                        param2Name,
+                        param3Name);
 
-            @class.AddMethod(nameConcatCall, m => m
-                .WithGenericParameters(param1, param2, param3));
+                    cls.AddMethod("GetNames", nameConcatCall, m => m
+                        .AddGenericParameters(param1, param2, param3));
+                });
+            });
 
             var translated = sourceCode.ToSourceCode();
 
@@ -372,7 +383,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public string GetString<T1, TParam2, T3>()
+        public string GetNames<T1, TParam2, T3>()
         {
             return nameof(T1) + nameof(TParam2) + nameof(T3);
         }
@@ -385,14 +396,17 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildAStructConstrainedGenericParameterMethod()
         {
-            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
-            var @class = sourceCode.AddClass();
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    var param = BuildableExpression.GenericParameter("TStruct", gp => gp
+                        .WithStructConstraint());
 
-            var param = BuildableExpression.GenericParameter("TStruct", gp => gp
-                .WithStructConstraint());
-
-            @class.AddMethod(Default(typeof(object)), m => m
-                .WithGenericParameter(param));
+                    cls.AddMethod("GetObject", Default(typeof(object)), m => m
+                        .AddGenericParameter(param));
+                });
+            });
 
             var translated = sourceCode.ToSourceCode();
 
@@ -415,15 +429,18 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildANewableClassConstrainedGenericParameterMethod()
         {
-            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
-            var @class = sourceCode.AddClass();
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    var param = BuildableExpression.GenericParameter("TNewable", gp => gp
+                        .WithClassConstraint()
+                        .WithNewableConstraint());
 
-            var param = BuildableExpression.GenericParameter("TNewable", gp => gp
-                .WithClassConstraint()
-                .WithNewableConstraint());
-
-            @class.AddMethod(Default(typeof(object)), m => m
-                .WithGenericParameter(param));
+                    cls.AddMethod("GetObject", Default(typeof(object)), m => m
+                        .AddGenericParameter(param));
+                });
+            });
 
             var translated = sourceCode.ToSourceCode();
 
@@ -446,15 +463,18 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildAStructInterfaceConstrainedGenericParameterMethod()
         {
-            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
-            var @class = sourceCode.AddClass();
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    var param = BuildableExpression.GenericParameter("TMarker", gp => gp
+                        .WithStructConstraint()
+                        .WithTypeConstraint<IMarker1>());
 
-            var param = BuildableExpression.GenericParameter("TMarker", gp => gp
-                .WithStructConstraint()
-                .WithTypeConstraint<IMarker1>());
-
-            @class.AddMethod(Default(typeof(object)), m => m
-                .WithGenericParameter(param));
+                    cls.AddMethod("GetMarker", Default(typeof(object)), m => m
+                        .AddGenericParameter(param));
+                });
+            });
 
             var translated = sourceCode.ToSourceCode();
 
@@ -465,7 +485,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public object GetObject<TMarker>()
+        public object GetMarker<TMarker>()
             where TMarker : struct, WhenBuildingSourceCode.IMarker1
         {
             return null;
@@ -479,14 +499,17 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildAClassAndInterfaceConstrainedGenericParameterMethod()
         {
-            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
-            var @class = sourceCode.AddClass();
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    var param = BuildableExpression.GenericParameter("TDerived", gp => gp
+                        .WithTypeConstraints(typeof(BaseType), typeof(IMarker1), typeof(IMarker2)));
 
-            var param = BuildableExpression.GenericParameter("TDerived", gp => gp
-                .WithTypeConstraints(typeof(BaseType), typeof(IMarker1), typeof(IMarker2)));
-
-            @class.AddMethod(Default(typeof(object)), m => m
-                .WithGenericParameter(param));
+                    cls.AddMethod("GetDerived", Default(typeof(object)), m => m
+                        .AddGenericParameter(param));
+                });
+            });
 
             var translated = sourceCode.ToSourceCode();
 
@@ -497,7 +520,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public object GetObject<TDerived>()
+        public object GetDerived<TDerived>()
             where TDerived : WhenBuildingSourceCode.BaseType, WhenBuildingSourceCode.IMarker1, WhenBuildingSourceCode.IMarker2
         {
             return null;
@@ -514,10 +537,10 @@ namespace GeneratedExpressionCode
             var param = BuildableExpression.GenericParameter("T");
             var paramDefault = Default(param.Type);
 
-            var translated = SourceCodeFactory.Default.CreateSourceCode(sc => sc
-                .WithClass(cls => cls
-                    .WithMethod(paramDefault, m => m
-                        .WithGenericParameter(param))))
+            var translated = BuildableExpression.SourceCode(sc => sc
+                .AddClass(cls => cls
+                    .AddMethod("GetT", paramDefault, m => m
+                        .AddGenericParameter(param))))
                 .ToSourceCode();
 
             const string EXPECTED = @"

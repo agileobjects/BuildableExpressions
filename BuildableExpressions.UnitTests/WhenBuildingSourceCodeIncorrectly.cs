@@ -5,6 +5,7 @@
     using System.Reflection;
     using Common;
     using ReadableExpressions;
+    using SourceCode;
     using Xunit;
     using static System.Linq.Expressions.Expression;
 
@@ -15,8 +16,8 @@
         {
             var classEx = Should.Throw<InvalidOperationException>(() =>
             {
-                SourceCodeFactory.Default
-                    .CreateSourceCode(sc => sc
+                BuildableExpression
+                    .SourceCode(sc => sc
                         .WithNamespaceOf<CommentExpression>())
                     .ToSourceCode();
             });
@@ -29,48 +30,22 @@
         {
             var classNameEx = Should.Throw<ArgumentException>(() =>
             {
-                SourceCodeFactory.Default
-                    .CreateSourceCode(sc => sc
-                        .WithClass(cls => cls
-                            .Named(null)));
+                BuildableExpression
+                    .SourceCode(sc => sc
+                        .AddClass(null, cls => { }));
             });
 
             classNameEx.Message.ShouldContain("cannot be null");
         }
 
         [Fact]
-        public void ShouldErrorIfNullCustomClassName()
+        public void ShouldErrorIfBlankClassName()
         {
-            var classNameEx = Should.Throw<InvalidOperationException>(() =>
+            var classNameEx = Should.Throw<ArgumentException>(() =>
             {
-                var doNothing = Default(typeof(void));
-
-                var factory = new SourceCodeFactory(scf => scf
-                    .NameClassesUsing((sc, ctx) => null));
-
-                factory.CreateSourceCode(sc => sc
-                        .WithClass(cls => cls
-                            .WithMethod(doNothing)))
-                    .ToSourceCode();
-            });
-
-            classNameEx.Message.ShouldContain("cannot be null");
-        }
-
-        [Fact]
-        public void ShouldErrorIfBlankCustomClassName()
-        {
-            var classNameEx = Should.Throw<InvalidOperationException>(() =>
-            {
-                var doNothing = Lambda<Action>(Default(typeof(void)));
-
-                var factory = new SourceCodeFactory(scf => scf
-                    .NameClassesUsing((sc, ctx) => string.Empty));
-
-                factory.CreateSourceCode(sc => sc
-                        .WithClass(cls => cls
-                            .WithMethod(doNothing)))
-                    .ToSourceCode();
+                BuildableExpression
+                    .SourceCode(sc => sc
+                        .AddClass(string.Empty, cls => { }));
             });
 
             classNameEx.Message.ShouldContain("cannot be blank");
@@ -81,10 +56,9 @@
         {
             var classNameEx = Should.Throw<ArgumentException>(() =>
              {
-                 SourceCodeFactory.Default
-                     .CreateSourceCode(sc => sc
-                        .WithClass(cls => cls
-                            .Named("   ")));
+                 BuildableExpression
+                     .SourceCode(sc => sc
+                        .AddClass("   ", cls => { }));
              });
 
             classNameEx.Message.ShouldContain("cannot be blank");
@@ -95,32 +69,12 @@
         {
             var classNameEx = Should.Throw<ArgumentException>(() =>
             {
-                SourceCodeFactory.Default
-                    .CreateSourceCode(sc => sc
-                        .WithClass(cls => cls
-                            .Named("X-Y-Z")));
+                BuildableExpression
+                    .SourceCode(sc => sc
+                        .AddClass("X-Y-Z", cls => { }));
             });
 
-            classNameEx.Message.ShouldContain("invalid class name");
-        }
-
-        [Fact]
-        public void ShouldErrorIfInvalidCustomClassName()
-        {
-            var classNameEx = Should.Throw<InvalidOperationException>(() =>
-            {
-                var doNothing = Lambda<Action>(Default(typeof(void)));
-
-                var factory = new SourceCodeFactory(scf => scf
-                    .NameClassesUsing((sc, ctx) => $"1_Class_{ctx.Index}"));
-
-                factory.CreateSourceCode(sc => sc
-                        .WithClass(cls => cls
-                            .WithMethod(doNothing)))
-                    .ToSourceCode();
-            });
-
-            classNameEx.Message.ShouldContain("invalid class name");
+            classNameEx.Message.ShouldContain("invalid type name");
         }
 
         [Fact]
@@ -130,14 +84,12 @@
             {
                 var doNothing = Lambda<Action>(Default(typeof(void)));
 
-                SourceCodeFactory.Default
-                    .CreateSourceCode(sc => sc
-                        .WithClass(cls => cls
-                            .Named("MyClass")
-                            .WithMethod(doNothing))
-                        .WithClass(cls => cls
-                            .Named("MyClass")
-                            .WithMethod(doNothing)))
+                BuildableExpression
+                    .SourceCode(sc =>
+                    {
+                        sc.AddClass("MyClass", cls => cls.AddMethod(doNothing));
+                        sc.AddClass("MyClass", cls => { });
+                    })
                     .ToSourceCode();
             });
 
@@ -150,10 +102,14 @@
         {
             var baseTypeEx = Should.Throw<InvalidOperationException>(() =>
             {
-                var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
-                var @class = sourceCode.AddClass();
-                @class.BaseType = typeof(Stream);
-                @class.BaseType = typeof(TestClassBase);
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetBaseType(typeof(Stream));
+                        cls.SetBaseType(typeof(TestClassBase));
+                    });
+                });
             });
 
             baseTypeEx.Message.ShouldContain("Unable to set class base type");
@@ -167,11 +123,15 @@
             {
                 var getString = Lambda<Func<string>>(Default(typeof(string)));
 
-                SourceCodeFactory.Default
-                    .CreateSourceCode(sc => sc
-                        .WithClass(cls => cls
-                            .Implementing(typeof(IMessager), typeof(IRandomStringFactory))
-                            .WithMethod(getString)))
+                BuildableExpression
+                    .SourceCode(sc =>
+                    {
+                        sc.AddClass(cls =>
+                        {
+                            cls.SetImplements(typeof(IMessager), typeof(IRandomStringFactory));
+                            cls.AddMethod("GetString", getString);
+                        });
+                    })
                     .ToSourceCode();
             });
 
@@ -184,12 +144,17 @@
         {
             var methodEx = Should.Throw<NotSupportedException>(() =>
             {
-                var int1Variable = Parameter(typeof(int), "int1");
-                var int2Variable = Variable(typeof(int), "int2");
-                var addInts = Add(int1Variable, int2Variable);
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        var int1Variable = Parameter(typeof(int), "int1");
+                        var int2Variable = Variable(typeof(int), "int2");
+                        var addInts = Add(int1Variable, int2Variable);
 
-                var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
-                sourceCode.AddClass(cls => cls.WithMethod(addInts));
+                        cls.AddMethod(addInts);
+                    });
+                });
             });
 
             methodEx.Message.ShouldContain("undefined variable(s) 'int int1', 'int int2'");
@@ -202,52 +167,13 @@
             {
                 var doNothing = Lambda<Action>(Default(typeof(void)));
 
-                SourceCodeFactory.Default
-                    .CreateSourceCode(sc => sc
-                        .WithClass(cls => cls
-                            .WithMethod(doNothing, m => m
-                                .Named(null))));
+                BuildableExpression
+                    .SourceCode(sc => sc
+                        .AddClass(cls => cls
+                            .AddMethod(null, doNothing, m => { })));
             });
 
             methodNameEx.Message.ShouldContain("cannot be null");
-        }
-
-        [Fact]
-        public void ShouldErrorIfNullCustomMethodName()
-        {
-            var methodNameEx = Should.Throw<InvalidOperationException>(() =>
-            {
-                var doNothing = Lambda<Action>(Default(typeof(void)));
-
-                var factory = new SourceCodeFactory(scf => scf
-                    .NameMethodsUsing((sc, cls, ctx) => null));
-
-                factory.CreateSourceCode(sc => sc
-                        .WithClass(cls => cls
-                            .WithMethod(doNothing)))
-                    .ToSourceCode();
-            });
-
-            methodNameEx.Message.ShouldContain("cannot be null");
-        }
-
-        [Fact]
-        public void ShouldErrorIfBlankCustomMethodName()
-        {
-            var methodNameEx = Should.Throw<InvalidOperationException>(() =>
-            {
-                var doNothing = Lambda<Action>(Default(typeof(void)));
-
-                var factory = new SourceCodeFactory(scf => scf
-                    .NameMethodsUsing((sc, cls, ctx) => string.Empty));
-
-                factory.CreateSourceCode(sc => sc
-                        .WithClass(cls => cls
-                            .WithMethod(doNothing)))
-                    .ToSourceCode();
-            });
-
-            methodNameEx.Message.ShouldContain("cannot be blank");
         }
 
         [Fact]
@@ -257,11 +183,10 @@
             {
                 var doNothing = Lambda<Action>(Default(typeof(void)));
 
-                SourceCodeFactory.Default
-                    .CreateSourceCode(sc => sc
-                        .WithClass(cls => cls
-                            .WithMethod(doNothing, m => m
-                                .Named("\t"))));
+                BuildableExpression
+                    .SourceCode(sc => sc
+                        .AddClass(cls => cls
+                            .AddMethod("\t", doNothing, m => { })));
             });
 
             methodNameEx.Message.ShouldContain("cannot be blank");
@@ -274,30 +199,10 @@
             {
                 var doNothing = Lambda<Action>(Default(typeof(void)));
 
-                SourceCodeFactory.Default
-                    .CreateSourceCode(sc => sc
-                        .WithClass(cls => cls
-                            .WithMethod(doNothing, m => m
-                                .Named(" My_Method"))));
-            });
-
-            methodNameEx.Message.ShouldContain("invalid method name");
-        }
-
-        [Fact]
-        public void ShouldErrorIfInvalidCustomMethodName()
-        {
-            var methodNameEx = Should.Throw<InvalidOperationException>(() =>
-            {
-                var doNothing = Default(typeof(void));
-
-                var factory = new SourceCodeFactory(scf => scf
-                    .NameMethodsUsing((sc, cls, ctx) => $"Method {ctx.Index}"));
-
-                factory.CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(doNothing)))
-                    .ToSourceCode();
+                BuildableExpression
+                    .SourceCode(sc => sc
+                        .AddClass(cls => cls
+                            .AddMethod(" My_Method", doNothing, m => { })));
             });
 
             methodNameEx.Message.ShouldContain("invalid method name");
@@ -308,15 +213,17 @@
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
-                var doNothing = Default(typeof(void));
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        var doNothing = Default(typeof(void));
 
-                SourceCodeFactory.Default.CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(doNothing, m => m
-                            .Named("MyMethod"))
-                        .WithMethod(doNothing, m => m
-                            .Named("MyMethod"))))
-                    .ToSourceCode();
+                        cls.AddMethod("MyMethod", doNothing, m => { });
+                        cls.AddMethod("MyMethod", doNothing, m => { });
+                    });
+                })
+                .ToSourceCode();
             });
 
             configEx.Message.ShouldContain("duplicate method name");
@@ -374,16 +281,20 @@
             {
                 var doNothing = Default(typeof(void));
 
-                var param1 = BuildableExpression.GenericParameter("T1");
-                var param2 = BuildableExpression.GenericParameter("T1");
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("Class1", cls =>
+                    {
+                        cls.AddMethod("Method1", doNothing, m =>
+                        {
+                            var param1 = BuildableExpression.GenericParameter("T1");
+                            var param2 = BuildableExpression.GenericParameter("T1");
 
-                SourceCodeFactory.Default.CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .Named("Class1")
-                        .WithMethod(doNothing, m => m
-                            .Named("Method1")
-                            .WithGenericParameters(param1, param2))))
-                    .ToSourceCode();
+                            m.AddGenericParameters(param1, param2);
+                        });
+                    });
+                })/*
+                .ToSourceCode()*/;
             });
 
             configEx.Message.ShouldContain("Class1.Method1");
@@ -398,18 +309,24 @@
             {
                 var doNothing = Default(typeof(void));
 
-                var param = BuildableExpression.GenericParameter("T");
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("Class1", cls =>
+                    {
+                        var param = BuildableExpression.GenericParameter("T");
 
-                SourceCodeFactory.Default.CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .Named("Class1")
-                        .WithMethod(doNothing, m => m
-                            .Named("Method1")
-                            .WithGenericParameter(param))
-                        .WithMethod(doNothing, m => m
-                            .Named("Method2")
-                            .WithGenericParameter(param))))
-                    .ToSourceCode();
+                        cls.AddMethod("Method1", doNothing, m =>
+                        {
+                            m.AddGenericParameter(param);
+                        });
+
+                        cls.AddMethod("Method2", doNothing, m =>
+                        {
+                            m.AddGenericParameter(param);
+                        });
+                    });
+                })/*
+                .ToSourceCode()*/;
             });
 
             paramEx.Message.ShouldContain("Unable to add generic parameter");

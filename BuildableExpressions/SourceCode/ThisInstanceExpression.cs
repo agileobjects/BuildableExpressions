@@ -9,9 +9,9 @@
     /// </summary>
     public sealed class ThisInstanceExpression : Expression
     {
-        internal ThisInstanceExpression(ClassExpression @class)
+        internal ThisInstanceExpression(ConcreteTypeExpression instance)
         {
-            Class = @class;
+            Instance = instance;
         }
 
         /// <summary>
@@ -24,7 +24,7 @@
         /// <summary>
         /// Gets the type of this <see cref="ThisInstanceExpression"/>.
         /// </summary>
-        public override Type Type => Class.Type;
+        public override Type Type => Instance.Type;
 
         /// <summary>
         /// Visits this <see cref="ThisInstanceExpression"/>.
@@ -36,8 +36,8 @@
         protected override Expression Accept(ExpressionVisitor visitor) => this;
 
         /// <summary>
-        /// Gets the <see cref="ClassExpression"/> representing the instance Type.
+        /// Gets the <see cref="ConcreteTypeExpression"/> representing the instance Type.
         /// </summary>
-        public ClassExpression Class { get; }
+        public ConcreteTypeExpression Instance { get; }
     }
 }

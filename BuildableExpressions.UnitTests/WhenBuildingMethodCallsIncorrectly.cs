@@ -1,7 +1,9 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using System.Linq;
     using Common;
+    using SourceCode;
     using Xunit;
     using static System.Linq.Expressions.Expression;
 
@@ -15,10 +17,16 @@
                 var stringParam = Parameter(typeof(string), "str");
                 var getStringLambda = Lambda<Func<string, string>>(stringParam, stringParam);
 
-                var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
-                var method = sourceCode.AddClass().AddMethod(getStringLambda);
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        var method = cls.AddMethod("GetString", getStringLambda);
 
-                BuildableExpression.Call(method);
+                        BuildableExpression.Call(method);
+                    });
+                });
+
             });
 
             argsEx.Message.ShouldContain("Expected 1");
@@ -30,8 +38,15 @@
         {
             var argsEx = Assert.Throws<ArgumentException>(() =>
             {
-                var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
-                var method = sourceCode.AddClass().AddMethod(Default(typeof(int)));
+                var sourceCode = BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod(Default(typeof(int)));
+                    });
+                });
+
+                var method = sourceCode.Types.First().Methods.First();
 
                 BuildableExpression.Call(
                     method,
@@ -51,8 +66,15 @@
                 var longParam = Parameter(typeof(long), "lng");
                 var getLongLambda = Lambda<Func<long, long>>(longParam, longParam);
 
-                var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
-                var method = sourceCode.AddClass().AddMethod(getLongLambda);
+                var sourceCode = BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("GetLong", getLongLambda);
+                    });
+                });
+
+                var method = sourceCode.Types.First().Methods.First();
 
                 BuildableExpression.Call(method, Parameter(typeof(string), "str"));
             });

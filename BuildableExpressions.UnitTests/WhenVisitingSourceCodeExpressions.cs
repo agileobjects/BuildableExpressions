@@ -5,6 +5,7 @@
     using BuildableExpressions;
     using BuildableExpressions.SourceCode;
     using Common;
+    using SourceCode;
     using Xunit;
     using static System.Linq.Expressions.Expression;
 
@@ -15,12 +16,15 @@
         {
             var returnOneThousand = CreateLambda(() => 1000);
 
-            var sourceCode = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .Named("MyClass")
-                        .WithSummary("This is my class")
-                        .WithMethod(returnOneThousand)));
+            var sourceCode = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("MyClass", cls =>
+                    {
+                        cls.SetSummary("This is my class");
+                        cls.AddMethod("Get1000", returnOneThousand);
+                    });
+                });
 
             var visitor = new VisitationHelper();
 
@@ -35,12 +39,20 @@
         [Fact]
         public void ShouldVisitABuildableMethodCallExpression()
         {
-            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
-            var @class = sourceCode.AddClass();
-            var method1 = @class.AddMethod(Default(typeof(void)));
+            var method1Call = default(Expression);
 
-            var method1Call = BuildableExpression.Call(method1);
-            @class.AddMethod(method1Call);
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    var method1 = cls.AddMethod(Default(typeof(void)));
+
+                    method1Call = BuildableExpression.Call(method1);
+                    cls.AddMethod("CallOther", method1Call);
+                });
+            });
+
+            method1Call.ShouldNotBeNull();
 
             var visitor = new VisitationHelper();
 
@@ -51,10 +63,19 @@
         [Fact]
         public void ShouldVisitAThisInstanceExpression()
         {
-            var sourceCode = SourceCodeFactory.Default.CreateSourceCode();
-            var @class = sourceCode.AddClass();
-            var classInstance = BuildableExpression.ThisInstance(@class);
-            @class.AddMethod(classInstance);
+            var classInstance = default(Expression);
+
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    classInstance = cls.ThisInstanceExpression;
+
+                    cls.AddMethod("GetThis", classInstance);
+                });
+            });
+
+            classInstance.ShouldNotBeNull();
 
             var visitor = new VisitationHelper();
 

@@ -1,9 +1,11 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests.InputOutput
 {
     using System.IO;
+    using System.Linq;
     using BuildableExpressions.InputOutput;
     using Configuration;
     using Moq;
+    using SourceCode;
     using Xunit;
     using static System.Linq.Expressions.Expression;
     using static Moq.Times;
@@ -19,14 +21,18 @@
             var fileManagerMock = new Mock<IFileManager>();
             var outputWriter = new OutputWriter(fileManagerMock.Object);
 
-            var sourceCode = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithNamespace(_rootNamespace));
+            var sourceCode = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.SetNamespace(_rootNamespace);
 
-            var @class = sourceCode.AddClass();
-            @class.AddMethod(Default(typeof(void)));
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod(Default(typeof(void)));
+                    });
+                });
 
-            var fileName = @class.Name + ".cs";
+            var fileName = sourceCode.Types.First().Name + ".cs";
 
             outputWriter.Write(new[] { sourceCode }, new Config
             {
@@ -47,14 +53,17 @@
             var fileManagerMock = new Mock<IFileManager>();
             var outputWriter = new OutputWriter(fileManagerMock.Object);
 
-            var sourceCode = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithNamespace($"{_rootNamespace}.GeneratedCode"));
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.SetNamespace($"{_rootNamespace}.GeneratedCode");
 
-            var @class = sourceCode.AddClass();
-            @class.AddMethod(Default(typeof(void)));
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod(Default(typeof(void)));
+                });
+            });
 
-            var fileName = @class.Name + ".cs";
+            var fileName = sourceCode.Types.First().Name + ".cs";
 
             outputWriter.Write(new[] { sourceCode }, new Config
             {

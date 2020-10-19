@@ -22,9 +22,7 @@ namespace AgileObjects.BuildableExpressions.Compilation
             };
 
             var referenceAssemblyPaths = sourceCodes
-                .SelectMany(sc => sc.GetReferenceAssemblyTypes())
-                .Distinct()
-                .Select(t => t.Assembly)
+                .SelectMany(sc => sc.GetReferenceAssemblies())
                 .Concat(referenceAssemblies)
                 .Select(GetFilePath)
                 .Distinct()

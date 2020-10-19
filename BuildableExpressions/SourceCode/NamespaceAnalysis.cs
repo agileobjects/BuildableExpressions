@@ -9,36 +9,25 @@
     using NetStandardPolyfills;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations.Reflection;
+    using static SourceCodeTranslationSettings;
 
     internal class NamespaceAnalysis : ExpressionVisitor
     {
         private List<string> _requiredNamespaces;
 
-        public NamespaceAnalysis(SourceCodeTranslationSettings settings)
+        public static NamespaceAnalysis For(Expression expression)
         {
-            Settings = settings;
-        }
-
-        public static NamespaceAnalysis For(
-            Expression expression,
-            SourceCodeTranslationSettings settings)
-        {
-            var analysis = new NamespaceAnalysis(settings);
+            var analysis = new NamespaceAnalysis();
             analysis.Visit(expression);
             analysis.Finalise();
 
             return analysis;
         }
 
-        public SourceCodeTranslationSettings Settings { get; }
-
         public IList<string> RequiredNamespaces => _requiredNamespaces;
 
-        public void Visit(ClassExpression @class)
-        {
-            AddNamespaceIfRequired(@class.BaseType);
-            AddNamespacesIfRequired(@class.Interfaces);
-        }
+        public void Visit(TypeExpression type)
+            => AddNamespacesIfRequired(type.ImplementedTypes);
 
         protected override Expression VisitConstant(ConstantExpression constant)
         {
@@ -168,8 +157,7 @@
 
         private void AddNamespaceIfRequired(Type accessedType)
         {
-            if (!Settings.CollectRequiredNamespaces ||
-                (accessedType == typeof(void)) ||
+            if ((accessedType == typeof(void)) ||
                 (accessedType == typeof(string)) ||
                 (accessedType == typeof(object)) ||
                  accessedType.IsPrimitive() ||
@@ -220,7 +208,7 @@
             {
                 _requiredNamespaces.Sort(UsingsComparer.Instance);
             }
-            else if (Settings.CollectRequiredNamespaces)
+            else
             {
                 _requiredNamespaces = Enumerable<string>.EmptyList;
             }

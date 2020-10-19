@@ -5,7 +5,6 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
     using Api;
     using BuildableExpressions.Extensions;
     using Compilation;
@@ -20,7 +19,6 @@
     /// </summary>
     public class GenericParameterExpression :
         Expression,
-        IGenericParameterNamingContext,
         IGenericParameterExpressionConfigurator,
         IGenericArgument,
         ICustomTranslationExpression
@@ -47,94 +45,67 @@
 
         private Type CreateType()
         {
-            var paramSourceCode = SourceCodeFactory.Default.CreateSourceCode(sc => sc
-                .WithNamespace(BuildConstants.GenericParameterTypeNamespace));
-
-            var paramClass = paramSourceCode.AddClass(cls => cls.Named(Name));
-
-            if (_hasStructConstraint)
+            var paramSourceCode = BuildableExpression.SourceCode(sc =>
             {
-                paramClass.IsValueType = true;
-            }
+                sc.SetNamespace(BuildConstants.GenericParameterTypeNamespace);
 
-            IList<Assembly> referenceAssemblies;
-
-            if (_typeConstraints != null)
-            {
-                referenceAssemblies = new List<Assembly>();
-
-                foreach (var type in _typeConstraints)
+                if (_hasStructConstraint)
                 {
-#if NETFRAMEWORK
-                    AddAssembliesFor(type, referenceAssemblies);
-#else
-                    AddAssemblyFor(type, referenceAssemblies);
-#endif
-                    if (type.IsInterface())
-                    {
-                        paramClass.Implement(type);
-                        AddDefaultImplementations(paramClass, type);
-                        continue;
-                    }
-
-                    paramClass.BaseType = type;
-
-                    if (type.IsAbstract())
-                    {
-                        paramClass.IsAbstract = true;
-                    }
+                    sc.AddStruct(Name, cfg => ConfigureType(cfg, baseTypeCallback: null));
                 }
-            }
-            else
-            {
-                referenceAssemblies = Enumerable<Assembly>.EmptyArray;
-            }
+                else
+                {
+                    sc.AddClass(Name, ConfigureClass);
+                }
+            });
 
             var compiledTypes = Compiler.Instance
-                .Compile(referenceAssemblies, paramSourceCode)
+                .Compile(paramSourceCode)
                 .CompiledAssembly
                 .GetTypes();
 
             return compiledTypes[0];
         }
 
-#if NETFRAMEWORK
-        private static void AddAssembliesFor(Type type, ICollection<Assembly> assemblies)
+        private void ConfigureClass(IClassExpressionConfigurator classConfig)
         {
-            while (true)
+            ConfigureType(classConfig, (cfg, baseType) =>
             {
-                AddAssemblyFor(type, assemblies);
+                cfg.SetBaseType(baseType);
 
-                // ReSharper disable once PossibleNullReferenceException
-                var baseType = type.BaseType;
-
-                while (baseType != null && baseType != typeof(object))
+                if (baseType.IsAbstract())
                 {
-                    AddAssemblyFor(baseType, assemblies);
-                    baseType = baseType.BaseType;
+                    cfg.SetAbstract();
                 }
+            });
+        }
 
-                if (type.IsNested)
+        private void ConfigureType<TConfigurator>(
+            TConfigurator typeConfig,
+            Action<TConfigurator, Type> baseTypeCallback)
+            where TConfigurator : ITypeExpressionConfigurator
+        {
+            if (_typeConstraints == null)
+            {
+                return;
+            }
+
+            foreach (var type in _typeConstraints)
+            {
+                if (type.IsInterface())
                 {
-                    type = type.DeclaringType;
+                    typeConfig.SetImplements(type);
+                    AddDefaultImplementations(typeConfig, type);
                     continue;
                 }
 
-                return;
-            }
-        }
-#endif
-        private static void AddAssemblyFor(Type type, ICollection<Assembly> assemblies)
-        {
-            var assembly = type.GetAssembly();
-
-            if (!assemblies.Contains(assembly))
-            {
-                assemblies.Add(assembly);
+                baseTypeCallback.Invoke(typeConfig, type);
             }
         }
 
-        private static void AddDefaultImplementations(ClassExpression @class, Type type)
+        private static void AddDefaultImplementations(
+            ITypeExpressionConfigurator typeConfig,
+            Type type)
         {
             var methods = type
                 .GetPublicInstanceMethods()
@@ -149,7 +120,7 @@
 
                 var methodLambda = Default(method.ReturnType).ToLambdaExpression(parameters);
 
-                @class.AddMethod(methodLambda, m => m.Named(method.Name));
+                typeConfig.AddMethod(method.Name, methodLambda);
             }
         }
 
@@ -186,12 +157,6 @@
         /// Gets the name of this <see cref="GenericParameterExpression"/>
         /// </summary>
         public string Name { get; }
-
-        #region IGenericParameterNamingContext Members
-
-        int IGenericParameterNamingContext.Index => Method?.GenericArguments.IndexOf(this) ?? 0;
-
-        #endregion
 
         #region IGenericParameterExpressionConfigurator Members
 
@@ -321,9 +286,9 @@
 
             throw new InvalidOperationException(
                  "Unable to add generic parameter to method " +
-                $"'{owningMethod.Class.Name}.{owningMethod.Name}' - " +
+                $"'{owningMethod.DeclaringType.Name}.{owningMethod.Name}' - " +
                  "this parameter has already been added to method " +
-                $"'{Method.Class.Name}.{Method.Name}'");
+                $"'{Method.DeclaringType.Name}.{Method.Name}'");
         }
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)

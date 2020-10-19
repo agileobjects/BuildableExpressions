@@ -1,10 +1,10 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
-    using System.Linq;
     using BuildableExpressions.SourceCode;
     using Common;
     using ReadableExpressions;
+    using SourceCode;
     using Xunit;
     using static System.Linq.Expressions.Expression;
 
@@ -15,11 +15,13 @@
         {
             var doNothing = Lambda<Action>(Default(typeof(void)));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithNamespace("AgileObjects.GeneratedStuff")
-                    .WithClass(cls => cls
-                        .WithMethod(doNothing))).ToSourceCode();
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.SetNamespace("AgileObjects.GeneratedStuff");
+                    sc.AddClass(cls => cls.AddMethod("DoAction", doNothing));
+                })
+                .ToSourceCode();
 
             const string EXPECTED = @"
 namespace AgileObjects.GeneratedStuff
@@ -40,11 +42,12 @@ namespace AgileObjects.GeneratedStuff
         {
             var doNothing = Lambda<Action>(Default(typeof(void)));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithNamespace(null)
-                    .WithClass(cls => cls
-                        .WithMethod(doNothing)))
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.SetNamespace(null);
+                    sc.AddClass(cls => cls.AddMethod("DoAction", doNothing));
+                })
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -63,11 +66,12 @@ public class GeneratedExpressionClass
         {
             var doNothing = Lambda<Action>(Default(typeof(void)));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithNamespace(string.Empty)
-                    .WithClass(cls => cls
-                        .WithMethod(doNothing)))
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.SetNamespace(string.Empty);
+                    sc.AddClass(cls => cls.AddMethod("DoAction", doNothing));
+                })
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -86,11 +90,11 @@ public class GeneratedExpressionClass
         {
             var doNothing = Lambda<Action>(Default(typeof(void)));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
                     .WithNamespaceOf<WhenBuildingSourceCode>()
-                    .WithClass(cls => cls
-                        .WithMethod(doNothing)))
+                    .AddClass(cls => cls
+                        .AddMethod("DoAction", doNothing)))
                 .ToSourceCode();
 
             var expected = @$"
@@ -108,73 +112,20 @@ namespace {typeof(WhenBuildingSourceCode).Namespace}
         }
 
         [Fact]
-        public void ShouldUseACustomClassName()
-        {
-            var doNothing = Default(typeof(void));
-
-            var factory = new SourceCodeFactory(s => s
-                .NameClassesUsing((sc, ctx) => $"My{ctx.Methods.First().Type.Name}Class_{ctx.Index}"));
-
-            var translated = factory
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(doNothing)))
-                .ToSourceCode();
-
-            const string EXPECTED = @"
-namespace GeneratedExpressionCode
-{
-    public class MyVoidClass_0
-    {
-        public void DoAction()
-        {
-        }
-    }
-}";
-            EXPECTED.ShouldCompile();
-            translated.ShouldBe(EXPECTED.TrimStart());
-        }
-
-        [Fact]
-        public void ShouldUseACustomMethodName()
-        {
-            var doNothing = Lambda<Action>(Default(typeof(void)));
-
-            var factory = new SourceCodeFactory(s => s
-                .NameMethodsUsing((sc, cls, ctx) => $"Method_{cls.Index}_{ctx.Index}"));
-
-            var translated = factory
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(doNothing)))
-                .ToSourceCode();
-
-            const string EXPECTED = @"
-namespace GeneratedExpressionCode
-{
-    public class GeneratedExpressionClass
-    {
-        public void Method_0_0()
-        {
-        }
-    }
-}";
-            EXPECTED.ShouldCompile();
-            translated.ShouldBe(EXPECTED.TrimStart());
-        }
-
-        [Fact]
         public void ShouldUseCustomClassAndMethodNames()
         {
             var doNothing = Lambda<Action>(Default(typeof(void)));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithNamespaceOf(GetType())
-                    .WithClass(cls => cls
-                        .Named("MyClass")
-                        .WithMethod(doNothing, m => m
-                            .Named("MyMethod"))))
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.WithNamespaceOf(GetType());
+
+                    sc.AddClass("MyClass", cls =>
+                    {
+                        cls.AddMethod("MyMethod", doNothing, m => { });
+                    });
+                })
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -183,36 +134,6 @@ namespace AgileObjects.BuildableExpressions.UnitTests
     public class MyClass
     {
         public void MyMethod()
-        {
-        }
-    }
-}";
-            EXPECTED.ShouldCompile();
-            translated.ShouldBe(EXPECTED.TrimStart());
-        }
-
-        [Fact]
-        public void ShouldUseCustomClassAndMethodNameFactories()
-        {
-            var doNothing = Lambda<Action>(Default(typeof(void)));
-
-            var factory = new SourceCodeFactory(s => s
-                .NameClassesUsing(ctx => "MySpecialClass")
-                .NameMethodsUsing((clsExp, mCtx) =>
-                    $"{clsExp.Name}{mCtx.ReturnTypeName}Method_{clsExp.Index + 1}_{mCtx.Index + 1}"));
-
-            var translated = factory
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(doNothing)))
-                .ToSourceCode();
-
-            const string EXPECTED = @"
-namespace GeneratedExpressionCode
-{
-    public class MySpecialClass
-    {
-        public void MySpecialClassVoidMethod_1_1()
         {
         }
     }
@@ -234,14 +155,19 @@ Isn't it great?";
 This is my method!
 It's even better.";
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithSummary(CLASS_SUMMARY)
-                        .Named("MyClass")
-                        .WithMethod(doNothing, m => m
-                            .WithSummary(METHOD_SUMMARY)
-                            .Named("MyMethod"))))
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("MyClass", cls =>
+                    {
+                        cls.SetSummary(CLASS_SUMMARY);
+
+                        cls.AddMethod("MyMethod", doNothing, m =>
+                        {
+                            m.SetSummary(METHOD_SUMMARY);
+                        });
+                    });
+                })
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -279,14 +205,19 @@ Isn't it great?");
 This is my method!
 It's even better.".TrimStart());
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithSummary(classSummary)
-                        .Named("MyClass")
-                        .WithMethod(doNothing, m => m
-                            .WithSummary(methodSummary)
-                            .Named("MyMethod"))))
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("MyClass", cls =>
+                    {
+                        cls.SetSummary(classSummary);
+
+                        cls.AddMethod("MyMethod", doNothing, m =>
+                        {
+                            m.SetSummary(methodSummary);
+                        });
+                    });
+                })
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -318,16 +249,23 @@ namespace GeneratedExpressionCode
             var getIntFromLong = Lambda<Func<long, int>>(Constant(2), Parameter(typeof(long), "lng"));
             var getIntFromDate = Lambda<Func<DateTime, int>>(Constant(3), Parameter(typeof(DateTime), "date"));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithVisibility(ClassVisibility.Internal)
-                        .WithMethod(getIntFromString, m => m
-                            .WithVisibility(MemberVisibility.Internal))
-                        .WithMethod(getIntFromLong, m => m
-                            .WithVisibility(MemberVisibility.Protected))
-                        .WithMethod(getIntFromDate, m => m
-                            .WithVisibility(MemberVisibility.Private))))
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetVisibility(TypeVisibility.Internal);
+
+                        cls.AddMethod("GetInt", getIntFromString, m => m
+                            .SetVisibility(MemberVisibility.Internal));
+
+                        cls.AddMethod("GetInt", getIntFromLong, m => m
+                            .SetVisibility(MemberVisibility.Protected));
+
+                        cls.AddMethod("GetInt", getIntFromDate, m => m
+                            .SetVisibility(MemberVisibility.Private));
+                    });
+                })
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -369,12 +307,15 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldUseStaticMethodScope()
         {
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(Default(typeof(string)), m => m
-                            .AsStatic())
-                        .WithMethod(Default(typeof(int)))))
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("GetString", Default(typeof(string)), m => m.SetStatic());
+                        cls.AddMethod("GetInt", Default(typeof(int)));
+                    });
+                })
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -400,13 +341,16 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldUseStaticClassAndMethodScopes()
         {
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .AsStatic()
-                        .WithMethod(Default(typeof(string)))
-                        .WithMethod(Default(typeof(int)), m => m
-                            .AsStatic())))
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetStatic();
+                        cls.AddMethod("GetString", Default(typeof(string)));
+                        cls.AddMethod("GetInt", Default(typeof(int)), m => m.SetStatic());
+                    });
+                })
                 .ToSourceCode();
 
             const string EXPECTED = @"

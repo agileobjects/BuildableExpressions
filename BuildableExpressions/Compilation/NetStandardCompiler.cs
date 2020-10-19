@@ -1,7 +1,6 @@
 ﻿#if NET_STANDARD
 namespace AgileObjects.BuildableExpressions.Compilation
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -19,7 +18,7 @@ namespace AgileObjects.BuildableExpressions.Compilation
             params string[] sourceCodes)
         {
             var assemblyReferences = CreateReferences(referenceAssemblies, sourceCodes
-                .SelectMany(s => s.GetReferenceAssemblyTypes())
+                .SelectMany(sc => sc.GetReferenceAssemblies())
                 .Distinct()
                 .ToList());
 
@@ -54,34 +53,29 @@ namespace AgileObjects.BuildableExpressions.Compilation
 
         private static IEnumerable<MetadataReference> CreateReferences(
             IEnumerable<Assembly> passedInAssemblies,
-            ICollection<Type> passedInTypes)
+            ICollection<Assembly> sourceCodeAssemblies)
         {
-            var referencedAssemblyTypes = new List<Type>(passedInTypes);
+            var objectAssembly = typeof(object).GetAssembly();
+            var collectionsAssembly = typeof(List<>).GetAssembly();
 
-            if (!passedInTypes.Contains(typeof(object)))
+            if (!sourceCodeAssemblies.Contains(objectAssembly))
             {
-                referencedAssemblyTypes.Add(typeof(object));
+                sourceCodeAssemblies.Add(objectAssembly);
             }
 
-            if (!passedInTypes.Contains(typeof(List<>)))
+            if (!sourceCodeAssemblies.Contains(collectionsAssembly))
             {
-                referencedAssemblyTypes.Add(typeof(List<>));
+                sourceCodeAssemblies.Add(collectionsAssembly);
             }
 
-            var assemblies = new List<Assembly>(passedInAssemblies);
-            CollectAssemblies(referencedAssemblyTypes, assemblies);
+            var referencedAssemblies = new List<Assembly>(passedInAssemblies);
 
-            return assemblies.Select(CreateReference);
-        }
-
-        private static void CollectAssemblies(
-            IEnumerable<Type> assemblyTypes,
-            ICollection<Assembly> assemblies)
-        {
-            foreach (var assemblyType in assemblyTypes.Distinct())
+            foreach (var assembly in sourceCodeAssemblies)
             {
-                CollectReferencedAssemblies(assemblyType.GetAssembly(), assemblies);
+                CollectReferencedAssemblies(assembly, referencedAssemblies);
             }
+
+            return referencedAssemblies.Select(CreateReference);
         }
 
         private static void CollectReferencedAssemblies(

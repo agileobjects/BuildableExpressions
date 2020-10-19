@@ -25,18 +25,26 @@
         /// Add generated classes to the given <paramref name="namespace"/>.
         /// </summary>
         /// <param name="namespace">The namespace to which generated classes should belong.</param>
-        /// <returns>This <see cref="ISourceCodeExpressionConfigurator"/>, to support a fluent API.</returns>
-        ISourceCodeExpressionConfigurator WithNamespace(string @namespace);
+        void SetNamespace(string @namespace);
 
         /// <summary>
-        /// Add a <see cref="ClassExpression"/> to the <see cref="SourceCodeExpression"/> using the
-        /// given <paramref name="configuration"/>.
+        /// Adds a new <see cref="ClassExpression"/> to this <see cref="SourceCodeExpression"/>.
         /// </summary>
+        /// <param name="name">The name of the <see cref="ClassExpression"/>.</param>
         /// <param name="configuration">
-        /// The configuration with which to generate the <see cref="ClassExpression"/>.
+        /// The configuration with which to configure the new <see cref="ClassExpression"/>.
         /// </param>
-        /// <returns>This <see cref="ISourceCodeExpressionConfigurator"/>, to support a fluent API.</returns>
-        ISourceCodeExpressionConfigurator WithClass(
-            Func<IClassExpressionConfigurator, IClassExpressionConfigurator> configuration);
+        /// <returns>The newly-created <see cref="ClassExpression"/>.</returns>
+        ClassExpression AddClass(string name, Action<IClassExpressionConfigurator> configuration);
+
+        /// <summary>
+        /// Adds a new <see cref="StructExpression"/> to this <see cref="SourceCodeExpression"/>.
+        /// </summary>
+        /// <param name="name">The name of the <see cref="StructExpression"/>.</param>
+        /// <param name="configuration">
+        /// The configuration with which to configure the new <see cref="StructExpression"/>.
+        /// </param>
+        /// <returns>The newly-created <see cref="StructExpression"/>.</returns>
+        StructExpression AddStruct(string name, Action<IStructExpressionConfigurator> configuration);
     }
 }

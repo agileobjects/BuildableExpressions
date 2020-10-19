@@ -11,8 +11,7 @@
         /// Set the summary documentation of the <see cref="MethodExpression"/>.
         /// </summary>
         /// <param name="summary">The summary documentation of the <see cref="MethodExpression"/>.</param>
-        /// <returns>This <see cref="IMethodExpressionConfigurator"/>, to support a fluent API.</returns>
-        IMethodExpressionConfigurator WithSummary(string summary);
+        void SetSummary(string summary);
 
         /// <summary>
         /// Set the summary documentation of the <see cref="MethodExpression"/>.
@@ -21,8 +20,7 @@
         /// A <see cref="CommentExpression"/> containing summary documentation of the
         /// <see cref="MethodExpression"/>.
         /// </param>
-        /// <returns>This <see cref="IMethodExpressionConfigurator"/>, to support a fluent API.</returns>
-        IMethodExpressionConfigurator WithSummary(CommentExpression summary);
+        void SetSummary(CommentExpression summary);
 
         /// <summary>
         /// Gives the <see cref="MethodExpression"/> the given <paramref name="visibility"/>.
@@ -30,34 +28,23 @@
         /// <param name="visibility">
         /// The <see cref="MemberVisibility"/> to give the <see cref="MethodExpression"/>.
         /// </param>
-        /// <returns>This <see cref="IMethodExpressionConfigurator"/>, to support a fluent API.</returns>
-        IMethodExpressionConfigurator WithVisibility(MemberVisibility visibility);
+        void SetVisibility(MemberVisibility visibility);
 
         /// <summary>
         /// Mark the <see cref="MethodExpression"/> as static.
         /// </summary>
-        /// <returns>This <see cref="IMethodExpressionConfigurator"/>, to support a fluent API.</returns>
-        IMethodExpressionConfigurator AsStatic();
-
-        /// <summary>
-        /// Gives the <see cref="MethodExpression"/> the given <paramref name="name"/>.
-        /// </summary>
-        /// <param name="name">The name to give the <see cref="MethodExpression"/>.</param>
-        /// <returns>This <see cref="IMethodExpressionConfigurator"/>, to support a fluent API.</returns>
-        IMethodExpressionConfigurator Named(string name);
+        void SetStatic();
 
         /// <summary>
         /// Adds the given <paramref name="parameter"/> to the <see cref="MethodExpression"/>.
         /// </summary>
         /// <param name="parameter">The <see cref="GenericParameterExpression"/> to add.</param>
-        /// <returns>This <see cref="IMethodExpressionConfigurator"/>, to support a fluent API.</returns>
-        IMethodExpressionConfigurator WithGenericParameter(GenericParameterExpression parameter);
+        void AddGenericParameter(GenericParameterExpression parameter);
 
         /// <summary>
         /// Adds the given <paramref name="parameters"/> to the <see cref="MethodExpression"/>.
         /// </summary>
         /// <param name="parameters">The <see cref="GenericParameterExpression"/>s to add.</param>
-        /// <returns>This <see cref="IMethodExpressionConfigurator"/>, to support a fluent API.</returns>
-        IMethodExpressionConfigurator WithGenericParameters(params GenericParameterExpression[] parameters);
+        void AddGenericParameters(params GenericParameterExpression[] parameters);
     }
 }

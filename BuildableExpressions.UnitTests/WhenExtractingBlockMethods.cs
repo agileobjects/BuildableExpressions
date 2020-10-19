@@ -4,6 +4,7 @@
     using BuildableExpressions;
     using Common;
     using NetStandardPolyfills;
+    using SourceCode;
     using Xunit;
     using static System.Linq.Expressions.Expression;
 
@@ -28,10 +29,10 @@
                     Constant("Yep")),
                 Constant("Nope"));
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(yepOrNopeBlock)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("GetYepOrNope", yepOrNopeBlock)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -41,7 +42,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public string GetString()
+        public string GetYepOrNope()
         {
             if (this.GetBool())
             {
@@ -83,10 +84,10 @@ namespace GeneratedExpressionCode
                 intParameter1,
                 intParameter2);
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(conditionalLambda)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("GetInts", conditionalLambda)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -94,7 +95,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public int GetInt1
+        public int GetInts
         (
             int i,
             int j
@@ -157,10 +158,10 @@ namespace GeneratedExpressionCode
                 intParameter1,
                 intParameter2);
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(yepOrNopeLambda)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("GetYepOrNope", yepOrNopeLambda)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -168,7 +169,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public string GetString
+        public string GetYepOrNope
         (
             int i,
             int j
@@ -226,10 +227,10 @@ namespace GeneratedExpressionCode
 
             var assignmentLambda = Lambda<Func<int, int>>(assignNestedBlockResult, parameterI);
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(assignmentLambda)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("GetInt", assignmentLambda)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -237,7 +238,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public int GetInt1
+        public int GetInt
         (
             int i
         )
@@ -298,10 +299,10 @@ namespace GeneratedExpressionCode
                 objectParam,
                 stringParam);
 
-            var translated = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(tryParseResultLambda)))
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("SetIntValue", tryParseResultLambda)))
                 .ToSourceCode();
 
             const string EXPECTED = @"
@@ -311,7 +312,7 @@ namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
     {
-        public void DoAction
+        public void SetIntValue
         (
             WhenExtractingBlockMethods.PublicProperty<int> obj,
             string str

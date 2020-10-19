@@ -16,11 +16,10 @@
     using static MemberVisibility;
 
     /// <summary>
-    /// Represents a method in a class in a piece of source code.
+    /// Represents a method in a type in a piece of source code.
     /// </summary>
     public class MethodExpression :
         Expression,
-        IMethodNamingContext,
         IMethodExpressionConfigurator,
         IMethod,
         ICustomAnalysableExpression,
@@ -32,14 +31,20 @@
         private ReadOnlyCollection<IParameter> _parameters;
         private string _name;
 
-        internal MethodExpression(
-            ClassExpression @class,
-            Expression body,
-            SourceCodeTranslationSettings settings)
+        internal MethodExpression(TypeExpression type, Expression body)
         {
-            Class = @class;
+            DeclaringType = type;
             Definition = body.ToLambdaExpression();
-            Settings = settings;
+        }
+
+        internal MethodExpression(
+            TypeExpression type,
+            string name,
+            Expression body)
+        {
+            DeclaringType = type;
+            _name = name;
+            Definition = body.ToLambdaExpression();
         }
 
         /// <summary>
@@ -73,14 +78,12 @@
             return this;
         }
 
-        internal SourceCodeTranslationSettings Settings { get; }
-
         internal MethodExpressionAnalysis Analysis { get; set; }
 
         /// <summary>
-        /// Gets this <see cref="MethodExpression"/>'s parent <see cref="ClassExpression"/>.
+        /// Gets this <see cref="MethodExpression"/>'s parent <see cref="TypeExpression"/>.
         /// </summary>
-        public ClassExpression Class { get; }
+        public TypeExpression DeclaringType { get; }
 
         /// <summary>
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="MethodExpression"/>,
@@ -106,15 +109,7 @@
         /// <summary>
         /// Gets the name of this <see cref="MethodExpression"/>.
         /// </summary>
-        public string Name => _name ??= GetName();
-
-        private string GetName()
-        {
-            return Settings
-                .MethodNameFactory
-                .Invoke(Class.SourceCode, Class, this)
-                .ThrowIfInvalidName<InvalidOperationException>("Method");
-        }
+        public string Name => _name ??= DeclaringType.GetMethodName(this);
 
         /// <summary>
         /// Gets the return type of this <see cref="MethodExpression"/>, which is the return type
@@ -154,69 +149,30 @@
         /// </summary>
         public Expression Body => Definition.Body;
 
-        #region IMethodNamingContext Members
-
-        Type IMethodNamingContext.ReturnType => Type;
-
-        string IMethodNamingContext.ReturnTypeName
-            => Type.GetVariableNameInPascalCase(Settings);
-
-        LambdaExpression IMethodNamingContext.MethodLambda => Definition;
-
-        int IMethodNamingContext.Index => Class.Methods.IndexOf(this);
-
-        #endregion
-
         #region IMethodExpressionConfigurator Members
 
-        IMethodExpressionConfigurator IMethodExpressionConfigurator.WithSummary(
-            string summary)
-        {
-            Summary = ReadableExpression.Comment(summary);
-            return this;
-        }
+        void IMethodExpressionConfigurator.SetSummary(string summary)
+            => Summary = ReadableExpression.Comment(summary);
 
-        IMethodExpressionConfigurator IMethodExpressionConfigurator.WithSummary(
-            CommentExpression summary)
-        {
-            Summary = summary;
-            return this;
-        }
+        void IMethodExpressionConfigurator.SetSummary(CommentExpression summary)
+            => Summary = summary;
 
-        IMethodExpressionConfigurator IMethodExpressionConfigurator.WithVisibility(
-            MemberVisibility visibility)
-        {
-            Visibility = visibility;
-            return this;
-        }
+        void IMethodExpressionConfigurator.SetVisibility(MemberVisibility visibility)
+            => Visibility = visibility;
 
-        IMethodExpressionConfigurator IMethodExpressionConfigurator.AsStatic()
-        {
-            IsStatic = true;
-            return this;
-        }
+        void IMethodExpressionConfigurator.SetStatic()
+            => IsStatic = true;
 
-        IMethodExpressionConfigurator IMethodExpressionConfigurator.Named(
-            string name)
-        {
-            _name = name.ThrowIfInvalidName<ArgumentException>("Method");
-            return this;
-        }
+        void IMethodExpressionConfigurator.AddGenericParameter(GenericParameterExpression parameter)
+            => AddGenericParameters(parameter);
 
-        IMethodExpressionConfigurator IMethodExpressionConfigurator.WithGenericParameter(
-            GenericParameterExpression parameter)
-        {
-            return AddGenericParameters(parameter);
-        }
-
-        IMethodExpressionConfigurator IMethodExpressionConfigurator.WithGenericParameters(
+        void IMethodExpressionConfigurator.AddGenericParameters(
             params GenericParameterExpression[] parameters)
         {
-            return AddGenericParameters(parameters);
+            AddGenericParameters(parameters);
         }
 
-        private IMethodExpressionConfigurator AddGenericParameters(
-            params GenericParameterExpression[] parameters)
+        private void AddGenericParameters(params GenericParameterExpression[] parameters)
         {
             _genericArguments ??= new List<GenericParameterExpression>();
             _readonlyGenericParameters = null;
@@ -227,8 +183,6 @@
                 _genericArguments.Add(parameter);
                 parameter.SetMethod(this);
             }
-
-            return this;
         }
 
         #endregion
@@ -304,7 +258,7 @@
             if (duplicateParameterName != null)
             {
                 throw new InvalidOperationException(
-                    $"Method '{Class.Name}.{Name}': " +
+                    $"Method '{DeclaringType.Name}.{Name}': " +
                     $"duplicate generic parameter name '{duplicateParameterName}' specified.");
             }
         }

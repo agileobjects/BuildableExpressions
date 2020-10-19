@@ -12,12 +12,12 @@
         [Fact]
         public void ShouldUseANonSourceCodeExpressionAnalysis()
         {
-            var sourceCode = SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .WithMethod(
-                            Property(null, typeof(DateTime), "Now"),
-                            m => m.Named("GetNow"))));
+            var sourceCode = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod(
+                            "GetNow",
+                            Property(null, typeof(DateTime), "Now"))));
 
             var sourceCodeTranslation = new ExpressionTranslation(
                 sourceCode,

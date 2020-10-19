@@ -5,8 +5,10 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using Api;
     using Extensions;
+    using NetStandardPolyfills;
     using ReadableExpressions;
     using ReadableExpressions.Translations;
     using Translations;
@@ -20,16 +22,83 @@
         ICustomAnalysableExpression,
         ICustomTranslationExpression
     {
-        private readonly SourceCodeTranslationSettings _settings;
-        private readonly List<ClassExpression> _classes;
-        private ReadOnlyCollection<ClassExpression> _readOnlyClasses;
+        private readonly List<TypeExpression> _types;
+        private ReadOnlyCollection<TypeExpression> _readOnlyTypes;
 
-        internal SourceCodeExpression(SourceCodeTranslationSettings settings)
+        internal SourceCodeExpression(Action<ISourceCodeExpressionConfigurator> configuration)
         {
-            _settings = settings;
-            _classes = new List<ClassExpression>();
+            _types = new List<TypeExpression>();
             Namespace = "GeneratedExpressionCode";
+
+            configuration.Invoke(this);
+
+            var referenceAssemblies = new List<Assembly>();
+
+            foreach (var type in Types.SelectMany(t => t.ImplementedTypes).Distinct())
+            {
+#if NETFRAMEWORK
+                AddAssembliesFor(type, referenceAssemblies);
+#else
+                AddAssemblyFor(type, referenceAssemblies);
+#endif
+            }
+
+            ReferencedAssemblies = referenceAssemblies.ToReadOnlyCollection();
         }
+
+        #region Setup
+
+#if NETFRAMEWORK
+        private static void AddAssembliesFor(Type type, ICollection<Assembly> assemblies)
+        {
+            while (true)
+            {
+                AddAssemblyFor(type, assemblies);
+
+                // ReSharper disable once PossibleNullReferenceException
+                var baseType = type.BaseType;
+
+                while (baseType != null && baseType != typeof(object))
+                {
+                    AddAssemblyFor(baseType, assemblies);
+                    baseType = baseType.BaseType;
+                }
+
+                if (!type.IsNested)
+                {
+                    return;
+                }
+
+                type = type.DeclaringType;
+            }
+        }
+#endif
+        private static void AddAssemblyFor(Type type, ICollection<Assembly> assemblies)
+        {
+            var assembly = type.GetAssembly();
+
+            if (!assemblies.Contains(assembly))
+            {
+                assemblies.Add(assembly);
+            }
+        }
+
+        #endregion
+
+        #region Factory Methods
+
+        /// <summary>
+        /// Creates a <see cref="SourceCodeExpression"/> representing a complete piece of source code.
+        /// </summary>
+        /// <param name="configuration">The configuration to use for the <see cref="SourceCodeExpression"/>.</param>
+        /// <returns>A <see cref="SourceCodeExpression"/> representing a complete piece of source code.</returns>
+        public static SourceCodeExpression Create(
+            Action<ISourceCodeExpressionConfigurator> configuration)
+        {
+            return new SourceCodeExpression(configuration);
+        }
+
+        #endregion
 
         /// <summary>
         /// Gets the <see cref="SourceCodeExpressionType"/> value (1000) indicating the type of this
@@ -44,16 +113,16 @@
         public override Type Type => typeof(void);
 
         /// <summary>
-        /// Visits each of this <see cref="SourceCodeExpression"/>'s <see cref="Classes"/>.
+        /// Visits each of this <see cref="SourceCodeExpression"/>'s <see cref="Types"/>.
         /// </summary>
         /// <param name="visitor">
         /// The visitor with which to visit this <see cref="SourceCodeExpression"/>'s
-        /// <see cref="Classes"/>.
+        /// <see cref="Types"/>.
         /// </param>
         /// <returns>This <see cref="SourceCodeExpression"/>.</returns>
         protected override Expression Accept(ExpressionVisitor visitor)
         {
-            foreach (var @class in Classes)
+            foreach (var @class in Types)
             {
                 visitor.Visit(@class);
             }
@@ -68,59 +137,41 @@
         public string Namespace { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="ClassExpression"/>s which describe the classes of this
+        /// Gets the Assemblies referenced by this <see cref="SourceCodeExpression"/>'s
+        /// <see cref="Types"/>.
+        /// </summary>
+        public ReadOnlyCollection<Assembly> ReferencedAssemblies { get; }
+
+        /// <summary>
+        /// Gets the <see cref="TypeExpression"/>s which describe the types defined by this
         /// <see cref="SourceCodeExpression"/>.
         /// </summary>
-        public ReadOnlyCollection<ClassExpression> Classes
-            => _readOnlyClasses ??= _classes.ToReadOnlyCollection();
+        public ReadOnlyCollection<TypeExpression> Types
+            => _readOnlyTypes ??= _types.ToReadOnlyCollection();
 
-        /// <summary>
-        /// Adds a new <see cref="ClassExpression"/> to this <see cref="SourceCodeExpression"/>.
-        /// </summary>
-        /// <returns>The newly-created <see cref="ClassExpression"/>.</returns>
-        public ClassExpression AddClass() => AddClass(cfg => cfg);
-
-        /// <summary>
-        /// Adds a new <see cref="ClassExpression"/> to this <see cref="SourceCodeExpression"/>.
-        /// </summary>
-        /// <param name="configuration">
-        /// The configuration with which to configure the new <see cref="ClassExpression"/>
-        /// .</param>
-        /// <returns>The newly-created <see cref="ClassExpression"/>.</returns>
-        public ClassExpression AddClass(
-            Func<IClassExpressionConfigurator, IClassExpressionConfigurator> configuration)
+        internal void Finalise(IList<TypeExpression> types)
         {
-            var @class = new ClassExpression(this, _settings);
-            configuration.Invoke(@class);
-
-            _classes.Add(@class);
-            _readOnlyClasses = null;
-            return @class;
-        }
-
-        internal void Finalise(IList<ClassExpression> classes)
-        {
-            if (_classes.SequenceEqual(classes))
+            if (_types.SequenceEqual(types))
             {
                 return;
             }
 
-            _classes.Clear();
-            _classes.AddRange(classes);
+            _types.Clear();
+            _types.AddRange(types);
         }
 
         /// <summary>
         /// Translates this <see cref="SourceCodeExpression"/> to a complete source-code string,
-        /// formatted as one or more classes with one or more methods in a namespace.
+        /// formatted as one or more types with one or more methods in a namespace.
         /// </summary>
         /// <returns>
-        /// The translated <see cref="SourceCodeExpression"/>, formatted as one or more classes with
+        /// The translated <see cref="SourceCodeExpression"/>, formatted as one or more types with
         /// one or more methods in a namespace.
         /// </returns>
         public string ToSourceCode()
         {
             Validate();
-            return new SourceCodeExpressionTranslation(this, _settings).GetTranslation();
+            return new SourceCodeExpressionTranslation(this).GetTranslation();
         }
 
         private void Validate()
@@ -128,7 +179,7 @@
             ThrowIfNoClasses();
             ThrowIfDuplicateClassName();
 
-            foreach (var @class in _classes)
+            foreach (var @class in _types)
             {
                 @class.Validate();
             }
@@ -136,7 +187,7 @@
 
         private void ThrowIfNoClasses()
         {
-            if (_classes.Any())
+            if (_types.Any())
             {
                 return;
             }
@@ -146,7 +197,7 @@
 
         private void ThrowIfDuplicateClassName()
         {
-            var duplicateClassName = _classes
+            var duplicateClassName = _types
                 .GroupBy(cls => cls.Name)
                 .FirstOrDefault(nameGroup => nameGroup.Count() > 1)?
                 .Key;
@@ -172,31 +223,42 @@
             return this;
         }
 
-        ISourceCodeExpressionConfigurator ISourceCodeExpressionConfigurator.WithNamespace(
-            string @namespace)
+        void ISourceCodeExpressionConfigurator.SetNamespace(string @namespace)
+            => Namespace = @namespace;
+
+        ClassExpression ISourceCodeExpressionConfigurator.AddClass(
+            string name,
+            Action<IClassExpressionConfigurator> configuration)
         {
-            Namespace = @namespace;
-            return this;
+            return Add(new ClassExpression(this, name, configuration));
         }
 
-        ISourceCodeExpressionConfigurator ISourceCodeExpressionConfigurator.WithClass(
-            Func<IClassExpressionConfigurator, IClassExpressionConfigurator> configuration)
+        StructExpression ISourceCodeExpressionConfigurator.AddStruct(
+            string name,
+            Action<IStructExpressionConfigurator> configuration)
         {
-            AddClass(configuration);
-            return this;
+            return Add(new StructExpression(this, name, configuration));
+        }
+
+        private TType Add<TType>(TType type)
+            where TType : TypeExpression
+        {
+            _types.Add(type);
+            _readOnlyTypes = null;
+            return type;
         }
 
         #endregion
 
         IEnumerable<Expression> ICustomAnalysableExpression.Expressions
-            => Classes.Cast<ICustomAnalysableExpression>().SelectMany(c => c.Expressions);
+            => Types.Cast<ICustomAnalysableExpression>().SelectMany(c => c.Expressions);
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
         {
             if (!(context is ISourceCodeTranslationContext sourceCodeContext))
             {
                 sourceCodeContext = new CompositeSourceCodeTranslationContext(
-                    NamespaceAnalysis.For(this, _settings),
+                    NamespaceAnalysis.For(this),
                     context);
             }
 

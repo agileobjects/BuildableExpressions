@@ -27,7 +27,7 @@ namespace MyNamespace
         }
     }
 }";
-            var result = compiler.Compile(new[] { SOURCE });
+            var result = compiler.Compile(SOURCE);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -80,7 +80,7 @@ namespace MyNamespace
         }
     }
 }";
-            var result = compiler.Compile(new[] { SOURCE1, SOURCE2, SOURCE3 });
+            var result = compiler.Compile(new[] { SOURCE1, SOURCE2, SOURCE3 }.AsEnumerable());
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -111,7 +111,7 @@ namespace MyNamespace
         }
     }
 }";
-            var result = compiler.Compile(new[] { SOURCE });
+            var result = compiler.Compile(SOURCE);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -152,14 +152,15 @@ namespace MyNamespace
     {
         public static SourceCodeExpression Build()
         {
-            var doNothing = Expression.Lambda<Action>(Expression.Default(typeof(void)));
-
-            return SourceCodeFactory.Default
-                .CreateSourceCode(sc => sc
-                    .WithClass(cls => cls
-                        .Named(""MyClass"")
-                        .WithMethod(doNothing, m => m
-                            .Named(""DoNothing""))));
+            return BuildableExpression.SourceCode(sc => 
+            {
+                sc.AddClass(""MyClass"", cls => 
+                {
+                    var doNothing = Expression.Lambda<Action>(Expression.Default(typeof(void)));
+                    
+                    cls.AddMethod(""DoNothing"", doNothing, m => { });
+                });
+            });
         }
     }
 }
@@ -179,7 +180,7 @@ namespace MyNamespace
                 .ShouldNotBeNull()
                 .ShouldBeOfType<SourceCodeExpression>();
 
-            var classExpression = sourceCodeExpression.Classes.ShouldHaveSingleItem();
+            var classExpression = sourceCodeExpression.Types.ShouldHaveSingleItem();
             classExpression.Name.ShouldBe("MyClass");
 
             var methodExpression = classExpression.Methods.ShouldHaveSingleItem();

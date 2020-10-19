@@ -8,6 +8,7 @@
     using ReadableExpressions.Extensions;
     using static System.Linq.Expressions.ExpressionType;
     using static MemberVisibility;
+    using static SourceCodeTranslationSettings;
 
     internal class MethodExpressionAnalysis : ExpressionAnalysis
     {
@@ -15,7 +16,7 @@
         private MethodScope _currentMethodScope;
 
         private MethodExpressionAnalysis(NamespaceAnalysis namespaceAnalysis)
-            : base(namespaceAnalysis.Settings)
+            : base(Settings)
         {
             NamespaceAnalysis = namespaceAnalysis;
             _expressions = new Stack<Expression>();
@@ -23,12 +24,8 @@
 
         #region Factory Methods
 
-        public static MethodExpressionAnalysis For(
-            MethodExpression method,
-            SourceCodeTranslationSettings settings)
-        {
-            return For(method, new NamespaceAnalysis(settings));
-        }
+        public static MethodExpressionAnalysis For(MethodExpression method)
+            => For(method, new NamespaceAnalysis());
 
         public static MethodExpressionAnalysis For(
             MethodExpression method,
@@ -291,7 +288,10 @@
             }
 
             public MethodExpression CreateMethodFor(Expression block)
-                => _method.Class.AddMethodWithoutAnalysis(block, m => m.WithVisibility(Private));
+            {
+                return _method.DeclaringType
+                    .AddMethodWithoutAnalysis(block, m => m.SetVisibility(Private));
+            }
 
             public void Finalise(
                 Expression updatedBody,

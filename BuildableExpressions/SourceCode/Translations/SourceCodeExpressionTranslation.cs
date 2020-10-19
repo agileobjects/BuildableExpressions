@@ -1,8 +1,8 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Translations
 {
     using System.Collections.Generic;
-    using ReadableExpressions;
     using ReadableExpressions.Translations;
+    using static SourceCodeTranslationSettings;
 
     internal class SourceCodeExpressionTranslation :
         ExpressionTranslation,
@@ -10,17 +10,13 @@
     {
         private readonly SourceCodeAnalysis _analysis;
 
-        public SourceCodeExpressionTranslation(
-            SourceCodeExpression expression,
-            SourceCodeTranslationSettings settings)
-            : this(SourceCodeAnalysis.For(expression, settings), settings)
+        public SourceCodeExpressionTranslation(SourceCodeExpression expression)
+            : this(SourceCodeAnalysis.For(expression))
         {
         }
 
-        private SourceCodeExpressionTranslation(
-            SourceCodeAnalysis analysis,
-            TranslationSettings settings)
-            : base(analysis, settings)
+        private SourceCodeExpressionTranslation(SourceCodeAnalysis analysis)
+            : base(analysis, Settings)
         {
             _analysis = analysis;
         }

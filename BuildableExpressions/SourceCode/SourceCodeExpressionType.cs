@@ -11,9 +11,9 @@
         SourceCode = 1000,
 
         /// <summary>
-        /// 1001. A source code class.
+        /// 1001. A source code Type.
         /// </summary>
-        Class = 1001,
+        Type = 1001,
 
         /// <summary>
         /// 1002. The instance of an object to which the 'this' keyword relates in the current

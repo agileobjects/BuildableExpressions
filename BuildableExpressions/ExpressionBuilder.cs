@@ -18,18 +18,17 @@
         /// <returns><see cref="SourceCodeExpression"/>s to compile to source code files.</returns>
         public IEnumerable<SourceCodeExpression> Build()
         {
-            // Replace this code with your own, building a SourceCodeExpression
+            // Replace this code with your own, building SourceCodeExpression(s)
             // to be compiled to a source code file:
-            var factory = SourceCodeFactory.Default;
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(typeof(ExpressionBuilder).Name + "OutputClass", cls =>
+                {
+                    var doNothing = Expression.Default(typeof(void));
 
-            var sourceCode = factory.CreateSourceCode(sc => sc
-                .WithNamespaceOf<ExpressionBuilder>());
-
-            var @class = sourceCode.AddClass(cls => cls
-                .Named(typeof(ExpressionBuilder).Name + "OutputClass"));
-
-            var doNothing = Expression.Default(typeof(void));
-            @class.AddMethod(doNothing, m => m.Named("DoNothing"));
+                    cls.AddMethod("DoNothing", doNothing);
+                });
+            });
 
             yield return sourceCode;
         }

@@ -1,6 +1,5 @@
 ﻿namespace AgileObjects.BuildableExpressions.Compilation
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
@@ -29,11 +28,10 @@
 
         public static CompilationResult Compile(
             this ICompiler compiler,
-            IEnumerable<Assembly> referenceAssemblies,
             params SourceCodeExpression[] sourceCodes)
         {
             return compiler.Compile(
-                referenceAssemblies,
+                sourceCodes.SelectMany(sc => sc.ReferencedAssemblies).Distinct(),
                 sourceCodes.Project(sc => sc.ToSourceCode()));
         }
 
@@ -45,23 +43,23 @@
             return compiler.Compile(referenceAssemblies, sourceCodes.ToArray());
         }
 
-        public static ICollection<Type> GetReferenceAssemblyTypes(
+        public static ICollection<Assembly> GetReferenceAssemblies(
             this string expressionBuilderSource)
         {
-            var referenceAssemblyTypes = new List<Type>
+            var referenceAssemblies = new List<Assembly>
             {
-                typeof(object),
-                typeof(AssemblyExtensionsPolyfill),
-                typeof(ReadableExpression),
-                typeof(SourceCodeFactory)
+                typeof(object).GetAssembly(),
+                typeof(AssemblyExtensionsPolyfill).GetAssembly(),
+                typeof(ReadableExpression).GetAssembly(),
+                typeof(BuildableExpression).GetAssembly()
             };
 
             if (expressionBuilderSource.Contains("using System.Linq"))
             {
-                referenceAssemblyTypes.Add(typeof(Enumerable));
+                referenceAssemblies.Add(typeof(Enumerable).GetAssembly());
             }
 
-            return referenceAssemblyTypes;
+            return referenceAssemblies;
         }
 
         public static bool CompilationFailed(

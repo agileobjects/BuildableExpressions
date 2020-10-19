@@ -3,24 +3,23 @@
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using ReadableExpressions;
+    using static SourceCodeTranslationSettings;
 
     internal class SourceCodeAnalysis : ExpressionAnalysis
     {
         private readonly NamespaceAnalysis _namespaceAnalysis;
 
-        private SourceCodeAnalysis(SourceCodeTranslationSettings settings)
-            : base(settings)
+        private SourceCodeAnalysis()
+            : base(Settings)
         {
-            _namespaceAnalysis = new NamespaceAnalysis(settings);
+            _namespaceAnalysis = new NamespaceAnalysis();
         }
 
         #region Factory Method
 
-        public static SourceCodeAnalysis For(
-            SourceCodeExpression expression,
-            SourceCodeTranslationSettings settings)
+        public static SourceCodeAnalysis For(SourceCodeExpression expression)
         {
-            var analysis = new SourceCodeAnalysis(settings);
+            var analysis = new SourceCodeAnalysis();
             analysis.Analyse(expression);
 
             return analysis;
@@ -43,8 +42,8 @@
                 case (ExpressionType)SourceCodeExpressionType.SourceCode:
                     return VisitAndConvert((SourceCodeExpression)expression);
 
-                case (ExpressionType)SourceCodeExpressionType.Class:
-                    return VisitAndConvert((ClassExpression)expression);
+                case (ExpressionType)SourceCodeExpressionType.Type:
+                    return VisitAndConvert((TypeExpression)expression);
 
                 case (ExpressionType)SourceCodeExpressionType.Method:
                     return VisitAndConvert((MethodExpression)expression);
@@ -57,21 +56,21 @@
         private SourceCodeExpression VisitAndConvert(SourceCodeExpression sourceCode)
         {
             sourceCode.Finalise(VisitAndConvert(
-                sourceCode.Classes,
-                c => (ClassExpression)VisitAndConvert((Expression)c)));
+                sourceCode.Types,
+                c => (TypeExpression)VisitAndConvert((Expression)c)));
 
             return sourceCode;
         }
 
-        private ClassExpression VisitAndConvert(ClassExpression @class)
+        private TypeExpression VisitAndConvert(TypeExpression type)
         {
-            _namespaceAnalysis.Visit(@class);
+            _namespaceAnalysis.Visit(type);
 
             VisitAndConvert(
-                @class.Methods,
+                type.Methods,
                 m => (MethodExpression)VisitAndConvert((Expression)m));
 
-            return @class;
+            return type;
         }
 
         private MethodExpression VisitAndConvert(MethodExpression method)

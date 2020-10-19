@@ -10,13 +10,15 @@
     public static partial class BuildableExpression
     {
         /// <summary>
-        /// Create a <see cref="ThisInstanceExpression"/> that represents the instance of an object
-        /// to which the 'this' keyword relates in the current context.
+        /// Create a <see cref="SourceCodeExpression"/> representing a complete piece of source code.
         /// </summary>
-        /// <param name="class">The <see cref="ClassExpression"/> representing the instance Type.</param>
-        /// <returns>The <see cref="ThisInstanceExpression"/> representing the object instance.</returns>
-        public static ThisInstanceExpression ThisInstance(ClassExpression @class)
-            => new ThisInstanceExpression(@class);
+        /// <param name="configuration">The configuration to use for the <see cref="SourceCodeExpression"/>.</param>
+        /// <returns>A <see cref="SourceCodeExpression"/> representing a complete piece of source code.</returns>
+        public static SourceCodeExpression SourceCode(
+            Action<ISourceCodeExpressionConfigurator> configuration)
+        {
+            return new SourceCodeExpression(configuration);
+        }
 
         /// <summary>
         /// Create a <see cref="GenericParameterExpression"/> that represents a class or method

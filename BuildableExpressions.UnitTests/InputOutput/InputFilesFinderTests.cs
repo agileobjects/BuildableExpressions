@@ -50,7 +50,7 @@
             var fileManagerMock = new Mock<IFileManager>();
 
             var filePath1 = @$"{_contentRoot}\File1.cs";
-            var filePath2 = @$"{_contentRoot}\Classes\File2.cs";
+            var filePath2 = @$"{_contentRoot}\Types\File2.cs";
 
             fileManagerMock
                 .Setup(fm => fm.FindFiles(_contentRoot, "*.cs"))
