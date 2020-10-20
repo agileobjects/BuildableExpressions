@@ -98,6 +98,16 @@
             param.Type.BaseType.ShouldBe(typeof(AbstractBaseType));
         }
 
+        [Fact]
+        public void ShouldReuseBuiltParameterTypes()
+        {
+            var param1 = BuildableExpression.GenericParameter("T");
+            var param2 = BuildableExpression.GenericParameter("T");
+
+            param1.ShouldNotBeSameAs(param2);
+            param1.Type.ShouldNotBeNull().ShouldBeSameAs(param2.Type);
+        }
+
         #region Helper Members
 
         public class BaseType

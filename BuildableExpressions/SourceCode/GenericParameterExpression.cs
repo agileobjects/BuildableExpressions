@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
@@ -13,6 +14,7 @@
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
+    using static System.StringComparison;
 
     /// <summary>
     /// Represents an open class or method generic argument.
@@ -23,6 +25,10 @@
         IGenericArgument,
         ICustomTranslationExpression
     {
+        private static readonly ConcurrentDictionary<GenericParameterExpression, Type> _typeCache =
+            new ConcurrentDictionary<GenericParameterExpression, Type>(
+                new GenericParameterExpressionComparer());
+
         private Type _type;
         private bool _hasConstraints;
         private bool _hasStructConstraint;
@@ -51,23 +57,25 @@
         /// Gets the type of this <see cref="GenericParameterExpression"/>, which is 'void', as this
         /// class represents an open generic argument.
         /// </summary>
-        public override Type Type => _type ??= CreateType();
+        public override Type Type
+            => _type ??= _typeCache.GetOrAdd(this, CreateType);
 
         #region Type Creation
 
-        private Type CreateType()
+        private static Type CreateType(GenericParameterExpression parameter)
         {
             var paramSourceCode = BuildableExpression.SourceCode(sc =>
             {
                 sc.SetNamespace(BuildConstants.GenericParameterTypeNamespace);
 
-                if (_hasStructConstraint)
+                if (parameter._hasStructConstraint)
                 {
-                    sc.AddStruct(Name, cfg => ConfigureType(cfg, baseTypeCallback: null));
+                    sc.AddStruct(parameter.Name, cfg => parameter
+                        .ConfigureType(cfg, baseTypeCallback: null));
                 }
                 else
                 {
-                    sc.AddClass(Name, ConfigureClass);
+                    sc.AddClass(parameter.Name, parameter.ConfigureClass);
                 }
             });
 
@@ -292,5 +300,44 @@
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => context.GetTranslationFor(Type);
+
+        private class GenericParameterExpressionComparer : IEqualityComparer<GenericParameterExpression>
+        {
+            public bool Equals(GenericParameterExpression x, GenericParameterExpression y)
+            {
+                if (ReferenceEquals(y, null))
+                {
+                    return ReferenceEquals(x, null);
+                }
+
+                if (ReferenceEquals(x, y))
+                {
+                    return true;
+                }
+
+                // ReSharper disable once PossibleNullReferenceException
+                if (x._hasConstraints != y._hasConstraints ||
+                    x._hasStructConstraint != y._hasStructConstraint ||
+                    x._hasClassConstraint != y._hasClassConstraint ||
+                    x._hasNewableConstraint != y._hasNewableConstraint ||
+                    x._typeConstraints?.Count != y._typeConstraints?.Count ||
+                    !x.Name.Equals(y.Name, Ordinal))
+                {
+                    return false;
+                }
+
+                if (x._typeConstraints == null)
+                {
+                    return true;
+                }
+
+                // ReSharper disable once AssignNullToNotNullAttribute
+                return x._typeConstraints
+                    .OrderBy(t => t)
+                    .SequenceEqual(y._typeConstraints.OrderBy(t => t));
+            }
+
+            public int GetHashCode(GenericParameterExpression obj) => 0;
+        }
     }
 }
