@@ -33,8 +33,49 @@
 
             configuration.Invoke(this);
 
+            Validate();
+
             Analysis = SourceCodeAnalysis.For(this);
         }
+
+        #region Validation
+
+        private void Validate()
+        {
+            ThrowIfNoTypes();
+            ThrowIfDuplicateTypeName();
+
+            foreach (var type in _typeExpressions)
+            {
+                type.Validate();
+            }
+        }
+
+        private void ThrowIfNoTypes()
+        {
+            if (_typeExpressions.Any())
+            {
+                return;
+            }
+
+            throw new InvalidOperationException("At least one type must be specified");
+        }
+
+        private void ThrowIfDuplicateTypeName()
+        {
+            var duplicateName = _typeExpressions
+                .GroupBy(t => t.Name)
+                .FirstOrDefault(nameGroup => nameGroup.Count() > 1)?
+                .Key;
+
+            if (duplicateName != null)
+            {
+                throw new InvalidOperationException(
+                    $"Duplicate type name '{duplicateName}' specified.");
+            }
+        }
+
+        #endregion
 
         internal SourceCodeAnalysis Analysis { get; }
 
@@ -148,45 +189,7 @@
         /// one or more methods in a namespace.
         /// </returns>
         public string ToCSharpString()
-        {
-            Validate();
-            return new SourceCodeExpressionTranslation(this).GetTranslation();
-        }
-
-        private void Validate()
-        {
-            ThrowIfNoClasses();
-            ThrowIfDuplicateClassName();
-
-            foreach (var @class in _typeExpressions)
-            {
-                @class.Validate();
-            }
-        }
-
-        private void ThrowIfNoClasses()
-        {
-            if (_typeExpressions.Any())
-            {
-                return;
-            }
-
-            throw new InvalidOperationException("At least one class must be specified");
-        }
-
-        private void ThrowIfDuplicateClassName()
-        {
-            var duplicateClassName = _typeExpressions
-                .GroupBy(cls => cls.Name)
-                .FirstOrDefault(nameGroup => nameGroup.Count() > 1)?
-                .Key;
-
-            if (duplicateClassName != null)
-            {
-                throw new InvalidOperationException(
-                    $"Duplicate class name '{duplicateClassName}' specified.");
-            }
-        }
+            => new SourceCodeExpressionTranslation(this).GetTranslation();
 
         #region ISourceCodeExpressionConfigurator Members
 

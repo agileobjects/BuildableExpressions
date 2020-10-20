@@ -67,9 +67,10 @@
         {
             _namespaceAnalysis.Visit(type);
 
-            VisitAndConvert(
-                type.MethodExpressions,
-                m => (MethodExpression)VisitAndConvert((Expression)m));
+            foreach (Expression methodExpression in type.MethodExpressions)
+            {
+                VisitAndConvert(methodExpression);
+            }
 
             return type;
         }

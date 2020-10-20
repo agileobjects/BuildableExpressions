@@ -16,13 +16,13 @@
         {
             var classEx = Should.Throw<InvalidOperationException>(() =>
             {
-                BuildableExpression
-                    .SourceCode(sc => sc
-                        .WithNamespaceOf<CommentExpression>())
-                    .ToCSharpString();
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.WithNamespaceOf<CommentExpression>();
+                });
             });
 
-            classEx.Message.ShouldContain("class must be specified");
+            classEx.Message.ShouldContain("type must be specified");
         }
 
         [Fact]
@@ -84,16 +84,14 @@
             {
                 var doNothing = Lambda<Action>(Default(typeof(void)));
 
-                BuildableExpression
-                    .SourceCode(sc =>
-                    {
-                        sc.AddClass("MyClass", cls => cls.AddMethod(doNothing));
-                        sc.AddClass("MyClass", cls => { });
-                    })
-                    .ToCSharpString();
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("MyClass", cls => cls.AddMethod(doNothing));
+                    sc.AddClass("MyClass", cls => { });
+                });
             });
 
-            configEx.Message.ShouldContain("Duplicate class name");
+            configEx.Message.ShouldContain("Duplicate type name");
             configEx.Message.ShouldContain("MyClass");
         }
 
@@ -123,16 +121,14 @@
             {
                 var getString = Lambda<Func<string>>(Default(typeof(string)));
 
-                BuildableExpression
-                    .SourceCode(sc =>
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
                     {
-                        sc.AddClass(cls =>
-                        {
-                            cls.SetImplements(typeof(IMessager), typeof(IRandomStringFactory));
-                            cls.AddMethod("GetString", getString);
-                        });
-                    })
-                    .ToCSharpString();
+                        cls.SetImplements(typeof(IMessager), typeof(IRandomStringFactory));
+                        cls.AddMethod("GetString", getString);
+                    });
+                });
             });
 
             interfaceEx.Message.ShouldContain("'(): string'");
@@ -154,7 +150,7 @@
                 });
             });
 
-            classEx.Message.ShouldContain("");
+            classEx.Message.ShouldContain("cannot be both static and abstract");
         }
 
         [Fact]
@@ -172,7 +168,7 @@
                 });
             });
 
-            classEx.Message.ShouldContain("");
+            classEx.Message.ShouldContain("cannot be both abstract and static");
         }
 
         [Fact]
@@ -258,8 +254,7 @@
                         cls.AddMethod("MyMethod", doNothing, m => { });
                         cls.AddMethod("MyMethod", doNothing, m => { });
                     });
-                })
-                .ToCSharpString();
+                });
             });
 
             configEx.Message.ShouldContain("duplicate method name");
@@ -329,8 +324,7 @@
                             m.AddGenericParameters(param1, param2);
                         });
                     });
-                })/*
-                .ToCSharpString()*/;
+                });
             });
 
             configEx.Message.ShouldContain("Class1.Method1");
@@ -361,8 +355,7 @@
                             m.AddGenericParameter(param);
                         });
                     });
-                })/*
-                .ToCSharpString()*/;
+                });
             });
 
             paramEx.Message.ShouldContain("Unable to add generic parameter");
