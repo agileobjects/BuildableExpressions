@@ -12,6 +12,8 @@
     using NetStandardPolyfills;
     using ReadableExpressions;
     using ReadableExpressions.Extensions;
+    using ReadableExpressions.Translations.Reflection;
+    using static SourceCodeTranslationSettings;
 
     /// <summary>
     /// Represents a Type in a piece of source code.
@@ -198,35 +200,68 @@
                     .SelectMany(it => it.GetPublicMethods()))
                 .ToList();
 
-            foreach (var method in MethodExpressions)
-            {
-                ThrowIfAmbiguousImplementation(method, interfaceMethods);
-            }
+            ThrowIfInterfaceMethodNotImplemented(interfaceMethods);
+            ThrowIfAmbiguousImplementation(interfaceMethods);
         }
 
-        private static void ThrowIfAmbiguousImplementation(
-            MethodExpression method,
-            IEnumerable<MethodInfo> interfaceMethods)
+        private void ThrowIfInterfaceMethodNotImplemented(IEnumerable<MethodInfo> interfaceMethods)
         {
-            var parameterTypes = method.Parameters.ProjectToArray(p => p.Type);
+            var unimplementedMethod = interfaceMethods.FirstOrDefault(method =>
+            {
+                var implementationExists = MethodExpressions.Any(m =>
+                    m.Name == method.Name &&
+                    m.Parameters.Project(p => p.Type)
+                        .SequenceEqual(method.GetParameters().Project(p => p.ParameterType)));
 
-            var matchingInterfaceMethodCount = interfaceMethods
-                .Count(im =>
-                    im.ReturnType == method.ReturnType &&
-                    im.GetParameters().Project(p => p.ParameterType).SequenceEqual(parameterTypes));
+                return !implementationExists;
+            });
 
-            if (matchingInterfaceMethodCount <= 1)
+            if (unimplementedMethod == null)
             {
                 return;
             }
 
-            var argumentTypes = string.Join(", ",
-                parameterTypes.ProjectToArray(p => p.GetFriendlyName()));
+            var wrapper = new BclMethodWrapper(unimplementedMethod, Settings);
+
+            throw new InvalidOperationException(
+                $"Method '{GetSignature(wrapper)}' has not been implemented");
+        }
+
+        private void ThrowIfAmbiguousImplementation(IEnumerable<MethodInfo> interfaceMethods)
+        {
+            var ambiguousMethod = MethodExpressions.FirstOrDefault(method =>
+            {
+                var parameterTypes = method.Parameters.ProjectToArray(p => p.Type);
+
+                var matchingInterfaceMethodCount = interfaceMethods
+                    .Count(im =>
+                        im.Name == method.Name &&
+                        im.GetParameters().Project(p => p.ParameterType).SequenceEqual(parameterTypes));
+
+                return matchingInterfaceMethodCount > 1;
+            });
+
+            if (ambiguousMethod == null)
+            {
+                return;
+            }
+
+            throw new AmbiguousMatchException(
+                $"Method '{GetSignature(ambiguousMethod)}' matches multiple interface methods");
+        }
+
+        private static string GetSignature(IMethod method)
+        {
+            var typeName = method.DeclaringType != null
+                ? method.DeclaringType.GetFriendlyName() + "."
+                : null;
+
+            var parameterTypeNames = string.Join(", ",
+                method.GetParameters().Project(p => p.Type.GetFriendlyName()));
 
             var returnType = method.ReturnType.GetFriendlyName();
 
-            throw new AmbiguousMatchException(
-                $"Method '({argumentTypes}): {returnType}' matches multiple interface methods");
+            return $"{returnType} {typeName + method.Name}({parameterTypeNames})";
         }
 
         #endregion

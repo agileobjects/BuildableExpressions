@@ -115,6 +115,27 @@
         }
 
         [Fact]
+        public void ShouldErrorIfInterfaceMethodNotImplemented()
+        {
+            var interfaceEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                var getString = Lambda<Func<string>>(Default(typeof(string)));
+
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetImplements(typeof(IMessager));
+                        cls.AddMethod("GetMsg", getString);
+                    });
+                });
+            });
+
+            interfaceEx.Message.ShouldContain("'string WhenBuildingSourceCodeIncorrectly.IMessager.GetMessage()'");
+            interfaceEx.Message.ShouldContain("has not been implemented");
+        }
+
+        [Fact]
         public void ShouldErrorIfAmbiguousInterfacesImplemented()
         {
             var interfaceEx = Should.Throw<AmbiguousMatchException>(() =>
@@ -123,15 +144,15 @@
 
                 BuildableExpression.SourceCode(sc =>
                 {
-                    sc.AddClass(cls =>
+                    sc.AddClass("Stringy", cls =>
                     {
-                        cls.SetImplements(typeof(IMessager), typeof(IRandomStringFactory));
-                        cls.AddMethod("GetString", getString);
+                        cls.SetImplements(typeof(ICodeGenerator), typeof(IRandomStringFactory));
+                        cls.AddMethod(nameof(ICodeGenerator.Generate), getString);
                     });
                 });
             });
 
-            interfaceEx.Message.ShouldContain("'(): string'");
+            interfaceEx.Message.ShouldContain("'string Generate()'");
             interfaceEx.Message.ShouldContain("matches multiple interface methods");
         }
 
@@ -369,6 +390,11 @@
         public interface IMessager
         {
             string GetMessage();
+        }
+
+        public interface ICodeGenerator
+        {
+            string Generate();
         }
 
         public interface IRandomStringFactory
