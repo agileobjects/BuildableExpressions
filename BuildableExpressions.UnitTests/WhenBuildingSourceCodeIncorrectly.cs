@@ -19,7 +19,7 @@
                 BuildableExpression
                     .SourceCode(sc => sc
                         .WithNamespaceOf<CommentExpression>())
-                    .ToSourceCode();
+                    .ToCSharpString();
             });
 
             classEx.Message.ShouldContain("class must be specified");
@@ -90,7 +90,7 @@
                         sc.AddClass("MyClass", cls => cls.AddMethod(doNothing));
                         sc.AddClass("MyClass", cls => { });
                     })
-                    .ToSourceCode();
+                    .ToCSharpString();
             });
 
             configEx.Message.ShouldContain("Duplicate class name");
@@ -132,7 +132,7 @@
                             cls.AddMethod("GetString", getString);
                         });
                     })
-                    .ToSourceCode();
+                    .ToCSharpString();
             });
 
             interfaceEx.Message.ShouldContain("'(): string'");
@@ -259,7 +259,7 @@
                         cls.AddMethod("MyMethod", doNothing, m => { });
                     });
                 })
-                .ToSourceCode();
+                .ToCSharpString();
             });
 
             configEx.Message.ShouldContain("duplicate method name");
@@ -330,7 +330,7 @@
                         });
                     });
                 })/*
-                .ToSourceCode()*/;
+                .ToCSharpString()*/;
             });
 
             configEx.Message.ShouldContain("Class1.Method1");
@@ -362,7 +362,7 @@
                         });
                     });
                 })/*
-                .ToSourceCode()*/;
+                .ToCSharpString()*/;
             });
 
             paramEx.Message.ShouldContain("Unable to add generic parameter");

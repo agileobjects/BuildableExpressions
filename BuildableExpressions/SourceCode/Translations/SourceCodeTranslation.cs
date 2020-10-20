@@ -26,7 +26,7 @@
             _namespaceCount = sourceCode.Analysis.RequiredNamespaces.Count;
             _hasNamespace = !string.IsNullOrWhiteSpace(sourceCode.Namespace);
             _sourceCode = sourceCode;
-            _typeCount = sourceCode.Types.Count;
+            _typeCount = sourceCode.TypeExpressions.Count;
             _types = new ITranslation[_typeCount];
 
             var translationSize = 6; // <- for opening and closing braces
@@ -61,7 +61,7 @@
 
             for (var i = 0; ;)
             {
-                var @class = _types[i] = context.GetTranslationFor(sourceCode.Types[i]);
+                var @class = _types[i] = context.GetTranslationFor(sourceCode.TypeExpressions[i]);
 
                 translationSize += @class.TranslationSize;
                 formattingSize += @class.FormattingSize;

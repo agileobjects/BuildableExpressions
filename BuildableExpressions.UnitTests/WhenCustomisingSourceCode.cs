@@ -21,7 +21,7 @@
                     sc.SetNamespace("AgileObjects.GeneratedStuff");
                     sc.AddClass(cls => cls.AddMethod("DoAction", doNothing));
                 })
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace AgileObjects.GeneratedStuff
@@ -48,7 +48,7 @@ namespace AgileObjects.GeneratedStuff
                     sc.SetNamespace(null);
                     sc.AddClass(cls => cls.AddMethod("DoAction", doNothing));
                 })
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 public class GeneratedExpressionClass
@@ -72,7 +72,7 @@ public class GeneratedExpressionClass
                     sc.SetNamespace(string.Empty);
                     sc.AddClass(cls => cls.AddMethod("DoAction", doNothing));
                 })
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 public class GeneratedExpressionClass
@@ -95,7 +95,7 @@ public class GeneratedExpressionClass
                     .WithNamespaceOf<WhenBuildingSourceCode>()
                     .AddClass(cls => cls
                         .AddMethod("DoAction", doNothing)))
-                .ToSourceCode();
+                .ToCSharpString();
 
             var expected = @$"
 namespace {typeof(WhenBuildingSourceCode).Namespace}
@@ -126,7 +126,7 @@ namespace {typeof(WhenBuildingSourceCode).Namespace}
                         cls.AddMethod("MyMethod", doNothing, m => { });
                     });
                 })
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace AgileObjects.BuildableExpressions.UnitTests
@@ -168,7 +168,7 @@ It's even better.";
                         });
                     });
                 })
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -218,7 +218,7 @@ It's even better.".TrimStart());
                         });
                     });
                 })
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -266,7 +266,7 @@ namespace GeneratedExpressionCode
                             .SetVisibility(MemberVisibility.Private));
                     });
                 })
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 using System;
@@ -316,7 +316,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("GetInt", Default(typeof(int)));
                     });
                 })
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -351,7 +351,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("GetInt", Default(typeof(int)), m => m.SetStatic());
                     });
                 })
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -385,7 +385,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("GetString", Default(typeof(string)));
                     });
                 })
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode

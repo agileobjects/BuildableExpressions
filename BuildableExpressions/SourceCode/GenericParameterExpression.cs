@@ -51,8 +51,7 @@
         /// Gets the type of this <see cref="GenericParameterExpression"/>, which is 'void', as this
         /// class represents an open generic argument.
         /// </summary>
-        public override Type Type
-         => _type ??= CreateType();
+        public override Type Type => _type ??= CreateType();
 
         #region Type Creation
 

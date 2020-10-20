@@ -19,7 +19,7 @@
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod(doNothing)))
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -44,7 +44,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod(doNothing)))
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -69,7 +69,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("Get1000", returnOneThousand)))
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -95,7 +95,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("GetLong", returnGivenLong)))
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -124,7 +124,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("Subtract", subtractShortFromInt)))
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -159,7 +159,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("AddInts", addIntsLambda)))
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -193,7 +193,7 @@ namespace GeneratedExpressionCode
                         cls.SetImplements<IMessager>();
                         cls.AddMethod(nameof(IMessager.GetMessage), sayHello);
                     }))
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -226,7 +226,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod(nameof(IMessager.GetMessage), sayHello);
                         cls.AddMethod(nameof(INumberSource.GetNumber), return123);
                     }))
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -260,7 +260,7 @@ namespace GeneratedExpressionCode
                         cls.SetBaseType<BaseType>();
                         cls.AddMethod("SayHello", Constant("Hello!"));
                     }))
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -285,7 +285,7 @@ namespace GeneratedExpressionCode
             BuildableExpression
                 .SourceCode(sc => sc
                     .AddClass("EmptyClass", cls => { }))
-                .ToSourceCode();
+                .ToCSharpString();
         }
 
         [Fact]
@@ -295,7 +295,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddStruct("MyStruct", cls => cls
                         .AddMethod(Default(typeof(void)))))
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -326,7 +326,7 @@ namespace GeneratedExpressionCode
                 });
             });
 
-            var translated = sourceCode.ToSourceCode();
+            var translated = sourceCode.ToCSharpString();
 
             const string EXPECTED = @"
 using System;
@@ -376,7 +376,7 @@ namespace GeneratedExpressionCode
                 });
             });
 
-            var translated = sourceCode.ToSourceCode();
+            var translated = sourceCode.ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -408,7 +408,7 @@ namespace GeneratedExpressionCode
                 });
             });
 
-            var translated = sourceCode.ToSourceCode();
+            var translated = sourceCode.ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -442,7 +442,7 @@ namespace GeneratedExpressionCode
                 });
             });
 
-            var translated = sourceCode.ToSourceCode();
+            var translated = sourceCode.ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -476,7 +476,7 @@ namespace GeneratedExpressionCode
                 });
             });
 
-            var translated = sourceCode.ToSourceCode();
+            var translated = sourceCode.ToCSharpString();
 
             const string EXPECTED = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -511,7 +511,7 @@ namespace GeneratedExpressionCode
                 });
             });
 
-            var translated = sourceCode.ToSourceCode();
+            var translated = sourceCode.ToCSharpString();
 
             const string EXPECTED = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -541,7 +541,7 @@ namespace GeneratedExpressionCode
                 .AddClass(cls => cls
                     .AddMethod("GetT", paramDefault, m => m
                         .AddGenericParameter(param))))
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode

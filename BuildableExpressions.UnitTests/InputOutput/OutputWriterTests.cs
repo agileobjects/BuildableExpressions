@@ -32,7 +32,7 @@
                     });
                 });
 
-            var fileName = sourceCode.Types.First().Name + ".cs";
+            var fileName = sourceCode.TypeExpressions.First().Name + ".cs";
 
             outputWriter.Write(new[] { sourceCode }, new Config
             {
@@ -63,7 +63,7 @@
                 });
             });
 
-            var fileName = sourceCode.Types.First().Name + ".cs";
+            var fileName = sourceCode.TypeExpressions.First().Name + ".cs";
 
             outputWriter.Write(new[] { sourceCode }, new Config
             {

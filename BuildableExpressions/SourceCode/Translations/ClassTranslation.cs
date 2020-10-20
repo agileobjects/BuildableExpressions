@@ -26,9 +26,9 @@
             _typeString = typeString;
             _summaryTranslation = SummaryTranslation.For(type.Summary, context);
             _visibility = type.Visibility.ToString().ToLowerInvariant();
-            _interfaceTypeCount = type.Interfaces.Count;
+            _interfaceTypeCount = type.InterfaceTypes.Count;
 
-            _methodCount = type.Methods.Count;
+            _methodCount = type.MethodExpressions.Count;
             _methodTranslations = new ITranslation[_methodCount];
 
             var translationSize =
@@ -52,7 +52,7 @@
 
                 for (var i = 0; i < _interfaceTypeCount; ++i)
                 {
-                    var interfaceTranslation = context.GetTranslationFor(type.Interfaces[i]);
+                    var interfaceTranslation = context.GetTranslationFor(type.InterfaceTypes[i]);
                     _interfaceTypeTranslations[i] = interfaceTranslation;
                     translationSize += interfaceTranslation.TranslationSize;
                     formattingSize += interfaceTranslation.FormattingSize;
@@ -63,7 +63,7 @@
             {
                 for (var i = 0; ;)
                 {
-                    var method = _methodTranslations[i] = context.GetTranslationFor(type.Methods[i]);
+                    var method = _methodTranslations[i] = context.GetTranslationFor(type.MethodExpressions[i]);
                     translationSize += method.TranslationSize;
                     formattingSize += method.FormattingSize;
 

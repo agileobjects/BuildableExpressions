@@ -11,7 +11,7 @@
             this TypeExpression typeExpression,
             MethodExpression method)
         {
-            var typeMethods = typeExpression.MethodsByReturnType[method.ReturnType];
+            var typeMethods = typeExpression.MethodExpressionsByReturnType[method.ReturnType];
 
             if (typeMethods.Count == 1)
             {

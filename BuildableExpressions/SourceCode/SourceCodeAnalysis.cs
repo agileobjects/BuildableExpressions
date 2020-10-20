@@ -56,7 +56,7 @@
         private SourceCodeExpression VisitAndConvert(SourceCodeExpression sourceCode)
         {
             sourceCode.Finalise(VisitAndConvert(
-                sourceCode.Types,
+                sourceCode.TypeExpressions,
                 c => (TypeExpression)VisitAndConvert((Expression)c)));
 
             return sourceCode;
@@ -67,7 +67,7 @@
             _namespaceAnalysis.Visit(type);
 
             VisitAndConvert(
-                type.Methods,
+                type.MethodExpressions,
                 m => (MethodExpression)VisitAndConvert((Expression)m));
 
             return type;

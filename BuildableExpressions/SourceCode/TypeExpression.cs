@@ -21,23 +21,24 @@
         ITypeExpressionConfigurator,
         ICustomAnalysableExpression
     {
-        private readonly List<MethodExpression> _methods;
-        private readonly Dictionary<Type, List<MethodExpression>> _methodsByReturnType;
-        private ReadOnlyCollection<MethodExpression> _readOnlyMethods;
-        private List<Type> _interfaces;
-        private ReadOnlyCollection<Type> _readOnlyInterfaces;
+        private readonly List<MethodExpression> _methodExpressions;
+        private readonly Dictionary<Type, List<MethodExpression>> _methodExpressionsByReturnType;
+        private ReadOnlyCollection<MethodExpression> _readOnlyMethodExpressions;
+        private Type _type;
+        private List<Type> _interfaceTypes;
+        private ReadOnlyCollection<Type> _readOnlyInterfaceTypes;
 #if FEATURE_READONLYDICTIONARY
-        private ReadOnlyDictionary<Type, ReadOnlyCollection<MethodExpression>> _readOnlyMethodsByReturnType;
+        private ReadOnlyDictionary<Type, ReadOnlyCollection<MethodExpression>> _readOnlyMethodExpressionsByReturnType;
 #else
-        private IDictionary<Type, ReadOnlyCollection<MethodExpression>> _readOnlyMethodsByReturnType;
+        private IDictionary<Type, ReadOnlyCollection<MethodExpression>> _readOnlyMethodExpressionsByReturnType;
 #endif
 
         internal TypeExpression(SourceCodeExpression sourceCode, string name)
         {
             SourceCode = sourceCode;
             Name = name.ThrowIfInvalidName<ArgumentException>("Type");
-            _methods = new List<MethodExpression>();
-            _methodsByReturnType = new Dictionary<Type, List<MethodExpression>>();
+            _methodExpressions = new List<MethodExpression>();
+            _methodExpressionsByReturnType = new Dictionary<Type, List<MethodExpression>>();
 
             sourceCode.Register(this);
         }
@@ -51,24 +52,32 @@
 
         /// <summary>
         /// Gets the type of this <see cref="TypeExpression"/>, which is the return type of the
-        /// first of the type's <see cref="Methods"/>, or typeof(void) if this type has no methods.
+        /// first of the type's <see cref="MethodExpressions"/>, or typeof(void) if this type has no methods.
         /// </summary>
-        public override Type Type
-            => _methods.FirstOrDefault()?.Type ?? typeof(void);
+        public override Type Type => _type ??= CreateType();
+
+        #region Type Creation
+
+        private Type CreateType()
+        {
+            return _methodExpressions.FirstOrDefault()?.Type ?? typeof(void);
+        }
+
+        #endregion
 
         /// <summary>
-        /// Visits each of this <see cref="TypeExpression"/>'s <see cref="Methods"/>.
+        /// Visits each of this <see cref="TypeExpression"/>'s <see cref="MethodExpressions"/>.
         /// </summary>
         /// <param name="visitor">
         /// The visitor with which to visit this <see cref="TypeExpression"/>'s
-        /// <see cref="Methods"/>.
+        /// <see cref="MethodExpressions"/>.
         /// </param>
         /// <returns>This <see cref="TypeExpression"/>.</returns>
         protected override Expression Accept(ExpressionVisitor visitor)
         {
             visitor.Visit(Summary);
 
-            foreach (var method in Methods)
+            foreach (var method in MethodExpressions)
             {
                 visitor.Visit(method);
             }
@@ -89,13 +98,13 @@
         /// <summary>
         /// Gets the types implemented by this <see cref="TypeExpression"/>.
         /// </summary>
-        public virtual IEnumerable<Type> ImplementedTypes => Interfaces;
+        public virtual IEnumerable<Type> ImplementedTypes => InterfaceTypes;
 
         /// <summary>
         /// Gets the interface types implemented by this <see cref="TypeExpression"/>.
         /// </summary>
-        public ReadOnlyCollection<Type> Interfaces
-            => _readOnlyInterfaces ??= _interfaces.ToReadOnlyCollection();
+        public ReadOnlyCollection<Type> InterfaceTypes
+            => _readOnlyInterfaceTypes ??= _interfaceTypes.ToReadOnlyCollection();
 
         /// <summary>
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="TypeExpression"/>,
@@ -112,19 +121,19 @@
         /// Gets the <see cref="MethodExpression"/>s which make up this <see cref="TypeExpression"/>'s
         /// methods.
         /// </summary>
-        public ReadOnlyCollection<MethodExpression> Methods
-            => _readOnlyMethods ??= _methods.ToReadOnlyCollection();
+        public ReadOnlyCollection<MethodExpression> MethodExpressions
+            => _readOnlyMethodExpressions ??= _methodExpressions.ToReadOnlyCollection();
 
         /// <summary>
         /// Gets the <see cref="MethodExpression"/>s which make up this <see cref="TypeExpression"/>'s
         /// methods, keyed by their return type.
         /// </summary>
 #if FEATURE_READONLYDICTIONARY
-        public ReadOnlyDictionary<Type, ReadOnlyCollection<MethodExpression>> MethodsByReturnType
+        public ReadOnlyDictionary<Type, ReadOnlyCollection<MethodExpression>> MethodExpressionsByReturnType
 #else
-        public IDictionary<Type, ReadOnlyCollection<MethodExpression>> MethodsByReturnType
+        public IDictionary<Type, ReadOnlyCollection<MethodExpression>> MethodExpressionsByReturnType
 #endif
-            => _readOnlyMethodsByReturnType ??= GetMethodsByReturnType();
+            => _readOnlyMethodExpressionsByReturnType ??= GetMethodsByReturnType();
 
 #if FEATURE_READONLYDICTIONARY
         private ReadOnlyDictionary<Type, ReadOnlyCollection<MethodExpression>> GetMethodsByReturnType()
@@ -133,9 +142,9 @@
 #endif
         {
             var readonlyMethodsByReturnType =
-                new Dictionary<Type, ReadOnlyCollection<MethodExpression>>(_methodsByReturnType.Count);
+                new Dictionary<Type, ReadOnlyCollection<MethodExpression>>(_methodExpressionsByReturnType.Count);
 
-            foreach (var methodAndReturnType in _methodsByReturnType)
+            foreach (var methodAndReturnType in _methodExpressionsByReturnType)
             {
                 readonlyMethodsByReturnType.Add(
                     methodAndReturnType.Key,
@@ -149,22 +158,22 @@
                 ;
         }
 
+        #region Validation
+
         internal void Validate()
         {
             ThrowIfDuplicateMethodName();
             ThrowIfInvalidImplementations();
         }
 
-        #region Validate Helpers
-
         private void ThrowIfDuplicateMethodName()
         {
-            if (_methods.Count <= 1)
+            if (_methodExpressions.Count <= 1)
             {
                 return;
             }
 
-            var duplicateMethodName = _methods
+            var duplicateMethodName = _methodExpressions
                 .GroupBy(m => $"{m.Name}({string.Join(",", m.Parameters.Select(p => p.Type.FullName))})")
                 .FirstOrDefault(nameGroup => nameGroup.Count() > 1)?
                 .Key;
@@ -178,18 +187,18 @@
 
         private void ThrowIfInvalidImplementations()
         {
-            if (Interfaces.Count == 0)
+            if (InterfaceTypes.Count == 0)
             {
                 return;
             }
 
-            var interfaceMethods = Interfaces
+            var interfaceMethods = InterfaceTypes
                 .SelectMany(type => new[] { type }
                     .Concat(type.GetAllInterfaces())
                     .SelectMany(it => it.GetPublicMethods()))
                 .ToList();
 
-            foreach (var method in Methods)
+            foreach (var method in MethodExpressions)
             {
                 ThrowIfAmbiguousImplementation(method, interfaceMethods);
             }
@@ -226,16 +235,16 @@
 
         void ITypeExpressionConfigurator.SetImplements(params Type[] interfaces)
         {
-            if (_interfaces == null)
+            if (_interfaceTypes == null)
             {
-                _interfaces = new List<Type>();
+                _interfaceTypes = new List<Type>();
             }
             else
             {
-                _readOnlyInterfaces = null;
+                _readOnlyInterfaceTypes = null;
             }
 
-            _interfaces.AddRange(interfaces);
+            _interfaceTypes.AddRange(interfaces);
         }
 
         void ITypeExpressionConfigurator.SetSummary(CommentExpression summary)
@@ -275,18 +284,18 @@
 
         internal void Register(MethodExpression method)
         {
-            _methods.Add(method);
-            _readOnlyMethods = null;
+            _methodExpressions.Add(method);
+            _readOnlyMethodExpressions = null;
 
             AddTypedMethod(method);
-            _readOnlyMethodsByReturnType = null;
+            _readOnlyMethodExpressionsByReturnType = null;
         }
 
         private void AddTypedMethod(MethodExpression method)
         {
-            if (!_methodsByReturnType.TryGetValue(method.ReturnType, out var typedMethods))
+            if (!_methodExpressionsByReturnType.TryGetValue(method.ReturnType, out var typedMethods))
             {
-                _methodsByReturnType.Add(
+                _methodExpressionsByReturnType.Add(
                     method.ReturnType,
                     typedMethods = new List<MethodExpression>());
             }
@@ -297,6 +306,6 @@
         #endregion
 
         IEnumerable<Expression> ICustomAnalysableExpression.Expressions
-            => Methods.Cast<ICustomAnalysableExpression>().SelectMany(m => m.Expressions);
+            => MethodExpressions.Cast<ICustomAnalysableExpression>().SelectMany(m => m.Expressions);
     }
 }

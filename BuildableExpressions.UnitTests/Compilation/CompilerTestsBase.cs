@@ -180,10 +180,10 @@ namespace MyNamespace
                 .ShouldNotBeNull()
                 .ShouldBeOfType<SourceCodeExpression>();
 
-            var classExpression = sourceCodeExpression.Types.ShouldHaveSingleItem();
+            var classExpression = sourceCodeExpression.TypeExpressions.ShouldHaveSingleItem();
             classExpression.Name.ShouldBe("MyClass");
 
-            var methodExpression = classExpression.Methods.ShouldHaveSingleItem();
+            var methodExpression = classExpression.MethodExpressions.ShouldHaveSingleItem();
             methodExpression.ReturnType.ShouldBe(typeof(void));
             methodExpression.Name.ShouldBe("DoNothing");
             methodExpression.Parameters.ShouldBeEmpty();

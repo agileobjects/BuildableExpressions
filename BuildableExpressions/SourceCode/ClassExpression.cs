@@ -54,7 +54,7 @@
                     yield return BaseType;
                 }
 
-                foreach (var @interface in Interfaces)
+                foreach (var @interface in InterfaceTypes)
                 {
                     yield return @interface;
                 }

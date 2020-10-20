@@ -22,13 +22,13 @@
         ICustomAnalysableExpression,
         ICustomTranslationExpression
     {
-        private readonly List<TypeExpression> _types;
-        private ReadOnlyCollection<TypeExpression> _readOnlyTypes;
+        private readonly List<TypeExpression> _typeExpressions;
+        private ReadOnlyCollection<TypeExpression> _readOnlyTypeExpressions;
         private ReadOnlyCollection<Assembly> _referencedAssemblies;
 
         internal SourceCodeExpression(Action<ISourceCodeExpressionConfigurator> configuration)
         {
-            _types = new List<TypeExpression>();
+            _typeExpressions = new List<TypeExpression>();
             Namespace = "GeneratedExpressionCode";
 
             configuration.Invoke(this);
@@ -51,16 +51,16 @@
         public override Type Type => typeof(void);
 
         /// <summary>
-        /// Visits each of this <see cref="SourceCodeExpression"/>'s <see cref="Types"/>.
+        /// Visits each of this <see cref="SourceCodeExpression"/>'s <see cref="TypeExpressions"/>.
         /// </summary>
         /// <param name="visitor">
         /// The visitor with which to visit this <see cref="SourceCodeExpression"/>'s
-        /// <see cref="Types"/>.
+        /// <see cref="TypeExpressions"/>.
         /// </param>
         /// <returns>This <see cref="SourceCodeExpression"/>.</returns>
         protected override Expression Accept(ExpressionVisitor visitor)
         {
-            foreach (var @class in Types)
+            foreach (var @class in TypeExpressions)
             {
                 visitor.Visit(@class);
             }
@@ -83,7 +83,7 @@
         {
             var referenceAssemblies = new List<Assembly>();
 
-            foreach (var type in Types.SelectMany(t => t.ImplementedTypes).Distinct())
+            foreach (var type in TypeExpressions.SelectMany(t => t.ImplementedTypes).Distinct())
             {
 #if NETFRAMEWORK
                 AddAssembliesFor(type, referenceAssemblies);
@@ -136,18 +136,18 @@
         /// Gets the <see cref="TypeExpression"/>s which describe the types defined by this
         /// <see cref="SourceCodeExpression"/>.
         /// </summary>
-        public ReadOnlyCollection<TypeExpression> Types
-            => _readOnlyTypes ??= _types.ToReadOnlyCollection();
+        public ReadOnlyCollection<TypeExpression> TypeExpressions
+            => _readOnlyTypeExpressions ??= _typeExpressions.ToReadOnlyCollection();
 
-        internal void Finalise(IList<TypeExpression> types)
+        internal void Finalise(IList<TypeExpression> typeExpressions)
         {
-            if (_types.SequenceEqual(types))
+            if (_typeExpressions.SequenceEqual(typeExpressions))
             {
                 return;
             }
 
-            _types.Clear();
-            _types.AddRange(types);
+            _typeExpressions.Clear();
+            _typeExpressions.AddRange(typeExpressions);
         }
 
         /// <summary>
@@ -158,7 +158,7 @@
         /// The translated <see cref="SourceCodeExpression"/>, formatted as one or more types with
         /// one or more methods in a namespace.
         /// </returns>
-        public string ToSourceCode()
+        public string ToCSharpString()
         {
             Validate();
             return new SourceCodeExpressionTranslation(this).GetTranslation();
@@ -169,7 +169,7 @@
             ThrowIfNoClasses();
             ThrowIfDuplicateClassName();
 
-            foreach (var @class in _types)
+            foreach (var @class in _typeExpressions)
             {
                 @class.Validate();
             }
@@ -177,7 +177,7 @@
 
         private void ThrowIfNoClasses()
         {
-            if (_types.Any())
+            if (_typeExpressions.Any())
             {
                 return;
             }
@@ -187,7 +187,7 @@
 
         private void ThrowIfDuplicateClassName()
         {
-            var duplicateClassName = _types
+            var duplicateClassName = _typeExpressions
                 .GroupBy(cls => cls.Name)
                 .FirstOrDefault(nameGroup => nameGroup.Count() > 1)?
                 .Key;
@@ -232,14 +232,14 @@
 
         internal void Register(TypeExpression type)
         {
-            _types.Add(type);
-            _readOnlyTypes = null;
+            _typeExpressions.Add(type);
+            _readOnlyTypeExpressions = null;
         }
 
         #endregion
 
         IEnumerable<Expression> ICustomAnalysableExpression.Expressions
-            => Types.Cast<ICustomAnalysableExpression>().SelectMany(c => c.Expressions);
+            => TypeExpressions.Cast<ICustomAnalysableExpression>().SelectMany(c => c.Expressions);
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => new SourceCodeTranslation(this, context);

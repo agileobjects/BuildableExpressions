@@ -33,7 +33,7 @@
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("GetYepOrNope", yepOrNopeBlock)))
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 using System;
@@ -88,7 +88,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("GetInts", conditionalLambda)))
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -162,7 +162,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("GetYepOrNope", yepOrNopeLambda)))
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -231,7 +231,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("GetInt", assignmentLambda)))
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
@@ -303,7 +303,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("SetIntValue", tryParseResultLambda)))
-                .ToSourceCode();
+                .ToCSharpString();
 
             const string EXPECTED = @"
 using AgileObjects.BuildableExpressions.UnitTests;

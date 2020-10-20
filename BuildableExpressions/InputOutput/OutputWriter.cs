@@ -45,10 +45,10 @@
                     relativeFilePath = string.Empty;
                 }
 
-                var fileName = sourceCodeExpression.Types.First().Name + ".cs";
+                var fileName = sourceCodeExpression.TypeExpressions.First().Name + ".cs";
                 var filePath = Path.Combine(outputDirectory, fileName);
 
-                var sourceCode = sourceCodeExpression.ToSourceCode();
+                var sourceCode = sourceCodeExpression.ToCSharpString();
 
                 _fileManager.Write(filePath, sourceCode);
                 newFilePaths.Add(Path.Combine(relativeFilePath, fileName));

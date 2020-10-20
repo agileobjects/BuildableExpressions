@@ -17,7 +17,7 @@
                     sc.AddClass("MyClass", cls => { });
                 });
 
-            sourceCode.ToSourceCode();
+            sourceCode.ToCSharpString();
 
             sourceCode.ReferencedAssemblies.ShouldBeEmpty();
         }
@@ -34,7 +34,7 @@
                     });
                 });
 
-            sourceCode.ToSourceCode();
+            sourceCode.ToCSharpString();
 
             sourceCode.ReferencedAssemblies
                 .ShouldHaveSingleItem()
@@ -59,7 +59,7 @@
                     });
                 });
 
-            sourceCode.ToSourceCode();
+            sourceCode.ToCSharpString();
 
             sourceCode.ReferencedAssemblies
                 .ShouldHaveSingleItem()

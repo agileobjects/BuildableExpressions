@@ -21,7 +21,7 @@
                 });
             });
 
-            var method = sourceCode.Types.First().Methods.First();
+            var method = sourceCode.TypeExpressions.First().MethodExpressions.First();
 
             var methodCall = BuildableExpression.Call(method);
 

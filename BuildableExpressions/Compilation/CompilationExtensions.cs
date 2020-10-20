@@ -44,7 +44,7 @@
         {
             return compiler.Compile(
                 sourceCodes.SelectMany(sc => sc.ReferencedAssemblies).Distinct(),
-                sourceCodes.Project(sc => sc.ToSourceCode()));
+                sourceCodes.Project(sc => sc.ToCSharpString()));
         }
 
         public static CompilationResult Compile(

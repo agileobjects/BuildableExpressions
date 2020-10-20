@@ -46,7 +46,7 @@
                     });
                 });
 
-                var method = sourceCode.Types.First().Methods.First();
+                var method = sourceCode.TypeExpressions.First().MethodExpressions.First();
 
                 BuildableExpression.Call(
                     method,
@@ -74,7 +74,7 @@
                     });
                 });
 
-                var method = sourceCode.Types.First().Methods.First();
+                var method = sourceCode.TypeExpressions.First().MethodExpressions.First();
 
                 BuildableExpression.Call(method, Parameter(typeof(string), "str"));
             });
