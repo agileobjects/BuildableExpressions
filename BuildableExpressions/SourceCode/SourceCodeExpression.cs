@@ -24,6 +24,7 @@
     {
         private readonly List<TypeExpression> _types;
         private ReadOnlyCollection<TypeExpression> _readOnlyTypes;
+        private ReadOnlyCollection<Assembly> _referencedAssemblies;
 
         internal SourceCodeExpression(Action<ISourceCodeExpressionConfigurator> configuration)
         {
@@ -33,11 +34,50 @@
             configuration.Invoke(this);
 
             Analysis = SourceCodeAnalysis.For(this);
-            ReferencedAssemblies = GetReferenceAssemblies().ToReadOnlyCollection();
         }
 
-        #region Setup
+        internal SourceCodeAnalysis Analysis { get; }
 
+        /// <summary>
+        /// Gets the <see cref="SourceCodeExpressionType"/> value (1000) indicating the type of this
+        /// <see cref="SourceCodeExpression"/> as an ExpressionType.
+        /// </summary>
+        public override ExpressionType NodeType
+            => (ExpressionType)SourceCodeExpressionType.SourceCode;
+
+        /// <summary>
+        /// Gets the type of this <see cref="SourceCodeExpression"/> - typeof(void).
+        /// </summary>
+        public override Type Type => typeof(void);
+
+        /// <summary>
+        /// Visits each of this <see cref="SourceCodeExpression"/>'s <see cref="Types"/>.
+        /// </summary>
+        /// <param name="visitor">
+        /// The visitor with which to visit this <see cref="SourceCodeExpression"/>'s
+        /// <see cref="Types"/>.
+        /// </param>
+        /// <returns>This <see cref="SourceCodeExpression"/>.</returns>
+        protected override Expression Accept(ExpressionVisitor visitor)
+        {
+            foreach (var @class in Types)
+            {
+                visitor.Visit(@class);
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Gets the namespace to which the source code represented by this
+        /// <see cref="SourceCodeExpression"/> belongs.
+        /// </summary>
+        public string Namespace { get; private set; }
+
+        internal ReadOnlyCollection<Assembly> ReferencedAssemblies
+            => _referencedAssemblies ??= GetReferenceAssemblies().ToReadOnlyCollection();
+
+        #region ReferencedAssemblies Helpers
 
         private IList<Assembly> GetReferenceAssemblies()
         {
@@ -91,50 +131,6 @@
         }
 
         #endregion
-
-        internal SourceCodeAnalysis Analysis { get; }
-
-        /// <summary>
-        /// Gets the <see cref="SourceCodeExpressionType"/> value (1000) indicating the type of this
-        /// <see cref="SourceCodeExpression"/> as an ExpressionType.
-        /// </summary>
-        public override ExpressionType NodeType
-            => (ExpressionType)SourceCodeExpressionType.SourceCode;
-
-        /// <summary>
-        /// Gets the type of this <see cref="SourceCodeExpression"/> - typeof(void).
-        /// </summary>
-        public override Type Type => typeof(void);
-
-        /// <summary>
-        /// Visits each of this <see cref="SourceCodeExpression"/>'s <see cref="Types"/>.
-        /// </summary>
-        /// <param name="visitor">
-        /// The visitor with which to visit this <see cref="SourceCodeExpression"/>'s
-        /// <see cref="Types"/>.
-        /// </param>
-        /// <returns>This <see cref="SourceCodeExpression"/>.</returns>
-        protected override Expression Accept(ExpressionVisitor visitor)
-        {
-            foreach (var @class in Types)
-            {
-                visitor.Visit(@class);
-            }
-
-            return this;
-        }
-
-        /// <summary>
-        /// Gets the namespace to which the source code represented by this
-        /// <see cref="SourceCodeExpression"/> belongs.
-        /// </summary>
-        public string Namespace { get; private set; }
-
-        /// <summary>
-        /// Gets the Assemblies referenced by this <see cref="SourceCodeExpression"/>'s
-        /// <see cref="Types"/>.
-        /// </summary>
-        public ReadOnlyCollection<Assembly> ReferencedAssemblies { get; }
 
         /// <summary>
         /// Gets the <see cref="TypeExpression"/>s which describe the types defined by this
