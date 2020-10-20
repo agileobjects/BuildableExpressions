@@ -220,22 +220,20 @@
             string name,
             Action<IClassExpressionConfigurator> configuration)
         {
-            return Add(new ClassExpression(this, name, configuration));
+            return new ClassExpression(this, name, configuration);
         }
 
         StructExpression ISourceCodeExpressionConfigurator.AddStruct(
             string name,
             Action<IStructExpressionConfigurator> configuration)
         {
-            return Add(new StructExpression(this, name, configuration));
+            return new StructExpression(this, name, configuration);
         }
 
-        private TType Add<TType>(TType type)
-            where TType : TypeExpression
+        internal void Register(TypeExpression type)
         {
             _types.Add(type);
             _readOnlyTypes = null;
-            return type;
         }
 
         #endregion

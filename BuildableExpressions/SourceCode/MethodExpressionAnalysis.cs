@@ -290,7 +290,7 @@
             public MethodExpression CreateMethodFor(Expression block)
             {
                 return _method.DeclaringType
-                    .AddMethodWithoutAnalysis(block, m => m.SetVisibility(Private));
+                    .AddMethod(block, m => m.SetVisibility(Private));
             }
 
             public void Finalise(

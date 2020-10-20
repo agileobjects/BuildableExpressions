@@ -31,20 +31,18 @@
         private ReadOnlyCollection<IParameter> _parameters;
         private string _name;
 
-        internal MethodExpression(TypeExpression type, Expression body)
-        {
-            DeclaringType = type;
-            Definition = body.ToLambdaExpression();
-        }
-
         internal MethodExpression(
             TypeExpression type,
             string name,
-            Expression body)
+            Expression body,
+            Action<IMethodExpressionConfigurator> configuration)
         {
             DeclaringType = type;
             _name = name;
             Definition = body.ToLambdaExpression();
+
+            type.Register(this);
+            configuration.Invoke(this);
         }
 
         /// <summary>

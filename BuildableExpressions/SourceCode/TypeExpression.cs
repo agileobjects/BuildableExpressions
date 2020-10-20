@@ -38,6 +38,8 @@
             Name = name.ThrowIfInvalidName<ArgumentException>("Type");
             _methods = new List<MethodExpression>();
             _methodsByReturnType = new Dictionary<Type, List<MethodExpression>>();
+
+            sourceCode.Register(this);
         }
 
         /// <summary>
@@ -157,7 +159,7 @@
 
         private void ThrowIfDuplicateMethodName()
         {
-            if (_methods.Count == 1)
+            if (_methods.Count <= 1)
             {
                 return;
             }
@@ -249,33 +251,35 @@
         {
             name.ThrowIfInvalidName<ArgumentException>("Method");
 
-            var method = AddMethodWithoutAnalysis(body, configuration, name);
+            var method = AddMethod(body, configuration, name);
             MethodExpressionAnalysis.For(method);
 
             return method;
         }
 
-        internal MethodExpression AddMethodWithoutAnalysis(
+        internal MethodExpression AddMethod(
             Expression body,
             Action<IMethodExpressionConfigurator> configuration,
             string name = null)
         {
-            var method = new MethodExpression(this, name, body);
-            configuration.Invoke(method);
+            var method = new MethodExpression(this, name, body, configuration);
 
             ValidateMethod(method);
-
-            _methods.Add(method);
-            _readOnlyMethods = null;
-
-            AddTypedMethod(method);
-            _readOnlyMethodsByReturnType = null;
             return method;
         }
 
         internal virtual void ValidateMethod(MethodExpression method)
         {
             method.Validate();
+        }
+
+        internal void Register(MethodExpression method)
+        {
+            _methods.Add(method);
+            _readOnlyMethods = null;
+
+            AddTypedMethod(method);
+            _readOnlyMethodsByReturnType = null;
         }
 
         private void AddTypedMethod(MethodExpression method)
