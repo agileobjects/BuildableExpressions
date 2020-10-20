@@ -55,9 +55,10 @@
 
         private SourceCodeExpression VisitAndConvert(SourceCodeExpression sourceCode)
         {
-            sourceCode.Finalise(VisitAndConvert(
-                sourceCode.TypeExpressions,
-                c => (TypeExpression)VisitAndConvert((Expression)c)));
+            foreach (Expression typeExpression in sourceCode.TypeExpressions)
+            {
+                VisitAndConvert(typeExpression);
+            }
 
             return sourceCode;
         }

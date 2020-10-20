@@ -139,19 +139,8 @@
         public ReadOnlyCollection<TypeExpression> TypeExpressions
             => _readOnlyTypeExpressions ??= _typeExpressions.ToReadOnlyCollection();
 
-        internal void Finalise(IList<TypeExpression> typeExpressions)
-        {
-            if (_typeExpressions.SequenceEqual(typeExpressions))
-            {
-                return;
-            }
-
-            _typeExpressions.Clear();
-            _typeExpressions.AddRange(typeExpressions);
-        }
-
         /// <summary>
-        /// Translates this <see cref="SourceCodeExpression"/> to a complete source-code string,
+        /// Translates this <see cref="SourceCodeExpression"/> to a complete C# source-code string,
         /// formatted as one or more types with one or more methods in a namespace.
         /// </summary>
         /// <returns>
