@@ -23,6 +23,7 @@
         IGenericArgument,
         ICustomTranslationExpression
     {
+        private Type _type;
         private bool _hasConstraints;
         private bool _hasStructConstraint;
         private bool _hasClassConstraint;
@@ -37,11 +38,23 @@
             Name = name.ThrowIfInvalidName<ArgumentException>("Generic Parameter");
 
             configuration.Invoke(this);
-
-            Type = CreateType();
         }
 
-        #region Setup
+        /// <summary>
+        /// Gets the <see cref="SourceCodeExpressionType"/> value (1004) indicating the type of this
+        /// <see cref="GenericParameterExpression"/> as an ExpressionType.
+        /// </summary>
+        public override ExpressionType NodeType
+            => (ExpressionType)SourceCodeExpressionType.GenericArgument;
+
+        /// <summary>
+        /// Gets the type of this <see cref="GenericParameterExpression"/>, which is 'void', as this
+        /// class represents an open generic argument.
+        /// </summary>
+        public override Type Type
+         => _type ??= CreateType();
+
+        #region Type Creation
 
         private Type CreateType()
         {
@@ -125,19 +138,6 @@
         }
 
         #endregion
-
-        /// <summary>
-        /// Gets the <see cref="SourceCodeExpressionType"/> value (1004) indicating the type of this
-        /// <see cref="GenericParameterExpression"/> as an ExpressionType.
-        /// </summary>
-        public override ExpressionType NodeType
-            => (ExpressionType)SourceCodeExpressionType.GenericArgument;
-
-        /// <summary>
-        /// Gets the type of this <see cref="GenericParameterExpression"/>, which is 'void', as this
-        /// class represents an open generic argument.
-        /// </summary>
-        public override Type Type { get; }
 
         /// <summary>
         /// Visits this <see cref="GenericParameterExpression"/>.
