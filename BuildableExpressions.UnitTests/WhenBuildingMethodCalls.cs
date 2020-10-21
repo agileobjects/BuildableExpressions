@@ -31,7 +31,7 @@
             methodCall.Object
                 .ShouldNotBeNull()
                 .ShouldBeOfType<ThisInstanceExpression>()
-                .Instance.ShouldBeSameAs(method.DeclaringType);
+                .Instance.ShouldBeSameAs(method.DeclaringTypeExpression);
 
             methodCall.Arguments.ShouldBeEmpty();
         }

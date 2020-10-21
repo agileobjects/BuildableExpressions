@@ -32,16 +32,16 @@
         private string _name;
 
         internal MethodExpression(
-            TypeExpression type,
+            TypeExpression typeExpression,
             string name,
             Expression body,
             Action<IMethodExpressionConfigurator> configuration)
         {
-            DeclaringType = type;
+            DeclaringTypeExpression = typeExpression;
             _name = name;
             Definition = body.ToLambdaExpression();
 
-            type.Register(this);
+            typeExpression.Register(this);
             configuration.Invoke(this);
         }
 
@@ -81,7 +81,7 @@
         /// <summary>
         /// Gets this <see cref="MethodExpression"/>'s parent <see cref="TypeExpression"/>.
         /// </summary>
-        public TypeExpression DeclaringType { get; }
+        public TypeExpression DeclaringTypeExpression { get; }
 
         /// <summary>
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="MethodExpression"/>,
@@ -107,7 +107,7 @@
         /// <summary>
         /// Gets the name of this <see cref="MethodExpression"/>.
         /// </summary>
-        public string Name => _name ??= DeclaringType.GetMethodName(this);
+        public string Name => _name ??= DeclaringTypeExpression.GetMethodName(this);
 
         /// <summary>
         /// Gets the return type of this <see cref="MethodExpression"/>, which is the return type
@@ -149,9 +149,6 @@
 
         #region IMethodExpressionConfigurator Members
 
-        void IMethodExpressionConfigurator.SetSummary(string summary)
-            => Summary = ReadableExpression.Comment(summary);
-
         void IMethodExpressionConfigurator.SetSummary(CommentExpression summary)
             => Summary = summary;
 
@@ -161,16 +158,8 @@
         void IMethodExpressionConfigurator.SetStatic()
             => IsStatic = true;
 
-        void IMethodExpressionConfigurator.AddGenericParameter(GenericParameterExpression parameter)
-            => AddGenericParameters(parameter);
-
         void IMethodExpressionConfigurator.AddGenericParameters(
             params GenericParameterExpression[] parameters)
-        {
-            AddGenericParameters(parameters);
-        }
-
-        private void AddGenericParameters(params GenericParameterExpression[] parameters)
         {
             _genericArguments ??= new List<GenericParameterExpression>();
             _readonlyGenericParameters = null;
@@ -256,7 +245,7 @@
             if (duplicateParameterName != null)
             {
                 throw new InvalidOperationException(
-                    $"Method '{DeclaringType.Name}.{Name}': " +
+                    $"Method '{DeclaringTypeExpression.Name}.{Name}': " +
                     $"duplicate generic parameter name '{duplicateParameterName}' specified.");
             }
         }

@@ -10,12 +10,6 @@
         /// <summary>
         /// Set the summary documentation of the <see cref="MethodExpression"/>.
         /// </summary>
-        /// <param name="summary">The summary documentation of the <see cref="MethodExpression"/>.</param>
-        void SetSummary(string summary);
-
-        /// <summary>
-        /// Set the summary documentation of the <see cref="MethodExpression"/>.
-        /// </summary>
         /// <param name="summary">
         /// A <see cref="CommentExpression"/> containing summary documentation of the
         /// <see cref="MethodExpression"/>.
@@ -34,12 +28,6 @@
         /// Mark the <see cref="MethodExpression"/> as static.
         /// </summary>
         void SetStatic();
-
-        /// <summary>
-        /// Adds the given <paramref name="parameter"/> to the <see cref="MethodExpression"/>.
-        /// </summary>
-        /// <param name="parameter">The <see cref="GenericParameterExpression"/> to add.</param>
-        void AddGenericParameter(GenericParameterExpression parameter);
 
         /// <summary>
         /// Adds the given <paramref name="parameters"/> to the <see cref="MethodExpression"/>.

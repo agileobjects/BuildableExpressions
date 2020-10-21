@@ -280,9 +280,9 @@
 
             throw new InvalidOperationException(
                  "Unable to add generic parameter to method " +
-                $"'{owningMethod.DeclaringType.Name}.{owningMethod.Name}' - " +
+                $"'{owningMethod.DeclaringTypeExpression.Name}.{owningMethod.Name}' - " +
                  "this parameter has already been added to method " +
-                $"'{Method.DeclaringType.Name}.{Method.Name}'");
+                $"'{Method.DeclaringTypeExpression.Name}.{Method.Name}'");
         }
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)

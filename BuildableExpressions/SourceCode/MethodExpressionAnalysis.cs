@@ -289,7 +289,7 @@
 
             public MethodExpression CreateMethodFor(Expression block)
             {
-                return _method.DeclaringType
+                return _method.DeclaringTypeExpression
                     .AddMethod(block, m => m.SetVisibility(Private));
             }
 

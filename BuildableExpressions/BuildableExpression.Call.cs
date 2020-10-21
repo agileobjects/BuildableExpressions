@@ -51,7 +51,7 @@
             ThrowIfParameterCountMismatch(method, arguments);
             ThrowIfParameterTypeMismatch(method, arguments);
 
-            var thisInstance = ((ConcreteTypeExpression)method.DeclaringType).ThisInstanceExpression;
+            var thisInstance = ((ConcreteTypeExpression)method.DeclaringTypeExpression).ThisInstanceExpression;
 
             return new BuildableMethodCallExpression(thisInstance, method, arguments);
         }

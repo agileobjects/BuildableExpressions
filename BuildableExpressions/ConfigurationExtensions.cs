@@ -96,5 +96,41 @@
         {
             parameterConfig.AddTypeConstraints(types.ToArray());
         }
+
+        /// <summary>
+        /// Adds the given <paramref name="parameter"/> to the <see cref="MethodExpression"/>.
+        /// </summary>
+        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
+        /// <param name="parameter">The <see cref="GenericParameterExpression"/> to add.</param>
+        public static void AddGenericParameter(
+            this IMethodExpressionConfigurator methodConfig,
+            GenericParameterExpression parameter)
+        {
+            methodConfig.AddGenericParameters(parameter);
+        }
+
+        /// <summary>
+        /// Set the summary documentation of the <see cref="MethodExpression"/>.
+        /// </summary>
+        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
+        /// <param name="summary">The summary documentation of the <see cref="MethodExpression"/>.</param>
+        public static void SetSummary(
+            this IMethodExpressionConfigurator methodConfig,
+            string summary)
+        {
+            methodConfig.SetSummary(ReadableExpression.Comment(summary));
+        }
+
+        /// <summary>
+        /// Adds the given <paramref name="parameters"/> to the <see cref="MethodExpression"/>.
+        /// </summary>
+        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
+        /// <param name="parameters">The <see cref="GenericParameterExpression"/> to add.</param>
+        public static void AddGenericParameters(
+            this IMethodExpressionConfigurator methodConfig,
+            IEnumerable<GenericParameterExpression> parameters)
+        {
+            methodConfig.AddGenericParameters(parameters.ToArray());
+        }
     }
 }
