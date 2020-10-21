@@ -23,9 +23,11 @@
         [Fact]
         public void ShouldBuildANewableClassParameter()
         {
-            var param = BuildableExpression.GenericParameter("TNewable", gp => gp
-                .WithClassConstraint()
-                .WithNewableConstraint());
+            var param = BuildableExpression.GenericParameter("TNewable", gp =>
+            {
+                gp.AddClassConstraint();
+                gp.AddNewableConstraint();
+            });
 
             param.Name.ShouldBe("TNewable");
             param.IsClosed.ShouldBeFalse();
@@ -40,7 +42,7 @@
         public void ShouldBuildAStructParameter()
         {
             var param = BuildableExpression.GenericParameter("TStruct", gp => gp
-                .WithStructConstraint());
+                .AddStructConstraint());
 
             param.Name.ShouldBe("TStruct");
             param.IsClosed.ShouldBeFalse();
@@ -54,7 +56,7 @@
         public void ShouldBuildATypeConstrainedParameter()
         {
             var param = BuildableExpression.GenericParameter("TDerived", gp => gp
-                .WithTypeConstraint(typeof(BaseType)));
+                .AddTypeConstraint(typeof(BaseType)));
 
             param.Name.ShouldBe("TDerived");
             param.IsClosed.ShouldBeFalse();
@@ -69,7 +71,7 @@
         public void ShouldBuildAnInterfaceConstrainedParameter()
         {
             var param = BuildableExpression.GenericParameter("TDisposable", gp => gp
-                .WithTypeConstraint(typeof(IDisposable)));
+                .AddTypeConstraint(typeof(IDisposable)));
 
             param.Name.ShouldBe("TDisposable");
             param.IsClosed.ShouldBeFalse();
@@ -86,7 +88,7 @@
         public void ShouldBuildAnAbstractTypeConstrainedParameter()
         {
             var param = BuildableExpression.GenericParameter("TDerived", gp => gp
-                .WithTypeConstraint(typeof(AbstractBaseType)));
+                .AddTypeConstraint(typeof(AbstractBaseType)));
 
             param.Name.ShouldBe("TDerived");
             param.IsClosed.ShouldBeFalse();
@@ -106,6 +108,16 @@
 
             param1.ShouldNotBeSameAs(param2);
             param1.Type.ShouldNotBeNull().ShouldBeSameAs(param2.Type);
+        }
+
+        [Fact]
+        public void ShouldVaryBuiltParameterTypesByStructConstraint()
+        {
+            var param1 = BuildableExpression.GenericParameter("T");
+            var param2 = BuildableExpression.GenericParameter("T", gp => gp.AddStructConstraint());
+
+            param1.ShouldNotBeSameAs(param2);
+            param1.Type.ShouldNotBeNull().ShouldNotBeSameAs(param2.Type);
         }
 
         #region Helper Members

@@ -10,43 +10,23 @@
         /// <summary>
         /// Set the <see cref="GenericParameterExpression"/> to have a struct constraint.
         /// </summary>
-        /// <returns>This <see cref="IGenericParameterExpressionConfigurator"/>, to support a fluent API.</returns>
-        IGenericParameterExpressionConfigurator WithStructConstraint();
+        void AddStructConstraint();
 
         /// <summary>
         /// Set the <see cref="GenericParameterExpression"/> to have a class constraint.
         /// </summary>
-        /// <returns>This <see cref="IGenericParameterExpressionConfigurator"/>, to support a fluent API.</returns>
-        IGenericParameterExpressionConfigurator WithClassConstraint();
+        void AddClassConstraint();
 
         /// <summary>
         /// Set the <see cref="GenericParameterExpression"/> to have a new() constraint.
         /// </summary>
-        /// <returns>This <see cref="IGenericParameterExpressionConfigurator"/>, to support a fluent API.</returns>
-        IGenericParameterExpressionConfigurator WithNewableConstraint();
-
-        /// <summary>
-        /// Set the <see cref="GenericParameterExpression"/> to be constrained to the given
-        /// <typeparamref name="T"/> Type.
-        /// </summary>
-        /// <typeparam name="T">The Type to which to constrain the <see cref="GenericParameterExpression"/>.</typeparam>
-        /// <returns>This <see cref="IGenericParameterExpressionConfigurator"/>, to support a fluent API.</returns>
-        IGenericParameterExpressionConfigurator WithTypeConstraint<T>();
-
-        /// <summary>
-        /// Set the <see cref="GenericParameterExpression"/> to be constrained to the given
-        /// <paramref name="type"/>.
-        /// </summary>
-        /// <param name="type">The Type to which to constrain the <see cref="GenericParameterExpression"/>.</param>
-        /// <returns>This <see cref="IGenericParameterExpressionConfigurator"/>, to support a fluent API.</returns>
-        IGenericParameterExpressionConfigurator WithTypeConstraint(Type type);
+        void AddNewableConstraint();
 
         /// <summary>
         /// Set the <see cref="GenericParameterExpression"/> to be constrained to the given
         /// <paramref name="types"/>.
         /// </summary>
         /// <param name="types">The Type(s) to which to constrain the <see cref="GenericParameterExpression"/>.</param>
-        /// <returns>This <see cref="IGenericParameterExpressionConfigurator"/>, to support a fluent API.</returns>
-        IGenericParameterExpressionConfigurator WithTypeConstraints(params Type[] types);
+        void AddTypeConstraints(params Type[] types);
     }
 }

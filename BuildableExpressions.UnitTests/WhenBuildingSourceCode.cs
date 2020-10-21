@@ -401,7 +401,7 @@ namespace GeneratedExpressionCode
                 sc.AddClass(cls =>
                 {
                     var param = BuildableExpression.GenericParameter("TStruct", gp => gp
-                        .WithStructConstraint());
+                        .AddStructConstraint());
 
                     cls.AddMethod("GetObject", Default(typeof(object)), m => m
                         .AddGenericParameter(param));
@@ -433,9 +433,11 @@ namespace GeneratedExpressionCode
             {
                 sc.AddClass(cls =>
                 {
-                    var param = BuildableExpression.GenericParameter("TNewable", gp => gp
-                        .WithClassConstraint()
-                        .WithNewableConstraint());
+                    var param = BuildableExpression.GenericParameter("TNewable", gp =>
+                    {
+                        gp.AddClassConstraint();
+                        gp.AddNewableConstraint();
+                    });
 
                     cls.AddMethod("GetObject", Default(typeof(object)), m => m
                         .AddGenericParameter(param));
@@ -467,9 +469,11 @@ namespace GeneratedExpressionCode
             {
                 sc.AddClass(cls =>
                 {
-                    var param = BuildableExpression.GenericParameter("TMarker", gp => gp
-                        .WithStructConstraint()
-                        .WithTypeConstraint<IMarker1>());
+                    var param = BuildableExpression.GenericParameter("TMarker", gp =>
+                    {
+                        gp.AddStructConstraint();
+                        gp.AddTypeConstraint<IMarker1>();
+                    });
 
                     cls.AddMethod("GetMarker", Default(typeof(object)), m => m
                         .AddGenericParameter(param));
@@ -504,7 +508,7 @@ namespace GeneratedExpressionCode
                 sc.AddClass(cls =>
                 {
                     var param = BuildableExpression.GenericParameter("TDerived", gp => gp
-                        .WithTypeConstraints(typeof(BaseType), typeof(IMarker1), typeof(IMarker2)));
+                        .AddTypeConstraints(typeof(BaseType), typeof(IMarker1), typeof(IMarker2)));
 
                     cls.AddMethod("GetDerived", Default(typeof(object)), m => m
                         .AddGenericParameter(param));

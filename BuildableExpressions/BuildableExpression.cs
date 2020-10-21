@@ -30,7 +30,7 @@
         /// argument.
         /// </returns>
         public static GenericParameterExpression GenericParameter(string name)
-            => GenericParameter(name, gp => gp);
+            => GenericParameter(name, gp => { });
 
         /// <summary>
         /// Create a <see cref="GenericParameterExpression"/> that represents a class or method
@@ -44,7 +44,7 @@
         /// </returns>
         public static GenericParameterExpression GenericParameter(
             string name,
-            Func<IGenericParameterExpressionConfigurator, IGenericParameterExpressionConfigurator> configuration)
+            Action<IGenericParameterExpressionConfigurator> configuration)
         {
             return new GenericParameterExpression(name, configuration);
         }

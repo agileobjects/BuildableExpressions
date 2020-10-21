@@ -39,7 +39,7 @@
 
         internal GenericParameterExpression(
             string name,
-            Func<IGenericParameterExpressionConfigurator, IGenericParameterExpressionConfigurator> configuration)
+            Action<IGenericParameterExpressionConfigurator> configuration)
         {
             Name = name.ThrowIfInvalidName<ArgumentException>("Generic Parameter");
 
@@ -167,37 +167,25 @@
 
         #region IGenericParameterExpressionConfigurator Members
 
-        IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithStructConstraint()
+        void IGenericParameterExpressionConfigurator.AddStructConstraint()
         {
             ThrowIfHasClassConstraint(conflictingConstraint: "struct");
             _hasConstraints = _hasStructConstraint = true;
-            return this;
         }
 
-        IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithClassConstraint()
+        void IGenericParameterExpressionConfigurator.AddClassConstraint()
         {
             ThrowIfHasStructConstraint(conflictingConstraint: "class");
             _hasConstraints = _hasClassConstraint = true;
-            return this;
         }
 
-        IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithNewableConstraint()
+        void IGenericParameterExpressionConfigurator.AddNewableConstraint()
         {
             ThrowIfHasStructConstraint(conflictingConstraint: "new()");
             _hasConstraints = _hasNewableConstraint = true;
-            return this;
         }
 
-        IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithTypeConstraint<T>()
-            => AddTypeConstraints(typeof(T));
-
-        IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithTypeConstraint(Type type)
-            => AddTypeConstraints(type);
-
-        IGenericParameterExpressionConfigurator IGenericParameterExpressionConfigurator.WithTypeConstraints(params Type[] types)
-            => AddTypeConstraints(types);
-
-        private IGenericParameterExpressionConfigurator AddTypeConstraints(params Type[] types)
+        void IGenericParameterExpressionConfigurator.AddTypeConstraints(params Type[] types)
         {
             _typeConstraints ??= new List<Type>();
 
@@ -217,7 +205,6 @@
 
             _hasConstraints = true;
             _readonlyTypeConstraints = null;
-            return this;
         }
 
         private void ThrowIfHasStructConstraint(string conflictingConstraint)

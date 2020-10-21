@@ -1,5 +1,8 @@
 ﻿namespace AgileObjects.BuildableExpressions
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
     using ReadableExpressions;
     using SourceCode;
@@ -54,6 +57,44 @@
             Expression body)
         {
             return typeConfig.AddMethod(name, body, cfg => { });
+        }
+
+        /// <summary>
+        /// Set the <see cref="GenericParameterExpression"/> to be constrained to the given
+        /// <typeparamref name="T"/> Type.
+        /// </summary>
+        /// <typeparam name="T">The Type to which to constrain the <see cref="GenericParameterExpression"/>.</typeparam>
+        /// <param name="parameterConfig">The <see cref="IGenericParameterExpressionConfigurator"/> to configure.</param>
+        public static void AddTypeConstraint<T>(
+            this IGenericParameterExpressionConfigurator parameterConfig)
+        {
+            parameterConfig.AddTypeConstraint(typeof(T));
+        }
+
+        /// <summary>
+        /// Set the <see cref="GenericParameterExpression"/> to be constrained to the given
+        /// <paramref name="type"/>.
+        /// </summary>
+        /// <param name="parameterConfig">The <see cref="IGenericParameterExpressionConfigurator"/> to configure.</param>
+        /// <param name="type">The Type to which to constrain the <see cref="GenericParameterExpression"/>.</param>
+        public static void AddTypeConstraint(
+            this IGenericParameterExpressionConfigurator parameterConfig,
+            Type type)
+        {
+            parameterConfig.AddTypeConstraints(type);
+        }
+
+        /// <summary>
+        /// Set the <see cref="GenericParameterExpression"/> to be constrained to the given
+        /// <paramref name="types"/>.
+        /// </summary>
+        /// <param name="parameterConfig">The <see cref="IGenericParameterExpressionConfigurator"/> to configure.</param>
+        /// <param name="types">The Types to which to constrain the <see cref="GenericParameterExpression"/>.</param>
+        public static void AddTypeConstraints(
+            this IGenericParameterExpressionConfigurator parameterConfig,
+            IEnumerable<Type> types)
+        {
+            parameterConfig.AddTypeConstraints(types.ToArray());
         }
     }
 }

@@ -12,9 +12,11 @@
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
-                BuildableExpression.GenericParameter("T", gp => gp
-                    .WithStructConstraint()
-                    .WithClassConstraint());
+                BuildableExpression.GenericParameter("T", gp =>
+                {
+                    gp.AddStructConstraint();
+                    gp.AddClassConstraint();
+                });
             });
 
             configEx.Message.ShouldContain("both struct and class constraints");
@@ -25,9 +27,11 @@
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
-                BuildableExpression.GenericParameter("T", gp => gp
-                    .WithClassConstraint()
-                    .WithStructConstraint());
+                BuildableExpression.GenericParameter("T", gp =>
+                {
+                    gp.AddClassConstraint();
+                    gp.AddStructConstraint();
+                });
             });
 
             configEx.Message.ShouldContain("both class and struct constraints");
@@ -38,9 +42,11 @@
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
-                BuildableExpression.GenericParameter("T", gp => gp
-                    .WithStructConstraint()
-                    .WithNewableConstraint());
+                BuildableExpression.GenericParameter("T", gp =>
+                {
+                    gp.AddStructConstraint();
+                    gp.AddNewableConstraint();
+                });
             });
 
             configEx.Message.ShouldContain("both struct and new() constraints");
@@ -51,9 +57,11 @@
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
-                BuildableExpression.GenericParameter("T", gp => gp
-                    .WithStructConstraint()
-                    .WithTypeConstraint<Stream>());
+                BuildableExpression.GenericParameter("T", gp =>
+                {
+                    gp.AddStructConstraint();
+                    gp.AddTypeConstraint<Stream>();
+                });
             });
 
             configEx.Message.ShouldContain("both struct and Stream constraints");
@@ -64,9 +72,11 @@
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
-                BuildableExpression.GenericParameter("T", gp => gp
-                    .WithClassConstraint()
-                    .WithTypeConstraint<StringComparer>());
+                BuildableExpression.GenericParameter("T", gp =>
+                {
+                    gp.AddClassConstraint();
+                    gp.AddTypeConstraint<StringComparer>();
+                });
             });
 
             configEx.Message.ShouldContain("both class and StringComparer constraints");
@@ -78,7 +88,7 @@
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
                 BuildableExpression.GenericParameter("T", gp => gp
-                    .WithTypeConstraints(typeof(StringComparer), typeof(Stream)));
+                    .AddTypeConstraints(typeof(StringComparer), typeof(Stream)));
             });
 
             configEx.Message.ShouldContain("both StringComparer and Stream constraints");
@@ -89,9 +99,11 @@
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
-                BuildableExpression.GenericParameter("T", gp => gp
-                    .WithTypeConstraint<Stream>()
-                    .WithTypeConstraint<StringComparer>());
+                BuildableExpression.GenericParameter("T", gp =>
+                {
+                    gp.AddTypeConstraint<Stream>();
+                    gp.AddTypeConstraint<StringComparer>();
+                });
             });
 
             configEx.Message.ShouldContain("both Stream and StringComparer constraints");
