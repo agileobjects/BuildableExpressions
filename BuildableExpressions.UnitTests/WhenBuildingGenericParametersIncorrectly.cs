@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using Common;
+    using SourceCode;
     using Xunit;
 
     public class WhenBuildingGenericParametersIncorrectly
@@ -12,10 +13,19 @@
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
-                BuildableExpression.GenericParameter("T", gp =>
+                BuildableExpression.SourceCode(sc =>
                 {
-                    gp.AddStructConstraint();
-                    gp.AddClassConstraint();
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("DoStuff", m =>
+                        {
+                            m.AddGenericParameter("T", gp =>
+                            {
+                                gp.AddStructConstraint();
+                                gp.AddClassConstraint();
+                            });
+                        });
+                    });
                 });
             });
 
@@ -27,10 +37,19 @@
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
-                BuildableExpression.GenericParameter("T", gp =>
+                BuildableExpression.SourceCode(sc =>
                 {
-                    gp.AddClassConstraint();
-                    gp.AddStructConstraint();
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("DoStuff", m =>
+                        {
+                            m.AddGenericParameter("T", gp =>
+                            {
+                                gp.AddClassConstraint();
+                                gp.AddStructConstraint();
+                            });
+                        });
+                    });
                 });
             });
 
@@ -42,10 +61,19 @@
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
-                BuildableExpression.GenericParameter("T", gp =>
+                BuildableExpression.SourceCode(sc =>
                 {
-                    gp.AddStructConstraint();
-                    gp.AddNewableConstraint();
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("DoStuff", m =>
+                        {
+                            m.AddGenericParameter("T", gp =>
+                            {
+                                gp.AddStructConstraint();
+                                gp.AddNewableConstraint();
+                            });
+                        });
+                    });
                 });
             });
 
@@ -57,10 +85,19 @@
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
-                BuildableExpression.GenericParameter("T", gp =>
+                BuildableExpression.SourceCode(sc =>
                 {
-                    gp.AddStructConstraint();
-                    gp.AddTypeConstraint<Stream>();
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("DoStuff", m =>
+                        {
+                            m.AddGenericParameter("T", gp =>
+                            {
+                                gp.AddStructConstraint();
+                                gp.AddTypeConstraint<Stream>();
+                            });
+                        });
+                    });
                 });
             });
 
@@ -72,10 +109,19 @@
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
-                BuildableExpression.GenericParameter("T", gp =>
+                BuildableExpression.SourceCode(sc =>
                 {
-                    gp.AddClassConstraint();
-                    gp.AddTypeConstraint<StringComparer>();
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("DoStuff", m =>
+                        {
+                            m.AddGenericParameter("T", gp =>
+                            {
+                                gp.AddClassConstraint();
+                                gp.AddTypeConstraint<StringComparer>();
+                            });
+                        });
+                    });
                 });
             });
 
@@ -87,8 +133,19 @@
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
-                BuildableExpression.GenericParameter("T", gp => gp
-                    .AddTypeConstraints(typeof(StringComparer), typeof(Stream)));
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("DoStuff", m =>
+                        {
+                            m.AddGenericParameter("T", gp =>
+                            {
+                                gp.AddTypeConstraints(typeof(StringComparer), typeof(Stream));
+                            });
+                        });
+                    });
+                });
             });
 
             configEx.Message.ShouldContain("both StringComparer and Stream constraints");
@@ -99,10 +156,19 @@
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
-                BuildableExpression.GenericParameter("T", gp =>
+                BuildableExpression.SourceCode(sc =>
                 {
-                    gp.AddTypeConstraint<Stream>();
-                    gp.AddTypeConstraint<StringComparer>();
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("DoStuff", m =>
+                        {
+                            m.AddGenericParameter("T", gp =>
+                            {
+                                gp.AddTypeConstraint<Stream>();
+                                gp.AddTypeConstraint<StringComparer>();
+                            });
+                        });
+                    });
                 });
             });
 

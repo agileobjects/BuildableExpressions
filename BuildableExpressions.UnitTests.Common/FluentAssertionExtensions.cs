@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
     using NetStandardPolyfills;
@@ -424,6 +425,7 @@
         private static void Asplode(string expected, string actual, string errorMessage = null)
             => throw new TestAsplodeException(expected, actual, errorMessage);
 
+        [SuppressMessage("Usage", "CA2237:Mark ISerializable types with serializable", Justification = "Test Exception, never serialized")]
         public class TestAsplodeException : Exception
         {
             public TestAsplodeException(string expected, string actual, string errorMessage)

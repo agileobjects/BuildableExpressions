@@ -138,31 +138,21 @@
         }
 
         /// <summary>
-        /// Adds the given <paramref name="parameter"/> to the <see cref="MethodExpression"/>.
+        /// Add an unconstrained <see cref="GenericParameterExpression"/> with the given
+        /// <paramref name="name"/> to the <see cref="MethodExpression"/>.
         /// </summary>
         /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
-        /// <param name="parameter">The <see cref="GenericParameterExpression"/> to add.</param>
-        public static void AddGenericParameter(
+        /// <param name="name">The name of the <see cref="GenericParameterExpression"/>.</param>
+        /// <returns>The newly-created <see cref="GenericParameterExpression"/>.</returns>
+        public static GenericParameterExpression AddGenericParameter(
             this IMethodExpressionConfigurator methodConfig,
-            GenericParameterExpression parameter)
+            string name)
         {
-            methodConfig.AddGenericParameters(parameter);
+            return methodConfig.AddGenericParameter(name, gp => { });
         }
 
         /// <summary>
-        /// Adds the given <paramref name="parameters"/> to the <see cref="MethodExpression"/>.
-        /// </summary>
-        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
-        /// <param name="parameters">The <see cref="GenericParameterExpression"/>s to add.</param>
-        public static void AddGenericParameters(
-            this IMethodExpressionConfigurator methodConfig,
-            IEnumerable<GenericParameterExpression> parameters)
-        {
-            methodConfig.AddGenericParameters(parameters.ToArray());
-        }
-
-        /// <summary>
-        /// Adds the given <paramref name="parameter"/> to the <see cref="MethodExpression"/>.
+        /// Add the given <paramref name="parameter"/> to the <see cref="MethodExpression"/>.
         /// </summary>
         /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
         /// <param name="parameter">The ParameterExpression to add.</param>
@@ -174,7 +164,7 @@
         }
 
         /// <summary>
-        /// Adds the given <paramref name="parameters"/> to the <see cref="MethodExpression"/>.
+        /// Add the given <paramref name="parameters"/> to the <see cref="MethodExpression"/>.
         /// </summary>
         /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
         /// <param name="parameters">The ParameterExpressions to add.</param>

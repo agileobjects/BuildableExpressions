@@ -233,18 +233,18 @@
         void IMethodExpressionConfigurator.SetStatic()
             => IsStatic = true;
 
-        void IMethodExpressionConfigurator.AddGenericParameters(
-            params GenericParameterExpression[] parameters)
+        GenericParameterExpression IMethodExpressionConfigurator.AddGenericParameter(
+            string name,
+            Action<IGenericParameterExpressionConfigurator> configuration)
         {
+            var parameter = new GenericParameterExpression(this, name, configuration);
+
             _genericArguments ??= new List<GenericParameterExpression>();
             _readonlyGenericParameters = null;
             _readonlyGenericArguments = null;
 
-            foreach (var parameter in parameters)
-            {
-                _genericArguments.Add(parameter);
-                parameter.SetMethod(this);
-            }
+            _genericArguments.Add(parameter);
+            return parameter;
         }
 
         void IMethodExpressionConfigurator.AddParameters(

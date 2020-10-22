@@ -19,34 +19,5 @@
         {
             return new SourceCodeExpression(configuration);
         }
-
-        /// <summary>
-        /// Create a <see cref="GenericParameterExpression"/> that represents a class or method
-        /// open generic argument, with the given <paramref name="name"/> and no type contraints.
-        /// </summary>
-        /// <param name="name">The name of the <see cref="GenericParameterExpression"/>.</param>
-        /// <returns>
-        /// The <see cref="GenericParameterExpression"/> representing a class or method open generic
-        /// argument.
-        /// </returns>
-        public static GenericParameterExpression GenericParameter(string name)
-            => GenericParameter(name, gp => { });
-
-        /// <summary>
-        /// Create a <see cref="GenericParameterExpression"/> that represents a class or method
-        /// open generic argument, with the given <paramref name="name"/>.
-        /// </summary>
-        /// <param name="name">The name of the <see cref="GenericParameterExpression"/>.</param>
-        /// <param name="configuration">The configuration to use for the <see cref="GenericParameterExpression"/>.</param>
-        /// <returns>
-        /// The <see cref="GenericParameterExpression"/> representing a class or method open generic
-        /// argument.
-        /// </returns>
-        public static GenericParameterExpression GenericParameter(
-            string name,
-            Action<IGenericParameterExpressionConfigurator> configuration)
-        {
-            return new GenericParameterExpression(name, configuration);
-        }
     }
 }

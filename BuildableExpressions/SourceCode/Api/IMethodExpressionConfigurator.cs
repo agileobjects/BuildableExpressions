@@ -32,12 +32,14 @@
         void SetStatic();
 
         /// <summary>
-        /// Adds the given <paramref name="parameters"/> to the <see cref="MethodExpression"/>. to
-        /// create a <see cref="GenericParameterExpression"/>, use
-        /// BuildableExpression.GenericParameter(name).
+        /// Adds a <see cref="GenericParameterExpression"/> to the <see cref="MethodExpression"/>.
         /// </summary>
-        /// <param name="parameters">The <see cref="GenericParameterExpression"/>s to add.</param>
-        void AddGenericParameters(params GenericParameterExpression[] parameters);
+        /// <param name="name">The name of the <see cref="GenericParameterExpression"/>.</param>
+        /// <param name="configuration">The configuration to use for the <see cref="GenericParameterExpression"/>.</param>
+        /// <returns>The newly-created <see cref="GenericParameterExpression"/>.</returns>
+        GenericParameterExpression AddGenericParameter(
+            string name,
+            Action<IGenericParameterExpressionConfigurator> configuration);
 
         /// <summary>
         /// Adds the given <paramref name="parameters"/> to the <see cref="MethodExpression"/>.

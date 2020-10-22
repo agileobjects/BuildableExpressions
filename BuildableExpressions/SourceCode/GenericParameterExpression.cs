@@ -38,10 +38,12 @@
         private ReadOnlyCollection<Type> _readonlyTypeConstraints;
 
         internal GenericParameterExpression(
+            MethodExpression method,
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
         {
             Name = name.ThrowIfInvalidName<ArgumentException>("Generic Parameter");
+            Method = method;
 
             configuration.Invoke(this);
         }
@@ -158,7 +160,7 @@
         /// <summary>
         /// Gets this <see cref="GenericParameterExpression"/>'s parent <see cref="MethodExpression"/>.
         /// </summary>
-        public MethodExpression Method { get; private set; }
+        public MethodExpression Method { get; }
 
         /// <summary>
         /// Gets the name of this <see cref="GenericParameterExpression"/>
@@ -269,21 +271,6 @@
         }
 
         #endregion
-
-        internal void SetMethod(MethodExpression owningMethod)
-        {
-            if (Method == null)
-            {
-                Method = owningMethod;
-                return;
-            }
-
-            throw new InvalidOperationException(
-                 "Unable to add generic parameter to method " +
-                $"'{owningMethod.DeclaringTypeExpression.Name}.{owningMethod.Name}' - " +
-                 "this parameter has already been added to method " +
-                $"'{Method.DeclaringTypeExpression.Name}.{Method.Name}'");
-        }
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => context.GetTranslationFor(Type);

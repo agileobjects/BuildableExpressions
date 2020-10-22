@@ -240,7 +240,16 @@
         {
             var paramNameEx = Should.Throw<ArgumentException>(() =>
             {
-                BuildableExpression.GenericParameter(null);
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("NullParam", m =>
+                        {
+                            m.AddGenericParameter(null);
+                        });
+                    });
+                });
             });
 
             paramNameEx.Message.ShouldContain("cannot be null");
@@ -251,7 +260,16 @@
         {
             var paramNameEx = Should.Throw<ArgumentException>(() =>
             {
-                BuildableExpression.GenericParameter(string.Empty);
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("BlankParam", m =>
+                        {
+                            m.AddGenericParameter(string.Empty);
+                        });
+                    });
+                });
             });
 
             paramNameEx.Message.ShouldContain("cannot be blank");
@@ -262,7 +280,16 @@
         {
             var paramNameEx = Should.Throw<ArgumentException>(() =>
             {
-                BuildableExpression.GenericParameter("   ");
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("WhitespaceParam", m =>
+                        {
+                            m.AddGenericParameter("    ");
+                        });
+                    });
+                });
             });
 
             paramNameEx.Message.ShouldContain("cannot be blank");
@@ -273,7 +300,16 @@
         {
             var paramNameEx = Should.Throw<ArgumentException>(() =>
             {
-                BuildableExpression.GenericParameter("Param1!");
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("InvalidParam", m =>
+                        {
+                            m.AddGenericParameter("Param1!");
+                        });
+                    });
+                });
             });
 
             paramNameEx.Message.ShouldContain("invalid generic parameter name");
@@ -290,10 +326,8 @@
                     {
                         cls.AddMethod("Method1", m =>
                         {
-                            var param1 = BuildableExpression.GenericParameter("T1");
-                            var param2 = BuildableExpression.GenericParameter("T1");
-
-                            m.AddGenericParameters(param1, param2);
+                            m.AddGenericParameter("T1");
+                            m.AddGenericParameter("T1");
                         });
                     });
                 });
@@ -302,38 +336,6 @@
             configEx.Message.ShouldContain("Class1.Method1");
             configEx.Message.ShouldContain("duplicate generic parameter name");
             configEx.Message.ShouldContain("T1");
-        }
-
-        [Fact]
-        public void ShouldErrorIfGenericParameterReused()
-        {
-            var paramEx = Should.Throw<InvalidOperationException>(() =>
-            {
-                BuildableExpression.SourceCode(sc =>
-                {
-                    sc.AddClass("Class1", cls =>
-                    {
-                        var param = BuildableExpression.GenericParameter("T");
-
-                        cls.AddMethod("Method1", m =>
-                        {
-                            m.AddGenericParameter(param);
-                            m.SetBody(Default(typeof(void)));
-                        });
-
-                        cls.AddMethod("Method2", m =>
-                        {
-                            m.AddGenericParameter(param);
-                            m.SetBody(Default(typeof(void)));
-                        });
-                    });
-                });
-            });
-
-            paramEx.Message.ShouldContain("Unable to add generic parameter");
-            paramEx.Message.ShouldContain("Class1.Method1");
-            paramEx.Message.ShouldContain("already been added");
-            paramEx.Message.ShouldContain("Class1.Method2");
         }
 
         #region Helper Members

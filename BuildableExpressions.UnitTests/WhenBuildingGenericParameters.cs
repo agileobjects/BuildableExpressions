@@ -1,8 +1,10 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using BuildableExpressions.SourceCode;
     using Common;
     using NetStandardPolyfills;
+    using SourceCode;
     using Xunit;
 
     public class WhenBuildingGenericParameters
@@ -10,11 +12,23 @@
         [Fact]
         public void ShouldBuildAnUnconstrainedParameter()
         {
-            var param = BuildableExpression.GenericParameter("T");
+            var param = default(GenericParameterExpression);
 
+            BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod("DoStuff", m =>
+                    {
+                        param = m.AddGenericParameter("T");
+                    });
+                });
+            });
+
+            param.ShouldNotBeNull();
             param.Name.ShouldBe("T");
             param.IsClosed.ShouldBeFalse();
-            param.Method.ShouldBeNull();
+            param.Method.ShouldNotBeNull();
             param.Type.ShouldNotBeNull().Name.ShouldBe("T");
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
@@ -23,15 +37,27 @@
         [Fact]
         public void ShouldBuildANewableClassParameter()
         {
-            var param = BuildableExpression.GenericParameter("TNewable", gp =>
+            var param = default(GenericParameterExpression);
+
+            BuildableExpression.SourceCode(sc =>
             {
-                gp.AddClassConstraint();
-                gp.AddNewableConstraint();
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod("DoStuff", m =>
+                    {
+                        param = m.AddGenericParameter("TNewable", gp =>
+                        {
+                            gp.AddClassConstraint();
+                            gp.AddNewableConstraint();
+                        });
+                    });
+                });
             });
 
+            param.ShouldNotBeNull();
             param.Name.ShouldBe("TNewable");
             param.IsClosed.ShouldBeFalse();
-            param.Method.ShouldBeNull();
+            param.Method.ShouldNotBeNull();
             param.Type.ShouldNotBeNull().Name.ShouldBe("TNewable");
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
@@ -41,12 +67,26 @@
         [Fact]
         public void ShouldBuildAStructParameter()
         {
-            var param = BuildableExpression.GenericParameter("TStruct", gp => gp
-                .AddStructConstraint());
+            var param = default(GenericParameterExpression);
 
+            BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod("DoStuff", m =>
+                    {
+                        param = m.AddGenericParameter("TStruct", gp =>
+                        {
+                            gp.AddStructConstraint();
+                        });
+                    });
+                });
+            });
+
+            param.ShouldNotBeNull();
             param.Name.ShouldBe("TStruct");
             param.IsClosed.ShouldBeFalse();
-            param.Method.ShouldBeNull();
+            param.Method.ShouldNotBeNull();
             param.Type.ShouldNotBeNull().Name.ShouldBe("TStruct");
             param.Type.IsClass().ShouldBeFalse();
             param.Type.IsValueType().ShouldBeTrue();
@@ -55,12 +95,26 @@
         [Fact]
         public void ShouldBuildATypeConstrainedParameter()
         {
-            var param = BuildableExpression.GenericParameter("TDerived", gp => gp
-                .AddTypeConstraint(typeof(BaseType)));
+            var param = default(GenericParameterExpression);
 
+            BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod("DoStuff", m =>
+                    {
+                        param = m.AddGenericParameter("TDerived", gp =>
+                        {
+                            gp.AddTypeConstraint(typeof(BaseType));
+                        });
+                    });
+                });
+            });
+
+            param.ShouldNotBeNull();
             param.Name.ShouldBe("TDerived");
             param.IsClosed.ShouldBeFalse();
-            param.Method.ShouldBeNull();
+            param.Method.ShouldNotBeNull();
             param.Type.ShouldNotBeNull().Name.ShouldBe("TDerived");
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
@@ -70,12 +124,26 @@
         [Fact]
         public void ShouldBuildAnInterfaceConstrainedParameter()
         {
-            var param = BuildableExpression.GenericParameter("TDisposable", gp => gp
-                .AddTypeConstraint(typeof(IDisposable)));
+            var param = default(GenericParameterExpression);
 
+            BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod("DoStuff", m =>
+                    {
+                        param = m.AddGenericParameter("TDisposable", gp =>
+                        {
+                            gp.AddTypeConstraint(typeof(IDisposable));
+                        });
+                    });
+                });
+            });
+
+            param.ShouldNotBeNull();
             param.Name.ShouldBe("TDisposable");
             param.IsClosed.ShouldBeFalse();
-            param.Method.ShouldBeNull();
+            param.Method.ShouldNotBeNull();
             param.Type.ShouldNotBeNull().Name.ShouldBe("TDisposable");
             param.Type.IsAbstract().ShouldBeFalse();
             param.Type.IsClass().ShouldBeTrue();
@@ -87,12 +155,26 @@
         [Fact]
         public void ShouldBuildAnAbstractTypeConstrainedParameter()
         {
-            var param = BuildableExpression.GenericParameter("TDerived", gp => gp
-                .AddTypeConstraint(typeof(AbstractBaseType)));
+            var param = default(GenericParameterExpression);
 
+            BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod("DoStuff", m =>
+                    {
+                        param = m.AddGenericParameter("TDerived", gp =>
+                        {
+                            gp.AddTypeConstraint(typeof(AbstractBaseType));
+                        });
+                    });
+                });
+            });
+
+            param.ShouldNotBeNull();
             param.Name.ShouldBe("TDerived");
             param.IsClosed.ShouldBeFalse();
-            param.Method.ShouldBeNull();
+            param.Method.ShouldNotBeNull();
             param.Type.ShouldNotBeNull().Name.ShouldBe("TDerived");
             param.Type.IsAbstract().ShouldBeTrue();
             param.Type.IsClass().ShouldBeTrue();
@@ -103,9 +185,27 @@
         [Fact]
         public void ShouldReuseBuiltParameterTypes()
         {
-            var param1 = BuildableExpression.GenericParameter("T");
-            var param2 = BuildableExpression.GenericParameter("T");
+            var param1 = default(GenericParameterExpression);
+            var param2 = default(GenericParameterExpression);
 
+            BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod("DoStuff", m =>
+                    {
+                        param1 = m.AddGenericParameter("T");
+                    });
+
+                    cls.AddMethod("DoMoarStuff", m =>
+                    {
+                        param2 = m.AddGenericParameter("T");
+                    });
+                });
+            });
+
+            param1.ShouldNotBeNull();
+            param2.ShouldNotBeNull();
             param1.ShouldNotBeSameAs(param2);
             param1.Type.ShouldNotBeNull().ShouldBeSameAs(param2.Type);
         }
@@ -113,9 +213,30 @@
         [Fact]
         public void ShouldVaryBuiltParameterTypesByStructConstraint()
         {
-            var param1 = BuildableExpression.GenericParameter("T");
-            var param2 = BuildableExpression.GenericParameter("T", gp => gp.AddStructConstraint());
+            var param1 = default(GenericParameterExpression);
+            var param2 = default(GenericParameterExpression);
 
+            BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod("DoStuff", m =>
+                    {
+                        param1 = m.AddGenericParameter("T");
+                    });
+
+                    cls.AddMethod("DoMoarStuff", m =>
+                    {
+                        param2 = m.AddGenericParameter("T", gp =>
+                        {
+                            gp.AddStructConstraint();
+                        });
+                    });
+                });
+            });
+
+            param1.ShouldNotBeNull();
+            param2.ShouldNotBeNull();
             param1.ShouldNotBeSameAs(param2);
             param1.Type.ShouldNotBeNull().ShouldNotBeSameAs(param2.Type);
         }

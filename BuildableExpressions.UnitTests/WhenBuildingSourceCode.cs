@@ -319,12 +319,11 @@ namespace GeneratedExpressionCode
             {
                 sc.AddClass(cls =>
                 {
-                    var param = BuildableExpression.GenericParameter("T");
-                    var paramType = BuildableExpression.TypeOf(param);
-
                     cls.AddMethod("GetType", m =>
                     {
-                        m.AddGenericParameter(param);
+                        var param = m.AddGenericParameter("T");
+                        var paramType = BuildableExpression.TypeOf(param);
+
                         m.SetBody(paramType);
                     });
                 });
@@ -356,28 +355,29 @@ namespace GeneratedExpressionCode
             {
                 sc.AddClass(cls =>
                 {
-                    var param1 = BuildableExpression.GenericParameter("T1");
-                    var param2 = BuildableExpression.GenericParameter("TParam2");
-                    var param3 = BuildableExpression.GenericParameter("T3");
-                    var param1Name = BuildableExpression.NameOf(param1);
-                    var param2Name = BuildableExpression.NameOf(param2);
-                    var param3Name = BuildableExpression.NameOf(param3);
-
-                    var concatMethod = typeof(string).GetPublicStaticMethod(
-                        nameof(string.Concat),
-                        typeof(string),
-                        typeof(string),
-                        typeof(string));
-
-                    var nameConcatCall = Call(
-                        concatMethod,
-                        param1Name,
-                        param2Name,
-                        param3Name);
-
                     cls.AddMethod("GetNames", m =>
                     {
-                        m.AddGenericParameters(param1, param2, param3);
+                        var param1 = m.AddGenericParameter("T1");
+                        var param1Name = BuildableExpression.NameOf(param1);
+
+                        var param2 = m.AddGenericParameter("TParam2");
+                        var param2Name = BuildableExpression.NameOf(param2);
+
+                        var param3 = m.AddGenericParameter("T3");
+                        var param3Name = BuildableExpression.NameOf(param3);
+
+                        var concatMethod = typeof(string).GetPublicStaticMethod(
+                            nameof(string.Concat),
+                            typeof(string),
+                            typeof(string),
+                            typeof(string));
+
+                        var nameConcatCall = Call(
+                            concatMethod,
+                            param1Name,
+                            param2Name,
+                            param3Name);
+
                         m.SetBody(nameConcatCall);
                     });
                 });
@@ -407,12 +407,13 @@ namespace GeneratedExpressionCode
             {
                 sc.AddClass(cls =>
                 {
-                    var param = BuildableExpression.GenericParameter("TStruct", gp => gp
-                        .AddStructConstraint());
-
                     cls.AddMethod("GetObject", m =>
                     {
-                        m.AddGenericParameter(param);
+                        m.AddGenericParameter("TStruct", gp =>
+                        {
+                            gp.AddStructConstraint();
+                        });
+
                         m.SetBody(Default(typeof(object)));
                     });
                 });
@@ -443,15 +444,14 @@ namespace GeneratedExpressionCode
             {
                 sc.AddClass(cls =>
                 {
-                    var param = BuildableExpression.GenericParameter("TNewable", gp =>
-                    {
-                        gp.AddClassConstraint();
-                        gp.AddNewableConstraint();
-                    });
-
                     cls.AddMethod("GetObject", m =>
                     {
-                        m.AddGenericParameter(param);
+                        m.AddGenericParameter("TNewable", gp =>
+                        {
+                            gp.AddClassConstraint();
+                            gp.AddNewableConstraint();
+                        });
+
                         m.SetBody(Default(typeof(object)));
                     });
                 });
@@ -482,15 +482,14 @@ namespace GeneratedExpressionCode
             {
                 sc.AddClass(cls =>
                 {
-                    var param = BuildableExpression.GenericParameter("TMarker", gp =>
-                    {
-                        gp.AddStructConstraint();
-                        gp.AddTypeConstraint<IMarker1>();
-                    });
-
                     cls.AddMethod("GetMarker", m =>
                     {
-                        m.AddGenericParameter(param);
+                        m.AddGenericParameter("TMarker", gp =>
+                        {
+                            gp.AddStructConstraint();
+                            gp.AddTypeConstraint<IMarker1>();
+                        });
+
                         m.SetBody(Default(typeof(object)));
                     });
                 });
@@ -523,17 +522,16 @@ namespace GeneratedExpressionCode
             {
                 sc.AddClass(cls =>
                 {
-                    var param = BuildableExpression.GenericParameter("TDerived", gp =>
-                    {
-                        gp.AddTypeConstraints(new List<Type>
-                        {
-                            typeof(BaseType), typeof(IMarker1), typeof(IMarker2)
-                        });
-                    });
-
                     cls.AddMethod("GetDerived", m =>
                     {
-                        m.AddGenericParameter(param);
+                        m.AddGenericParameter("TDerived", gp =>
+                        {
+                            gp.AddTypeConstraints(new List<Type>
+                            {
+                                typeof(BaseType), typeof(IMarker1), typeof(IMarker2)
+                            });
+                        });
+
                         m.SetBody(Default(typeof(object)));
                     });
                 });
@@ -562,14 +560,13 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildADefaultGenericParameterValueMethod()
         {
-            var param = BuildableExpression.GenericParameter("T");
-            var paramDefault = Default(param.Type);
-
             var translated = BuildableExpression.SourceCode(sc => sc
                 .AddClass(cls => cls
                     .AddMethod("GetT", m =>
                     {
-                        m.AddGenericParameter(param);
+                        var param = m.AddGenericParameter("T");
+                        var paramDefault = Default(param.Type);
+
                         m.SetBody(paramDefault);
                     })))
                 .ToCSharpString();
