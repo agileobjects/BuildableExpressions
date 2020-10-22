@@ -1,4 +1,4 @@
-﻿namespace AgileObjects.BuildableExpressions.SourceCode
+﻿namespace AgileObjects.BuildableExpressions.SourceCode.Analysis
 {
     using System.Collections.Generic;
     using System.Linq.Expressions;

@@ -5,6 +5,7 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Linq.Expressions;
+    using Analysis;
     using Api;
     using BuildableExpressions.Extensions;
     using Extensions;
