@@ -101,10 +101,10 @@ namespace GeneratedExpressionCode
             int j
         )
         {
-            return (i > 3) ? this.GetInt2(j, i) : this.GetInt3(j, i);
+            return (i > 3) ? this.GetInt1(j, i) : this.GetInt2(j, i);
         }
 
-        private int GetInt2
+        private int GetInt1
         (
             int j,
             int i
@@ -115,7 +115,7 @@ namespace GeneratedExpressionCode
             return i * j;
         }
 
-        private int GetInt3
+        private int GetInt2
         (
             int j,
             int i
@@ -300,9 +300,16 @@ namespace GeneratedExpressionCode
                 stringParam);
 
             var translated = BuildableExpression
-                .SourceCode(sc => sc
-                    .AddClass(cls => cls
-                        .AddMethod("SetIntValue", tryParseResultLambda)))
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("SetIntValue", m =>
+                        {
+                            m.SetDefinition(tryParseResultLambda);
+                        });
+                    });
+                })
                 .ToCSharpString();
 
             const string EXPECTED = @"

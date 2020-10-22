@@ -152,7 +152,7 @@
                 });
             });
 
-            interfaceEx.Message.ShouldContain("'string Generate()'");
+            interfaceEx.Message.ShouldContain("'string Stringy.Generate()'");
             interfaceEx.Message.ShouldContain("matches multiple interface methods");
         }
 
@@ -182,12 +182,9 @@
         {
             var methodNameEx = Should.Throw<ArgumentException>(() =>
             {
-                var doNothing = Lambda<Action>(Default(typeof(void)));
-
-                BuildableExpression
-                    .SourceCode(sc => sc
-                        .AddClass(cls => cls
-                            .AddMethod(null, doNothing, m => { })));
+                BuildableExpression.SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod(default(string))));
             });
 
             methodNameEx.Message.ShouldContain("cannot be null");
@@ -198,12 +195,9 @@
         {
             var methodNameEx = Should.Throw<ArgumentException>(() =>
             {
-                var doNothing = Lambda<Action>(Default(typeof(void)));
-
-                BuildableExpression
-                    .SourceCode(sc => sc
-                        .AddClass(cls => cls
-                            .AddMethod("\t", doNothing, m => { })));
+                BuildableExpression.SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod("\t")));
             });
 
             methodNameEx.Message.ShouldContain("cannot be blank");
@@ -214,19 +208,16 @@
         {
             var methodNameEx = Should.Throw<ArgumentException>(() =>
             {
-                var doNothing = Lambda<Action>(Default(typeof(void)));
-
-                BuildableExpression
-                    .SourceCode(sc => sc
-                        .AddClass(cls => cls
-                            .AddMethod(" My_Method", doNothing, m => { })));
+                BuildableExpression.SourceCode(sc => sc
+                    .AddClass(cls => cls
+                        .AddMethod(" My_Method")));
             });
 
             methodNameEx.Message.ShouldContain("invalid method name");
         }
 
         [Fact]
-        public void ShouldErrorIfDuplicateMethodNames()
+        public void ShouldErrorIfDuplicateMethodSignatures()
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
@@ -234,16 +225,14 @@
                 {
                     sc.AddClass(cls =>
                     {
-                        var doNothing = Default(typeof(void));
-
-                        cls.AddMethod("MyMethod", doNothing, m => { });
-                        cls.AddMethod("MyMethod", doNothing, m => { });
+                        cls.AddMethod("MyMethod");
+                        cls.AddMethod("MyMethod");
                     });
                 });
             });
 
-            configEx.Message.ShouldContain("duplicate method name");
-            configEx.Message.ShouldContain("MyMethod");
+            configEx.Message.ShouldContain("duplicate method signature");
+            configEx.Message.ShouldContain("void MyMethod()");
         }
 
         [Fact]
@@ -295,13 +284,11 @@
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
-                var doNothing = Default(typeof(void));
-
                 BuildableExpression.SourceCode(sc =>
                 {
                     sc.AddClass("Class1", cls =>
                     {
-                        cls.AddMethod("Method1", doNothing, m =>
+                        cls.AddMethod("Method1", m =>
                         {
                             var param1 = BuildableExpression.GenericParameter("T1");
                             var param2 = BuildableExpression.GenericParameter("T1");
@@ -322,22 +309,22 @@
         {
             var paramEx = Should.Throw<InvalidOperationException>(() =>
             {
-                var doNothing = Default(typeof(void));
-
                 BuildableExpression.SourceCode(sc =>
                 {
                     sc.AddClass("Class1", cls =>
                     {
                         var param = BuildableExpression.GenericParameter("T");
 
-                        cls.AddMethod("Method1", doNothing, m =>
+                        cls.AddMethod("Method1", m =>
                         {
                             m.AddGenericParameter(param);
+                            m.SetBody(Default(typeof(void)));
                         });
 
-                        cls.AddMethod("Method2", doNothing, m =>
+                        cls.AddMethod("Method2", m =>
                         {
                             m.AddGenericParameter(param);
+                            m.SetBody(Default(typeof(void)));
                         });
                     });
                 });

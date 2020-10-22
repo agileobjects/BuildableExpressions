@@ -11,7 +11,6 @@
     using Extensions;
     using NetStandardPolyfills;
     using ReadableExpressions;
-    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations.Reflection;
     using static SourceCodeTranslationSettings;
 
@@ -24,25 +23,16 @@
         ICustomAnalysableExpression
     {
         private readonly List<MethodExpression> _methodExpressions;
-        private readonly Dictionary<Type, List<MethodExpression>> _methodExpressionsByReturnType;
         private ReadOnlyCollection<MethodExpression> _readOnlyMethodExpressions;
         private Type _type;
         private List<Type> _interfaceTypes;
         private ReadOnlyCollection<Type> _readOnlyInterfaceTypes;
-#if FEATURE_READONLYDICTIONARY
-        private ReadOnlyDictionary<Type, ReadOnlyCollection<MethodExpression>> _readOnlyMethodExpressionsByReturnType;
-#else
-        private IDictionary<Type, ReadOnlyCollection<MethodExpression>> _readOnlyMethodExpressionsByReturnType;
-#endif
 
         internal TypeExpression(SourceCodeExpression sourceCode, string name)
         {
             SourceCode = sourceCode;
             Name = name.ThrowIfInvalidName<ArgumentException>("Type");
             _methodExpressions = new List<MethodExpression>();
-            _methodExpressionsByReturnType = new Dictionary<Type, List<MethodExpression>>();
-
-            sourceCode.Register(this);
         }
 
         /// <summary>
@@ -126,64 +116,23 @@
         public ReadOnlyCollection<MethodExpression> MethodExpressions
             => _readOnlyMethodExpressions ??= _methodExpressions.ToReadOnlyCollection();
 
-        /// <summary>
-        /// Gets the <see cref="MethodExpression"/>s which make up this <see cref="TypeExpression"/>'s
-        /// methods, keyed by their return type.
-        /// </summary>
-#if FEATURE_READONLYDICTIONARY
-        public ReadOnlyDictionary<Type, ReadOnlyCollection<MethodExpression>> MethodExpressionsByReturnType
-#else
-        public IDictionary<Type, ReadOnlyCollection<MethodExpression>> MethodExpressionsByReturnType
-#endif
-            => _readOnlyMethodExpressionsByReturnType ??= GetMethodsByReturnType();
-
-#if FEATURE_READONLYDICTIONARY
-        private ReadOnlyDictionary<Type, ReadOnlyCollection<MethodExpression>> GetMethodsByReturnType()
-#else
-        private IDictionary<Type, ReadOnlyCollection<MethodExpression>> GetMethodsByReturnType()
-#endif
-        {
-            var readonlyMethodsByReturnType =
-                new Dictionary<Type, ReadOnlyCollection<MethodExpression>>(_methodExpressionsByReturnType.Count);
-
-            foreach (var methodAndReturnType in _methodExpressionsByReturnType)
-            {
-                readonlyMethodsByReturnType.Add(
-                    methodAndReturnType.Key,
-                    methodAndReturnType.Value.ToReadOnlyCollection());
-            }
-
-            return readonlyMethodsByReturnType
-#if FEATURE_READONLYDICTIONARY
-                    .ToReadOnlyDictionary()
-#endif
-                ;
-        }
-
         #region Validation
 
         internal void Validate()
         {
-            ThrowIfDuplicateMethodName();
+            ThrowIfDuplicateTypeName();
             ThrowIfInvalidImplementations();
         }
 
-        private void ThrowIfDuplicateMethodName()
+        private void ThrowIfDuplicateTypeName()
         {
-            if (_methodExpressions.Count <= 1)
-            {
-                return;
-            }
+            var duplicateName = SourceCode.TypeExpressions
+                .FirstOrDefault(t => t != this && t.Name == Name);
 
-            var duplicateMethodName = _methodExpressions
-                .GroupBy(m => $"{m.Name}({string.Join(",", m.Parameters.Select(p => p.Type.FullName))})")
-                .FirstOrDefault(nameGroup => nameGroup.Count() > 1)?
-                .Key;
-
-            if (duplicateMethodName != null)
+            if (duplicateName != null)
             {
                 throw new InvalidOperationException(
-                    $"Class '{Name}': duplicate method name '{duplicateMethodName}' specified.");
+                    $"Duplicate type name '{Name}' specified.");
             }
         }
 
@@ -224,7 +173,7 @@
             var wrapper = new BclMethodWrapper(unimplementedMethod, Settings);
 
             throw new InvalidOperationException(
-                $"Method '{GetSignature(wrapper)}' has not been implemented");
+                $"Method '{wrapper.GetSignature()}' has not been implemented");
         }
 
         private void ThrowIfAmbiguousImplementation(IEnumerable<MethodInfo> interfaceMethods)
@@ -247,21 +196,7 @@
             }
 
             throw new AmbiguousMatchException(
-                $"Method '{GetSignature(ambiguousMethod)}' matches multiple interface methods");
-        }
-
-        private static string GetSignature(IMethod method)
-        {
-            var typeName = method.DeclaringType != null
-                ? method.DeclaringType.GetFriendlyName() + "."
-                : null;
-
-            var parameterTypeNames = string.Join(", ",
-                method.GetParameters().Project(p => p.Type.GetFriendlyName()));
-
-            var returnType = method.ReturnType.GetFriendlyName();
-
-            return $"{returnType} {typeName + method.Name}({parameterTypeNames})";
+                $"Method '{ambiguousMethod.GetSignature()}' matches multiple interface methods");
         }
 
         #endregion
@@ -290,52 +225,15 @@
 
         MethodExpression ITypeExpressionConfigurator.AddMethod(
             string name,
-            Expression body,
             Action<IMethodExpressionConfigurator> configuration)
         {
-            name.ThrowIfInvalidName<ArgumentException>("Method");
-
-            var method = AddMethod(body, configuration, name);
-            MethodExpressionAnalysis.For(method);
-
-            return method;
+            return new MethodExpression(this, name, configuration);
         }
 
-        internal MethodExpression AddMethod(
-            Expression body,
-            Action<IMethodExpressionConfigurator> configuration,
-            string name = null)
-        {
-            var method = new MethodExpression(this, name, body, configuration);
-
-            ValidateMethod(method);
-            return method;
-        }
-
-        internal virtual void ValidateMethod(MethodExpression method)
-        {
-            method.Validate();
-        }
-
-        internal void Register(MethodExpression method)
+        internal virtual void Register(MethodExpression method)
         {
             _methodExpressions.Add(method);
             _readOnlyMethodExpressions = null;
-
-            AddTypedMethod(method);
-            _readOnlyMethodExpressionsByReturnType = null;
-        }
-
-        private void AddTypedMethod(MethodExpression method)
-        {
-            if (!_methodExpressionsByReturnType.TryGetValue(method.ReturnType, out var typedMethods))
-            {
-                _methodExpressionsByReturnType.Add(
-                    method.ReturnType,
-                    typedMethods = new List<MethodExpression>());
-            }
-
-            typedMethods.Add(method);
         }
 
         #endregion

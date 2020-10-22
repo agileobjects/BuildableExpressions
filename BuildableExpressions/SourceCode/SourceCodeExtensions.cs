@@ -10,14 +10,14 @@
     {
         public static LambdaExpression ToLambdaExpression(
             this Expression expression,
-            IList<ParameterExpression> parameters = null)
+            IList<ParameterExpression> parameters,
+            Type returnType = null)
         {
-            if (expression.NodeType == ExpressionType.Lambda)
-            {
-                return (LambdaExpression)expression;
-            }
+            returnType ??= expression.Type;
 
-            var isAction = !expression.HasReturnType();
+            var isAction =
+                 returnType == typeof(void) ||
+                !expression.HasReturnType();
 
             Type lambdaType;
 
@@ -25,7 +25,7 @@
             {
                 lambdaType = isAction
                     ? GetActionType()
-                    : GetFuncType(expression.Type);
+                    : GetFuncType(returnType);
 
                 return Lambda(lambdaType, expression);
             }
@@ -47,7 +47,6 @@
             for (var i = 0; ;)
             {
                 lambdaParameterTypes[i] = parameters[i].Type;
-
                 ++i;
 
                 if (i != parameterCount)
@@ -55,7 +54,7 @@
                     continue;
                 }
 
-                lambdaParameterTypes[parameterCount] = expression.Type;
+                lambdaParameterTypes[parameterCount] = returnType;
                 lambdaType = GetFuncType(lambdaParameterTypes);
 
                 return Lambda(lambdaType, expression, parameters);

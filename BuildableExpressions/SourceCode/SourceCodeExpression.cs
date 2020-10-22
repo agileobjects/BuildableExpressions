@@ -28,14 +28,13 @@
 
         internal SourceCodeExpression(Action<ISourceCodeExpressionConfigurator> configuration)
         {
-            _typeExpressions = new List<TypeExpression>();
             Namespace = "GeneratedExpressionCode";
+            _typeExpressions = new List<TypeExpression>();
 
             configuration.Invoke(this);
 
-            Validate();
-
             Analysis = SourceCodeAnalysis.For(this);
+            Validate();
         }
 
         #region Validation
@@ -43,7 +42,6 @@
         private void Validate()
         {
             ThrowIfNoTypes();
-            ThrowIfDuplicateTypeName();
 
             foreach (var type in _typeExpressions)
             {
@@ -59,20 +57,6 @@
             }
 
             throw new InvalidOperationException("At least one type must be specified");
-        }
-
-        private void ThrowIfDuplicateTypeName()
-        {
-            var duplicateName = _typeExpressions
-                .GroupBy(t => t.Name)
-                .FirstOrDefault(nameGroup => nameGroup.Count() > 1)?
-                .Key;
-
-            if (duplicateName != null)
-            {
-                throw new InvalidOperationException(
-                    $"Duplicate type name '{duplicateName}' specified.");
-            }
         }
 
         #endregion
@@ -212,20 +196,23 @@
             string name,
             Action<IClassExpressionConfigurator> configuration)
         {
-            return new ClassExpression(this, name, configuration);
+            return Add(new ClassExpression(this, name, configuration));
         }
 
         StructExpression ISourceCodeExpressionConfigurator.AddStruct(
             string name,
             Action<IStructExpressionConfigurator> configuration)
         {
-            return new StructExpression(this, name, configuration);
+            return Add(new StructExpression(this, name, configuration));
         }
 
-        internal void Register(TypeExpression type)
+        private TType Add<TType>(TType type)
+            where TType : TypeExpression
         {
             _typeExpressions.Add(type);
             _readOnlyTypeExpressions = null;
+
+            return type;
         }
 
         #endregion

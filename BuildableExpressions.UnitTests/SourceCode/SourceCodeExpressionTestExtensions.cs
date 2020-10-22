@@ -4,6 +4,7 @@
     using System.Linq.Expressions;
     using BuildableExpressions.SourceCode;
     using BuildableExpressions.SourceCode.Api;
+    using static System.Linq.Expressions.Expression;
 
     internal static class SourceCodeExpressionTestExtensions
     {
@@ -12,6 +13,13 @@
             Action<IClassExpressionConfigurator> configuration)
         {
             return sourceCodeConfig.AddClass("GeneratedExpressionClass", configuration);
+        }
+
+        public static MethodExpression AddMethod(
+            this ITypeExpressionConfigurator classConfig,
+            string name)
+        {
+            return classConfig.AddMethod(name, Default(typeof(void)));
         }
 
         public static MethodExpression AddMethod(

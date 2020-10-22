@@ -9,7 +9,6 @@
     using BuildableExpressions.Extensions;
     using Extensions;
     using ReadableExpressions;
-    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
     using Translations;
@@ -25,23 +24,96 @@
         ICustomAnalysableExpression,
         ICustomTranslationExpression
     {
+        private List<ParameterExpression> _parameters;
         private List<GenericParameterExpression> _genericArguments;
         private ReadOnlyCollection<GenericParameterExpression> _readonlyGenericParameters;
         private ReadOnlyCollection<IGenericArgument> _readonlyGenericArguments;
-        private ReadOnlyCollection<IParameter> _parameters;
-        private string _name;
+        private ReadOnlyCollection<IParameter> _readonlyParameters;
 
         internal MethodExpression(
-            TypeExpression typeExpression,
+            TypeExpression declaringTypeExpression,
             string name,
-            Expression body,
             Action<IMethodExpressionConfigurator> configuration)
         {
-            DeclaringTypeExpression = typeExpression;
-            _name = name;
-            Definition = body.ToLambdaExpression();
+            Name = name.ThrowIfInvalidName<ArgumentException>("Method");
+            DeclaringTypeExpression = declaringTypeExpression;
 
-            typeExpression.Register(this);
+            declaringTypeExpression.Register(this);
+            configuration.Invoke(this);
+
+            Analysis = MethodExpressionAnalysis.For(this);
+            Validate();
+        }
+
+        #region Validation
+
+        internal void Validate()
+        {
+            ThrowIfDuplicateGenericArgumentNames();
+            ThrowIfDuplicateMethodName();
+        }
+
+        private void ThrowIfDuplicateGenericArgumentNames()
+        {
+            if (!IsGeneric || !(_genericArguments?.Count > 1))
+            {
+                return;
+            }
+
+            var duplicateParameterName = _genericArguments
+                .GroupBy(arg => arg.Name)
+                .FirstOrDefault(nameGroup => nameGroup.Count() > 1)?
+                .Key;
+
+            if (duplicateParameterName != null)
+            {
+                throw new InvalidOperationException(
+                    $"Method '{DeclaringTypeExpression.Name}.{Name}': " +
+                    $"duplicate generic parameter name '{duplicateParameterName}' specified.");
+            }
+        }
+
+        private void ThrowIfDuplicateMethodName()
+        {
+            var duplicateMethod = DeclaringTypeExpression
+                .MethodExpressions
+                .FirstOrDefault(m => m != this && m.Name == Name && HasSameParameterTypes(m));
+
+            if (duplicateMethod != null)
+            {
+                throw new InvalidOperationException(
+                    $"Type {DeclaringTypeExpression.Name} has duplicate " +
+                    $"method signature '{this.GetSignature(includeTypeName: false)}'");
+            }
+        }
+
+        private bool HasSameParameterTypes(MethodExpression otherMethod)
+        {
+            if (_parameters == null)
+            {
+                return otherMethod._parameters == null;
+            }
+
+            if (otherMethod._parameters == null)
+            {
+                return false;
+            }
+
+            var parameterTypes = _parameters.ProjectToArray(p => p.Type);
+
+            return otherMethod._parameters
+                .Project(p => p.Type)
+                .SequenceEqual(parameterTypes);
+        }
+
+        #endregion
+
+        internal MethodExpression(
+            TypeExpression declaringTypeExpression,
+            Action<IMethodExpressionConfigurator> configuration)
+        {
+            DeclaringTypeExpression = declaringTypeExpression;
+            IsBlockMethod = true;
             configuration.Invoke(this);
         }
 
@@ -78,6 +150,8 @@
 
         internal MethodExpressionAnalysis Analysis { get; set; }
 
+        internal bool IsBlockMethod { get; }
+
         /// <summary>
         /// Gets this <see cref="MethodExpression"/>'s parent <see cref="TypeExpression"/>.
         /// </summary>
@@ -107,13 +181,13 @@
         /// <summary>
         /// Gets the name of this <see cref="MethodExpression"/>.
         /// </summary>
-        public string Name => _name ??= DeclaringTypeExpression.GetMethodName(this);
+        public string Name { get; internal set; }
 
         /// <summary>
         /// Gets the return type of this <see cref="MethodExpression"/>, which is the return type
         /// of the LambdaExpression from which the method was created.
         /// </summary>
-        public Type ReturnType => Definition.ReturnType;
+        public Type ReturnType => Definition?.ReturnType ?? typeof(void);
 
         /// <summary>
         /// Gets the LambdaExpression describing the parameters and body of this
@@ -140,12 +214,12 @@
         /// <see cref="MethodExpression"/>, if any.
         /// </summary>
         public ReadOnlyCollection<ParameterExpression> Parameters
-            => Definition.Parameters;
+            => Definition?.Parameters ?? Enumerable<ParameterExpression>.EmptyReadOnlyCollection;
 
         /// <summary>
         /// Gets the Expression describing the body of this <see cref="MethodExpression"/>.
         /// </summary>
-        public Expression Body => Definition.Body;
+        public Expression Body => Definition?.Body;
 
         #region IMethodExpressionConfigurator Members
 
@@ -170,6 +244,41 @@
                 _genericArguments.Add(parameter);
                 parameter.SetMethod(this);
             }
+        }
+
+        void IMethodExpressionConfigurator.AddParameters(
+            params ParameterExpression[] parameters)
+        {
+            AddParameters(parameters);
+        }
+
+        private void AddParameters(IList<ParameterExpression> parameters)
+        {
+            if (!parameters.Any())
+            {
+                return;
+            }
+
+            if (_parameters == null)
+            {
+                _parameters = new List<ParameterExpression>(parameters);
+                return;
+            }
+
+            _parameters.AddRange(parameters.Except(_parameters));
+        }
+
+        void IMethodExpressionConfigurator.SetBody(Expression body, Type returnType)
+        {
+            if (body.NodeType == ExpressionType.Lambda)
+            {
+                var lambda = (LambdaExpression)body;
+                returnType = lambda.ReturnType;
+                AddParameters(lambda.Parameters);
+                body = lambda.Body;
+            }
+
+            Definition = body.ToLambdaExpression(_parameters, returnType);
         }
 
         #endregion
@@ -207,7 +316,7 @@
 
         ReadOnlyCollection<IParameter> IMethod.GetParameters()
         {
-            return _parameters ??= Parameters
+            return _readonlyParameters ??= Parameters
                 .ProjectToArray<ParameterExpression, IParameter>(p => new MethodParameter(p))
                 .ToReadOnlyCollection();
         }
@@ -222,52 +331,12 @@
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => new MethodTranslation(this, context);
 
-        internal void Validate()
+        internal void Update(Expression updatedBody)
         {
-            if (IsGeneric)
+            if (Body != updatedBody)
             {
-                ThrowIfDuplicateGenericArgumentNames();
+                Definition = updatedBody.ToLambdaExpression(_parameters, ReturnType);
             }
-        }
-
-        private void ThrowIfDuplicateGenericArgumentNames()
-        {
-            if (!(_genericArguments?.Count > 1))
-            {
-                return;
-            }
-
-            var duplicateParameterName = _genericArguments
-                .GroupBy(arg => arg.Name)
-                .FirstOrDefault(nameGroup => nameGroup.Count() > 1)?
-                .Key;
-
-            if (duplicateParameterName != null)
-            {
-                throw new InvalidOperationException(
-                    $"Method '{DeclaringTypeExpression.Name}.{Name}': " +
-                    $"duplicate generic parameter name '{duplicateParameterName}' specified.");
-            }
-        }
-
-        internal void Finalise(
-            Expression body,
-            IList<ParameterExpression> parameters)
-        {
-            var parametersUnchanged = Parameters.SequenceEqual(parameters);
-
-            if (parametersUnchanged)
-            {
-                if (body == Body)
-                {
-                    return;
-                }
-
-                parameters = Definition.Parameters;
-                _parameters = null;
-            }
-
-            Definition = Definition.Update(body, parameters);
         }
 
         #region Helper Class

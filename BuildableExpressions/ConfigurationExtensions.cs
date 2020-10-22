@@ -41,8 +41,8 @@
         }
 
         /// <summary>
-        /// Add a public <see cref="MethodExpression"/> to the <see cref="TypeExpression"/>, with
-        /// the given <paramref name="name"/> and <paramref name="body"/>.
+        /// Add a public, instance-scoped <see cref="MethodExpression"/> to the <see cref="TypeExpression"/>,
+        /// with the given <paramref name="name"/> and <paramref name="body"/>.
         /// </summary>
         /// <param name="typeConfig">The <see cref="ITypeExpressionConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
@@ -56,7 +56,35 @@
             string name,
             Expression body)
         {
-            return typeConfig.AddMethod(name, body, cfg => { });
+            return typeConfig.AddMethod(name, cfg => cfg.SetBody(body));
+        }
+
+        /// <summary>
+        /// Add a <see cref="MethodExpression"/> to the <see cref="TypeExpression"/>, with the
+        /// given <paramref name="name"/> and <paramref name="body"/>, using the given
+        /// <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="typeConfig">The <see cref="ITypeExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
+        /// <param name="body">
+        /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
+        /// body.
+        /// </param>
+        /// <param name="configuration">
+        /// The configuration with which to configure the new <see cref="MethodExpression"/>.
+        /// </param>
+        /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
+        public static MethodExpression AddMethod(
+            this ITypeExpressionConfigurator typeConfig,
+            string name,
+            Expression body,
+            Action<IMethodExpressionConfigurator> configuration)
+        {
+            return typeConfig.AddMethod(name, cfg =>
+            {
+                configuration.Invoke(cfg);
+                cfg.SetBody(body);
+            });
         }
 
         /// <summary>
@@ -98,18 +126,6 @@
         }
 
         /// <summary>
-        /// Adds the given <paramref name="parameter"/> to the <see cref="MethodExpression"/>.
-        /// </summary>
-        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
-        /// <param name="parameter">The <see cref="GenericParameterExpression"/> to add.</param>
-        public static void AddGenericParameter(
-            this IMethodExpressionConfigurator methodConfig,
-            GenericParameterExpression parameter)
-        {
-            methodConfig.AddGenericParameters(parameter);
-        }
-
-        /// <summary>
         /// Set the summary documentation of the <see cref="MethodExpression"/>.
         /// </summary>
         /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
@@ -122,15 +138,78 @@
         }
 
         /// <summary>
+        /// Adds the given <paramref name="parameter"/> to the <see cref="MethodExpression"/>.
+        /// </summary>
+        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
+        /// <param name="parameter">The <see cref="GenericParameterExpression"/> to add.</param>
+        public static void AddGenericParameter(
+            this IMethodExpressionConfigurator methodConfig,
+            GenericParameterExpression parameter)
+        {
+            methodConfig.AddGenericParameters(parameter);
+        }
+
+        /// <summary>
         /// Adds the given <paramref name="parameters"/> to the <see cref="MethodExpression"/>.
         /// </summary>
         /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
-        /// <param name="parameters">The <see cref="GenericParameterExpression"/> to add.</param>
+        /// <param name="parameters">The <see cref="GenericParameterExpression"/>s to add.</param>
         public static void AddGenericParameters(
             this IMethodExpressionConfigurator methodConfig,
             IEnumerable<GenericParameterExpression> parameters)
         {
             methodConfig.AddGenericParameters(parameters.ToArray());
+        }
+
+        /// <summary>
+        /// Adds the given <paramref name="parameter"/> to the <see cref="MethodExpression"/>.
+        /// </summary>
+        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
+        /// <param name="parameter">The ParameterExpression to add.</param>
+        public static void AddParameter(
+            this IMethodExpressionConfigurator methodConfig,
+            ParameterExpression parameter)
+        {
+            methodConfig.AddParameters(parameter);
+        }
+
+        /// <summary>
+        /// Adds the given <paramref name="parameters"/> to the <see cref="MethodExpression"/>.
+        /// </summary>
+        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
+        /// <param name="parameters">The ParameterExpressions to add.</param>
+        public static void AddParameters(
+            this IMethodExpressionConfigurator methodConfig,
+            IEnumerable<ParameterExpression> parameters)
+        {
+            methodConfig.AddParameters(parameters.ToArray());
+        }
+
+        /// <summary>
+        /// Set the parameters and body of the <see cref="MethodExpression"/> to those of the given
+        /// <paramref name="definition" />.
+        /// </summary>
+        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
+        /// <param name="definition">The LambdaExpression to use.</param>
+        public static void SetDefinition(
+            this IMethodExpressionConfigurator methodConfig,
+            LambdaExpression definition)
+        {
+            methodConfig.AddParameters(definition.Parameters);
+            methodConfig.SetBody(definition.Body, definition.ReturnType);
+        }
+
+        /// <summary>
+        /// Set the body of the <see cref="MethodExpression"/>, using the body Expression's Type as
+        /// the <see cref="MethodExpression"/>'s return type.
+        /// </summary>
+        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
+        /// <param name="body">The Expression to use.</param>
+        public static void SetBody(
+            this IMethodExpressionConfigurator methodConfig,
+            Expression body)
+        {
+            methodConfig.SetBody(body, body.Type);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using System.Collections.Generic;
     using BuildableExpressions;
     using Common;
     using NetStandardPolyfills;
@@ -321,8 +322,11 @@ namespace GeneratedExpressionCode
                     var param = BuildableExpression.GenericParameter("T");
                     var paramType = BuildableExpression.TypeOf(param);
 
-                    cls.AddMethod("GetType", paramType, m => m
-                        .AddGenericParameter(param));
+                    cls.AddMethod("GetType", m =>
+                    {
+                        m.AddGenericParameter(param);
+                        m.SetBody(paramType);
+                    });
                 });
             });
 
@@ -371,8 +375,11 @@ namespace GeneratedExpressionCode
                         param2Name,
                         param3Name);
 
-                    cls.AddMethod("GetNames", nameConcatCall, m => m
-                        .AddGenericParameters(param1, param2, param3));
+                    cls.AddMethod("GetNames", m =>
+                    {
+                        m.AddGenericParameters(param1, param2, param3);
+                        m.SetBody(nameConcatCall);
+                    });
                 });
             });
 
@@ -403,8 +410,11 @@ namespace GeneratedExpressionCode
                     var param = BuildableExpression.GenericParameter("TStruct", gp => gp
                         .AddStructConstraint());
 
-                    cls.AddMethod("GetObject", Default(typeof(object)), m => m
-                        .AddGenericParameter(param));
+                    cls.AddMethod("GetObject", m =>
+                    {
+                        m.AddGenericParameter(param);
+                        m.SetBody(Default(typeof(object)));
+                    });
                 });
             });
 
@@ -439,8 +449,11 @@ namespace GeneratedExpressionCode
                         gp.AddNewableConstraint();
                     });
 
-                    cls.AddMethod("GetObject", Default(typeof(object)), m => m
-                        .AddGenericParameter(param));
+                    cls.AddMethod("GetObject", m =>
+                    {
+                        m.AddGenericParameter(param);
+                        m.SetBody(Default(typeof(object)));
+                    });
                 });
             });
 
@@ -475,8 +488,11 @@ namespace GeneratedExpressionCode
                         gp.AddTypeConstraint<IMarker1>();
                     });
 
-                    cls.AddMethod("GetMarker", Default(typeof(object)), m => m
-                        .AddGenericParameter(param));
+                    cls.AddMethod("GetMarker", m =>
+                    {
+                        m.AddGenericParameter(param);
+                        m.SetBody(Default(typeof(object)));
+                    });
                 });
             });
 
@@ -507,11 +523,19 @@ namespace GeneratedExpressionCode
             {
                 sc.AddClass(cls =>
                 {
-                    var param = BuildableExpression.GenericParameter("TDerived", gp => gp
-                        .AddTypeConstraints(typeof(BaseType), typeof(IMarker1), typeof(IMarker2)));
+                    var param = BuildableExpression.GenericParameter("TDerived", gp =>
+                    {
+                        gp.AddTypeConstraints(new List<Type>
+                        {
+                            typeof(BaseType), typeof(IMarker1), typeof(IMarker2)
+                        });
+                    });
 
-                    cls.AddMethod("GetDerived", Default(typeof(object)), m => m
-                        .AddGenericParameter(param));
+                    cls.AddMethod("GetDerived", m =>
+                    {
+                        m.AddGenericParameter(param);
+                        m.SetBody(Default(typeof(object)));
+                    });
                 });
             });
 
@@ -543,8 +567,11 @@ namespace GeneratedExpressionCode
 
             var translated = BuildableExpression.SourceCode(sc => sc
                 .AddClass(cls => cls
-                    .AddMethod("GetT", paramDefault, m => m
-                        .AddGenericParameter(param))))
+                    .AddMethod("GetT", m =>
+                    {
+                        m.AddGenericParameter(param);
+                        m.SetBody(paramDefault);
+                    })))
                 .ToCSharpString();
 
             const string EXPECTED = @"

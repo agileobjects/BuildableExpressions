@@ -22,7 +22,6 @@
             : base(sourceCode, name)
         {
             BaseType = typeof(object);
-
             configuration.Invoke(this);
         }
 
@@ -108,14 +107,14 @@
                 $"as it has already been set to {BaseType.GetFriendlyName()}");
         }
 
-        internal override void ValidateMethod(MethodExpression method)
+        internal override void Register(MethodExpression method)
         {
-            base.ValidateMethod(method);
-
             if (IsStatic)
             {
                 ((IMethodExpressionConfigurator)method).SetStatic();
             }
+
+            base.Register(method);
         }
 
         #endregion

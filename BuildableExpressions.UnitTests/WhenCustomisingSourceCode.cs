@@ -114,8 +114,6 @@ namespace {typeof(WhenBuildingSourceCode).Namespace}
         [Fact]
         public void ShouldUseCustomClassAndMethodNames()
         {
-            var doNothing = Lambda<Action>(Default(typeof(void)));
-
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
@@ -123,7 +121,10 @@ namespace {typeof(WhenBuildingSourceCode).Namespace}
 
                     sc.AddClass("MyClass", cls =>
                     {
-                        cls.AddMethod("MyMethod", doNothing, m => { });
+                        cls.AddMethod("MyMethod", m =>
+                        {
+                            m.SetDefinition(Lambda<Action>(Default(typeof(void))));
+                        });
                     });
                 })
                 .ToCSharpString();
@@ -162,9 +163,10 @@ It's even better.";
                     {
                         cls.SetSummary(CLASS_SUMMARY);
 
-                        cls.AddMethod("MyMethod", doNothing, m =>
+                        cls.AddMethod("MyMethod", m =>
                         {
                             m.SetSummary(METHOD_SUMMARY);
+                            m.SetDefinition(doNothing);
                         });
                     });
                 })
@@ -212,9 +214,10 @@ It's even better.".TrimStart());
                     {
                         cls.SetSummary(classSummary);
 
-                        cls.AddMethod("MyMethod", doNothing, m =>
+                        cls.AddMethod("MyMethod", m =>
                         {
                             m.SetSummary(methodSummary);
+                            m.SetDefinition(doNothing);
                         });
                     });
                 })
@@ -245,7 +248,6 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldUseCustomClassAndMethodVisibilities()
         {
-            var getIntFromString = Lambda<Func<string, int>>(Constant(1), Parameter(typeof(string), "str"));
             var getIntFromLong = Lambda<Func<long, int>>(Constant(2), Parameter(typeof(long), "lng"));
             var getIntFromDate = Lambda<Func<DateTime, int>>(Constant(3), Parameter(typeof(DateTime), "date"));
 
@@ -256,14 +258,24 @@ namespace GeneratedExpressionCode
                     {
                         cls.SetVisibility(TypeVisibility.Internal);
 
-                        cls.AddMethod("GetInt", getIntFromString, m => m
-                            .SetVisibility(MemberVisibility.Internal));
+                        cls.AddMethod("GetInt", m =>
+                        {
+                            m.SetVisibility(MemberVisibility.Internal);
+                            m.AddParameter(Parameter(typeof(string), "str"));
+                            m.SetBody(Constant(1));
+                        });
 
-                        cls.AddMethod("GetInt", getIntFromLong, m => m
-                            .SetVisibility(MemberVisibility.Protected));
+                        cls.AddMethod("GetInt", m =>
+                        {
+                            m.SetVisibility(MemberVisibility.Protected);
+                            m.SetDefinition(getIntFromLong);
+                        });
 
-                        cls.AddMethod("GetInt", getIntFromDate, m => m
-                            .SetVisibility(MemberVisibility.Private));
+                        cls.AddMethod("GetInt", m =>
+                        {
+                            m.SetVisibility(MemberVisibility.Private);
+                            m.SetDefinition(getIntFromDate);
+                        });
                     });
                 })
                 .ToCSharpString();
@@ -312,8 +324,16 @@ namespace GeneratedExpressionCode
                 {
                     sc.AddClass(cls =>
                     {
-                        cls.AddMethod("GetString", Default(typeof(string)), m => m.SetStatic());
-                        cls.AddMethod("GetInt", Default(typeof(int)));
+                        cls.AddMethod("GetString", m =>
+                        {
+                            m.SetStatic();
+                            m.SetBody(Default(typeof(string)));
+                        });
+
+                        cls.AddMethod("GetInt", m =>
+                        {
+                            m.SetBody(Default(typeof(int)));
+                        });
                     });
                 })
                 .ToCSharpString();
@@ -347,8 +367,13 @@ namespace GeneratedExpressionCode
                     sc.AddClass(cls =>
                     {
                         cls.SetStatic();
+
                         cls.AddMethod("GetString", Default(typeof(string)));
-                        cls.AddMethod("GetInt", Default(typeof(int)), m => m.SetStatic());
+
+                        cls.AddMethod("GetInt", Default(typeof(int)), m =>
+                        {
+                            m.SetStatic();
+                        });
                     });
                 })
                 .ToCSharpString();

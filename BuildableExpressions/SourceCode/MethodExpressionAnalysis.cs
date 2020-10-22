@@ -4,16 +4,18 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using BuildableExpressions.Extensions;
+    using Extensions;
     using ReadableExpressions;
     using ReadableExpressions.Extensions;
     using static System.Linq.Expressions.ExpressionType;
-    using static MemberVisibility;
+    using static System.StringComparison;
     using static SourceCodeTranslationSettings;
 
     internal class MethodExpressionAnalysis : ExpressionAnalysis
     {
         private readonly Stack<Expression> _expressions;
-        private MethodScope _currentMethodScope;
+        private MethodScopeBase _currentMethodScope;
 
         private MethodExpressionAnalysis(NamespaceAnalysis namespaceAnalysis)
             : base(Settings)
@@ -45,12 +47,6 @@
         #endregion
 
         public NamespaceAnalysis NamespaceAnalysis { get; }
-
-        public void Analyse(MethodExpression method)
-        {
-            method.Analysis = this;
-            base.Analyse(method);
-        }
 
         protected override Expression VisitAndConvert(Expression expression)
         {
@@ -114,7 +110,7 @@
             }
         }
 
-        private bool ExtractToMethod(Expression block, out MethodExpression extractedMethod)
+        private bool ExtractToMethod(BlockExpression block, out MethodExpression extractedMethod)
         {
             if (!Extract(block))
             {
@@ -122,8 +118,17 @@
                 return false;
             }
 
-            extractedMethod = _currentMethodScope.CreateMethodFor(block);
-            extractedMethod = VisitAndConvert(extractedMethod);
+            var blockMethodScope = new BlockMethodScope(_currentMethodScope);
+
+            EnterMethodScope(blockMethodScope);
+
+            var updatedBlock = VisitAndConvert(block);
+
+            blockMethodScope.Finalise(updatedBlock);
+
+            extractedMethod = blockMethodScope.BlockMethod;
+
+            ExitMethodScope();
             return true;
         }
 
@@ -166,6 +171,8 @@
 
         protected override bool IsAssignmentJoinable(ParameterExpression variable)
         {
+            _currentMethodScope.VariableAccessed(variable);
+
             if (_currentMethodScope.IsMethodParameter(variable))
             {
                 return false;
@@ -196,10 +203,10 @@
         {
             EnterMethodScope(method);
 
-            var updatedParameters = VisitAndConvert(method.Parameters);
+            VisitAndConvert(method.Parameters);
             var updatedBody = VisitAndConvert(method.Body);
 
-            _currentMethodScope.Finalise(updatedBody, updatedParameters);
+            _currentMethodScope.Finalise(updatedBody);
             NamespaceAnalysis?.Visit(method);
 
             ExitMethodScope();
@@ -207,7 +214,10 @@
         }
 
         private void EnterMethodScope(MethodExpression method)
-            => _currentMethodScope = new MethodScope(method, _currentMethodScope);
+            => EnterMethodScope(new MethodExpressionScope(method, _currentMethodScope));
+
+        private void EnterMethodScope(MethodScopeBase methodScope)
+            => _currentMethodScope = methodScope;
 
         private void ExitMethodScope()
             => _currentMethodScope = _currentMethodScope.Parent;
@@ -246,21 +256,21 @@
 
         #region Helper Class
 
-        private class MethodScope
+        private abstract class MethodScopeBase
         {
-            private readonly MethodExpression _method;
             private readonly List<ParameterExpression> _inScopeVariables;
-            private readonly IList<ParameterExpression> _unscopedVariables;
+            private readonly List<ParameterExpression> _unscopedVariables;
 
-            public MethodScope(MethodExpression method, MethodScope parent)
+            protected MethodScopeBase(MethodScopeBase parent)
             {
-                _method = method;
                 Parent = parent;
-                _inScopeVariables = new List<ParameterExpression>(method.Definition.Parameters);
+                _inScopeVariables = new List<ParameterExpression>();
                 _unscopedVariables = new List<ParameterExpression>();
             }
 
-            public MethodScope Parent { get; }
+            public MethodScopeBase Parent { get; }
+
+            public abstract TypeExpression GetDeclaringType();
 
             public void Add(ParameterExpression inScopeVariable)
                 => _inScopeVariables.Add(inScopeVariable);
@@ -276,51 +286,207 @@
                     return;
                 }
 
-                _unscopedVariables.Add(variable);
-                Parent?.VariableAccessed(variable);
+                UnscopedVariableAccessed(variable);
             }
+
+            protected virtual void UnscopedVariableAccessed(ParameterExpression variable)
+                => _unscopedVariables.Add(variable);
 
             public bool IsMethodParameter(ParameterExpression parameter)
-            {
-                VariableAccessed(parameter);
+                => _unscopedVariables.Contains(parameter);
 
-                return _unscopedVariables.Contains(parameter);
-            }
-
-            public MethodExpression CreateMethodFor(Expression block)
-            {
-                return _method.DeclaringTypeExpression
-                    .AddMethod(block, m => m.SetVisibility(Private));
-            }
-
-            public void Finalise(
-                Expression updatedBody,
-                IList<ParameterExpression> updatedParameters)
+            public virtual void Finalise(Expression finalisedBody)
             {
                 if (_unscopedVariables.Any())
                 {
-                    if (Parent == null)
-                    {
-                        var variables = string.Join(", ", _unscopedVariables
-                            .Select(v => $"'{v.Type.GetFriendlyName()} {v.Name}'"));
+                    UnscopedVariablesAccessed(_unscopedVariables);
+                }
+            }
 
-                        throw new NotSupportedException(
-                            $"Method accesses undefined variable(s) {variables}");
+            protected abstract void UnscopedVariablesAccessed(
+                IEnumerable<ParameterExpression> unscopedVariables);
+        }
+
+        private class MethodExpressionScope : MethodScopeBase
+        {
+            private readonly MethodExpression _methodExpression;
+
+            public MethodExpressionScope(MethodExpression methodExpression, MethodScopeBase parent)
+                : base(parent)
+            {
+                _methodExpression = methodExpression;
+                Add(methodExpression.Parameters);
+            }
+
+            public override TypeExpression GetDeclaringType()
+                => _methodExpression.DeclaringTypeExpression;
+
+            public override void Finalise(Expression finalisedBody)
+            {
+                base.Finalise(finalisedBody);
+                _methodExpression.Update(finalisedBody);
+            }
+
+            protected override void UnscopedVariablesAccessed(
+                IEnumerable<ParameterExpression> unscopedVariables)
+            {
+                var variables = string.Join(", ", unscopedVariables
+                    .Select(v => $"'{v.Type.GetFriendlyName()} {v.Name}'"));
+
+                throw new NotSupportedException(
+                    $"Method accesses undefined variable(s) {variables}");
+            }
+        }
+
+        private class BlockMethodScope : MethodScopeBase
+        {
+            private readonly bool _isNestedBlock;
+            private List<ParameterExpression> _parameters;
+            private List<BlockMethodScope> _childBlockScopes;
+
+            public BlockMethodScope(MethodScopeBase parent)
+                : base(parent)
+            {
+                if (parent is BlockMethodScope parentBlockScope)
+                {
+                    _isNestedBlock = true;
+                    parentBlockScope.AddChildBlockScope(this);
+                }
+            }
+
+            public MethodExpression BlockMethod { get; private set; }
+
+            public override TypeExpression GetDeclaringType() => Parent.GetDeclaringType();
+
+            private void AddChildBlockScope(BlockMethodScope childBlockScope)
+            {
+                _childBlockScopes ??= new List<BlockMethodScope>();
+                _childBlockScopes.Add(childBlockScope);
+            }
+
+            protected override void UnscopedVariableAccessed(ParameterExpression variable)
+            {
+                base.UnscopedVariableAccessed(variable);
+                Parent.VariableAccessed(variable);
+            }
+
+            public override void Finalise(Expression finalisedBody)
+            {
+                base.Finalise(finalisedBody);
+
+                var declaringType = GetDeclaringType();
+
+                BlockMethod = new MethodExpression(declaringType, m =>
+                {
+                    m.SetVisibility(MemberVisibility.Private);
+
+                    if (_parameters != null)
+                    {
+                        m.AddParameters(_parameters);
                     }
 
-                    if (updatedParameters.IsReadOnly)
-                    {
-                        updatedParameters = new List<ParameterExpression>(
-                            updatedParameters.Count + _unscopedVariables.Count);
-                    }
+                    m.SetBody(finalisedBody);
+                });
 
-                    foreach (var variable in _unscopedVariables)
-                    {
-                        updatedParameters.Add(variable);
-                    }
+                if (_isNestedBlock)
+                {
+                    return;
                 }
 
-                _method.Finalise(updatedBody, updatedParameters);
+                Finalise(declaringType);
+
+                if (_childBlockScopes == null)
+                {
+                    return;
+                }
+
+                foreach (var childBlockScope in _childBlockScopes)
+                {
+                    childBlockScope.Finalise(declaringType);
+                }
+            }
+
+            private void Finalise(TypeExpression declaringType)
+            {
+                BlockMethod.Name = GetName();
+                declaringType.Register(BlockMethod);
+            }
+
+            private string GetName()
+            {
+                var baseName = GetBaseName();
+
+                var latestMatchingMethodSuffix =
+                    GetLatestMatchingMethodSuffix(baseName);
+
+                if (latestMatchingMethodSuffix == 0)
+                {
+                    return baseName;
+                }
+
+                return baseName + (latestMatchingMethodSuffix + 1);
+            }
+
+            private int GetLatestMatchingMethodSuffix(string baseName)
+            {
+                var parameterTypes =
+                    _parameters?.Project(p => p.Type).ToList() ??
+                     Enumerable<Type>.EmptyList;
+
+                return BlockMethod
+                    .DeclaringTypeExpression
+                    .MethodExpressions
+                    .Filter(m => m.Name != null)
+                    .Select(m =>
+                    {
+                        if (m.Name == baseName)
+                        {
+                            if (m.IsBlockMethod)
+                            {
+                                m.Name += "1";
+                            }
+
+                            return new { Suffix = 1 };
+                        }
+
+                        if (!m.Name.StartsWith(baseName, Ordinal))
+                        {
+                            return null;
+                        }
+
+                        var methodNameSuffix = m.Name.Substring(baseName.Length);
+
+                        if (!int.TryParse(methodNameSuffix, out var suffix))
+                        {
+                            return null;
+                        }
+
+                        if (!m.Parameters.Project(p => p.Type).SequenceEqual(parameterTypes))
+                        {
+                            return null;
+                        }
+
+                        return new { Suffix = suffix };
+                    })
+                    .Filter(_ => _ != null)
+                    .Select(_ => _.Suffix)
+                    .OrderByDescending(suffix => suffix)
+                    .FirstOrDefault();
+            }
+
+            private string GetBaseName()
+            {
+                var body = BlockMethod.Definition.Body;
+
+                return body.HasReturnType()
+                    ? "Get" + body.Type.GetVariableNameInPascalCase()
+                    : "DoAction";
+            }
+
+            protected override void UnscopedVariablesAccessed(
+                IEnumerable<ParameterExpression> unscopedVariables)
+            {
+                _parameters = new List<ParameterExpression>(unscopedVariables);
             }
         }
 
