@@ -56,8 +56,8 @@
             => (ExpressionType)SourceCodeExpressionType.GenericArgument;
 
         /// <summary>
-        /// Gets the type of this <see cref="GenericParameterExpression"/>, which is 'void', as this
-        /// class represents an open generic argument.
+        /// Gets the type of this <see cref="GenericParameterExpression"/>, which is auto-generated
+        /// based on this parameter's constraints.
         /// </summary>
         public override Type Type
             => _type ??= _typeCache.GetOrAdd(this, CreateType);
