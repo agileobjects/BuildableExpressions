@@ -86,6 +86,8 @@
             @class.Type.ShouldNotBeNull();
             @class.Type.Namespace.ShouldBe("MyStuff.Tests");
             @class.Type.Name.ShouldBe("MyClass");
+            @class.Type.IsClass().ShouldBeTrue();
+            @class.Type.IsGenericType().ShouldBeFalse();
 
             var method = @class.Type.GetPublicInstanceMethod("DoNothing").ShouldNotBeNull();
 
@@ -129,6 +131,40 @@
             var methodResult = method.Invoke(typeInstance, Enumerable<object>.EmptyArray);
             methodResult.ShouldBe(typeInstance);
         }
+
+        [Fact]
+        public void ShouldCreateAStructType()
+        {
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.SetNamespace("MyStuff.Tests");
+
+                sc.AddStruct("MyStruct", cls =>
+                {
+                    cls.AddMethod("DoNothing", Default(typeof(void)));
+                });
+            });
+
+            var @struct = sourceCode.TypeExpressions.FirstOrDefault().ShouldNotBeNull();
+
+            @struct.Type.ShouldNotBeNull();
+            @struct.Type.Namespace.ShouldBe("MyStuff.Tests");
+            @struct.Type.Name.ShouldBe("MyStruct");
+            @struct.Type.IsValueType().ShouldBeTrue();
+            @struct.Type.IsGenericType().ShouldBeFalse();
+
+            var method = @struct.Type.GetPublicInstanceMethod("DoNothing").ShouldNotBeNull();
+
+            method.Name.ShouldBe("DoNothing");
+            method.ReturnType.ShouldBe(typeof(void));
+            method.GetParameters().ShouldBeEmpty();
+            method.IsGenericMethod.ShouldBeFalse();
+
+            var typeInstance = Activator.CreateInstance(@struct.Type).ShouldNotBeNull();
+            var methodResult = method.Invoke(typeInstance, Enumerable<object>.EmptyArray);
+            methodResult.ShouldBeNull();
+        }
+
 
         #region Helper Members
 
