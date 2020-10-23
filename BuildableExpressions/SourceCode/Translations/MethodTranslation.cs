@@ -19,13 +19,14 @@
             _method = method;
             _summary = SummaryTranslation.For(method.Summary, context);
 
-            _definitionTranslation =
-                new MethodDefinitionTranslation(method, context.Settings);
+            _definitionTranslation = new MethodDefinitionTranslation(
+                method,
+                includeDeclaringType: false,
+                context.Settings);
 
             var bodyCodeBlock = context
                 .GetCodeBlockTranslationFor(method.Body)
                 .WithBraces()
-
                 .WithTermination();
 
             if (method.HasReturnType())
