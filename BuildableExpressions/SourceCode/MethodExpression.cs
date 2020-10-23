@@ -5,10 +5,12 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using Analysis;
     using Api;
     using BuildableExpressions.Extensions;
     using Extensions;
+    using NetStandardPolyfills;
     using ReadableExpressions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
@@ -30,6 +32,7 @@
         private ReadOnlyCollection<GenericParameterExpression> _readonlyGenericParameters;
         private ReadOnlyCollection<IGenericArgument> _readonlyGenericArguments;
         private ReadOnlyCollection<IParameter> _readonlyParameters;
+        private MethodInfo _methodInfo;
 
         internal MethodExpression(
             TypeExpression declaringTypeExpression,
@@ -106,6 +109,32 @@
         /// Gets the name of this <see cref="MethodExpression"/>.
         /// </summary>
         public string Name { get; internal set; }
+
+        /// <summary>
+        /// Gets the MethodInfo for this <see cref="MethodExpression"/>, which is lazily, dynamically
+        /// generated using this method's definition.
+        /// </summary>
+        public MethodInfo MethodInfo
+            => _methodInfo ??= CreateMethodInfo();
+
+        #region MethodInfo Creation
+
+        private MethodInfo CreateMethodInfo()
+        {
+            var declaringType = DeclaringTypeExpression.Type;
+
+            var parameterTypes =
+                _parameters?.ProjectToArray(p => p.Type) ??
+                Type.EmptyTypes;
+
+            var method = Visibility == Public
+                ? declaringType.GetPublicInstanceMethod(Name, parameterTypes)
+                : declaringType.GetNonPublicInstanceMethod(Name, parameterTypes);
+
+            return method;
+        }
+
+        #endregion
 
         /// <summary>
         /// Gets the return type of this <see cref="MethodExpression"/>, which is the return type

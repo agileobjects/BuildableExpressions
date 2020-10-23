@@ -165,6 +165,34 @@
             methodResult.ShouldBeNull();
         }
 
+        [Fact]
+        public void ShouldCreateAMethodInfo()
+        {
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass("MyClass", cls =>
+                {
+                    cls.AddMethod("DoNothing", Default(typeof(void)));
+                });
+            });
+
+            var method = sourceCode
+                .TypeExpressions
+                .FirstOrDefault()
+                .ShouldNotBeNull()
+                .MethodExpressions
+                .FirstOrDefault()
+                .ShouldNotBeNull()
+                .MethodInfo
+                .ShouldNotBeNull();
+
+            method.ReturnType.ShouldBe(typeof(void));
+            method.GetParameters().ShouldBeEmpty();
+            method.IsGenericMethod.ShouldBeFalse();
+            method.IsStatic.ShouldBeFalse();
+            method.IsAbstract.ShouldBeFalse();
+            method.IsPublic.ShouldBeTrue();
+        }
 
         #region Helper Members
 
