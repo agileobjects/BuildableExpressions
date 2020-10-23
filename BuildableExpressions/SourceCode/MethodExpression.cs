@@ -10,7 +10,6 @@
     using BuildableExpressions.Extensions;
     using Extensions;
     using ReadableExpressions;
-    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
     using Translations;
@@ -19,7 +18,7 @@
     /// <summary>
     /// Represents a method in a type in a piece of source code.
     /// </summary>
-    public class MethodExpression :
+    public abstract class MethodExpression :
         Expression,
         IMethodExpressionConfigurator,
         IMethod,
@@ -31,91 +30,14 @@
         private ReadOnlyCollection<GenericParameterExpression> _readonlyGenericParameters;
         private ReadOnlyCollection<IGenericArgument> _readonlyGenericArguments;
         private ReadOnlyCollection<IParameter> _readonlyParameters;
-        private List<MethodExpression> _blockMethods;
 
         internal MethodExpression(
             TypeExpression declaringTypeExpression,
             string name,
             Action<IMethodExpressionConfigurator> configuration)
         {
-            Name = name.ThrowIfInvalidName<ArgumentException>("Method");
             DeclaringTypeExpression = declaringTypeExpression;
-
-            configuration.Invoke(this);
-
-            Analysis = MethodExpressionAnalysis.For(this);
-            Validate();
-        }
-
-        #region Validation
-
-        internal void Validate()
-        {
-            ThrowIfDuplicateGenericArgumentNames();
-            ThrowIfDuplicateMethodName();
-        }
-
-        private void ThrowIfDuplicateGenericArgumentNames()
-        {
-            if (!IsGeneric || !(_genericArguments?.Count > 1))
-            {
-                return;
-            }
-
-            var duplicateParameterName = _genericArguments
-                .GroupBy(arg => arg.Name)
-                .FirstOrDefault(nameGroup => nameGroup.Count() > 1)?
-                .Key;
-
-            if (duplicateParameterName != null)
-            {
-                throw new InvalidOperationException(
-                    $"Method '{DeclaringTypeExpression.Name}.{Name}': " +
-                    $"duplicate generic parameter name '{duplicateParameterName}' specified.");
-            }
-        }
-
-        private void ThrowIfDuplicateMethodName()
-        {
-            var duplicateMethod = DeclaringTypeExpression
-                .MethodExpressions
-                .FirstOrDefault(m => m != this && m.Name == Name && HasSameParameterTypes(m));
-
-            if (duplicateMethod != null)
-            {
-                throw new InvalidOperationException(
-                    $"Type {DeclaringTypeExpression.Name} has duplicate " +
-                    $"method signature '{this.GetSignature(includeTypeName: false)}'");
-            }
-        }
-
-        private bool HasSameParameterTypes(MethodExpression otherMethod)
-        {
-            if (_parameters == null)
-            {
-                return otherMethod._parameters == null;
-            }
-
-            if (otherMethod._parameters == null)
-            {
-                return false;
-            }
-
-            var parameterTypes = _parameters.ProjectToArray(p => p.Type);
-
-            return otherMethod._parameters
-                .Project(p => p.Type)
-                .SequenceEqual(parameterTypes);
-        }
-
-        #endregion
-
-        internal MethodExpression(
-            TypeExpression declaringTypeExpression,
-            Action<IMethodExpressionConfigurator> configuration)
-        {
-            DeclaringTypeExpression = declaringTypeExpression;
-            IsBlockMethod = true;
+            Name = name;
             configuration.Invoke(this);
         }
 
@@ -150,14 +72,9 @@
             return this;
         }
 
-        internal MethodExpressionAnalysis Analysis { get; }
+        internal MethodExpressionAnalysis Analysis { get; set; }
 
-        internal bool IsBlockMethod { get; }
-
-        internal bool HasBlockMethods => _blockMethods != null;
-
-        internal IList<MethodExpression> BlockMethods
-            => _blockMethods ??= new List<MethodExpression>();
+        internal abstract bool HasGeneratedName { get; }
 
         /// <summary>
         /// Gets this <see cref="MethodExpression"/>'s parent <see cref="TypeExpression"/>.
@@ -197,12 +114,6 @@
         public Type ReturnType => Definition?.ReturnType ?? typeof(void);
 
         /// <summary>
-        /// Gets the LambdaExpression describing the parameters and body of this
-        /// <see cref="MethodExpression"/>.
-        /// </summary>
-        public LambdaExpression Definition { get; private set; }
-
-        /// <summary>
         /// Gets the <see cref="IGenericArgument"/>s describing the generic arguments of this
         /// <see cref="MethodExpression"/>, if any.
         /// </summary>
@@ -216,12 +127,23 @@
             }
         }
 
+        internal IList<GenericParameterExpression> GenericArgumentsAccessor
+            => _genericArguments;
+
+        /// <summary>
+        /// Gets the LambdaExpression describing the parameters and body of this
+        /// <see cref="MethodExpression"/>.
+        /// </summary>
+        public LambdaExpression Definition { get; private set; }
+
         /// <summary>
         /// Gets the <see cref="ParameterExpression"/>s describing the parameters of this
         /// <see cref="MethodExpression"/>, if any.
         /// </summary>
         public ReadOnlyCollection<ParameterExpression> Parameters
             => Definition?.Parameters ?? Enumerable<ParameterExpression>.EmptyReadOnlyCollection;
+
+        internal IList<ParameterExpression> ParametersAccessor => _parameters;
 
         /// <summary>
         /// Gets the Expression describing the body of this <see cref="MethodExpression"/>.
@@ -366,83 +288,5 @@
         }
 
         #endregion
-    }
-
-    internal static class BlockMethodExpressionExtensions
-    {
-        public static void SetName(this MethodExpression blockMethod)
-            => blockMethod.Name = GetName(blockMethod);
-
-        private static string GetName(MethodExpression blockMethod)
-        {
-            var baseName = GetBaseName(blockMethod);
-
-            var latestMatchingMethodSuffix =
-                GetLatestMatchingMethodSuffix(baseName, blockMethod);
-
-            if (latestMatchingMethodSuffix == 0)
-            {
-                return baseName;
-            }
-
-            return baseName + (latestMatchingMethodSuffix + 1);
-        }
-
-        private static int GetLatestMatchingMethodSuffix(
-            string baseName,
-            MethodExpression blockMethod)
-        {
-            var parameterTypes =
-                blockMethod.Parameters.ProjectToArray(p => p.Type);
-
-            return blockMethod
-                .DeclaringTypeExpression
-                .MethodExpressions
-                .Filter(m => m.Name != null)
-                .Select(m =>
-                {
-                    if (m.Name == baseName)
-                    {
-                        if (m.IsBlockMethod)
-                        {
-                            m.Name += "1";
-                        }
-
-                        return new { Suffix = 1 };
-                    }
-
-                    if (!m.Name.StartsWith(baseName, StringComparison.Ordinal))
-                    {
-                        return null;
-                    }
-
-                    var methodNameSuffix = m.Name.Substring(baseName.Length);
-
-                    if (!int.TryParse(methodNameSuffix, out var suffix))
-                    {
-                        return null;
-                    }
-
-                    if (!m.Parameters.Project(p => p.Type).SequenceEqual(parameterTypes))
-                    {
-                        return null;
-                    }
-
-                    return new { Suffix = suffix };
-                })
-                .Filter(_ => _ != null)
-                .Select(_ => _.Suffix)
-                .OrderByDescending(suffix => suffix)
-                .FirstOrDefault();
-        }
-
-        private static string GetBaseName(IMethod blockMethod)
-        {
-            var returnType = blockMethod.ReturnType;
-
-            return returnType != typeof(void)
-                ? "Get" + returnType.GetVariableNameInPascalCase()
-                : "DoAction";
-        }
     }
 }

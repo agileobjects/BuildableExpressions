@@ -106,7 +106,7 @@
                 $"as it has already been set to {BaseType.GetFriendlyName()}");
         }
 
-        internal override MethodExpression Add(MethodExpression method)
+        internal override StandardMethodExpression Add(StandardMethodExpression method)
         {
             if (IsStatic)
             {

@@ -19,7 +19,7 @@
             }
         }
 
-        public MethodExpression BlockMethod { get; private set; }
+        public BlockMethodExpression BlockMethod { get; private set; }
 
         public override MethodExpression GetOwningMethod()
             => Parent.GetOwningMethod();
@@ -40,9 +40,9 @@
         {
             base.Finalise(finalisedBody);
 
-            var owningMethod = GetOwningMethod();
+            var owningMethod = (StandardMethodExpression)GetOwningMethod();
 
-            BlockMethod = new MethodExpression(owningMethod.DeclaringTypeExpression, m =>
+            BlockMethod = owningMethod.CreateBlockMethod(m =>
             {
                 m.SetVisibility(MemberVisibility.Private);
 
@@ -72,7 +72,7 @@
             }
         }
 
-        private void Finalise(MethodExpression owningMethod)
+        private void Finalise(StandardMethodExpression owningMethod)
             => owningMethod.BlockMethods.Add(BlockMethod);
 
         protected override void UnscopedVariablesAccessed(

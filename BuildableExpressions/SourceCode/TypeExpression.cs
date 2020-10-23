@@ -238,10 +238,10 @@
             string name,
             Action<IMethodExpressionConfigurator> configuration)
         {
-            return Add(new MethodExpression(this, name, configuration));
+            return Add(new StandardMethodExpression(this, name, configuration));
         }
 
-        internal virtual MethodExpression Add(MethodExpression method)
+        internal virtual StandardMethodExpression Add(StandardMethodExpression method)
         {
             _methodExpressions.Add(method);
             _readOnlyMethodExpressions = null;
@@ -253,7 +253,7 @@
 
             foreach (var blockMethod in method.BlockMethods)
             {
-                blockMethod.SetName();
+                blockMethod.Finalise();
                 _methodExpressions.Add(blockMethod);
                 _readOnlyMethodExpressions = null;
             }
