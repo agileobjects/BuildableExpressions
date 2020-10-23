@@ -10,8 +10,7 @@
     /// </summary>
     public class StructExpression :
         ConcreteTypeExpression,
-        IStructExpressionConfigurator,
-        ICustomTranslationExpression
+        IStructExpressionConfigurator
     {
         internal StructExpression(
             SourceCodeExpression sourceCode,
@@ -22,7 +21,7 @@
             configuration.Invoke(this);
         }
 
-        ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
+        internal override ITranslation GetTranslation(ITranslationContext context)
             => new StructTranslation(this, context);
     }
 }

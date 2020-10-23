@@ -28,14 +28,26 @@
         private ReadOnlyCollection<Assembly> _referencedAssemblies;
 
         internal SourceCodeExpression(Action<ISourceCodeExpressionConfigurator> configuration)
+            : this("GeneratedExpressionCode", configuration)
         {
-            Namespace = "GeneratedExpressionCode";
+            Validate();
+        }
+
+        internal SourceCodeExpression(string @namespace)
+            : this(@namespace, sc => { })
+        {
+        }
+
+        private SourceCodeExpression(
+            string @namespace,
+            Action<ISourceCodeExpressionConfigurator> configuration)
+        {
+            Namespace = @namespace;
             _typeExpressions = new List<TypeExpression>();
 
             configuration.Invoke(this);
 
             Analysis = SourceCodeAnalysis.For(this);
-            Validate();
         }
 
         #region Validation
@@ -207,12 +219,11 @@
             return Add(new StructExpression(this, name, configuration));
         }
 
-        private TType Add<TType>(TType type)
+        internal TType Add<TType>(TType type)
             where TType : TypeExpression
         {
             _typeExpressions.Add(type);
             _readOnlyTypeExpressions = null;
-
             return type;
         }
 

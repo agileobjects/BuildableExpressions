@@ -17,8 +17,7 @@
             Add(methodExpression.Parameters);
         }
 
-        public override TypeExpression GetDeclaringType()
-            => _methodExpression.DeclaringTypeExpression;
+        public override MethodExpression GetOwningMethod() => _methodExpression;
 
         public override void Finalise(Expression finalisedBody)
         {

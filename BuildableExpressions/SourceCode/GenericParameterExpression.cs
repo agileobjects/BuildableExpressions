@@ -23,7 +23,8 @@
         Expression,
         IGenericParameterExpressionConfigurator,
         IGenericArgument,
-        ICustomTranslationExpression
+        ICustomTranslationExpression,
+        IEquatable<GenericParameterExpression>
     {
         private static readonly ConcurrentDictionary<GenericParameterExpression, Type> _typeCache =
             new ConcurrentDictionary<GenericParameterExpression, Type>(
@@ -56,8 +57,10 @@
             => (ExpressionType)SourceCodeExpressionType.GenericArgument;
 
         /// <summary>
-        /// Gets the type of this <see cref="GenericParameterExpression"/>, which is auto-generated
-        /// based on this parameter's constraints.
+        /// Gets the type of this <see cref="GenericParameterExpression"/>, which is lazily,
+        /// dynamically created using this parameter's constraints. Different
+        /// <see cref="GenericParameterExpression"/>s with the same constraints will have the same
+        /// Type.
         /// </summary>
         public override Type Type
             => _type ??= _typeCache.GetOrAdd(this, CreateType);
@@ -275,41 +278,43 @@
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => context.GetTranslationFor(Type);
 
+        bool IEquatable<GenericParameterExpression>.Equals(GenericParameterExpression other)
+        {
+            if (ReferenceEquals(other, null))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            if (_hasConstraints != other._hasConstraints ||
+                _hasStructConstraint != other._hasStructConstraint ||
+                _hasClassConstraint != other._hasClassConstraint ||
+                _hasNewableConstraint != other._hasNewableConstraint ||
+                _typeConstraints?.Count != other._typeConstraints?.Count ||
+                !Name.Equals(other.Name, Ordinal))
+            {
+                return false;
+            }
+
+            if (_typeConstraints == null)
+            {
+                return true;
+            }
+
+            // ReSharper disable once AssignNullToNotNullAttribute
+            return _typeConstraints
+                .OrderBy(t => t)
+                .SequenceEqual(other._typeConstraints.OrderBy(t => t));
+        }
+
         private class GenericParameterExpressionComparer : IEqualityComparer<GenericParameterExpression>
         {
             public bool Equals(GenericParameterExpression x, GenericParameterExpression y)
-            {
-                if (ReferenceEquals(y, null))
-                {
-                    return ReferenceEquals(x, null);
-                }
-
-                if (ReferenceEquals(x, y))
-                {
-                    return true;
-                }
-
-                // ReSharper disable once PossibleNullReferenceException
-                if (x._hasConstraints != y._hasConstraints ||
-                    x._hasStructConstraint != y._hasStructConstraint ||
-                    x._hasClassConstraint != y._hasClassConstraint ||
-                    x._hasNewableConstraint != y._hasNewableConstraint ||
-                    x._typeConstraints?.Count != y._typeConstraints?.Count ||
-                    !x.Name.Equals(y.Name, Ordinal))
-                {
-                    return false;
-                }
-
-                if (x._typeConstraints == null)
-                {
-                    return true;
-                }
-
-                // ReSharper disable once AssignNullToNotNullAttribute
-                return x._typeConstraints
-                    .OrderBy(t => t)
-                    .SequenceEqual(y._typeConstraints.OrderBy(t => t));
-            }
+                => ((IEquatable<GenericParameterExpression>)x)?.Equals(y) == true;
 
             public int GetHashCode(GenericParameterExpression obj) => 0;
         }

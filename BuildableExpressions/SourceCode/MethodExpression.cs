@@ -10,6 +10,7 @@
     using BuildableExpressions.Extensions;
     using Extensions;
     using ReadableExpressions;
+    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
     using Translations;
@@ -30,6 +31,7 @@
         private ReadOnlyCollection<GenericParameterExpression> _readonlyGenericParameters;
         private ReadOnlyCollection<IGenericArgument> _readonlyGenericArguments;
         private ReadOnlyCollection<IParameter> _readonlyParameters;
+        private List<MethodExpression> _blockMethods;
 
         internal MethodExpression(
             TypeExpression declaringTypeExpression,
@@ -39,7 +41,6 @@
             Name = name.ThrowIfInvalidName<ArgumentException>("Method");
             DeclaringTypeExpression = declaringTypeExpression;
 
-            declaringTypeExpression.Register(this);
             configuration.Invoke(this);
 
             Analysis = MethodExpressionAnalysis.For(this);
@@ -149,9 +150,14 @@
             return this;
         }
 
-        internal MethodExpressionAnalysis Analysis { get; set; }
+        internal MethodExpressionAnalysis Analysis { get; }
 
         internal bool IsBlockMethod { get; }
+
+        internal bool HasBlockMethods => _blockMethods != null;
+
+        internal IList<MethodExpression> BlockMethods
+            => _blockMethods ??= new List<MethodExpression>();
 
         /// <summary>
         /// Gets this <see cref="MethodExpression"/>'s parent <see cref="TypeExpression"/>.
@@ -360,5 +366,83 @@
         }
 
         #endregion
+    }
+
+    internal static class BlockMethodExpressionExtensions
+    {
+        public static void SetName(this MethodExpression blockMethod)
+            => blockMethod.Name = GetName(blockMethod);
+
+        private static string GetName(MethodExpression blockMethod)
+        {
+            var baseName = GetBaseName(blockMethod);
+
+            var latestMatchingMethodSuffix =
+                GetLatestMatchingMethodSuffix(baseName, blockMethod);
+
+            if (latestMatchingMethodSuffix == 0)
+            {
+                return baseName;
+            }
+
+            return baseName + (latestMatchingMethodSuffix + 1);
+        }
+
+        private static int GetLatestMatchingMethodSuffix(
+            string baseName,
+            MethodExpression blockMethod)
+        {
+            var parameterTypes =
+                blockMethod.Parameters.ProjectToArray(p => p.Type);
+
+            return blockMethod
+                .DeclaringTypeExpression
+                .MethodExpressions
+                .Filter(m => m.Name != null)
+                .Select(m =>
+                {
+                    if (m.Name == baseName)
+                    {
+                        if (m.IsBlockMethod)
+                        {
+                            m.Name += "1";
+                        }
+
+                        return new { Suffix = 1 };
+                    }
+
+                    if (!m.Name.StartsWith(baseName, StringComparison.Ordinal))
+                    {
+                        return null;
+                    }
+
+                    var methodNameSuffix = m.Name.Substring(baseName.Length);
+
+                    if (!int.TryParse(methodNameSuffix, out var suffix))
+                    {
+                        return null;
+                    }
+
+                    if (!m.Parameters.Project(p => p.Type).SequenceEqual(parameterTypes))
+                    {
+                        return null;
+                    }
+
+                    return new { Suffix = suffix };
+                })
+                .Filter(_ => _ != null)
+                .Select(_ => _.Suffix)
+                .OrderByDescending(suffix => suffix)
+                .FirstOrDefault();
+        }
+
+        private static string GetBaseName(IMethod blockMethod)
+        {
+            var returnType = blockMethod.ReturnType;
+
+            return returnType != typeof(void)
+                ? "Get" + returnType.GetVariableNameInPascalCase()
+                : "DoAction";
+        }
     }
 }

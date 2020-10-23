@@ -8,9 +8,11 @@
     using System.Reflection;
     using Api;
     using BuildableExpressions.Extensions;
+    using Compilation;
     using Extensions;
     using NetStandardPolyfills;
     using ReadableExpressions;
+    using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
     using static SourceCodeTranslationSettings;
 
@@ -20,7 +22,8 @@
     public abstract class TypeExpression :
         Expression,
         ITypeExpressionConfigurator,
-        ICustomAnalysableExpression
+        ICustomAnalysableExpression,
+        ICustomTranslationExpression
     {
         private readonly List<MethodExpression> _methodExpressions;
         private ReadOnlyCollection<MethodExpression> _readOnlyMethodExpressions;
@@ -43,8 +46,8 @@
             => (ExpressionType)SourceCodeExpressionType.Type;
 
         /// <summary>
-        /// Gets the type of this <see cref="TypeExpression"/>, which is the return type of the
-        /// first of the type's <see cref="MethodExpressions"/>, or typeof(void) if this type has no methods.
+        /// Gets the type of this <see cref="TypeExpression"/>, which is lazily, dynamically created
+        /// using this type's definition.
         /// </summary>
         public override Type Type => _type ??= CreateType();
 
@@ -52,7 +55,15 @@
 
         private Type CreateType()
         {
-            return _methodExpressions.FirstOrDefault()?.Type ?? typeof(void);
+            var sourceCode = new SourceCodeExpression(SourceCode.Namespace);
+            sourceCode.Add(this);
+
+            var compiledTypes = Compiler.Instance
+                .Compile(sourceCode)
+                .CompiledAssembly
+                .GetTypes();
+
+            return compiledTypes[0];
         }
 
         #endregion
@@ -227,18 +238,37 @@
             string name,
             Action<IMethodExpressionConfigurator> configuration)
         {
-            return new MethodExpression(this, name, configuration);
+            return Add(new MethodExpression(this, name, configuration));
         }
 
-        internal virtual void Register(MethodExpression method)
+        internal virtual MethodExpression Add(MethodExpression method)
         {
             _methodExpressions.Add(method);
             _readOnlyMethodExpressions = null;
+
+            if (!method.HasBlockMethods)
+            {
+                return method;
+            }
+
+            foreach (var blockMethod in method.BlockMethods)
+            {
+                blockMethod.SetName();
+                _methodExpressions.Add(blockMethod);
+                _readOnlyMethodExpressions = null;
+            }
+
+            return method;
         }
 
         #endregion
 
         IEnumerable<Expression> ICustomAnalysableExpression.Expressions
             => MethodExpressions.Cast<ICustomAnalysableExpression>().SelectMany(m => m.Expressions);
+
+        ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
+            => GetTranslation(context);
+
+        internal abstract ITranslation GetTranslation(ITranslationContext context);
     }
 }

@@ -12,8 +12,7 @@
     /// </summary>
     public class ClassExpression :
         ConcreteTypeExpression,
-        IClassExpressionConfigurator,
-        ICustomTranslationExpression
+        IClassExpressionConfigurator
     {
         internal ClassExpression(
             SourceCodeExpression sourceCode,
@@ -107,19 +106,19 @@
                 $"as it has already been set to {BaseType.GetFriendlyName()}");
         }
 
-        internal override void Register(MethodExpression method)
+        internal override MethodExpression Add(MethodExpression method)
         {
             if (IsStatic)
             {
                 ((IMethodExpressionConfigurator)method).SetStatic();
             }
 
-            base.Register(method);
+            return base.Add(method);
         }
 
         #endregion
 
-        ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
+        internal override ITranslation GetTranslation(ITranslationContext context)
             => new ClassTranslation(this, context);
     }
 }

@@ -69,9 +69,12 @@
             {
                 sc.AddClass(cls =>
                 {
-                    classInstance = cls.ThisInstanceExpression;
+                    cls.AddMethod("GetThis", m =>
+                    {
+                        classInstance = cls.ThisInstanceExpression;
 
-                    cls.AddMethod("GetThis", classInstance);
+                        m.SetBody(classInstance);
+                    });
                 });
             });
 

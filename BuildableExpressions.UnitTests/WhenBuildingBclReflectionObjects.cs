@@ -1,6 +1,8 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using System.Linq;
+    using AgileObjects.BuildableExpressions.SourceCode.Extensions;
     using Common;
     using NetStandardPolyfills;
     using Xunit;
@@ -64,6 +66,37 @@
             sourceCode.ReferencedAssemblies
                 .ShouldHaveSingleItem()
                 .ShouldBe(typeof(IMessager).GetAssembly());
+        }
+
+        [Fact]
+        public void ShouldCreateAClassType()
+        {
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.SetNamespace("MyStuff.Tests");
+
+                sc.AddClass("MyClass", cls =>
+                {
+                    cls.AddMethod("DoNothing", Default(typeof(void)));
+                });
+            });
+
+            var @class = sourceCode.TypeExpressions.FirstOrDefault().ShouldNotBeNull();
+
+            @class.Type.ShouldNotBeNull();
+            @class.Type.Namespace.ShouldBe("MyStuff.Tests");
+            @class.Type.Name.ShouldBe("MyClass");
+
+            var method = @class.Type.GetPublicInstanceMethod("DoNothing").ShouldNotBeNull();
+
+            method.Name.ShouldBe("DoNothing");
+            method.ReturnType.ShouldBe(typeof(void));
+            method.GetParameters().ShouldBeEmpty();
+            method.IsGenericMethod.ShouldBeFalse();
+
+            var typeInstance = Activator.CreateInstance(@class.Type).ShouldNotBeNull();
+            var methodResult = method.Invoke(typeInstance, Enumerable<object>.EmptyArray);
+            methodResult.ShouldBeNull();
         }
 
         #region Helper Members
