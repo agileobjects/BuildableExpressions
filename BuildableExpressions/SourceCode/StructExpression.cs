@@ -19,6 +19,7 @@
             : base(sourceCode, name)
         {
             configuration.Invoke(this);
+            Validate();
         }
 
         internal override ITranslation GetTranslation(ITranslationContext context)

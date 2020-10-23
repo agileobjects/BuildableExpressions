@@ -2,13 +2,17 @@
 {
     using System;
     using System.Linq.Expressions;
+    using ReadableExpressions.Translations;
+    using ReadableExpressions.Translations.Formatting;
 
     /// <summary>
     /// Represents the instance of an object to which the 'this' keyword relates in the current
     /// context.
     /// </summary>
-    public sealed class ThisInstanceExpression : Expression
+    public sealed class ThisInstanceExpression : Expression, ICustomTranslationExpression
     {
+        private ITranslation _translation;
+
         internal ThisInstanceExpression(ConcreteTypeExpression instance)
         {
             Instance = instance;
@@ -39,5 +43,15 @@
         /// Gets the <see cref="ConcreteTypeExpression"/> representing the instance Type.
         /// </summary>
         public ConcreteTypeExpression Instance { get; }
+
+        ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
+        {
+            return _translation ??= new FixedValueTranslation(
+                NodeType,
+                "this",
+                Type,
+                TokenType.Keyword,
+                context.Settings);
+        }
     }
 }

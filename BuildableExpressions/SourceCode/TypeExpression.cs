@@ -243,8 +243,7 @@
 
         internal virtual StandardMethodExpression Add(StandardMethodExpression method)
         {
-            _methodExpressions.Add(method);
-            _readOnlyMethodExpressions = null;
+            AddMethod(method);
 
             if (!method.HasBlockMethods)
             {
@@ -254,11 +253,21 @@
             foreach (var blockMethod in method.BlockMethods)
             {
                 blockMethod.Finalise();
-                _methodExpressions.Add(blockMethod);
-                _readOnlyMethodExpressions = null;
+                AddMethod(blockMethod);
             }
 
             return method;
+        }
+
+        private void AddMethod(MethodExpression method)
+        {
+            _methodExpressions.Add(method);
+            _readOnlyMethodExpressions = null;
+
+            if (_type != null)
+            {
+                _type = CreateType();
+            }
         }
 
         #endregion

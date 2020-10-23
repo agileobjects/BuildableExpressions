@@ -22,6 +22,7 @@
         {
             BaseType = typeof(object);
             configuration.Invoke(this);
+            Validate();
         }
 
         /// <summary>

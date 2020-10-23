@@ -99,6 +99,37 @@
             methodResult.ShouldBeNull();
         }
 
+        [Fact]
+        public void ShouldNotCreateAnIncompleteClassType()
+        {
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass("ThisClass", cls =>
+                {
+                    cls.AddMethod("GetThis", m =>
+                    {
+                        m.SetBody(cls.ThisInstanceExpression);
+                    });
+                });
+            });
+
+            var @class = sourceCode.TypeExpressions.FirstOrDefault().ShouldNotBeNull();
+
+            @class.Type.ShouldNotBeNull();
+            @class.Type.Name.ShouldBe("ThisClass");
+
+            var method = @class.Type.GetPublicInstanceMethod("GetThis").ShouldNotBeNull();
+
+            method.Name.ShouldBe("GetThis");
+            method.ReturnType.ShouldBe(@class.Type);
+            method.GetParameters().ShouldBeEmpty();
+            method.IsGenericMethod.ShouldBeFalse();
+
+            var typeInstance = Activator.CreateInstance(@class.Type).ShouldNotBeNull();
+            var methodResult = method.Invoke(typeInstance, Enumerable<object>.EmptyArray);
+            methodResult.ShouldBe(typeInstance);
+        }
+
         #region Helper Members
 
         public abstract class BaseType { }

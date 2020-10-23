@@ -33,6 +33,25 @@
             Validate();
         }
 
+        #region Validation
+
+        private void Validate()
+        {
+            ThrowIfNoTypes();
+        }
+
+        private void ThrowIfNoTypes()
+        {
+            if (_typeExpressions.Any())
+            {
+                return;
+            }
+
+            throw new InvalidOperationException("At least one type must be specified");
+        }
+
+        #endregion
+
         internal SourceCodeExpression(string @namespace)
             : this(@namespace, sc => { })
         {
@@ -49,30 +68,6 @@
 
             Analysis = SourceCodeAnalysis.For(this);
         }
-
-        #region Validation
-
-        private void Validate()
-        {
-            ThrowIfNoTypes();
-
-            foreach (var type in _typeExpressions)
-            {
-                type.Validate();
-            }
-        }
-
-        private void ThrowIfNoTypes()
-        {
-            if (_typeExpressions.Any())
-            {
-                return;
-            }
-
-            throw new InvalidOperationException("At least one type must be specified");
-        }
-
-        #endregion
 
         internal SourceCodeAnalysis Analysis { get; }
 
