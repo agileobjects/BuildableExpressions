@@ -1,6 +1,8 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using System.Collections.Generic;
+    using System.IO;
     using BuildableExpressions.SourceCode;
     using Common;
     using NetStandardPolyfills;
@@ -214,6 +216,34 @@
         }
 
         [Fact]
+        public void ShouldVaryBuiltParameterTypesByName()
+        {
+            var param1 = default(GenericParameterExpression);
+            var param2 = default(GenericParameterExpression);
+
+            BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod("DoStuff", m =>
+                    {
+                        param1 = m.AddGenericParameter("T1");
+                    });
+
+                    cls.AddMethod("DoMoarStuff", m =>
+                    {
+                        param2 = m.AddGenericParameter("T2");
+                    });
+                });
+            });
+
+            param1.ShouldNotBeNull();
+            param2.ShouldNotBeNull();
+            param1.ShouldNotBeSameAs(param2);
+            param1.Type.ShouldNotBeNull().ShouldNotBeSameAs(param2.Type);
+        }
+
+        [Fact]
         public void ShouldVaryBuiltParameterTypesByStructConstraint()
         {
             var param1 = default(GenericParameterExpression);
@@ -244,6 +274,202 @@
             param1.Type.ShouldNotBeNull().ShouldNotBeSameAs(param2.Type);
         }
 
+        [Fact]
+        public void ShouldVaryBuiltParameterTypesByClassConstraint()
+        {
+            var param1 = default(GenericParameterExpression);
+            var param2 = default(GenericParameterExpression);
+
+            BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod("DoStuff", m =>
+                    {
+                        param1 = m.AddGenericParameter("T", gp =>
+                        {
+                            gp.AddClassConstraint();
+                        });
+                    });
+
+                    cls.AddMethod("DoMoarStuff", m =>
+                    {
+                        param2 = m.AddGenericParameter("T");
+                    });
+                });
+            });
+
+            param1.ShouldNotBeNull();
+            param2.ShouldNotBeNull();
+            param1.ShouldNotBeSameAs(param2);
+            param1.Type.ShouldNotBeNull().ShouldNotBeSameAs(param2.Type);
+        }
+
+        [Fact]
+        public void ShouldVaryBuiltParameterTypesByNewableConstraint()
+        {
+            var param1 = default(GenericParameterExpression);
+            var param2 = default(GenericParameterExpression);
+
+            BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod("DoStuff", m =>
+                    {
+                        param1 = m.AddGenericParameter("T");
+                    });
+
+                    cls.AddMethod("DoMoarStuff", m =>
+                    {
+                        param2 = m.AddGenericParameter("T", gp =>
+                        {
+                            gp.AddNewableConstraint();
+                        });
+                    });
+                });
+            });
+
+            param1.ShouldNotBeNull();
+            param2.ShouldNotBeNull();
+            param1.ShouldNotBeSameAs(param2);
+            param1.Type.ShouldNotBeNull().ShouldNotBeSameAs(param2.Type);
+        }
+
+        [Fact]
+        public void ShouldVaryBuiltParameterTypesByTypeConstraintPresence()
+        {
+            var param1 = default(GenericParameterExpression);
+            var param2 = default(GenericParameterExpression);
+
+            BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod("DoStuff", m =>
+                    {
+                        param1 = m.AddGenericParameter("T", gp =>
+                        {
+                            gp.AddTypeConstraint(typeof(Stream));
+                        });
+                    });
+
+                    cls.AddMethod("DoMoarStuff", m =>
+                    {
+                        param2 = m.AddGenericParameter("T");
+                    });
+                });
+            });
+
+            param1.ShouldNotBeNull();
+            param2.ShouldNotBeNull();
+            param1.ShouldNotBeSameAs(param2);
+            param1.Type.ShouldNotBeNull().ShouldNotBeSameAs(param2.Type);
+        }
+
+        [Fact]
+        public void ShouldVaryBuiltParameterTypesByTypeConstraintDifference()
+        {
+            var param1 = default(GenericParameterExpression);
+            var param2 = default(GenericParameterExpression);
+
+            BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod("DoStuff", m =>
+                    {
+                        param1 = m.AddGenericParameter("T", gp =>
+                        {
+                            gp.AddTypeConstraint(typeof(Stream));
+                        });
+                    });
+
+                    cls.AddMethod("DoMoarStuff", m =>
+                    {
+                        param2 = m.AddGenericParameter("T", gp =>
+                        {
+                            gp.AddTypeConstraint(typeof(StringComparer));
+                        });
+                    });
+                });
+            });
+
+            param1.ShouldNotBeNull();
+            param2.ShouldNotBeNull();
+            param1.ShouldNotBeSameAs(param2);
+            param1.Type.ShouldNotBeNull().ShouldNotBeSameAs(param2.Type);
+        }
+
+        [Fact]
+        public void ShouldVaryBuiltParameterTypesByInterfaceTypeConstraintPresence()
+        {
+            var param1 = default(GenericParameterExpression);
+            var param2 = default(GenericParameterExpression);
+
+            BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod("DoStuff", m =>
+                    {
+                        param1 = m.AddGenericParameter("T");
+                    });
+
+                    cls.AddMethod("DoMoarStuff", m =>
+                    {
+                        param2 = m.AddGenericParameter("T", gp =>
+                        {
+                            gp.AddTypeConstraint<IDisposable>();
+                        });
+                    });
+                });
+            });
+
+            param1.ShouldNotBeNull();
+            param2.ShouldNotBeNull();
+            param1.ShouldNotBeSameAs(param2);
+            param1.Type.ShouldNotBeNull().ShouldNotBeSameAs(param2.Type);
+        }
+
+        [Fact]
+        public void ShouldVaryBuiltParameterTypesByInterfaceTypeConstraintDifference()
+        {
+            var param1 = default(GenericParameterExpression);
+            var param2 = default(GenericParameterExpression);
+
+            BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod("DoStuff", m =>
+                    {
+                        param1 = m.AddGenericParameter("T", gp =>
+                        {
+                            gp.AddTypeConstraint<IDisposable>();
+                        });
+                    });
+
+                    cls.AddMethod("DoMoarStuff", m =>
+                    {
+                        param2 = m.AddGenericParameter("T", gp =>
+                        {
+                            gp.AddTypeConstraints(new List<Type>
+                            {
+                                typeof(IDisposable),
+                                typeof(IMessager)
+                            });
+                        });
+                    });
+                });
+            });
+
+            param1.ShouldNotBeNull();
+            param2.ShouldNotBeNull();
+            param1.ShouldNotBeSameAs(param2);
+            param1.Type.ShouldNotBeNull().ShouldNotBeSameAs(param2.Type);
+        }
+
         #region Helper Members
 
         public class BaseType
@@ -257,6 +483,11 @@
             }
 
             protected abstract void ImplementThis(string value1, int value2);
+        }
+
+        public interface IMessager
+        {
+            void SendMessage(string message);
         }
 
         #endregion

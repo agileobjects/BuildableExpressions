@@ -196,16 +196,19 @@
 
             foreach (var type in types)
             {
-                if (type.IsClass())
+                if (type.IsInterface())
                 {
-                    var typeName = type.GetFriendlyName();
-
-                    ThrowIfHasStructConstraint(conflictingConstraint: typeName);
-                    ThrowIfHasClassConstraint(conflictingConstraint: typeName);
-                    ThrowIfAlreadyHasTypeConstraint(conflictingTypeConstraint: typeName);
+                    _typeConstraints.Add(type);
+                    continue;
                 }
 
-                _typeConstraints.Add(type);
+                var typeName = type.GetFriendlyName();
+
+                ThrowIfHasStructConstraint(conflictingConstraint: typeName);
+                ThrowIfHasClassConstraint(conflictingConstraint: typeName);
+                ThrowIfAlreadyHasTypeConstraint(conflictingTypeConstraint: typeName);
+
+                _typeConstraints.Insert(0, type);
             }
 
             _hasConstraints = true;

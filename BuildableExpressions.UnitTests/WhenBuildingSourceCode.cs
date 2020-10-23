@@ -558,6 +558,45 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldPlaceTypesFirstInConstraintList()
+        {
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass(cls =>
+                {
+                    cls.AddMethod("GetDerived", m =>
+                    {
+                        m.AddGenericParameter("TDerived", gp =>
+                        {
+                            gp.AddTypeConstraints(typeof(IMarker1), typeof(BaseType));
+                        });
+
+                        m.SetBody(Default(typeof(object)));
+                    });
+                });
+            });
+
+            var translated = sourceCode.ToCSharpString();
+
+            const string EXPECTED = @"
+using AgileObjects.BuildableExpressions.UnitTests;
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public object GetDerived<TDerived>()
+            where TDerived : WhenBuildingSourceCode.BaseType, WhenBuildingSourceCode.IMarker1
+        {
+            return null;
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildADefaultGenericParameterValueMethod()
         {
             var translated = BuildableExpression.SourceCode(sc => sc
