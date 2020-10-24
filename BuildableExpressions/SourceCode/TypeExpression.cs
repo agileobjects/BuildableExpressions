@@ -214,10 +214,9 @@
             {
                 var parameterTypes = method.Parameters.ProjectToArray(p => p.Type);
 
-                var matchingInterfaceMethodCount = interfaceMethods
-                    .Count(im =>
-                        im.Name == method.Name &&
-                        im.GetParameters().Project(p => p.ParameterType).SequenceEqual(parameterTypes));
+                var matchingInterfaceMethodCount = interfaceMethods.Count(im =>
+                    im.Name == method.Name &&
+                    im.GetParameters().Project(p => p.ParameterType).SequenceEqual(parameterTypes));
 
                 return matchingInterfaceMethodCount > 1;
             });
