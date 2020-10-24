@@ -25,6 +25,8 @@
         ICustomAnalysableExpression,
         ICustomTranslationExpression
     {
+        private List<GenericParameterExpression> _genericParameters;
+        private ReadOnlyCollection<GenericParameterExpression> _readonlyGenericParameters;
         private readonly List<MethodExpression> _methodExpressions;
         private ReadOnlyCollection<MethodExpression> _readOnlyMethodExpressions;
         private Type _type;
@@ -119,6 +121,25 @@
         /// Gets the name of this <see cref="TypeExpression"/>.
         /// </summary>
         public string Name { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="TypeExpression"/> is generic.
+        /// </summary>
+        public bool IsGeneric => _genericParameters?.Any() == true;
+
+        /// <summary>
+        /// Gets the <see cref="GenericParameterExpression"/>s describing the open generic arguments
+        /// of this <see cref="TypeExpression"/>, if any.
+        /// </summary>
+        public ReadOnlyCollection<GenericParameterExpression> GenericParameters
+        {
+            get
+            {
+                return _readonlyGenericParameters ??= IsGeneric
+                    ? _genericParameters.ToReadOnlyCollection()
+                    : Enumerable<GenericParameterExpression>.EmptyReadOnlyCollection;
+            }
+        }
 
         /// <summary>
         /// Gets the <see cref="MethodExpression"/>s which make up this <see cref="TypeExpression"/>'s
@@ -233,6 +254,18 @@
 
         void ITypeExpressionConfigurator.SetVisibility(TypeVisibility visibility)
             => Visibility = visibility;
+
+        GenericParameterExpression IGenericParameterConfigurator.AddGenericParameter(
+            string name,
+            Action<IGenericParameterExpressionConfigurator> configuration)
+        {
+            var parameter = new GenericParameterExpression(name, configuration);
+
+            _genericParameters ??= new List<GenericParameterExpression>();
+            _genericParameters.Add(parameter);
+            _readonlyGenericParameters = null;
+            return parameter;
+        }
 
         MethodExpression ITypeExpressionConfigurator.AddMethod(
             string name,

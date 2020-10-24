@@ -5,9 +5,27 @@
     using ReadableExpressions;
 
     /// <summary>
+    /// Provides options to configure a <see cref="TypeExpression"/> or <see cref="MethodExpression"/>'s
+    /// generic parameters.
+    /// </summary>
+    public interface IGenericParameterConfigurator
+    {
+        /// <summary>
+        /// Adds a <see cref="GenericParameterExpression"/> to the <see cref="TypeExpression"/> or
+        /// <see cref="MethodExpression"/>.
+        /// </summary>
+        /// <param name="name">The name of the <see cref="GenericParameterExpression"/>.</param>
+        /// <param name="configuration">The configuration to use for the <see cref="GenericParameterExpression"/>.</param>
+        /// <returns>The newly-created <see cref="GenericParameterExpression"/>.</returns>
+        GenericParameterExpression AddGenericParameter(
+            string name,
+            Action<IGenericParameterExpressionConfigurator> configuration);
+    }
+
+    /// <summary>
     /// Provides options to configure a <see cref="MethodExpression"/>.
     /// </summary>
-    public interface IMethodExpressionConfigurator
+    public interface IMethodExpressionConfigurator : IGenericParameterConfigurator
     {
         /// <summary>
         /// Set the summary documentation of the <see cref="MethodExpression"/>.
@@ -30,16 +48,6 @@
         /// Mark the <see cref="MethodExpression"/> as static.
         /// </summary>
         void SetStatic();
-
-        /// <summary>
-        /// Adds a <see cref="GenericParameterExpression"/> to the <see cref="MethodExpression"/>.
-        /// </summary>
-        /// <param name="name">The name of the <see cref="GenericParameterExpression"/>.</param>
-        /// <param name="configuration">The configuration to use for the <see cref="GenericParameterExpression"/>.</param>
-        /// <returns>The newly-created <see cref="GenericParameterExpression"/>.</returns>
-        GenericParameterExpression AddGenericParameter(
-            string name,
-            Action<IGenericParameterExpressionConfigurator> configuration);
 
         /// <summary>
         /// Adds the given <paramref name="parameters"/> to the <see cref="MethodExpression"/>.

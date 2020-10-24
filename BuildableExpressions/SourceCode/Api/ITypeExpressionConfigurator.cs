@@ -6,7 +6,7 @@
     /// <summary>
     /// Provides options to configure a <see cref="TypeExpression"/>.
     /// </summary>
-    public interface ITypeExpressionConfigurator
+    public interface ITypeExpressionConfigurator : IGenericParameterConfigurator
     {
         /// <summary>
         /// Configures the <see cref="TypeExpression"/> to implement the given

@@ -48,5 +48,41 @@ namespace GeneratedExpressionCode
             EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
+
+        [Fact]
+        public void ShouldBuildAGenericParameterStruct()
+        {
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddStruct("GenericStruct", str =>
+                {
+                    var param = str.AddGenericParameter("T");
+                    var paramType = BuildableExpression.TypeOf(param);
+
+                    str.AddMethod("GetParamType", m =>
+                    {
+                        m.SetBody(paramType);
+                    });
+                });
+            });
+
+            var translated = sourceCode.ToCSharpString();
+
+            const string EXPECTED = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    public struct GenericStruct<T>
+    {
+        public Type GetParamType()
+        {
+            return typeof(T);
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
     }
 }

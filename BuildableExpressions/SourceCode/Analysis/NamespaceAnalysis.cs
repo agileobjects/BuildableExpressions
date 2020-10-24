@@ -96,7 +96,7 @@
             if (method.IsGeneric)
             {
                 AddNamespacesIfRequired(method
-                    .GenericArguments
+                    .GenericParameters
                     .Cast<IGenericArgument>()
                     .Filter(ga => ga.HasConstraints)
                     .SelectMany(ga => ga.TypeConstraints));

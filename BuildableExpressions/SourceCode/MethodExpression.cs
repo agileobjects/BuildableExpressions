@@ -28,7 +28,7 @@
         ICustomTranslationExpression
     {
         private List<ParameterExpression> _parameters;
-        private List<GenericParameterExpression> _genericArguments;
+        private List<GenericParameterExpression> _genericParameters;
         private ReadOnlyCollection<GenericParameterExpression> _readonlyGenericParameters;
         private ReadOnlyCollection<IGenericArgument> _readonlyGenericArguments;
         private ReadOnlyCollection<IParameter> _readonlyParameters;
@@ -104,14 +104,31 @@
         public bool IsStatic { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating whether this <see cref="MethodExpression"/> is generic.
-        /// </summary>
-        public bool IsGeneric => _genericArguments?.Any() == true;
-
-        /// <summary>
         /// Gets the name of this <see cref="MethodExpression"/>.
         /// </summary>
         public string Name { get; internal set; }
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="MethodExpression"/> is generic.
+        /// </summary>
+        public bool IsGeneric => _genericParameters?.Any() == true;
+
+        /// <summary>
+        /// Gets the <see cref="GenericParameterExpression"/>s describing the open generic arguments
+        /// of this <see cref="MethodExpression"/>, if any.
+        /// </summary>
+        public ReadOnlyCollection<GenericParameterExpression> GenericParameters
+        {
+            get
+            {
+                return _readonlyGenericParameters ??= IsGeneric
+                    ? _genericParameters.ToReadOnlyCollection()
+                    : Enumerable<GenericParameterExpression>.EmptyReadOnlyCollection;
+            }
+        }
+
+        internal IList<GenericParameterExpression> GenericParametersAccessor
+            => _genericParameters;
 
         /// <summary>
         /// Gets the MethodInfo for this <see cref="MethodExpression"/>, which is lazily, dynamically
@@ -146,23 +163,6 @@
         public Type ReturnType => Definition?.ReturnType ?? typeof(void);
 
         /// <summary>
-        /// Gets the <see cref="IGenericArgument"/>s describing the generic arguments of this
-        /// <see cref="MethodExpression"/>, if any.
-        /// </summary>
-        public ReadOnlyCollection<GenericParameterExpression> GenericArguments
-        {
-            get
-            {
-                return _readonlyGenericParameters ??= IsGeneric
-                    ? _genericArguments.ToReadOnlyCollection()
-                    : Enumerable<GenericParameterExpression>.EmptyReadOnlyCollection;
-            }
-        }
-
-        internal IList<GenericParameterExpression> GenericArgumentsAccessor
-            => _genericArguments;
-
-        /// <summary>
         /// Gets the LambdaExpression describing the parameters and body of this
         /// <see cref="MethodExpression"/>.
         /// </summary>
@@ -193,17 +193,17 @@
         void IMethodExpressionConfigurator.SetStatic()
             => IsStatic = true;
 
-        GenericParameterExpression IMethodExpressionConfigurator.AddGenericParameter(
+        GenericParameterExpression IGenericParameterConfigurator.AddGenericParameter(
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
         {
-            var parameter = new GenericParameterExpression(this, name, configuration);
+            var parameter = new GenericParameterExpression(name, configuration);
 
-            _genericArguments ??= new List<GenericParameterExpression>();
+            _genericParameters ??= new List<GenericParameterExpression>();
             _readonlyGenericParameters = null;
             _readonlyGenericArguments = null;
 
-            _genericArguments.Add(parameter);
+            _genericParameters.Add(parameter);
             return parameter;
         }
 
@@ -271,7 +271,7 @@
         ReadOnlyCollection<IGenericArgument> IMethod.GetGenericArguments()
         {
             return _readonlyGenericArguments ??= IsGeneric
-                ? _genericArguments.ProjectToArray(arg => (IGenericArgument)arg).ToReadOnlyCollection()
+                ? _genericParameters.ProjectToArray(arg => (IGenericArgument)arg).ToReadOnlyCollection()
                 : Enumerable<IGenericArgument>.EmptyReadOnlyCollection;
         }
 

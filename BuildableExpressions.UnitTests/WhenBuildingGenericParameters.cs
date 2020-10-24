@@ -30,10 +30,6 @@
             param.ShouldNotBeNull();
             param.Name.ShouldBe("T");
             param.IsClosed.ShouldBeFalse();
-            param.Method.ShouldNotBeNull();
-            param.Method.Name.ShouldBe("DoStuff");
-            param.Method.IsGeneric.ShouldBeTrue();
-            param.Method.GenericArguments.ShouldHaveSingleItem().ShouldBe(param);
             param.Type.ShouldNotBeNull().Name.ShouldBe("T");
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
@@ -62,7 +58,6 @@
             param.ShouldNotBeNull();
             param.Name.ShouldBe("TNewable");
             param.IsClosed.ShouldBeFalse();
-            param.Method.ShouldNotBeNull().Name.ShouldBe("DoStuff");
             param.Type.ShouldNotBeNull().Name.ShouldBe("TNewable");
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
@@ -91,7 +86,6 @@
             param.ShouldNotBeNull();
             param.Name.ShouldBe("TStruct");
             param.IsClosed.ShouldBeFalse();
-            param.Method.ShouldNotBeNull().Name.ShouldBe("DoStuff");
             param.Type.ShouldNotBeNull().Name.ShouldBe("TStruct");
             param.Type.IsClass().ShouldBeFalse();
             param.Type.IsValueType().ShouldBeTrue();
@@ -119,7 +113,6 @@
             param.ShouldNotBeNull();
             param.Name.ShouldBe("TDerived");
             param.IsClosed.ShouldBeFalse();
-            param.Method.ShouldNotBeNull().Name.ShouldBe("DoStuff");
             param.Type.ShouldNotBeNull().Name.ShouldBe("TDerived");
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
@@ -148,7 +141,6 @@
             param.ShouldNotBeNull();
             param.Name.ShouldBe("TDisposable");
             param.IsClosed.ShouldBeFalse();
-            param.Method.ShouldNotBeNull().Name.ShouldBe("DoStuff");
             param.Type.ShouldNotBeNull().Name.ShouldBe("TDisposable");
             param.Type.IsAbstract().ShouldBeFalse();
             param.Type.IsClass().ShouldBeTrue();
@@ -179,7 +171,6 @@
             param.ShouldNotBeNull();
             param.Name.ShouldBe("TDerived");
             param.IsClosed.ShouldBeFalse();
-            param.Method.ShouldNotBeNull().Name.ShouldBe("DoStuff");
             param.Type.ShouldNotBeNull().Name.ShouldBe("TDerived");
             param.Type.IsAbstract().ShouldBeTrue();
             param.Type.IsClass().ShouldBeTrue();

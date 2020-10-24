@@ -34,12 +34,12 @@
 
         private void ThrowIfDuplicateGenericArgumentNames()
         {
-            if (!IsGeneric || !(GenericArgumentsAccessor?.Count > 1))
+            if (!IsGeneric || !(GenericParametersAccessor?.Count > 1))
             {
                 return;
             }
 
-            var duplicateParameterName = GenericArgumentsAccessor
+            var duplicateParameterName = GenericParametersAccessor
                 .GroupBy(arg => arg.Name)
                 .FirstOrDefault(nameGroup => nameGroup.Count() > 1)?
                 .Key;

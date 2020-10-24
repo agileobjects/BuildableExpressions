@@ -39,12 +39,10 @@
         private ReadOnlyCollection<Type> _readonlyTypeConstraints;
 
         internal GenericParameterExpression(
-            MethodExpression method,
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
         {
             Name = name.ThrowIfInvalidName<ArgumentException>("Generic Parameter");
-            Method = method;
 
             configuration.Invoke(this);
         }
@@ -159,11 +157,6 @@
         /// </param>
         /// <returns>This <see cref="GenericParameterExpression"/>.</returns>
         protected override Expression Accept(ExpressionVisitor visitor) => this;
-
-        /// <summary>
-        /// Gets this <see cref="GenericParameterExpression"/>'s parent <see cref="MethodExpression"/>.
-        /// </summary>
-        public MethodExpression Method { get; }
 
         /// <summary>
         /// Gets the name of this <see cref="GenericParameterExpression"/>

@@ -1,12 +1,15 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Translations
 {
     using System.Collections.Generic;
+    using BuildableExpressions.Extensions;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
+    using ReadableExpressions.Translations.Reflection;
 
     internal class TypeTranslation
     {
         private readonly TypeExpression _type;
+        private readonly bool _isGenericType;
         private readonly string _typeString;
         private readonly ITranslatable _summaryTranslation;
         private readonly string _visibility;
@@ -14,6 +17,8 @@
         private readonly int _interfaceTypeCount;
         private readonly IList<ITranslation> _methodTranslations;
         private readonly int _methodCount;
+        private readonly ITranslatable _genericParametersTranslation;
+        private readonly ITranslatable _genericParameterConstraintsTranslation;
 
         public TypeTranslation(
             TypeExpression type,
@@ -21,13 +26,10 @@
             ITranslationContext context)
         {
             _type = type;
+            _isGenericType = type.IsGeneric;
             _typeString = typeString;
             _summaryTranslation = SummaryTranslation.For(type.Summary, context);
             _visibility = type.Visibility.ToString().ToLowerInvariant();
-            _interfaceTypeCount = type.InterfaceTypes.Count;
-
-            _methodCount = type.MethodExpressions.Count;
-            _methodTranslations = new ITranslation[_methodCount];
 
             var translationSize =
                 _summaryTranslation.TranslationSize +
@@ -41,6 +43,33 @@
             var formattingSize =
                 _summaryTranslation.FormattingSize +
                 keywordFormattingSize; // <- for accessibility + type name
+
+            if (_isGenericType)
+            {
+                var genericArguments = type.GenericParameters
+                    .ProjectToArray<GenericParameterExpression, IGenericArgument>(p => p);
+
+                var settings = context.Settings;
+
+                _genericParametersTranslation =
+                    new GenericParameterSetDefinitionTranslation(genericArguments, settings);
+
+                _genericParameterConstraintsTranslation =
+                    new GenericParameterSetConstraintsTranslation(genericArguments, settings);
+
+                translationSize +=
+                    _genericParametersTranslation.TranslationSize +
+                    _genericParameterConstraintsTranslation.TranslationSize;
+
+                formattingSize +=
+                    _genericParametersTranslation.FormattingSize +
+                    _genericParameterConstraintsTranslation.FormattingSize;
+            }
+
+            _interfaceTypeCount = type.InterfaceTypes.Count;
+
+            _methodCount = type.MethodExpressions.Count;
+            _methodTranslations = new ITranslation[_methodCount];
 
             if (_interfaceTypeCount != 0)
             {
@@ -86,12 +115,19 @@
 
         public int GetIndentSize()
         {
-            if (_methodCount == 0)
+            var indentSize = 0;
+
+            if (_isGenericType)
             {
-                return 0;
+                indentSize +=
+                    _genericParametersTranslation.GetIndentSize() +
+                    _genericParameterConstraintsTranslation.GetIndentSize();
             }
 
-            var indentSize = 0;
+            if (_methodCount == 0)
+            {
+                return indentSize;
+            }
 
             for (var i = 0; ;)
             {
@@ -108,7 +144,15 @@
 
         public int GetLineCount()
         {
-            var lineCount = _summaryTranslation.GetLineCount();
+            var lineCount =
+                _summaryTranslation.GetLineCount();
+
+            if (_isGenericType)
+            {
+                lineCount +=
+                    _genericParametersTranslation.GetLineCount() +
+                    _genericParameterConstraintsTranslation.GetLineCount();
+            }
 
             if (_methodCount == 0)
             {
@@ -138,6 +182,12 @@
 
             writer.WriteKeywordToTranslation(declaration);
             writer.WriteTypeNameToTranslation(_type.Name);
+
+            if (_isGenericType)
+            {
+                _genericParametersTranslation.WriteTo(writer);
+                _genericParameterConstraintsTranslation.WriteTo(writer);
+            }
         }
 
         public void WriteTypeListTo(

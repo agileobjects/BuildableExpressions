@@ -139,13 +139,14 @@
 
         /// <summary>
         /// Add an unconstrained <see cref="GenericParameterExpression"/> with the given
-        /// <paramref name="name"/> to the <see cref="MethodExpression"/>.
+        /// <paramref name="name"/> to the <see cref="TypeExpression"/> or
+        /// <see cref="MethodExpression"/>.
         /// </summary>
-        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
+        /// <param name="methodConfig">The <see cref="IGenericParameterConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="GenericParameterExpression"/>.</param>
         /// <returns>The newly-created <see cref="GenericParameterExpression"/>.</returns>
         public static GenericParameterExpression AddGenericParameter(
-            this IMethodExpressionConfigurator methodConfig,
+            this IGenericParameterConfigurator methodConfig,
             string name)
         {
             return methodConfig.AddGenericParameter(name, gp => { });

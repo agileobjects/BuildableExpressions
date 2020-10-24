@@ -141,6 +141,4 @@ namespace GeneratedExpressionCode
 
         #endregion
     }
-
-    public struct MyStruct { }
 }
