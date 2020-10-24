@@ -84,6 +84,9 @@
         /// </summary>
         public TypeExpression DeclaringTypeExpression { get; }
 
+        /// <inheritdoc />
+        public Type DeclaringType => DeclaringTypeExpression.Type;
+
         /// <summary>
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="MethodExpression"/>,
         /// if a summary has been set.
@@ -242,8 +245,6 @@
         #endregion
 
         #region IMethod Members
-
-        Type IMethod.DeclaringType => null;
 
         bool IMethod.IsPublic => Visibility == Public;
 

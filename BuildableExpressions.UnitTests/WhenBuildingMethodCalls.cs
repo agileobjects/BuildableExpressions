@@ -40,7 +40,7 @@
         }
 
         [Fact]
-        public void ShouldBuildWithAMethodInfo()
+        public void ShouldBuildAParameterlessThisInstanceCallWithAMethodInfo()
         {
             var sourceCode = BuildableExpression.SourceCode(sc =>
             {

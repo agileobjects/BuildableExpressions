@@ -176,16 +176,19 @@
                 });
             });
 
-            var method = sourceCode
+            var @class = sourceCode
                 .TypeExpressions
                 .FirstOrDefault()
-                .ShouldNotBeNull()
+                .ShouldNotBeNull();
+
+            var method = @class
                 .MethodExpressions
                 .FirstOrDefault()
                 .ShouldNotBeNull()
                 .MethodInfo
                 .ShouldNotBeNull();
 
+            method.DeclaringType.ShouldBe(@class.Type);
             method.ReturnType.ShouldBe(typeof(void));
             method.GetParameters().ShouldBeEmpty();
             method.IsGenericMethod.ShouldBeFalse();
