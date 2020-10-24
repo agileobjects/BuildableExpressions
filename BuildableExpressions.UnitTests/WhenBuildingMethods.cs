@@ -122,14 +122,14 @@ namespace GeneratedExpressionCode
 
             var translated = BuildableExpression
                 .SourceCode(sc => sc
-                    .AddClass(cls => cls
+                    .AddStruct(str => str
                         .AddMethod("Subtract", subtractShortFromInt)))
                 .ToCSharpString();
 
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
 {
-    public class GeneratedExpressionClass
+    public struct GeneratedExpressionStruct
     {
         public int Subtract
         (
@@ -238,9 +238,9 @@ namespace GeneratedExpressionCode
         {
             var sourceCode = BuildableExpression.SourceCode(sc =>
             {
-                sc.AddClass(cls =>
+                sc.AddStruct(str =>
                 {
-                    cls.AddMethod("GetObject", m =>
+                    str.AddMethod("GetObject", m =>
                     {
                         m.AddGenericParameter("TStruct", gp =>
                         {
@@ -257,7 +257,7 @@ namespace GeneratedExpressionCode
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
 {
-    public class GeneratedExpressionClass
+    public struct GeneratedExpressionStruct
     {
         public object GetObject<TStruct>()
             where TStruct : struct

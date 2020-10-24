@@ -15,25 +15,53 @@
             return sourceCodeConfig.AddClass("GeneratedExpressionClass", configuration);
         }
 
+        public static StructExpression AddStruct(
+            this ISourceCodeExpressionConfigurator sourceCodeConfig,
+            Action<IStructExpressionConfigurator> configuration)
+        {
+            return sourceCodeConfig.AddStruct("GeneratedExpressionStruct", configuration);
+        }
+
         public static MethodExpression AddMethod(
-            this ITypeExpressionConfigurator classConfig,
+            this IClassExpressionConfigurator classConfig,
             string name)
         {
             return classConfig.AddMethod(name, Default(typeof(void)));
         }
 
         public static MethodExpression AddMethod(
-            this ITypeExpressionConfigurator classConfig,
+            this IStructExpressionConfigurator structConfig,
+            string name)
+        {
+            return structConfig.AddMethod(name, Default(typeof(void)));
+        }
+
+        public static MethodExpression AddMethod(
+            this IClassExpressionConfigurator classConfig,
             LambdaExpression defaultVoidLambda)
         {
             return classConfig.AddMethod(defaultVoidLambda.Body);
         }
 
         public static MethodExpression AddMethod(
-            this ITypeExpressionConfigurator classConfig,
+            this IStructExpressionConfigurator structConfig,
+            LambdaExpression defaultVoidLambda)
+        {
+            return structConfig.AddMethod(defaultVoidLambda.Body);
+        }
+
+        public static MethodExpression AddMethod(
+            this IClassExpressionConfigurator classConfig,
             Expression defaultVoid)
         {
             return classConfig.AddMethod("DoAction", defaultVoid);
+        }
+
+        public static MethodExpression AddMethod(
+            this IStructExpressionConfigurator structConfig,
+            Expression defaultVoid)
+        {
+            return structConfig.AddMethod("DoAction", defaultVoid);
         }
     }
 }

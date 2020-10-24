@@ -73,8 +73,7 @@
 
                 if (parameter._hasStructConstraint)
                 {
-                    sc.AddStruct(parameter.Name, cfg => parameter
-                        .ConfigureType(cfg, baseTypeCallback: null));
+                    sc.AddStruct(parameter.Name, parameter.ConfigureStruct);
                 }
                 else
                 {
@@ -90,9 +89,14 @@
             return compiledTypes[0];
         }
 
+        private void ConfigureStruct(IStructExpressionConfigurator structConfig)
+            => ConfigureType((StructExpression)structConfig, baseTypeCallback: null);
+
         private void ConfigureClass(IClassExpressionConfigurator classConfig)
         {
-            ConfigureType(classConfig, (cfg, baseType) =>
+            var @class = (ClassExpression)classConfig;
+
+            ConfigureType(@class, (cfg, baseType) =>
             {
                 cfg.SetBaseType(baseType);
 
@@ -103,10 +107,10 @@
             });
         }
 
-        private void ConfigureType<TConfigurator>(
-            TConfigurator typeConfig,
-            Action<TConfigurator, Type> baseTypeCallback)
-            where TConfigurator : ITypeExpressionConfigurator
+        private void ConfigureType<TTypeExpression>(
+            TTypeExpression typeExpression,
+            Action<TTypeExpression, Type> baseTypeCallback)
+            where TTypeExpression : TypeExpression
         {
             if (_typeConstraints == null)
             {
@@ -117,17 +121,17 @@
             {
                 if (type.IsInterface())
                 {
-                    typeConfig.SetImplements(type);
-                    AddDefaultImplementations(typeConfig, type);
+                    typeExpression.SetImplements(type);
+                    AddDefaultImplementations(typeExpression, type);
                     continue;
                 }
 
-                baseTypeCallback.Invoke(typeConfig, type);
+                baseTypeCallback.Invoke(typeExpression, type);
             }
         }
 
         private static void AddDefaultImplementations(
-            ITypeExpressionConfigurator typeConfig,
+            TypeExpression typeExpression,
             Type type)
         {
             var methods = type
@@ -143,7 +147,7 @@
 
                 var methodLambda = Default(method.ReturnType).ToLambdaExpression(parameters);
 
-                typeConfig.AddMethod(method.Name, methodLambda);
+                typeExpression.AddMethod(method.Name, methodLambda);
             }
         }
 

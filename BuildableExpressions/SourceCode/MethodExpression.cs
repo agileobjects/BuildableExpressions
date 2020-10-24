@@ -22,7 +22,7 @@
     /// </summary>
     public abstract class MethodExpression :
         Expression,
-        IMethodExpressionConfigurator,
+        IClassMethodExpressionConfigurator,
         IMethod,
         ICustomAnalysableExpression,
         ICustomTranslationExpression
@@ -37,7 +37,7 @@
         internal MethodExpression(
             TypeExpression declaringTypeExpression,
             string name,
-            Action<IMethodExpressionConfigurator> configuration)
+            Action<MethodExpression> configuration)
         {
             DeclaringTypeExpression = declaringTypeExpression;
             Name = name;
@@ -190,9 +190,6 @@
         void IMethodExpressionConfigurator.SetVisibility(MemberVisibility visibility)
             => Visibility = visibility;
 
-        void IMethodExpressionConfigurator.SetStatic()
-            => IsStatic = true;
-
         GenericParameterExpression IGenericParameterConfigurator.AddGenericParameter(
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
@@ -269,7 +266,14 @@
             _parameters.AddRange(parameters.Except(_parameters));
         }
 
-        void IMethodExpressionConfigurator.SetBody(Expression body, Type returnType)
+        #endregion
+
+        #region IConcreteTypeMethodExpressionConfigurator
+
+        void IConcreteTypeMethodExpressionConfigurator.SetStatic()
+            => IsStatic = true;
+
+        void IConcreteTypeMethodExpressionConfigurator.SetBody(Expression body, Type returnType)
         {
             if (body.NodeType == ExpressionType.Lambda)
             {

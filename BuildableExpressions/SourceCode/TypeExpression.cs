@@ -235,6 +235,9 @@
         #region ITypeExpressionConfigurator Members
 
         void ITypeExpressionConfigurator.SetImplements(params Type[] interfaces)
+            => SetImplements(interfaces);
+
+        internal void SetImplements(params Type[] interfaces)
         {
             if (_interfaceTypes == null)
             {
@@ -266,9 +269,12 @@
             return parameter;
         }
 
-        MethodExpression ITypeExpressionConfigurator.AddMethod(
+        internal MethodExpression AddMethod(string name, Expression body)
+            => AddMethod(name, cfg => cfg.SetBody(body));
+
+        internal MethodExpression AddMethod(
             string name,
-            Action<IMethodExpressionConfigurator> configuration)
+            Action<MethodExpression> configuration)
         {
             return Add(new StandardMethodExpression(this, name, configuration));
         }

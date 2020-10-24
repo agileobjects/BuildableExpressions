@@ -72,7 +72,9 @@
             IsStatic = true;
         }
 
-        void IClassExpressionConfigurator.SetAbstract()
+        void IClassExpressionConfigurator.SetAbstract() => SetAbstract();
+
+        internal void SetAbstract()
         {
             if (IsStatic)
             {
@@ -89,12 +91,12 @@
         }
 
         void IClassExpressionConfigurator.SetBaseType<TBase>() where TBase : class
-            => DeriveFrom(typeof(TBase));
+            => SetBaseType(typeof(TBase));
 
         void IClassExpressionConfigurator.SetBaseType(Type baseType)
-            => DeriveFrom(baseType);
+            => SetBaseType(baseType);
 
-        private void DeriveFrom(Type baseType)
+        internal void SetBaseType(Type baseType)
         {
             if (BaseType == typeof(object))
             {
@@ -107,11 +109,18 @@
                 $"as it has already been set to {BaseType.GetFriendlyName()}");
         }
 
+        MethodExpression IClassExpressionConfigurator.AddMethod(
+            string name,
+            Action<IClassMethodExpressionConfigurator> configuration)
+        {
+            return AddMethod(name, configuration);
+        }
+
         internal override StandardMethodExpression Add(StandardMethodExpression method)
         {
             if (IsStatic)
             {
-                ((IMethodExpressionConfigurator)method).SetStatic();
+                ((IConcreteTypeMethodExpressionConfigurator)method).SetStatic();
             }
 
             return base.Add(method);

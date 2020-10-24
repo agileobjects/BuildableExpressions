@@ -14,7 +14,7 @@
         public StandardMethodExpression(
             TypeExpression declaringTypeExpression,
             string name,
-            Action<IMethodExpressionConfigurator> configuration)
+            Action<MethodExpression> configuration)
             : base(
                 declaringTypeExpression,
                 name.ThrowIfInvalidName<ArgumentException>("Method"),
@@ -86,7 +86,7 @@
             => _blockMethods ??= new List<BlockMethodExpression>();
 
         public BlockMethodExpression CreateBlockMethod(
-            Action<IMethodExpressionConfigurator> configuration)
+            Action<IConcreteTypeMethodExpressionConfigurator> configuration)
         {
             return new BlockMethodExpression(DeclaringTypeExpression, configuration);
         }

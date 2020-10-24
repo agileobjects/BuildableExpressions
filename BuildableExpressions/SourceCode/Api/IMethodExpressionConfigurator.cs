@@ -1,6 +1,5 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Api
 {
-    using System;
     using System.Linq.Expressions;
     using ReadableExpressions;
 
@@ -27,21 +26,9 @@
         void SetVisibility(MemberVisibility visibility);
 
         /// <summary>
-        /// Mark the <see cref="MethodExpression"/> as static.
-        /// </summary>
-        void SetStatic();
-
-        /// <summary>
         /// Adds the given <paramref name="parameters"/> to the <see cref="MethodExpression"/>.
         /// </summary>
         /// <param name="parameters">The ParameterExpression to add.</param>
         void AddParameters(params ParameterExpression[] parameters);
-
-        /// <summary>
-        /// Set the body of the <see cref="MethodExpression"/>.
-        /// </summary>
-        /// <param name="body">The Expression to use.</param>
-        /// <param name="returnType">The return type to use for the method.</param>
-        void SetBody(Expression body, Type returnType);
     }
 }
