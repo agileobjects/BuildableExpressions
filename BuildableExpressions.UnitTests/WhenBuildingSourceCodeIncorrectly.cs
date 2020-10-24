@@ -39,7 +39,7 @@
         }
 
         [Fact]
-        public void ShouldErrorIfBlankClassName()
+        public void ShouldErrorIfBlankTypeName()
         {
             var classNameEx = Should.Throw<ArgumentException>(() =>
             {
@@ -52,7 +52,7 @@
         }
 
         [Fact]
-        public void ShouldErrorIfWhitespaceClassName()
+        public void ShouldErrorIfWhitespaceTypeName()
         {
             var classNameEx = Should.Throw<ArgumentException>(() =>
              {
@@ -65,7 +65,7 @@
         }
 
         [Fact]
-        public void ShouldErrorIfInvalidClassName()
+        public void ShouldErrorIfInvalidTypeName()
         {
             var classNameEx = Should.Throw<ArgumentException>(() =>
             {
@@ -78,7 +78,7 @@
         }
 
         [Fact]
-        public void ShouldErrorIfDuplicateClassNames()
+        public void ShouldErrorIfDuplicateTypeNames()
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
@@ -86,13 +86,13 @@
 
                 BuildableExpression.SourceCode(sc =>
                 {
-                    sc.AddClass("MyClass", cls => cls.AddMethod(doNothing));
-                    sc.AddClass("MyClass", cls => { });
+                    sc.AddStruct("Doer", cls => cls.AddMethod(doNothing));
+                    sc.AddClass("Doer", cls => { });
                 });
             });
 
             configEx.Message.ShouldContain("Duplicate type name");
-            configEx.Message.ShouldContain("MyClass");
+            configEx.Message.ShouldContain("Doer");
         }
 
         [Fact]
@@ -209,7 +209,7 @@
             var methodNameEx = Should.Throw<ArgumentException>(() =>
             {
                 BuildableExpression.SourceCode(sc => sc
-                    .AddClass(cls => cls
+                    .AddStruct(cls => cls
                         .AddMethod(" My_Method")));
             });
 
