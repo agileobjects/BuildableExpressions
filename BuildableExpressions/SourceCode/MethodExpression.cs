@@ -259,6 +259,8 @@
 
         bool IMethod.IsVirtual => false;
 
+        bool IMethod.IsOverride => false;
+
         bool IMethod.IsGenericMethod => IsGeneric;
 
         bool IMethod.IsExtensionMethod => false;
