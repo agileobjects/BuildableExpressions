@@ -158,10 +158,10 @@
 
         private void ThrowIfDuplicateTypeName()
         {
-            var duplicateName = SourceCode.TypeExpressions
-                .FirstOrDefault(t => t != this && t.Name == Name);
+            var hasDuplicateName = SourceCode.TypeExpressions
+                .Any(t => t != this && t.Name == Name);
 
-            if (duplicateName != null)
+            if (hasDuplicateName)
             {
                 throw new InvalidOperationException(
                     $"Duplicate type name '{Name}' specified.");

@@ -197,6 +197,7 @@
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
         {
+            ThrowIfDuplicateGenericParameterName(name);
             ThrowIfTypeGenericParameterNameClash(name);
 
             var parameter = new GenericParameterExpression(name, configuration);
@@ -207,6 +208,24 @@
 
             _genericParameters.Add(parameter);
             return parameter;
+        }
+
+        private void ThrowIfDuplicateGenericParameterName(string name)
+        {
+            if (!IsGeneric)
+            {
+                return;
+            }
+
+            var hasDuplicateParameterName = GenericParametersAccessor
+                .Any(gp => gp.Name == name);
+
+            if (hasDuplicateParameterName)
+            {
+                throw new InvalidOperationException(
+                    $"Method '{DeclaringTypeExpression.Name}.{Name}': " +
+                    $"duplicate generic parameter name '{name}' specified.");
+            }
         }
 
         private void ThrowIfTypeGenericParameterNameClash(string genericParameterName)

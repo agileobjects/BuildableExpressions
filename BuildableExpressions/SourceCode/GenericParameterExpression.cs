@@ -199,7 +199,7 @@
 
                 ThrowIfHasStructConstraint(conflictingConstraint: typeName);
                 ThrowIfHasClassConstraint(conflictingConstraint: typeName);
-                ThrowIfAlreadyHasTypeConstraint(conflictingTypeConstraint: typeName);
+                ThrowIfAlreadyHasClassConstraint(conflictingTypeConstraint: typeName);
 
                 _typeConstraints.Insert(0, type);
             }
@@ -224,7 +224,7 @@
             }
         }
 
-        private void ThrowIfAlreadyHasTypeConstraint(string conflictingTypeConstraint)
+        private void ThrowIfAlreadyHasClassConstraint(string conflictingTypeConstraint)
         {
             var existingClassConstraint = _typeConstraints
                 .FirstOrDefault(t => t.IsClass());

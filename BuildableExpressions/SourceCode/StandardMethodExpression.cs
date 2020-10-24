@@ -28,38 +28,27 @@
 
         internal void Validate()
         {
-            ThrowIfDuplicateGenericArgumentNames();
-            ThrowIfDuplicateMethodName();
             ThrowIfEmptyMethod();
+            ThrowIfDuplicateMethodSignature();
         }
 
-        private void ThrowIfDuplicateGenericArgumentNames()
+        private void ThrowIfEmptyMethod()
         {
-            if (!IsGeneric || !(GenericParametersAccessor?.Count > 1))
-            {
-                return;
-            }
-
-            var duplicateParameterName = GenericParametersAccessor
-                .GroupBy(arg => arg.Name)
-                .FirstOrDefault(nameGroup => nameGroup.Count() > 1)?
-                .Key;
-
-            if (duplicateParameterName != null)
+            if (Body == null)
             {
                 throw new InvalidOperationException(
-                    $"Method '{DeclaringTypeExpression.Name}.{Name}': " +
-                    $"duplicate generic parameter name '{duplicateParameterName}' specified.");
+                    $"Method '{this.GetSignature()}': no method body defined. " +
+                    "To add an empty method, use SetBody(Expression.Default(typeof(void)))");
             }
         }
 
-        private void ThrowIfDuplicateMethodName()
+        private void ThrowIfDuplicateMethodSignature()
         {
-            var duplicateMethod = DeclaringTypeExpression
+            var hasDuplicateMethod = DeclaringTypeExpression
                 .MethodExpressions
-                .FirstOrDefault(m => m != this && m.Name == Name && HasSameParameterTypes(m));
+                .Any(m => m.Name == Name && HasSameParameterTypes(m));
 
-            if (duplicateMethod != null)
+            if (hasDuplicateMethod)
             {
                 throw new InvalidOperationException(
                     $"Type {DeclaringTypeExpression.Name} has duplicate " +
@@ -85,16 +74,6 @@
             return otherMethod.ParametersAccessor
                 .Project(p => p.Type)
                 .SequenceEqual(parameterTypes);
-        }
-
-        private void ThrowIfEmptyMethod()
-        {
-            if (Body == null)
-            {
-                throw new InvalidOperationException(
-                    $"Method '{this.GetSignature()}': no method body defined. " +
-                     "To add an empty method, use SetBody(Expression.Default(typeof(void)))");
-            }
         }
 
         #endregion
