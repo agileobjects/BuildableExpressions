@@ -4,7 +4,7 @@
 
     public class NetFrameworkCompilerTests : CompilerTestsBase
     {
-        internal override ICompiler CreateCompiler()
-            => new NetFrameworkCompiler();
+        internal override ICSharpCompiler CreateCompiler()
+            => new NetFrameworkCSharpCompiler();
     }
 }

@@ -8,10 +8,10 @@ namespace AgileObjects.BuildableExpressions.Compilation
     using System.Runtime.Loader;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
-    using static CompilationExtensions;
+    using static CSharpCompiler;
     using static Microsoft.CodeAnalysis.OutputKind;
 
-    internal class NetStandardCompiler : ICompiler
+    internal class NetStandardCSharpCompiler : ICSharpCompiler
     {
         public CompilationResult Compile(
             IEnumerable<Assembly> referenceAssemblies,

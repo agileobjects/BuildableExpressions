@@ -191,7 +191,7 @@ namespace MyNamespace
 
         #region Helper Members
 
-        internal abstract ICompiler CreateCompiler();
+        internal abstract ICSharpCompiler CreateCompiler();
 
         public class TestClass
         {

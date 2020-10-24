@@ -19,7 +19,7 @@ namespace BuildXpr
     {
         private readonly ILogger _logger;
         private readonly InputFilesFinder _inputFilesFinder;
-        private readonly ICompiler _compiler;
+        private readonly ICSharpCompiler _compiler;
         private readonly OutputWriter _outputWriter;
         private readonly IProjectManager _projectManager;
 
@@ -32,7 +32,7 @@ namespace BuildXpr
                 new InputFilesFinder(
                     BclFileManager.Instance,
                     MsBuildTaskLogger.Instance),
-                Compiler.Instance,
+                CSharpCompiler.Instance,
                 new OutputWriter(BclFileManager.Instance),
                 new ProjectManager(BclFileManager.Instance))
         {
@@ -41,7 +41,7 @@ namespace BuildXpr
         internal BuildExpressionsTask(
             ILogger logger,
             InputFilesFinder inputFilesFinder,
-            ICompiler compiler,
+            ICSharpCompiler compiler,
             OutputWriter outputWriter,
             IProjectManager projectManager)
         {

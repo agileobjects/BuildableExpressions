@@ -5,41 +5,27 @@
     using System.Reflection;
     using Extensions;
     using Logging;
-    using NetStandardPolyfills;
-    using ReadableExpressions;
     using SourceCode;
     using SourceCode.Extensions;
 
     internal static class CompilationExtensions
     {
-        public static readonly Assembly[] CompilationAssemblies =
-        {
-            typeof(object).GetAssembly(),
-#if NET_STANDARD
-            typeof(List<>).GetAssembly(),
-#endif
-            typeof(Enumerable).GetAssembly(),
-            typeof(AssemblyExtensionsPolyfill).GetAssembly(),
-            typeof(ReadableExpression).GetAssembly(),
-            typeof(BuildableExpression).GetAssembly()
-        };
-
         public static CompilationResult Compile(
-            this ICompiler compiler,
+            this ICSharpCompiler compiler,
             IEnumerable<string> sourceCodes)
         {
             return compiler.Compile(sourceCodes.ToArray());
         }
 
         public static CompilationResult Compile(
-            this ICompiler compiler,
+            this ICSharpCompiler compiler,
             params string[] sourceCodes)
         {
             return compiler.Compile(Enumerable<Assembly>.EmptyArray, sourceCodes);
         }
 
         public static CompilationResult Compile(
-            this ICompiler compiler,
+            this ICSharpCompiler compiler,
             params SourceCodeExpression[] sourceCodes)
         {
             return compiler.Compile(
@@ -48,7 +34,7 @@
         }
 
         public static CompilationResult Compile(
-            this ICompiler compiler,
+            this ICSharpCompiler compiler,
             IEnumerable<Assembly> referenceAssemblies,
             IEnumerable<string> sourceCodes)
         {
@@ -56,7 +42,7 @@
         }
 
         public static bool CompilationFailed(
-            this ICompiler compiler,
+            this ICSharpCompiler compiler,
             IEnumerable<string> expressionBuilderSources,
             ILogger logger,
             out CompilationResult compilationResult)

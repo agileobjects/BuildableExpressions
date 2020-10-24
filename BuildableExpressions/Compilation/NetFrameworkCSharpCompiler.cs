@@ -6,13 +6,13 @@ namespace AgileObjects.BuildableExpressions.Compilation
     using System.Linq;
     using System.Reflection;
     using Microsoft.CSharp;
-    using static CompilationExtensions;
+    using static CSharpCompiler;
 
-    internal class NetFrameworkCompiler : ICompiler
+    internal class NetFrameworkCSharpCompiler : ICSharpCompiler
     {
         public CompilationResult Compile(
             IEnumerable<Assembly> referenceAssemblies,
-            params string[] sourceCodes)
+            params string[] cSharpSourceCodes)
         {
             var codeProvider = new CSharpCodeProvider();
 
@@ -31,7 +31,7 @@ namespace AgileObjects.BuildableExpressions.Compilation
             parameters.ReferencedAssemblies.AddRange(referenceAssemblyPaths);
 
             var compilationResult = codeProvider
-                .CompileAssemblyFromSource(parameters, sourceCodes);
+                .CompileAssemblyFromSource(parameters, cSharpSourceCodes);
 
             if (compilationResult.Errors.HasErrors)
             {

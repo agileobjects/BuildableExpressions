@@ -8,14 +8,38 @@
     using ReadableExpressions.Extensions;
     using SourceCode;
 
-    internal class CompilationResult
+    /// <summary>
+    /// Contains the results of a code-compilation operation.
+    /// </summary>
+    public class CompilationResult
     {
+        /// <summary>
+        /// Gets a value indicating whether the code compilation failed.
+        /// </summary>
         public bool Failed => CompiledAssembly == null;
 
-        public Assembly CompiledAssembly { get; set; }
+        /// <summary>
+        /// Gets the Assembly which contains the result of the compilation.
+        /// </summary>
+        public Assembly CompiledAssembly { get; internal set; }
 
-        public ICollection<string> Errors { get; set; }
+        /// <summary>
+        /// Gets descriptions of any errors which occurred during compilation.
+        /// </summary>
+        public IEnumerable<string> Errors { get; internal set; }
 
+        /// <summary>
+        /// Retrieves <see cref="SourceCodeExpression"/>s built by the
+        /// <see cref="ISourceCodeExpressionBuilder"/>s in the <see cref="CompiledAssembly"/>.
+        /// </summary>
+        /// <returns>
+        /// <see cref="SourceCodeExpression"/>s built by the <see cref="ISourceCodeExpressionBuilder"/>s
+        /// in the <see cref="CompiledAssembly"/>.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// Thrown if the <see cref="CompiledAssembly"/> does not contain any
+        /// <see cref="ISourceCodeExpressionBuilder"/> implementations.
+        /// </exception>
         public IEnumerable<SourceCodeExpression> ToSourceCodeExpressions()
         {
             var allExpressions = new List<SourceCodeExpression>();

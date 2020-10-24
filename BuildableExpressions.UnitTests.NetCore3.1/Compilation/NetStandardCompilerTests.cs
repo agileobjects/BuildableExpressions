@@ -4,7 +4,7 @@
 
     public class NetStandardCompilerTests : CompilerTestsBase
     {
-        internal override ICompiler CreateCompiler()
-            => new NetStandardCompiler();
+        internal override ICSharpCompiler CreateCompiler()
+            => new NetStandardCSharpCompiler();
     }
 }

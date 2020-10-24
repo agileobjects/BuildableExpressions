@@ -84,7 +84,7 @@
                 }
             });
 
-            var compiledTypes = Compiler.Instance
+            var compiledTypes = CSharpCompiler.Instance
                 .Compile(paramSourceCode)
                 .CompiledAssembly
                 .GetTypes();
