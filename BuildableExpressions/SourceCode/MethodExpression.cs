@@ -197,6 +197,8 @@
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
         {
+            ThrowIfTypeGenericParameterNameClash(name);
+
             var parameter = new GenericParameterExpression(name, configuration);
 
             _genericParameters ??= new List<GenericParameterExpression>();
@@ -205,6 +207,25 @@
 
             _genericParameters.Add(parameter);
             return parameter;
+        }
+
+        private void ThrowIfTypeGenericParameterNameClash(string genericParameterName)
+        {
+            if (!DeclaringTypeExpression.IsGeneric)
+            {
+                return;
+            }
+
+            var hasClashingGenericParameter = DeclaringTypeExpression
+                .GenericParameters
+                .Any(gp => gp.Name == genericParameterName);
+
+            if (hasClashingGenericParameter)
+            {
+                throw new InvalidOperationException(
+                    $"Generic parameter '{genericParameterName}' has the same name as a " +
+                    $"generic parameter in declaring type '{DeclaringTypeExpression.Name}'.");
+            }
         }
 
         void IMethodExpressionConfigurator.AddParameters(

@@ -174,5 +174,29 @@
 
             configEx.Message.ShouldContain("both Stream and StringComparer constraints");
         }
+
+        [Fact]
+        public void ShouldErrorIfClassAndMethodGenericParametersHaveSameName()
+        {
+            var configEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("ParameterClash", cls =>
+                    {
+                        cls.AddGenericParameter("T");
+
+                        cls.AddMethod("GenericNope", m =>
+                        {
+                            m.AddGenericParameter("T");
+                        });
+                    });
+                });
+            });
+
+            configEx.Message.ShouldContain("Generic parameter 'T'");
+            configEx.Message.ShouldContain("has the same name");
+            configEx.Message.ShouldContain("declaring type 'ParameterClash'");
+        }
     }
 }
