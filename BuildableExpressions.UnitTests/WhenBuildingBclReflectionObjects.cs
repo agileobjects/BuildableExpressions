@@ -166,7 +166,7 @@
         }
 
         [Fact]
-        public void ShouldCreateAMethodInfo()
+        public void ShouldCreateAParameterlessVoidClassMethodInfo()
         {
             var sourceCode = BuildableExpression.SourceCode(sc =>
             {
