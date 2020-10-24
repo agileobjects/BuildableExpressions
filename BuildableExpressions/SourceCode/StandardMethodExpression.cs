@@ -30,6 +30,7 @@
         {
             ThrowIfDuplicateGenericArgumentNames();
             ThrowIfDuplicateMethodName();
+            ThrowIfEmptyMethod();
         }
 
         private void ThrowIfDuplicateGenericArgumentNames()
@@ -84,6 +85,16 @@
             return otherMethod.ParametersAccessor
                 .Project(p => p.Type)
                 .SequenceEqual(parameterTypes);
+        }
+
+        private void ThrowIfEmptyMethod()
+        {
+            if (Body == null)
+            {
+                throw new InvalidOperationException(
+                    $"Method '{this.GetSignature()}': no method body defined. " +
+                     "To add an empty method, use SetBody(Expression.Default(typeof(void)))");
+            }
         }
 
         #endregion

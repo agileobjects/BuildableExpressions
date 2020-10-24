@@ -338,6 +338,24 @@
             configEx.Message.ShouldContain("T1");
         }
 
+        [Fact]
+        public void ShouldErrorIfEmptyStructMethod()
+        {
+            var methodEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddStruct("EmptyMethodStruct", str =>
+                    {
+                        str.AddMethod("EmptyMethod", m => { });
+                    });
+                });
+            });
+
+            methodEx.Message.ShouldContain("void EmptyMethodStruct.EmptyMethod()");
+            methodEx.Message.ShouldContain("no method body defined");
+        }
+
         #region Helper Members
 
         public interface IMessager
