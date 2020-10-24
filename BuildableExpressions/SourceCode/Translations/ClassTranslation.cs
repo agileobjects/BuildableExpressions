@@ -71,7 +71,7 @@
 
             _typeTranslation.WriteTypeDeclarationTo(writer, declarationModifiers);
             _typeTranslation.WriteTypeListTo(writer, _baseTypeTranslation);
-            _typeTranslation.WriteMethodsTo(writer);
+            _typeTranslation.WriteMembersTo(writer);
         }
     }
 }

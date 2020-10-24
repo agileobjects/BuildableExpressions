@@ -180,25 +180,28 @@
             }
         }
 
-        public void WriteMethodsTo(TranslationWriter writer)
+        public void WriteMembersTo(TranslationWriter writer)
         {
+            if (_methodCount == 0)
+            {
+                writer.WriteToTranslation(" { }");
+                return;
+            }
+
             writer.WriteOpeningBraceToTranslation();
 
-            if (_methodCount != 0)
+            for (var i = 0; ;)
             {
-                for (var i = 0; ;)
+                _methodTranslations[i].WriteTo(writer);
+                ++i;
+
+                if (i == _methodCount)
                 {
-                    _methodTranslations[i].WriteTo(writer);
-                    ++i;
-
-                    if (i == _methodCount)
-                    {
-                        break;
-                    }
-
-                    writer.WriteNewLineToTranslation();
-                    writer.WriteNewLineToTranslation();
+                    break;
                 }
+
+                writer.WriteNewLineToTranslation();
+                writer.WriteNewLineToTranslation();
             }
 
             writer.WriteClosingBraceToTranslation();
