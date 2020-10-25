@@ -16,6 +16,8 @@
 
         internal override bool HasGeneratedName => true;
 
+        internal override bool HasBody => true;
+
         public void Finalise() => Name = GetName();
 
         #region Name Generation

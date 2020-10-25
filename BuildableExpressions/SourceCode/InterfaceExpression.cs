@@ -21,6 +21,22 @@
             configuration.Invoke(this);
         }
 
+        #region IInterfaceExpressionConfigurator Members
+
+        MethodExpression IInterfaceExpressionConfigurator.AddMethod(
+            string name,
+            Type returnType,
+            Action<IMethodExpressionConfigurator> configuration)
+        {
+            return Add(new InterfaceMethodExpression(
+                this,
+                name,
+                returnType,
+                configuration));
+        }
+
+        #endregion
+
         internal override ITranslation GetTranslation(ITranslationContext context)
             => new InterfaceTranslation(this, context);
     }

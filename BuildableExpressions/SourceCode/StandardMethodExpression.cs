@@ -2,10 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using Analysis;
     using Api;
-    using BuildableExpressions.Extensions;
 
     internal class StandardMethodExpression : MethodExpression
     {
@@ -20,6 +18,11 @@
                 name.ThrowIfInvalidName<ArgumentException>("Method"),
                 configuration)
         {
+            if (!Visibility.HasValue)
+            {
+                SetVisibility(MemberVisibility.Public);
+            }
+
             Analysis = MethodExpressionAnalysis.For(this);
             Validate();
         }
@@ -42,43 +45,11 @@
             }
         }
 
-        private void ThrowIfDuplicateMethodSignature()
-        {
-            var hasDuplicateMethod = DeclaringTypeExpression
-                .MethodExpressions
-                .Any(m => m.Name == Name && HasSameParameterTypes(m));
-
-            if (hasDuplicateMethod)
-            {
-                throw new InvalidOperationException(
-                    $"Type {DeclaringTypeExpression.Name} has duplicate " +
-                    $"method signature '{this.GetSignature(includeTypeName: false)}'");
-            }
-        }
-
-        private bool HasSameParameterTypes(MethodExpression otherMethod)
-        {
-            if (ParametersAccessor == null)
-            {
-                return otherMethod.ParametersAccessor == null;
-            }
-
-            if (otherMethod.ParametersAccessor == null)
-            {
-                return false;
-            }
-
-            var parameterTypes =
-                ParametersAccessor.ProjectToArray(p => p.Type);
-
-            return otherMethod.ParametersAccessor
-                .Project(p => p.Type)
-                .SequenceEqual(parameterTypes);
-        }
-
         #endregion
 
         internal override bool HasGeneratedName => false;
+
+        internal override bool HasBody => !IsAbstract;
 
         public bool HasBlockMethods => _blockMethods != null;
 

@@ -33,7 +33,7 @@
                 _summary.FormattingSize +
                 _definitionTranslation.FormattingSize;
 
-            _methodHasBody = !method.IsAbstract;
+            _methodHasBody = _method.HasBody;
 
             if (_methodHasBody)
             {

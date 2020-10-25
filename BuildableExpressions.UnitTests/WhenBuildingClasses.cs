@@ -1,7 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
-    using System.Linq.Expressions;
     using Common;
     using SourceCode;
     using Xunit;

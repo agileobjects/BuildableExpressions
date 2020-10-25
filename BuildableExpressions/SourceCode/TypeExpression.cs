@@ -281,7 +281,7 @@
 
         internal virtual StandardMethodExpression Add(StandardMethodExpression method)
         {
-            AddMethod(method);
+            Add((MethodExpression)method);
 
             if (!method.HasBlockMethods)
             {
@@ -291,13 +291,18 @@
             foreach (var blockMethod in method.BlockMethods)
             {
                 blockMethod.Finalise();
-                AddMethod(blockMethod);
+                Add(blockMethod);
             }
 
             return method;
         }
 
-        private void AddMethod(MethodExpression method)
+        /// <summary>
+        /// Adds the given <paramref name="method"/> to this <see cref="TypeExpression"/>.
+        /// </summary>
+        /// <param name="method">The <see cref="MethodExpression"/> to add.</param>
+        /// <returns>The given <paramref name="method"/>.</returns>
+        protected MethodExpression Add(MethodExpression method)
         {
             _methodExpressions.Add(method);
             _readOnlyMethodExpressions = null;
@@ -306,6 +311,8 @@
             {
                 _type = CreateType();
             }
+
+            return method;
         }
 
         #endregion

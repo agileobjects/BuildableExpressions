@@ -12,6 +12,9 @@
         /// <summary>
         /// Mark the <see cref="MethodExpression"/> as static.
         /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this <see cref="MethodExpression"/> has already been marked as abstract.
+        /// </exception>
         void SetStatic();
 
         /// <summary>

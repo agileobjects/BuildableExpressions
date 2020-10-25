@@ -79,6 +79,8 @@
 
         internal abstract bool HasGeneratedName { get; }
 
+        internal abstract bool HasBody { get; }
+
         /// <summary>
         /// Gets this <see cref="MethodExpression"/>'s parent <see cref="TypeExpression"/>.
         /// </summary>
@@ -96,7 +98,7 @@
         /// <summary>
         /// Gets the <see cref="MemberVisibility"/> of this <see cref="MethodExpression"/>.
         /// </summary>
-        public MemberVisibility Visibility { get; private set; }
+        public MemberVisibility? Visibility { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="MethodExpression"/> is static.
@@ -165,7 +167,7 @@
         /// Gets the return type of this <see cref="MethodExpression"/>, which is the return type
         /// of the LambdaExpression from which the method was created.
         /// </summary>
-        public Type ReturnType => Definition?.ReturnType ?? typeof(void);
+        public virtual Type ReturnType => Definition?.ReturnType ?? typeof(void);
 
         /// <summary>
         /// Gets the LambdaExpression describing the parameters and body of this
@@ -177,7 +179,7 @@
         /// Gets the <see cref="ParameterExpression"/>s describing the parameters of this
         /// <see cref="MethodExpression"/>, if any.
         /// </summary>
-        public ReadOnlyCollection<ParameterExpression> Parameters
+        public virtual ReadOnlyCollection<ParameterExpression> Parameters
             => Definition?.Parameters ?? Enumerable<ParameterExpression>.EmptyReadOnlyCollection;
 
         internal IList<ParameterExpression> ParametersAccessor => _parameters;
@@ -251,6 +253,15 @@
             => Summary = summary;
 
         void IMethodExpressionConfigurator.SetVisibility(MemberVisibility visibility)
+            => SetVisibility(visibility);
+
+        /// <summary>
+        /// Gives the <see cref="MethodExpression"/> the given <paramref name="visibility"/>.
+        /// </summary>
+        /// <param name="visibility">
+        /// The <see cref="MemberVisibility"/> to give the <see cref="MethodExpression"/>.
+        /// </param>
+        protected void SetVisibility(MemberVisibility visibility)
             => Visibility = visibility;
 
         void IMethodExpressionConfigurator.AddParameters(
@@ -399,9 +410,62 @@
 
         #endregion
 
-        IEnumerable<Expression> ICustomAnalysableExpression.Expressions
+        #region Validation
+
+        /// <summary>
+        /// Throws an InvalidOperationException if this <see cref="MethodExpression"/> has the same
+        /// signature as another method on the <see cref="DeclaringTypeExpression"/>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this <see cref="MethodExpression"/> has the same signature as another method
+        /// on the <see cref="DeclaringTypeExpression"/>.
+        /// </exception>
+        protected void ThrowIfDuplicateMethodSignature()
         {
-            get { yield return Definition; }
+            var hasDuplicateMethod = DeclaringTypeExpression
+                .MethodExpressions
+                .Any(m => m.Name == Name && HasSameParameterTypes(m));
+
+            if (hasDuplicateMethod)
+            {
+                throw new InvalidOperationException(
+                    $"Type {DeclaringTypeExpression.Name} has duplicate " +
+                    $"method signature '{this.GetSignature(includeTypeName: false)}'");
+            }
+        }
+
+        private bool HasSameParameterTypes(MethodExpression otherMethod)
+        {
+            if (ParametersAccessor == null)
+            {
+                return otherMethod.ParametersAccessor == null;
+            }
+
+            if (otherMethod.ParametersAccessor == null)
+            {
+                return false;
+            }
+
+            var parameterTypes =
+                ParametersAccessor.ProjectToArray(p => p.Type);
+
+            return otherMethod.ParametersAccessor
+                .Project(p => p.Type)
+                .SequenceEqual(parameterTypes);
+        }
+
+        #endregion
+
+        IEnumerable<Expression> ICustomAnalysableExpression.Expressions
+            => GetAnalysisExpressions();
+
+        /// <summary>
+        /// Returns zero or more Expressions for a <see cref="MethodExpressionAnalysis"/> to examine.
+        /// </summary>
+        /// <returns>Zero or more Expressions for a <see cref="MethodExpressionAnalysis"/> to examine.</returns>
+        protected virtual IEnumerable<Expression> GetAnalysisExpressions()
+        {
+            yield return Definition;
         }
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
