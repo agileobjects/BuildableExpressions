@@ -14,6 +14,36 @@
     public static class CompilationExtensions
     {
         /// <summary>
+        /// Compiles this <paramref name="sourceCodeExpression"/>, returning a
+        /// <see cref="CompilationResult"/> describing the results.
+        /// </summary>
+        /// <param name="sourceCodeExpression">The <see cref="SourceCodeExpression"/>s to compile.</param>
+        /// <returns>A <see cref="CompilationResult"/> describing the result of the compilation.</returns>
+        public static CompilationResult Compile(
+            this SourceCodeExpression sourceCodeExpression)
+        {
+            return CSharpCompiler.Instance.Compile(
+                sourceCodeExpression.ReferencedAssemblies.Distinct(),
+                sourceCodeExpression.ToCSharpString());
+        }
+
+        /// <summary>
+        /// Compiles these <paramref name="sourceCodeExpressions"/>, returning a
+        /// <see cref="CompilationResult"/> describing the results.
+        /// </summary>
+        /// <param name="sourceCodeExpressions">One or more <see cref="SourceCodeExpression"/>s to compile.</param>
+        /// <returns>A <see cref="CompilationResult"/> describing the result of the compilation.</returns>
+        public static CompilationResult Compile(
+            this IEnumerable<SourceCodeExpression> sourceCodeExpressions)
+        {
+            var expressionsList = sourceCodeExpressions.ToList();
+
+            return CSharpCompiler.Instance.Compile(
+                expressionsList.SelectMany(sc => sc.ReferencedAssemblies).Distinct(),
+                expressionsList.Project(sc => sc.ToCSharpString()));
+        }
+
+        /// <summary>
         /// Compiles the given <paramref name="cSharpSourceCodes"/>, returning a
         /// <see cref="CompilationResult"/> describing the results.
         /// </summary>
@@ -39,22 +69,6 @@
             params string[] cSharpSourceCodes)
         {
             return compiler.Compile(Enumerable<Assembly>.EmptyArray, cSharpSourceCodes);
-        }
-
-        /// <summary>
-        /// Compiles the given <paramref name="sourceCodeExpressions"/>, returning a
-        /// <see cref="CompilationResult"/> describing the results.
-        /// </summary>
-        /// <param name="compiler">The <see cref="ICSharpCompiler"/> to use.</param>
-        /// <param name="sourceCodeExpressions">One or more <see cref="SourceCodeExpression"/>s to compile.</param>
-        /// <returns>A <see cref="CompilationResult"/> describing the result of the compilation.</returns>
-        public static CompilationResult Compile(
-            this ICSharpCompiler compiler,
-            params SourceCodeExpression[] sourceCodeExpressions)
-        {
-            return compiler.Compile(
-                sourceCodeExpressions.SelectMany(sc => sc.ReferencedAssemblies).Distinct(),
-                sourceCodeExpressions.Project(sc => sc.ToCSharpString()));
         }
 
         /// <summary>

@@ -60,8 +60,8 @@
             var sourceCode = new SourceCodeExpression(SourceCode.Namespace);
             sourceCode.Add(this);
 
-            var compiledTypes = CSharpCompiler.Instance
-                .Compile(sourceCode)
+            var compiledTypes = sourceCode
+                .Compile()
                 .CompiledAssembly
                 .GetTypes();
 
