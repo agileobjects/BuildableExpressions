@@ -56,11 +56,41 @@
         }
 
         /// <summary>
+        /// Configures the <see cref="TypeExpression"/> to implement the given
+        /// <paramref name="interfaceExpression"/>.
+        /// </summary>
+        /// <param name="typeConfig">The <see cref="ITypeExpressionConfigurator"/> to configure.</param>
+        /// <param name="interfaceExpression"></param>
+        public static void SetImplements(
+            this ITypeExpressionConfigurator typeConfig,
+            InterfaceExpression interfaceExpression)
+        {
+            typeConfig.SetImplements(interfaceExpression.Type);
+        }
+
+        /// <summary>
+        /// Add a parameterless <see cref="MethodExpression"/> to the
+        /// <see cref="InterfaceExpression"/>, with the given <paramref name="name"/> and
+        /// <paramref name="returnType"/>.
+        /// </summary>
+        /// <param name="interfaceConfig">The <see cref="IInterfaceExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
+        /// <param name="returnType">The return type of the <see cref="MethodExpression"/>.</param>
+        /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
+        public static MethodExpression AddMethod(
+            this IInterfaceExpressionConfigurator interfaceConfig,
+            string name,
+            Type returnType)
+        {
+            return interfaceConfig.AddMethod(name, returnType, cfg => { });
+        }
+
+        /// <summary>
         /// Add a public, instance-scoped <see cref="MethodExpression"/> to the
         /// <see cref="ClassExpression"/>, with the given <paramref name="name"/> and
         /// <paramref name="body"/>.
         /// </summary>
-        /// <param name="typeConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
         /// <param name="body">
         /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
@@ -68,11 +98,11 @@
         /// </param>
         /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
         public static MethodExpression AddMethod(
-            this IClassExpressionConfigurator typeConfig,
+            this IClassExpressionConfigurator classConfig,
             string name,
             Expression body)
         {
-            return typeConfig.AddMethod(name, cfg => cfg.SetBody(body));
+            return classConfig.AddMethod(name, cfg => cfg.SetBody(body));
         }
 
         /// <summary>
@@ -128,7 +158,7 @@
         /// given <paramref name="name"/> and <paramref name="body"/>, using the given
         /// <paramref name="configuration"/>.
         /// </summary>
-        /// <param name="typeConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
         /// <param name="body">
         /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
@@ -139,12 +169,12 @@
         /// </param>
         /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
         public static MethodExpression AddMethod(
-            this IClassExpressionConfigurator typeConfig,
+            this IClassExpressionConfigurator classConfig,
             string name,
             Expression body,
             Action<IClassMethodExpressionConfigurator> configuration)
         {
-            return typeConfig.AddMethod(name, cfg =>
+            return classConfig.AddMethod(name, cfg =>
             {
                 configuration.Invoke(cfg);
                 cfg.SetBody(body);

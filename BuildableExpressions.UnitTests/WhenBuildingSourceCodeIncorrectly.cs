@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using System.Reflection;
+    using System.Text;
     using Common;
     using ReadableExpressions;
     using SourceCode;
@@ -111,7 +112,41 @@
             });
 
             baseTypeEx.Message.ShouldContain("Unable to set class base type");
-            baseTypeEx.Message.ShouldContain("already been set to Stream");
+            baseTypeEx.Message.ShouldContain("already been set to 'Stream'");
+        }
+
+        [Fact]
+        public void ShouldErrorIfInterfaceTypeGivenAsBaseType()
+        {
+            var baseTypeEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetBaseType(typeof(IDisposable));
+                    });
+                });
+            });
+
+            baseTypeEx.Message.ShouldContain("'IDisposable' is not a valid base type");
+        }
+
+        [Fact]
+        public void ShouldErrorIfConcreteTypeGivenAsInterface()
+        {
+            var interfaceEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetImplements(typeof(StringBuilder));
+                    });
+                });
+            });
+
+            interfaceEx.Message.ShouldContain("'StringBuilder' is not an interface type");
         }
 
         [Fact]

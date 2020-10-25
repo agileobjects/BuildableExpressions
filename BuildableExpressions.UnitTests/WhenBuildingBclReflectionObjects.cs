@@ -69,6 +69,43 @@
         }
 
         [Fact]
+        public void ShouldCreateAnInterfaceType()
+        {
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.SetNamespace("MyStuff.Tests");
+
+                sc.AddInterface("IMyInterface", itf =>
+                {
+                    itf.AddMethod("DoNothing", typeof(void), m =>
+                    {
+                        m.AddParameters(
+                            Parameter(typeof(string), "str1"),
+                            Parameter(typeof(string), "str2"));
+                    });
+                });
+            });
+
+            var @interface = sourceCode.TypeExpressions.FirstOrDefault().ShouldNotBeNull();
+
+            @interface.Type.ShouldNotBeNull();
+            @interface.Type.Namespace.ShouldBe("MyStuff.Tests");
+            @interface.Type.Name.ShouldBe("IMyInterface");
+            @interface.Type.IsInterface().ShouldBeTrue();
+            @interface.Type.IsGenericType().ShouldBeFalse();
+
+            var method = @interface.Type.GetPublicInstanceMethod("DoNothing").ShouldNotBeNull();
+
+            method.Name.ShouldBe("DoNothing");
+            method.ReturnType.ShouldBe(typeof(void));
+            method.GetParameters()[0].ParameterType.ShouldBe(typeof(string));
+            method.GetParameters()[0].Name.ShouldBe("str1");
+            method.GetParameters()[1].ParameterType.ShouldBe(typeof(string));
+            method.GetParameters()[1].Name.ShouldBe("str2");
+            method.IsGenericMethod.ShouldBeFalse();
+        }
+
+        [Fact]
         public void ShouldCreateAClassType()
         {
             var sourceCode = BuildableExpression.SourceCode(sc =>

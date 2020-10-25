@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Api;
+    using NetStandardPolyfills;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using Translations;
@@ -98,15 +99,29 @@
 
         internal void SetBaseType(Type baseType)
         {
-            if (BaseType == typeof(object))
-            {
-                BaseType = baseType;
-                return;
-            }
+            ThrowIfBaseTypeAlreadySet(baseType);
+            ThrowIfInvalidBaseType(baseType);
 
-            throw new InvalidOperationException(
-                $"Unable to set class base type to {baseType.GetFriendlyName()} " +
-                $"as it has already been set to {BaseType.GetFriendlyName()}");
+            BaseType = baseType;
+        }
+
+        private void ThrowIfBaseTypeAlreadySet(Type baseType)
+        {
+            if (BaseType != typeof(object))
+            {
+                throw new InvalidOperationException(
+                    $"Unable to set class base type to '{baseType.GetFriendlyName()}' " +
+                    $"as it has already been set to '{BaseType.GetFriendlyName()}'");
+            }
+        }
+
+        private static void ThrowIfInvalidBaseType(Type baseType)
+        {
+            if (!baseType.IsClass())
+            {
+                throw new InvalidOperationException(
+                    $"Type '{baseType.GetFriendlyName()}' is not a valid base type.");
+            }
         }
 
         MethodExpression IClassExpressionConfigurator.AddMethod(

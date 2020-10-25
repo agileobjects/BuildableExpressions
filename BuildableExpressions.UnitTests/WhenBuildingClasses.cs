@@ -107,6 +107,49 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldBuildAnInterfaceAndImplementingClass()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var @interface = sc.AddInterface("IMyInterface", itf =>
+                    {
+                        itf.AddMethod("GetMessage", typeof(string));
+                    });
+
+                    sc.AddClass("ClassImpl", cls =>
+                    {
+                        cls.SetImplements(@interface);
+                        
+                        cls.AddMethod("GetMessage", m =>
+                        {
+                            m.SetBody(Constant("Hello!", typeof(string)));
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public interface IMyInterface
+    {
+        string GetMessage();
+    }
+
+    public class ClassImpl : IMyInterface
+    {
+        public string GetMessage()
+        {
+            return ""Hello!"";
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAClassBaseTypeAndDerivedTypes()
         {
             var translated = BuildableExpression

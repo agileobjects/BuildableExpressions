@@ -35,7 +35,7 @@
         internal override bool HasBody => false;
 
         public override ReadOnlyCollection<ParameterExpression> Parameters
-            => ParametersAccessor?.ToReadOnlyCollection();
+            => ParametersAccessor.ToReadOnlyCollection();
 
         protected override IEnumerable<Expression> GetAnalysisExpressions()
             => (IList<Expression>)ParametersAccessor ?? Enumerable<Expression>.EmptyArray;

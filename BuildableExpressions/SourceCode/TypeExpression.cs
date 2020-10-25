@@ -12,6 +12,7 @@
     using Extensions;
     using NetStandardPolyfills;
     using ReadableExpressions;
+    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
     using static SourceCodeTranslationSettings;
@@ -248,7 +249,20 @@
                 _readOnlyInterfaceTypes = null;
             }
 
-            _interfaceTypes.AddRange(interfaces);
+            foreach (var @interface in interfaces)
+            {
+                ThrowIfNonInterfaceType(@interface);
+                _interfaceTypes.Add(@interface);
+            }
+        }
+
+        private void ThrowIfNonInterfaceType(Type type)
+        {
+            if (!type.IsInterface())
+            {
+                throw new InvalidOperationException(
+                    $"Type '{type.GetFriendlyName()}' is not an interface type.");
+            }
         }
 
         void ITypeExpressionConfigurator.SetSummary(CommentExpression summary)
