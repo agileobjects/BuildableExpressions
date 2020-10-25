@@ -14,20 +14,15 @@
     internal class NamespaceAnalysis : ExpressionVisitor
     {
         private List<string> _requiredNamespaces;
-
-        public static NamespaceAnalysis For(Expression expression)
-        {
-            var analysis = new NamespaceAnalysis();
-            analysis.Visit(expression);
-            analysis.Finalise();
-
-            return analysis;
-        }
+        private string _sourceCodeNamespace;
 
         public IList<string> RequiredNamespaces => _requiredNamespaces;
 
         public void Visit(TypeExpression type)
-            => AddNamespacesIfRequired(type.ImplementedTypes);
+        {
+            _sourceCodeNamespace = type.SourceCode.Namespace;
+            AddNamespacesIfRequired(type.ImplementedTypes);
+        }
 
         protected override Expression VisitConstant(ConstantExpression constant)
         {
@@ -188,15 +183,12 @@
 
         public void Merge(NamespaceAnalysis otherAnalysis)
         {
-            if ((otherAnalysis._requiredNamespaces?.Any()) != true)
+            if (otherAnalysis._requiredNamespaces == null)
             {
                 return;
             }
 
-            if (_requiredNamespaces?.Any() != true)
-            {
-                _requiredNamespaces = new List<string>();
-            }
+            _requiredNamespaces ??= new List<string>();
 
             _requiredNamespaces.AddRange(otherAnalysis._requiredNamespaces
                 .Except(_requiredNamespaces));
@@ -204,14 +196,18 @@
 
         public void Finalise()
         {
-            if (_requiredNamespaces != null)
-            {
-                _requiredNamespaces.Sort(UsingsComparer.Instance);
-            }
-            else
+            if (_requiredNamespaces == null)
             {
                 _requiredNamespaces = Enumerable<string>.EmptyList;
+                return;
             }
+
+            if (!string.IsNullOrEmpty(_sourceCodeNamespace))
+            {
+                _requiredNamespaces.Remove(_sourceCodeNamespace);
+            }
+
+            _requiredNamespaces.Sort(UsingsComparer.Instance);
         }
     }
 }

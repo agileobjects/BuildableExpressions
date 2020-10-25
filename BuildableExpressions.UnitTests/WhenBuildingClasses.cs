@@ -5,6 +5,7 @@
     using Common;
     using SourceCode;
     using Xunit;
+    using static System.Linq.Expressions.Expression;
 
     public class WhenBuildingClasses
     {
@@ -99,6 +100,58 @@ namespace GeneratedExpressionCode
         public string SayHello()
         {
             return ""Hello!"";
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAClassBaseTypeAndDerivedTypes()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.SetNamespace("AgileObjects.Tests.Yo");
+
+                    var baseType = sc.AddClass("MyBaseType", cls =>
+                    {
+                        cls.SetAbstract();
+                    });
+
+                    sc.AddClass("DerivedOne", cls =>
+                    {
+                        cls.SetBaseType(baseType);
+                        cls.AddMethod("GetOne", Constant("One", typeof(string)));
+                    });
+
+                    sc.AddClass("DerivedTwo", cls =>
+                    {
+                        cls.SetBaseType(baseType);
+                        cls.AddMethod("GetTwo", Constant("Two", typeof(string)));
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace AgileObjects.Tests.Yo
+{
+    public abstract class MyBaseType { }
+
+    public class DerivedOne : MyBaseType
+    {
+        public string GetOne()
+        {
+            return ""One"";
+        }
+    }
+
+    public class DerivedTwo : MyBaseType
+    {
+        public string GetTwo()
+        {
+            return ""Two"";
         }
     }
 }";

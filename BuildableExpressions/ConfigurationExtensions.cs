@@ -26,6 +26,21 @@
         }
 
         /// <summary>
+        /// Configures the <see cref="ClassExpression"/> to derive from the given
+        /// <paramref name="baseTypeExpression"/>.
+        /// </summary>
+        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="baseTypeExpression">
+        /// The base type from which the <see cref="ClassExpression"/> being built should derive.
+        /// </param>
+        public static void SetBaseType(
+            this IClassExpressionConfigurator classConfig,
+            ClassExpression baseTypeExpression)
+        {
+            classConfig.SetBaseType(baseTypeExpression.Type);
+        }
+
+        /// <summary>
         /// Configures the <see cref="TypeExpression"/> to implement the given
         /// <typeparamref name="TInterface"/>.
         /// </summary>
