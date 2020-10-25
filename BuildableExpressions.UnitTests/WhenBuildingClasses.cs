@@ -12,7 +12,7 @@
         [Fact]
         public void ShouldBuildAnImplementationClassAndMethod()
         {
-            var sayHello = Expression.Lambda<Func<string>>(Expression.Constant("Hello!"));
+            var sayHello = Lambda<Func<string>>(Constant("Hello!"));
 
             var translated = BuildableExpression
                 .SourceCode(sc => sc
@@ -43,8 +43,8 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildAClassWithMultipleImplementationMethods()
         {
-            var sayHello = Expression.Lambda<Func<string>>(Expression.Constant("Hello!"));
-            var return123 = Expression.Lambda<Func<int>>(Expression.Constant(123));
+            var sayHello = Lambda<Func<string>>(Constant("Hello!"));
+            var return123 = Lambda<Func<int>>(Constant(123));
 
             var translated = BuildableExpression
                 .SourceCode(sc => sc
@@ -86,7 +86,7 @@ namespace GeneratedExpressionCode
                     .AddClass("DerivedType", cls =>
                     {
                         cls.SetBaseType<BaseType>();
-                        cls.AddMethod("SayHello", Expression.Constant("Hello!"));
+                        cls.AddMethod("SayHello", Constant("Hello!"));
                     }))
                 .ToCSharpString();
 

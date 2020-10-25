@@ -200,6 +200,13 @@
         void ISourceCodeExpressionConfigurator.SetNamespace(string @namespace)
             => Namespace = @namespace;
 
+        InterfaceExpression ISourceCodeExpressionConfigurator.AddInterface(
+            string name,
+            Action<IInterfaceExpressionConfigurator> configuration)
+        {
+            return Add(new InterfaceExpression(this, name, configuration));
+        }
+
         ClassExpression ISourceCodeExpressionConfigurator.AddClass(
             string name,
             Action<IClassExpressionConfigurator> configuration)

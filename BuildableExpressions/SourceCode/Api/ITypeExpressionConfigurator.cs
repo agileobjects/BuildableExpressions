@@ -4,6 +4,14 @@
     using ReadableExpressions;
 
     /// <summary>
+    /// Provides options to configure an <see cref="InterfaceExpression"/>.
+    /// </summary>
+    public interface IInterfaceExpressionConfigurator
+    {
+
+    }
+
+    /// <summary>
     /// Provides options to configure a <see cref="TypeExpression"/>.
     /// </summary>
     public interface ITypeExpressionConfigurator : IGenericParameterConfigurator

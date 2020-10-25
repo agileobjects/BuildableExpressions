@@ -28,6 +28,16 @@
         void SetNamespace(string @namespace);
 
         /// <summary>
+        /// Adds a new <see cref="InterfaceExpression"/> to this <see cref="SourceCodeExpression"/>.
+        /// </summary>
+        /// <param name="name">The name of the <see cref="InterfaceExpression"/>.</param>
+        /// <param name="configuration">
+        /// The configuration with which to configure the new <see cref="InterfaceExpression"/>.
+        /// </param>
+        /// <returns>The newly-created <see cref="InterfaceExpression"/>.</returns>
+        InterfaceExpression AddInterface(string name, Action<IInterfaceExpressionConfigurator> configuration);
+
+        /// <summary>
         /// Adds a new <see cref="ClassExpression"/> to this <see cref="SourceCodeExpression"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="ClassExpression"/>.</param>
