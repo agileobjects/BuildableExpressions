@@ -28,7 +28,6 @@
 
         #endregion
 
-        /// <inheritdoc />
         public override Type ReturnType { get; }
 
         internal override bool HasGeneratedName => false;
