@@ -393,7 +393,8 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildADefaultGenericParameterValueMethod()
         {
-            var translated = BuildableExpression.SourceCode(sc => sc
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("GetT", m =>
                         {
@@ -413,6 +414,36 @@ namespace GeneratedExpressionCode
         {
             return default(T);
         }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAnAbstractClassAbstractMethod()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("BaseClass", cls =>
+                    {
+                        cls.SetAbstract();
+
+                        cls.AddMethod("AbstractMethod", m =>
+                        {
+                            m.SetAbstract();
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public abstract class BaseClass
+    {
+        public abstract void AbstractMethod();
     }
 }";
             EXPECTED.ShouldCompile();

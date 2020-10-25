@@ -104,6 +104,11 @@
         public bool IsStatic { get; private set; }
 
         /// <summary>
+        /// Gets a value indicating whether this <see cref="MethodExpression"/> is abstract.
+        /// </summary>
+        public bool IsAbstract { get; private set; }
+
+        /// <summary>
         /// Gets the name of this <see cref="MethodExpression"/>.
         /// </summary>
         public string Name { get; internal set; }
@@ -182,13 +187,7 @@
         /// </summary>
         public Expression Body => Definition?.Body;
 
-        #region IMethodExpressionConfigurator Members
-
-        void IMethodExpressionConfigurator.SetSummary(CommentExpression summary)
-            => Summary = summary;
-
-        void IMethodExpressionConfigurator.SetVisibility(MemberVisibility visibility)
-            => Visibility = visibility;
+        #region IGenericParameterConfigurator Members
 
         GenericParameterExpression IGenericParameterConfigurator.AddGenericParameter(
             string name,
@@ -244,6 +243,16 @@
             }
         }
 
+        #endregion
+
+        #region IMethodExpressionConfigurator Members
+
+        void IMethodExpressionConfigurator.SetSummary(CommentExpression summary)
+            => Summary = summary;
+
+        void IMethodExpressionConfigurator.SetVisibility(MemberVisibility visibility)
+            => Visibility = visibility;
+
         void IMethodExpressionConfigurator.AddParameters(
             params ParameterExpression[] parameters)
         {
@@ -271,7 +280,18 @@
         #region IConcreteTypeMethodExpressionConfigurator
 
         void IConcreteTypeMethodExpressionConfigurator.SetStatic()
-            => IsStatic = true;
+        {
+            ThrowIfAbstract();
+            IsStatic = true;
+        }
+
+        private void ThrowIfAbstract()
+        {
+            if (IsAbstract)
+            {
+                ThrowModifierConflict("abstract", "static");
+            }
+        }
 
         void IConcreteTypeMethodExpressionConfigurator.SetBody(Expression body, Type returnType)
         {
@@ -288,6 +308,45 @@
 
         #endregion
 
+        #region IClassMethodExpressionConfigurator
+
+        void IClassMethodExpressionConfigurator.SetAbstract()
+        {
+            ThrowIfNonAbstractClass();
+            ThrowIfStatic();
+
+            IsAbstract = true;
+        }
+
+        private void ThrowIfNonAbstractClass()
+        {
+            if (((ClassExpression)DeclaringTypeExpression).IsAbstract)
+            {
+                return;
+            }
+
+            throw new InvalidOperationException(
+                $"Unable to add abstract method '{this.GetSignature(includeTypeName: false)}' " +
+                $"to non-abstract declaring type '{DeclaringTypeExpression.Name}'.");
+        }
+
+        private void ThrowIfStatic()
+        {
+            if (IsStatic)
+            {
+                ThrowModifierConflict("static", "abstract");
+            }
+        }
+
+        private void ThrowModifierConflict(string modifier, string conflictingModifier)
+        {
+            throw new InvalidOperationException(
+                $"Method '{this.GetSignature()}' cannot be " +
+                $"both {modifier} and {conflictingModifier}.");
+        }
+
+        #endregion
+
         #region IMethod Members
 
         bool IMethod.IsPublic => Visibility == Public;
@@ -299,8 +358,6 @@
         bool IMethod.IsProtected => Visibility == Protected;
 
         bool IMethod.IsPrivate => Visibility == Private;
-
-        bool IMethod.IsAbstract => false;
 
         bool IMethod.IsVirtual => false;
 
@@ -321,9 +378,23 @@
 
         ReadOnlyCollection<IParameter> IMethod.GetParameters()
         {
-            return _readonlyParameters ??= Parameters
+            if (_readonlyParameters != null)
+            {
+                return _readonlyParameters;
+            }
+
+            var parameters = Definition?.Parameters ?? (IList<ParameterExpression>)_parameters;
+
+            var readonlyParameters = parameters
                 .ProjectToArray<ParameterExpression, IParameter>(p => new MethodParameter(p))
                 .ToReadOnlyCollection();
+
+            if (Definition != null)
+            {
+                _readonlyParameters = readonlyParameters;
+            }
+
+            return readonlyParameters;
         }
 
         #endregion

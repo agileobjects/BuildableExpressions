@@ -11,6 +11,11 @@
             this IList<TItem> items,
             Func<TItem, TResult> projector)
         {
+            if (items == null)
+            {
+                return Enumerable<TResult>.EmptyArray;
+            }
+
             var itemCount = items.Count;
 
             switch (itemCount)

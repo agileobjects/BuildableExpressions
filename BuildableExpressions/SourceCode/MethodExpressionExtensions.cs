@@ -13,7 +13,7 @@
                 : null;
 
             var parameterTypeNames = string.Join(", ",
-                method.GetParameters().Project(p => p.Type.GetFriendlyName()));
+                method.GetParameters().Project(p => p.Type.GetFriendlyName() + " " + p.Name));
 
             var returnType = method.ReturnType.GetFriendlyName();
 

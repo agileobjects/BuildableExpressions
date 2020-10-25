@@ -34,7 +34,7 @@
 
         private void ThrowIfEmptyMethod()
         {
-            if (Body == null)
+            if (!IsAbstract && Body == null)
             {
                 throw new InvalidOperationException(
                     $"Method '{this.GetSignature()}': no method body defined. " +

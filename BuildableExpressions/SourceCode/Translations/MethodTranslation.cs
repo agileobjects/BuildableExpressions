@@ -12,6 +12,7 @@
         private readonly MethodExpression _method;
         private readonly ITranslatable _summary;
         private readonly ITranslatable _definitionTranslation;
+        private readonly bool _methodHasBody;
         private readonly ITranslation _bodyTranslation;
 
         public MethodTranslation(MethodExpression method, ITranslationContext context)
@@ -24,27 +25,35 @@
                 includeDeclaringType: false,
                 context.Settings);
 
-            var bodyCodeBlock = context
-                .GetCodeBlockTranslationFor(method.Body)
-                .WithBraces()
-                .WithTermination();
+            var translationSize =
+                _summary.TranslationSize +
+                _definitionTranslation.TranslationSize;
 
-            if (method.HasReturnType())
+            var formattingSize =
+                _summary.FormattingSize +
+                _definitionTranslation.FormattingSize;
+
+            _methodHasBody = !method.IsAbstract;
+
+            if (_methodHasBody)
             {
-                bodyCodeBlock.WithReturnKeyword();
+                var bodyCodeBlock = context
+                    .GetCodeBlockTranslationFor(method.Body)
+                    .WithBraces()
+                    .WithTermination();
+
+                if (method.HasReturnType())
+                {
+                    bodyCodeBlock.WithReturnKeyword();
+                }
+
+                translationSize += bodyCodeBlock.TranslationSize;
+                formattingSize += bodyCodeBlock.FormattingSize;
+                _bodyTranslation = bodyCodeBlock;
             }
 
-            _bodyTranslation = bodyCodeBlock;
-
-            TranslationSize =
-                _summary.TranslationSize +
-                _definitionTranslation.TranslationSize +
-                _bodyTranslation.TranslationSize;
-
-            FormattingSize =
-                _summary.FormattingSize +
-                _definitionTranslation.FormattingSize +
-                _bodyTranslation.FormattingSize;
+            TranslationSize = translationSize;
+            FormattingSize = formattingSize;
         }
 
         public ExpressionType NodeType => _method.NodeType;
@@ -57,23 +66,41 @@
 
         public int GetIndentSize()
         {
-            return
-                _definitionTranslation.GetIndentSize() +
-                _bodyTranslation.GetIndentSize();
+            var indentSize = _definitionTranslation.GetIndentSize();
+
+            if (_methodHasBody)
+            {
+                indentSize += _bodyTranslation.GetIndentSize();
+            }
+
+            return indentSize;
         }
 
         public int GetLineCount()
         {
-            return
-                _definitionTranslation.GetLineCount() +
-                _bodyTranslation.GetLineCount();
+            var lineCount = _definitionTranslation.GetLineCount();
+
+            if (_methodHasBody)
+            {
+                lineCount += _bodyTranslation.GetLineCount();
+            }
+
+            return lineCount;
         }
 
         public void WriteTo(TranslationWriter writer)
         {
             _summary.WriteTo(writer);
             _definitionTranslation.WriteTo(writer);
-            _bodyTranslation.WriteTo(writer);
+
+            if (_methodHasBody)
+            {
+                _bodyTranslation.WriteTo(writer);
+            }
+            else
+            {
+                writer.WriteToTranslation(';');
+            }
         }
     }
 }
