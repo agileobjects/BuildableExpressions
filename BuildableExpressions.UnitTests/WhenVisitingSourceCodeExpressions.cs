@@ -37,27 +37,32 @@
         }
 
         [Fact]
-        public void ShouldVisitABuildableMethodCallExpression()
+        public void ShouldVisitABlockMethodCallExpression()
         {
-            var method1Call = default(Expression);
+            var blockMethodCall = default(Expression);
 
             var sourceCode = BuildableExpression.SourceCode(sc =>
             {
                 sc.AddClass(cls =>
                 {
-                    var method1 = cls.AddMethod(Default(typeof(void)));
+                    var blockMethod = new BlockMethodExpression((TypeExpression)cls, cfg =>
+                    {
+                        cfg.SetBody(Default(typeof(void)));
+                    });
 
-                    method1Call = BuildableExpression.Call(method1);
-                    cls.AddMethod("CallOther", method1Call);
+                    cls.AddMethod(blockMethod);
+
+                    blockMethodCall = blockMethod.CallExpression;
+                    cls.AddMethod("CallBlockMethod", blockMethodCall);
                 });
             });
 
-            method1Call.ShouldNotBeNull();
+            blockMethodCall.ShouldNotBeNull();
 
             var visitor = new VisitationHelper();
 
             visitor.Visit(sourceCode);
-            visitor.VisitedExpressions.ShouldContain(method1Call);
+            visitor.VisitedExpressions.ShouldContain(blockMethodCall);
         }
 
         [Fact]

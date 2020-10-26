@@ -39,11 +39,28 @@
         /// </summary>
         public Expression Operand { get; }
 
+        /// <summary>
+        /// Returns a <see cref="NameOfOperatorExpression"/> for the given <paramref name="operand"/>,
+        /// or this instance if the <paramref name="operand"/> is the same object as
+        /// <see cref="Operand"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="NameOfOperatorExpression"/> for the given <paramref name="operand"/>,
+        /// or this instance if the <paramref name="operand"/> is the same object as
+        /// <see cref="Operand"/>.
+        /// </returns>
+        public NameOfOperatorExpression Update(Expression operand)
+            => operand != Operand ? new NameOfOperatorExpression(operand) : this;
+
+        #region ICustomTranslationExpression Members
+
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
         {
             var operandTranslation = context.GetTranslationFor(Operand);
 
             return new NameOfOperatorTranslation(operandTranslation, context);
         }
+
+        #endregion
     }
 }

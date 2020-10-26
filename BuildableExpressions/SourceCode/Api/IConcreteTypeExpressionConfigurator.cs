@@ -14,7 +14,8 @@
         Expression ThisInstanceExpression { get; }
 
         /// <summary>
-        /// Adds the given <paramref name="parameter"/> to the <see cref="TypeExpression"/>.
+        /// Adds the given open generic <paramref name="parameter"/> to the
+        /// <see cref="ConcreteTypeExpression"/>.
         /// </summary>
         /// <param name="parameter">The <see cref="GenericParameterExpression"/> to add.</param>
         void AddGenericParameter(GenericParameterExpression parameter);

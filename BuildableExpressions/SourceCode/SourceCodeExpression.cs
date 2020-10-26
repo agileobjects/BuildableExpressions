@@ -10,7 +10,6 @@
     using Api;
     using Extensions;
     using NetStandardPolyfills;
-    using ReadableExpressions;
     using ReadableExpressions.Translations;
     using Translations;
 
@@ -20,7 +19,6 @@
     public class SourceCodeExpression :
         Expression,
         ISourceCodeExpressionConfigurator,
-        ICustomAnalysableExpression,
         ICustomTranslationExpression
     {
         private readonly List<TypeExpression> _typeExpressions;
@@ -230,9 +228,6 @@
         }
 
         #endregion
-
-        IEnumerable<Expression> ICustomAnalysableExpression.Expressions
-            => TypeExpressions.Cast<ICustomAnalysableExpression>().SelectMany(c => c.Expressions);
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => new SourceCodeTranslation(this, context);

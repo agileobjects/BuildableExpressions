@@ -27,7 +27,7 @@
         Method = 1003,
 
         /// <summary>
-        /// 1004. A source code class or method generic argument.
+        /// 1004. A source code type or method generic argument.
         /// </summary>
         GenericArgument = 1004
     }

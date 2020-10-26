@@ -23,7 +23,6 @@
     public abstract class TypeExpression :
         Expression,
         ITypeExpressionConfigurator,
-        ICustomAnalysableExpression,
         ICustomTranslationExpression
     {
         private List<GenericParameterExpression> _genericParameters;
@@ -142,6 +141,12 @@
             }
         }
 
+        internal ICollection<ClosedGenericTypeArgumentExpression> GenericArguments
+        {
+            get;
+            private set;
+        }
+
         /// <summary>
         /// Gets the <see cref="MethodExpression"/>s which make up this <see cref="TypeExpression"/>'s
         /// methods.
@@ -151,7 +156,10 @@
 
         #region Validation
 
-        internal void Validate()
+        /// <summary>
+        /// Validates that this <see cref="TypeExpression"/> has a valid state.
+        /// </summary>
+        protected void Validate()
         {
             ThrowIfDuplicateTypeName();
             ThrowIfInvalidImplementations();
@@ -238,6 +246,18 @@
         void ITypeExpressionConfigurator.SetImplements(params Type[] interfaces)
             => SetImplements(interfaces);
 
+        void ITypeExpressionConfigurator.SetImplements(
+            Type @interface,
+            Action<IImplementationConfigurator> configuration)
+        {
+            var configurator = new ImplementationConfigurator(@interface);
+            configuration.Invoke(configurator);
+            SetImplements(configurator.GetImplementedType());
+
+            GenericArguments ??= new List<ClosedGenericTypeArgumentExpression>();
+            GenericArguments.Add(configurator.GenericArgumentExpression);
+        }
+
         internal void SetImplements(params Type[] interfaces)
         {
             if (_interfaceTypes == null)
@@ -256,7 +276,7 @@
             }
         }
 
-        private void ThrowIfNonInterfaceType(Type type)
+        private static void ThrowIfNonInterfaceType(Type type)
         {
             if (!type.IsInterface())
             {
@@ -275,7 +295,7 @@
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
         {
-            return AddGenericParameter(new GenericParameterExpression(name, configuration));
+            return AddGenericParameter(new OpenGenericArgumentExpression(name, configuration));
         }
 
         /// <summary>
@@ -325,7 +345,7 @@
         /// </summary>
         /// <param name="method">The <see cref="MethodExpression"/> to add.</param>
         /// <returns>The given <paramref name="method"/>.</returns>
-        protected MethodExpression Add(MethodExpression method)
+        protected internal MethodExpression Add(MethodExpression method)
         {
             _methodExpressions.Add(method);
             _readOnlyMethodExpressions = null;
@@ -340,12 +360,45 @@
 
         #endregion
 
-        IEnumerable<Expression> ICustomAnalysableExpression.Expressions
-            => MethodExpressions.Cast<ICustomAnalysableExpression>().SelectMany(m => m.Expressions);
-
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => GetTranslation(context);
 
         internal abstract ITranslation GetTranslation(ITranslationContext context);
+    }
+
+    internal class ImplementationConfigurator : IImplementationConfigurator
+    {
+        private readonly Type _implementedType;
+        private readonly Type[] _genericTypeArguments;
+
+        public ImplementationConfigurator(Type implementedType)
+        {
+            _implementedType = implementedType;
+            _genericTypeArguments = implementedType.GetGenericTypeArguments();
+        }
+
+        public Type GetImplementedType()
+            => _implementedType.MakeGenericType(_genericTypeArguments);
+
+        public ClosedGenericTypeArgumentExpression GenericArgumentExpression
+        {
+            get;
+            private set;
+        }
+
+        public void SetGenericArgument(GenericParameterExpression parameter, Type type)
+        {
+            for (var i = 0; i < _genericTypeArguments.Length; ++i)
+            {
+                if (_genericTypeArguments[i].Name != parameter.Name)
+                {
+                    continue;
+                }
+
+                _genericTypeArguments[i] = type;
+                GenericArgumentExpression = ((OpenGenericArgumentExpression)parameter).Close(type);
+                return;
+            }
+        }
     }
 }

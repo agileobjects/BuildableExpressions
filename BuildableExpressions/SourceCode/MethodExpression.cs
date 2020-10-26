@@ -24,7 +24,6 @@
         Expression,
         IClassMethodExpressionConfigurator,
         IMethod,
-        ICustomAnalysableExpression,
         ICustomTranslationExpression
     {
         private List<ParameterExpression> _parameters;
@@ -198,7 +197,7 @@
             ThrowIfDuplicateGenericParameterName(name);
             ThrowIfTypeGenericParameterNameClash(name);
 
-            var parameter = new GenericParameterExpression(name, configuration);
+            var parameter = new OpenGenericArgumentExpression(name, configuration);
 
             _genericParameters ??= new List<GenericParameterExpression>();
             _readonlyGenericParameters = null;
@@ -455,18 +454,6 @@
         }
 
         #endregion
-
-        IEnumerable<Expression> ICustomAnalysableExpression.Expressions
-            => GetAnalysisExpressions();
-
-        /// <summary>
-        /// Returns zero or more Expressions for a <see cref="MethodExpressionAnalysis"/> to examine.
-        /// </summary>
-        /// <returns>Zero or more Expressions for a <see cref="MethodExpressionAnalysis"/> to examine.</returns>
-        protected virtual IEnumerable<Expression> GetAnalysisExpressions()
-        {
-            yield return Definition;
-        }
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => new MethodTranslation(this, context);

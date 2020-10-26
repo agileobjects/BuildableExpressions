@@ -1,7 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq.Expressions;
     using Analysis;
@@ -36,8 +35,5 @@
 
         public override ReadOnlyCollection<ParameterExpression> Parameters
             => ParametersAccessor.ToReadOnlyCollection();
-
-        protected override IEnumerable<Expression> GetAnalysisExpressions()
-            => (IList<Expression>)ParametersAccessor ?? Enumerable<Expression>.EmptyArray;
     }
 }

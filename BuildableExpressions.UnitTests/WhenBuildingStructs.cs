@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System.Linq.Expressions;
+    using System.Text;
     using BuildableExpressions.SourceCode;
     using Common;
     using SourceCode;
@@ -89,12 +90,12 @@ namespace GeneratedExpressionCode
                         itf.AddMethod("GetTypeName", typeof(string));
                     });
 
-                    sc.AddStruct("StructTypeGetter", cls =>
+                    sc.AddStruct("StructTypeGetter", str =>
                     {
-                        cls.AddGenericParameter(param);
-                        cls.SetImplements(@interface);
+                        str.AddGenericParameter(param);
+                        str.SetImplements(@interface);
 
-                        cls.AddMethod("GetTypeName", m =>
+                        str.AddMethod("GetTypeName", m =>
                         {
                             m.SetBody(BuildableExpression.NameOf(param));
                         });
@@ -115,6 +116,58 @@ namespace GeneratedExpressionCode
         public string GetTypeName()
         {
             return nameof(T);
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAGenericInterfaceAndClosedImplementingStruct()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var param = default(GenericParameterExpression);
+
+                    var @interface = sc.AddInterface("ITypeGetter", itf =>
+                    {
+                        param = itf.AddGenericParameter("T");
+
+                        itf.AddMethod("GetTypeName", typeof(string));
+                    });
+
+                    sc.AddStruct("StringBuilderTypeGetter", str =>
+                    {
+                        str.SetImplements(@interface, itf =>
+                        {
+                            itf.SetGenericArgument<StringBuilder>(param);
+                        });
+
+                        str.AddMethod("GetTypeName", m =>
+                        {
+                            m.SetBody(BuildableExpression.NameOf(param));
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+using System.Text;
+
+namespace GeneratedExpressionCode
+{
+    public interface ITypeGetter<T>
+    {
+        string GetTypeName();
+    }
+
+    public struct StringBuilderTypeGetter : ITypeGetter<StringBuilder>
+    {
+        public string GetTypeName()
+        {
+            return nameof(StringBuilder);
         }
     }
 }";

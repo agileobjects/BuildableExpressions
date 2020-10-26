@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using Extensions;
     using ReadableExpressions;
     using SourceCode;
     using SourceCode.Api;
@@ -23,6 +24,25 @@
             string summary)
         {
             typeConfig.SetSummary(ReadableExpression.Comment(summary));
+        }
+
+        /// <summary>
+        /// Closes the given <paramref name="parameter"/> to the given <typeparamref name="TClosed"/>
+        /// for the <see cref="TypeExpression"/>
+        /// </summary>
+        /// <typeparam name="TClosed">
+        /// The Type to which to close the given <paramref name="parameter"/>.
+        /// </typeparam>
+        /// <param name="implConfig">The <see cref="IImplementationConfigurator"/> to configure.</param>
+        /// <param name="parameter">
+        /// The <see cref="GenericParameterExpression"/> describing the open generic parameter to
+        /// close to the given <typeparamref name="TClosed"/>.
+        /// </param>
+        public static void SetGenericArgument<TClosed>(
+            this IImplementationConfigurator implConfig,
+            GenericParameterExpression parameter)
+        {
+            implConfig.SetGenericArgument(parameter, typeof(TClosed));
         }
 
         /// <summary>
@@ -56,16 +76,36 @@
         }
 
         /// <summary>
-        /// Configures the <see cref="TypeExpression"/> to implement the given
-        /// <paramref name="interfaceExpression"/>.
+        /// Configures the <see cref="TypeExpression"/> to implement the Types of the given
+        /// <paramref name="interfaceExpressions"/>.
         /// </summary>
         /// <param name="typeConfig">The <see cref="ITypeExpressionConfigurator"/> to configure.</param>
-        /// <param name="interfaceExpression"></param>
+        /// <param name="interfaceExpressions">
+        /// One or more <see cref="InterfaceExpression"/>s the <see cref="TypeExpression"/> should
+        /// implement.
+        /// </param>
         public static void SetImplements(
             this ITypeExpressionConfigurator typeConfig,
-            InterfaceExpression interfaceExpression)
+            params InterfaceExpression[] interfaceExpressions)
         {
-            typeConfig.SetImplements(interfaceExpression.Type);
+            typeConfig.SetImplements(interfaceExpressions.ProjectToArray(ie => ie.Type));
+        }
+
+        /// <summary>
+        /// Configures the <see cref="TypeExpression"/> to implement the Types of the given
+        /// <paramref name="interfaceExpression"/>, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="typeConfig">The <see cref="ITypeExpressionConfigurator"/> to configure.</param>
+        /// <param name="interfaceExpression">
+        /// The <see cref="InterfaceExpression"/>s the <see cref="TypeExpression"/> should implement.
+        /// </param>
+        /// <param name="configuration">The configuration to use.</param>
+        public static void SetImplements(
+            this ITypeExpressionConfigurator typeConfig,
+            InterfaceExpression interfaceExpression,
+            Action<IImplementationConfigurator> configuration)
+        {
+            typeConfig.SetImplements(interfaceExpression.Type, configuration);
         }
 
         /// <summary>

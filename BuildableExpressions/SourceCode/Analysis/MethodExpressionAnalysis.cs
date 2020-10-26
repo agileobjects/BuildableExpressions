@@ -9,12 +9,16 @@
 
     internal class MethodExpressionAnalysis : ExpressionAnalysis
     {
+        private readonly MethodExpression _method;
         private readonly Stack<Expression> _expressions;
         private MethodScopeBase _currentMethodScope;
 
-        private MethodExpressionAnalysis(NamespaceAnalysis namespaceAnalysis)
+        private MethodExpressionAnalysis(
+            MethodExpression method,
+            NamespaceAnalysis namespaceAnalysis)
             : base(Settings)
         {
+            _method = method;
             NamespaceAnalysis = namespaceAnalysis;
             _expressions = new Stack<Expression>();
         }
@@ -33,7 +37,7 @@
                 return method.Analysis;
             }
 
-            var analysis = new MethodExpressionAnalysis(namespaceAnalysis);
+            var analysis = new MethodExpressionAnalysis(method, namespaceAnalysis);
             analysis.Analyse(method);
 
             return analysis;
@@ -74,6 +78,7 @@
                 case Constant:
                 case Default:
                 case DebugInfo:
+                case (ExpressionType)SourceCodeExpressionType.GenericArgument:
                 case Parameter:
                     return false;
 
@@ -86,12 +91,8 @@
         {
             switch (expression.NodeType)
             {
-                case Call when expression is BuildableMethodCallExpression methodCall:
-                    VisitAndConvert((ICustomAnalysableExpression)methodCall);
-                    return methodCall;
-
                 case Block when ExtractToMethod((BlockExpression)expression, out var extractedMethod):
-                    return BuildableExpression.Call(extractedMethod, extractedMethod.Parameters);
+                    return extractedMethod.CallExpression;
 
                 case Default:
                     NamespaceAnalysis?.Visit((DefaultExpression)expression);
@@ -100,12 +101,18 @@
                 case (ExpressionType)SourceCodeExpressionType.Method:
                     return VisitAndConvert((MethodExpression)expression);
 
+                case (ExpressionType)SourceCodeExpressionType.GenericArgument:
+                    return VisitAndConvert((GenericParameterExpression)expression);
+
+                case Extension when expression is NameOfOperatorExpression nameOf:
+                    return nameOf.Update(VisitAndConvert(nameOf.Operand));
+
                 default:
                     return base.VisitAndConvert(expression);
             }
         }
 
-        private bool ExtractToMethod(BlockExpression block, out MethodExpression extractedMethod)
+        private bool ExtractToMethod(BlockExpression block, out BlockMethodExpression extractedMethod)
         {
             if (!Extract(block))
             {
@@ -180,6 +187,21 @@
         {
             NamespaceAnalysis?.Visit(constant);
             return base.VisitAndConvert(constant);
+        }
+
+        private GenericParameterExpression VisitAndConvert(GenericParameterExpression parameter)
+        {
+            var inScopedGenericArguments = _method.DeclaringTypeExpression.GenericArguments;
+
+            if (inScopedGenericArguments == null)
+            {
+                return parameter;
+            }
+
+            var closedGenericArgument = inScopedGenericArguments
+                .FirstOrDefault(arg => arg.ParameterExpression == parameter);
+
+            return closedGenericArgument ?? parameter;
         }
 
         protected override Expression VisitAndConvert(MemberExpression memberAccess)

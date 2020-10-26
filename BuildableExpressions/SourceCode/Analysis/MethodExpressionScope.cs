@@ -29,7 +29,7 @@
             IEnumerable<ParameterExpression> unscopedVariables)
         {
             var variables = string.Join(", ", unscopedVariables
-                .Select(v => $"'{PublicTypeExtensions.GetFriendlyName(v.Type)} {v.Name}'"));
+                .Select(v => $"'{v.Type.GetFriendlyName()} {v.Name}'"));
 
             throw new NotSupportedException(
                 $"Method accesses undefined variable(s) {variables}");

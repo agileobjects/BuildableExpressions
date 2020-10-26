@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Linq.Expressions;
     using BuildableExpressions.Extensions;
     using ReadableExpressions.Extensions;
 
@@ -12,11 +13,14 @@
             Action<MethodExpression> configuration)
             : base(declaringTypeExpression, name: null, configuration)
         {
+            CallExpression = new BlockMethodCallExpression(this);
         }
 
         internal override bool HasGeneratedName => true;
 
         internal override bool HasBody => true;
+
+        public Expression CallExpression { get; }
 
         public void Finalise() => Name = GetName();
 
