@@ -12,5 +12,11 @@
         /// current scope. Use this property to access the 'this' keyword in a class method.
         /// </summary>
         Expression ThisInstanceExpression { get; }
+
+        /// <summary>
+        /// Adds the given <paramref name="parameter"/> to the <see cref="TypeExpression"/>.
+        /// </summary>
+        /// <param name="parameter">The <see cref="GenericParameterExpression"/> to add.</param>
+        void AddGenericParameter(GenericParameterExpression parameter);
     }
 }

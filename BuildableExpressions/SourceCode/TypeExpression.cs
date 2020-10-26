@@ -275,8 +275,17 @@
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
         {
-            var parameter = new GenericParameterExpression(name, configuration);
+            return AddGenericParameter(new GenericParameterExpression(name, configuration));
+        }
 
+        /// <summary>
+        /// Adds the given <paramref name="parameter"/> to this <see cref="TypeExpression"/>.
+        /// </summary>
+        /// <param name="parameter">The <see cref="GenericParameterExpression"/> to add.</param>
+        /// <returns>The given <paramref name="parameter"/>.</returns>
+        protected GenericParameterExpression AddGenericParameter(
+            GenericParameterExpression parameter)
+        {
             _genericParameters ??= new List<GenericParameterExpression>();
             _genericParameters.Add(parameter);
             _readonlyGenericParameters = null;

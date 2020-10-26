@@ -20,7 +20,17 @@
         internal Expression ThisInstanceExpression
             => _thisInstanceExpression ??= new ThisInstanceExpression(this);
 
+        #region IConcreteTypeExpressionConfigurator Members
+
         Expression IConcreteTypeExpressionConfigurator.ThisInstanceExpression
             => ThisInstanceExpression;
+
+        void IConcreteTypeExpressionConfigurator.AddGenericParameter(
+            GenericParameterExpression parameter)
+        {
+            AddGenericParameter(parameter);
+        }
+
+        #endregion
     }
 }

@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System.Linq.Expressions;
+    using BuildableExpressions.SourceCode;
     using Common;
     using SourceCode;
     using Xunit;
@@ -66,6 +67,54 @@ namespace GeneratedExpressionCode
     {
         public void DoNothing()
         {
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAGenericInterfaceAndOpenImplementingStruct()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var param = default(GenericParameterExpression);
+
+                    var @interface = sc.AddInterface("ITypeGetter", itf =>
+                    {
+                        param = itf.AddGenericParameter("T");
+
+                        itf.AddMethod("GetTypeName", typeof(string));
+                    });
+
+                    sc.AddStruct("StructTypeGetter", cls =>
+                    {
+                        cls.AddGenericParameter(param);
+                        cls.SetImplements(@interface);
+
+                        cls.AddMethod("GetTypeName", m =>
+                        {
+                            m.SetBody(BuildableExpression.NameOf(param));
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public interface ITypeGetter<T>
+    {
+        string GetTypeName();
+    }
+
+    public struct StructTypeGetter<T> : ITypeGetter<T>
+    {
+        public string GetTypeName()
+        {
+            return nameof(T);
         }
     }
 }";
