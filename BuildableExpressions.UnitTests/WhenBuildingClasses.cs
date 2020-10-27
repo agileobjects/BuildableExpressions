@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using BuildableExpressions.SourceCode;
     using Common;
     using SourceCode;
     using Xunit;
@@ -107,6 +108,49 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldBuildAClassWithAPartClosedGenericBaseType()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var param1 = default(GenericParameterExpression);
+
+                    var baseType = sc.AddClass("Basey", cls =>
+                    {
+                        cls.SetAbstract();
+                        
+                        param1 = cls.AddGenericParameter("T1");
+                        cls.AddGenericParameter("T2");
+                    });
+
+                    sc.AddClass("Derivey", cls =>
+                    {
+                        cls.AddGenericParameter(param1);
+
+                        cls.SetBaseType(baseType, bt =>
+                        {
+                            bt.SetGenericArgument<string>("T2");
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public abstract class Basey<T1, T2>
+    {
+    }
+
+    public class Derivey<T1> : Basey<T1, string>
+    {
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAnInterfaceAndImplementingClass()
         {
             var translated = BuildableExpression
@@ -120,7 +164,7 @@ namespace GeneratedExpressionCode
                     sc.AddClass("ClassImpl", cls =>
                     {
                         cls.SetImplements(@interface);
-                        
+
                         cls.AddMethod("GetMessage", m =>
                         {
                             m.SetBody(Constant("Hello!", typeof(string)));
@@ -179,7 +223,9 @@ namespace GeneratedExpressionCode
             const string EXPECTED = @"
 namespace AgileObjects.Tests.Yo
 {
-    public abstract class MyBaseType { }
+    public abstract class MyBaseType
+    {
+    }
 
     public class DerivedOne : MyBaseType
     {
@@ -214,7 +260,9 @@ namespace AgileObjects.Tests.Yo
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
 {
-    public class EmptyClass { }
+    public class EmptyClass
+    {
+    }
 }";
             EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());

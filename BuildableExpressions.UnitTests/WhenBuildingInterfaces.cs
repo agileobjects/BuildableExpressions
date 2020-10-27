@@ -20,7 +20,9 @@
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
 {
-    public interface IMarker { }
+    public interface IMarker
+    {
+    }
 }";
             EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
@@ -77,7 +79,9 @@ using System;
 
 namespace GeneratedExpressionCode
 {
-    public interface IDisposableMarker : IDisposable { }
+    public interface IDisposableMarker : IDisposable
+    {
+    }
 }";
             EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());

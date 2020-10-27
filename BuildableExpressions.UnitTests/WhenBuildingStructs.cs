@@ -188,7 +188,9 @@ namespace GeneratedExpressionCode
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
 {
-    public struct EmptyStruct { }
+    public struct EmptyStruct
+    {
+    }
 }";
             EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());

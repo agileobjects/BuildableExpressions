@@ -27,22 +27,73 @@
         }
 
         /// <summary>
-        /// Closes the given <paramref name="parameter"/> to the given <typeparamref name="TClosed"/>
+        /// Closes the <see cref="GenericParameterExpression"/> with the given
+        /// <paramref name="genericParameterName"/> to the given <typeparamref name="TClosed"/> type
         /// for the <see cref="TypeExpression"/>
+        /// </summary>
+        /// <typeparam name="TClosed">
+        /// The Type to which to close the <see cref="GenericParameterExpression"/> with the given
+        /// <paramref name="genericParameterName"/>.
+        /// </typeparam>
+        /// <param name="implConfig">The <see cref="ImplementationConfigurator"/> to configure.</param>
+        /// <param name="genericParameterName">
+        /// The name of the <see cref="GenericParameterExpression"/> describing the open generic
+        /// parameter to close to the given <typeparamref name="TClosed"/> type.
+        /// </param>
+        public static void SetGenericArgument<TClosed>(
+            this ImplementationConfigurator implConfig,
+            string genericParameterName)
+        {
+            implConfig.SetGenericArgument(genericParameterName, typeof(TClosed));
+        }
+
+        /// <summary>
+        /// Closes the given <paramref name="parameter"/> to the given <typeparamref name="TClosed"/>
+        /// type for the <see cref="TypeExpression"/>
         /// </summary>
         /// <typeparam name="TClosed">
         /// The Type to which to close the given <paramref name="parameter"/>.
         /// </typeparam>
-        /// <param name="implConfig">The <see cref="IImplementationConfigurator"/> to configure.</param>
+        /// <param name="implConfig">The <see cref="ImplementationConfigurator"/> to configure.</param>
         /// <param name="parameter">
         /// The <see cref="GenericParameterExpression"/> describing the open generic parameter to
-        /// close to the given <typeparamref name="TClosed"/>.
+        /// close to the given <typeparamref name="TClosed"/> type.
         /// </param>
         public static void SetGenericArgument<TClosed>(
-            this IImplementationConfigurator implConfig,
+            this ImplementationConfigurator implConfig,
             GenericParameterExpression parameter)
         {
             implConfig.SetGenericArgument(parameter, typeof(TClosed));
+        }
+
+        /// <summary>
+        /// Configures the <see cref="ClassExpression"/> to derive from the given
+        /// <typeparamref name="TBase"/>.
+        /// </summary>
+        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <typeparam name="TBase">
+        /// The base type from which the <see cref="ClassExpression"/> being built should derive.
+        /// </typeparam>
+        public static void SetBaseType<TBase>(
+            this IClassExpressionConfigurator classConfig)
+            where TBase : class
+        {
+            classConfig.SetBaseType(typeof(TBase));
+        }
+
+        /// <summary>
+        /// Configures the <see cref="ClassExpression"/> to derive from the given
+        /// <paramref name="baseType"/>.
+        /// </summary>
+        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="baseType">
+        /// The base type from which the <see cref="ClassExpression"/> being built should derive.
+        /// </param>
+        public static void SetBaseType(
+            this IClassExpressionConfigurator classConfig,
+            Type baseType)
+        {
+            classConfig.SetBaseType(baseType, configuration: null);
         }
 
         /// <summary>
@@ -58,6 +109,23 @@
             ClassExpression baseTypeExpression)
         {
             classConfig.SetBaseType(baseTypeExpression.Type);
+        }
+
+        /// <summary>
+        /// Configures the <see cref="ClassExpression"/> to derive from the given
+        /// <paramref name="baseTypeExpression"/>, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="baseTypeExpression">
+        /// The base type from which the <see cref="ClassExpression"/> being built should derive.
+        /// </param>
+        /// <param name="configuration">The configuration to use.</param>
+        public static void SetBaseType(
+            this IClassExpressionConfigurator classConfig,
+            ClassExpression baseTypeExpression,
+            Action<ImplementationConfigurator> configuration)
+        {
+            classConfig.SetBaseType(baseTypeExpression.Type, configuration);
         }
 
         /// <summary>
@@ -103,7 +171,7 @@
         public static void SetImplements(
             this ITypeExpressionConfigurator typeConfig,
             InterfaceExpression interfaceExpression,
-            Action<IImplementationConfigurator> configuration)
+            Action<ImplementationConfigurator> configuration)
         {
             typeConfig.SetImplements(interfaceExpression.Type, configuration);
         }

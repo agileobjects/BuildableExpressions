@@ -91,18 +91,34 @@
                 $"Class '{Name}' cannot be both {modifier} and {conflictingModifier}.");
         }
 
-        void IClassExpressionConfigurator.SetBaseType<TBase>() where TBase : class
-            => SetBaseType(typeof(TBase));
-
-        void IClassExpressionConfigurator.SetBaseType(Type baseType)
-            => SetBaseType(baseType);
+        void IClassExpressionConfigurator.SetBaseType(
+            Type baseType,
+            Action<ImplementationConfigurator> configuration)
+        {
+            SetBaseType(baseType, configuration);
+        }
 
         internal void SetBaseType(Type baseType)
+            => SetBaseType(baseType, configuration: null);
+
+        private void SetBaseType(
+            Type baseType,
+            Action<ImplementationConfigurator> configuration)
         {
             ThrowIfBaseTypeAlreadySet(baseType);
             ThrowIfInvalidBaseType(baseType);
 
-            BaseType = baseType;
+            if (configuration == null)
+            {
+                BaseType = baseType;
+                return;
+            }
+
+            var configurator = new ImplementationConfigurator(this, baseType);
+            configuration.Invoke(configurator);
+
+            BaseType = configurator.GetImplementedType();
+            Add(configurator.GenericArgumentExpression);
         }
 
         private void ThrowIfBaseTypeAlreadySet(Type baseType)

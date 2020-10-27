@@ -234,7 +234,10 @@
         {
             if (_methodCount == 0)
             {
-                writer.WriteToTranslation(" { }");
+                writer.WriteNewLineToTranslation();
+                writer.WriteToTranslation('{');
+                writer.WriteNewLineToTranslation();
+                writer.WriteToTranslation('}');
                 return;
             }
 

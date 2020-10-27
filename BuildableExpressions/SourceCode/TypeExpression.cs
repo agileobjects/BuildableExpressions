@@ -53,6 +53,8 @@
         /// </summary>
         public override Type Type => _type ??= CreateType();
 
+        internal Type TypeAccessor => _type;
+
         #region Type Creation
 
         private Type CreateType()
@@ -248,14 +250,13 @@
 
         void ITypeExpressionConfigurator.SetImplements(
             Type @interface,
-            Action<IImplementationConfigurator> configuration)
+            Action<ImplementationConfigurator> configuration)
         {
-            var configurator = new ImplementationConfigurator(@interface);
+            var configurator = new ImplementationConfigurator(this, @interface);
             configuration.Invoke(configurator);
-            SetImplements(configurator.GetImplementedType());
 
-            GenericArguments ??= new List<ClosedGenericTypeArgumentExpression>();
-            GenericArguments.Add(configurator.GenericArgumentExpression);
+            SetImplements(configurator.GetImplementedType());
+            Add(configurator.GenericArgumentExpression);
         }
 
         internal void SetImplements(params Type[] interfaces)
@@ -283,6 +284,12 @@
                 throw new InvalidOperationException(
                     $"Type '{type.GetFriendlyName()}' is not an interface type.");
             }
+        }
+
+        internal void Add(ClosedGenericTypeArgumentExpression argument)
+        {
+            GenericArguments ??= new List<ClosedGenericTypeArgumentExpression>();
+            GenericArguments.Add(argument);
         }
 
         void ITypeExpressionConfigurator.SetSummary(CommentExpression summary)
@@ -364,41 +371,5 @@
             => GetTranslation(context);
 
         internal abstract ITranslation GetTranslation(ITranslationContext context);
-    }
-
-    internal class ImplementationConfigurator : IImplementationConfigurator
-    {
-        private readonly Type _implementedType;
-        private readonly Type[] _genericTypeArguments;
-
-        public ImplementationConfigurator(Type implementedType)
-        {
-            _implementedType = implementedType;
-            _genericTypeArguments = implementedType.GetGenericTypeArguments();
-        }
-
-        public Type GetImplementedType()
-            => _implementedType.MakeGenericType(_genericTypeArguments);
-
-        public ClosedGenericTypeArgumentExpression GenericArgumentExpression
-        {
-            get;
-            private set;
-        }
-
-        public void SetGenericArgument(GenericParameterExpression parameter, Type type)
-        {
-            for (var i = 0; i < _genericTypeArguments.Length; ++i)
-            {
-                if (_genericTypeArguments[i].Name != parameter.Name)
-                {
-                    continue;
-                }
-
-                _genericTypeArguments[i] = type;
-                GenericArgumentExpression = ((OpenGenericArgumentExpression)parameter).Close(type);
-                return;
-            }
-        }
     }
 }

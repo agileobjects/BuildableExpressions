@@ -27,7 +27,7 @@
         /// <param name="configuration">The configuration to use.</param>
         void SetImplements(
             Type @interface,
-            Action<IImplementationConfigurator> configuration);
+            Action<ImplementationConfigurator> configuration);
 
         /// <summary>
         /// Set the summary documentation of the <see cref="TypeExpression"/>.
