@@ -374,7 +374,34 @@
         }
 
         [Fact]
-        public void ShouldErrorIfEmptyStructMethod()
+        public void ShouldErrorIfMissingGenericParameterName()
+        {
+            var parameterEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    var baseType = sc.AddClass("MyBaseType", cls =>
+                    {
+                        cls.SetAbstract();
+                        cls.AddGenericParameter("T");
+                    });
+
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetBaseType(baseType, bt =>
+                        {
+                            bt.SetGenericArgument<int>("X");
+                        });
+                    });
+                });
+            });
+
+            parameterEx.Message.ShouldContain("'MyBaseType<T>' ");
+            parameterEx.Message.ShouldContain("no generic parameter named 'X'.");
+        }
+
+        [Fact]
+        public void ShouldErrorIfStructMethodBodyNotSet()
         {
             var methodEx = Should.Throw<InvalidOperationException>(() =>
             {

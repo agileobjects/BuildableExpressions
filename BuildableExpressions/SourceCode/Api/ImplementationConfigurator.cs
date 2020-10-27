@@ -3,6 +3,7 @@
     using System;
     using System.Linq;
     using NetStandardPolyfills;
+    using ReadableExpressions.Extensions;
 
     /// <summary>
     /// Provides options to configure how a <see cref="TypeExpression"/> implements a base type or
@@ -51,11 +52,27 @@
         /// </param>
         public void SetGenericArgument(string genericParameterName, Type type)
         {
-            var parameter = _implementedTypeExpression
+            var parameterExpression = _implementedTypeExpression
                 .GenericParameters
                 .FirstOrDefault(p => p.Name == genericParameterName);
 
-            SetGenericArgument(parameter, type);
+            if (parameterExpression != null)
+            {
+                SetGenericArgument(parameterExpression, type);
+                return;
+            }
+
+            var parameter = _genericTypeArguments
+                .FirstOrDefault(arg => arg.Name == genericParameterName);
+
+            if (parameter != null)
+            {
+                return;
+            }
+
+            throw new InvalidOperationException(
+                $"Type '{_implementedType.GetFriendlyName()}' has no " +
+                $"generic parameter named '{genericParameterName}'.");
         }
 
         /// <summary>
