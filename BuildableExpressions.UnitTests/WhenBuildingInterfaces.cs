@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using System.Collections.Generic;
     using Common;
     using Xunit;
     using static System.Linq.Expressions.Expression;
@@ -62,7 +63,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildADerivedInterface()
+        public void ShouldBuildAnInterfaceTypeDerivedInterface()
         {
             var translated = BuildableExpression
                 .SourceCode(sc =>
@@ -80,6 +81,37 @@ using System;
 namespace GeneratedExpressionCode
 {
     public interface IDisposableMarker : IDisposable
+    {
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAnInterfaceTypeDerivedPartClosedGenericInterface()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddInterface("IStringDictionary", itf =>
+                    {
+                        itf.AddGenericParameter("TValue");
+
+                        itf.SetImplements(typeof(IDictionary<,>), itf2 =>
+                        {
+                            itf2.SetGenericArgument<string>("TKey");
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+using System.Collections.Generic;
+
+namespace GeneratedExpressionCode
+{
+    public interface IStringDictionary<TValue> : IDictionary<string, TValue>
     {
     }
 }";

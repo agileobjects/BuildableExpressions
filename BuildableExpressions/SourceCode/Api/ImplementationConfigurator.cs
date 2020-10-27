@@ -39,34 +39,33 @@
 
         /// <summary>
         /// Closes the <see cref="GenericParameterExpression"/> with the given
-        /// <paramref name="genericParameterName"/> to the given <paramref name="type"/> for the
-        /// <see cref="TypeExpression"/>
+        /// <paramref name="genericParameterName"/> to the given <paramref name="closedType"/> for
+        /// the <see cref="TypeExpression"/>
         /// </summary>
         /// <param name="genericParameterName">
         /// The name of the <see cref="GenericParameterExpression"/> describing the open generic
-        /// parameter to close to the given <paramref name="type"/>.
+        /// parameter to close to the given <paramref name="closedType"/>.
         /// </param>
-        /// <param name="type">
+        /// <param name="closedType">
         /// The Type to which to close the <see cref="GenericParameterExpression"/> with the given
         /// <paramref name="genericParameterName"/>.
         /// </param>
-        public void SetGenericArgument(string genericParameterName, Type type)
+        public void SetGenericArgument(string genericParameterName, Type closedType)
         {
-            var parameterExpression = _implementedTypeExpression
-                .GenericParameters
-                .FirstOrDefault(p => p.Name == genericParameterName);
-
-            if (parameterExpression != null)
+            if (TryGetImplementedTypeParameterExpression(
+                    genericParameterName,
+                    out var parameterExpression))
             {
-                SetGenericArgument(parameterExpression, type);
+                SetGenericArgument(parameterExpression, closedType);
                 return;
             }
 
-            var parameter = _genericTypeArguments
+            var parameterType = _genericTypeArguments
                 .FirstOrDefault(arg => arg.Name == genericParameterName);
 
-            if (parameter != null)
+            if (parameterType != null)
             {
+                SetGenericArgument(parameterType.ToParameterExpression(), closedType);
                 return;
             }
 
@@ -75,18 +74,42 @@
                 $"generic parameter named '{genericParameterName}'.");
         }
 
+        private bool TryGetImplementedTypeParameterExpression(
+            string parameterName,
+            out GenericParameterExpression parameterExpression)
+        {
+            if (_implementedTypeExpression == null)
+            {
+                parameterExpression = null;
+                return false;
+            }
+
+            parameterExpression = _implementedTypeExpression
+                .GenericParameters
+                .FirstOrDefault(p => p.Name == parameterName);
+
+            return parameterExpression != null;
+        }
+
         /// <summary>
-        /// Closes the given <paramref name="parameter"/> to the given <paramref name="type"/> for
-        /// the implementation.
+        /// Closes the given <paramref name="parameter"/> to the given <paramref name="closedType"/>
+        /// for the implementation.
         /// </summary>
         /// <param name="parameter">
         /// The <see cref="GenericParameterExpression"/> describing the open generic parameter to
-        /// close to the given <paramref name="type"/>.
+        /// close to the given <paramref name="closedType"/>.
         /// </param>
-        /// <param name="type">The Type to which to close the given <paramref name="parameter"/>.</param>
+        /// <param name="closedType">The Type to which to close the given <paramref name="parameter"/>.</param>
         public void SetGenericArgument(
             GenericParameterExpression parameter,
-            Type type)
+            Type closedType)
+        {
+            SetGenericArgument((OpenGenericArgumentExpression)parameter, closedType);
+        }
+
+        private void SetGenericArgument(
+            OpenGenericArgumentExpression parameter,
+            Type closedType)
         {
             for (var i = 0; i < _genericTypeArguments.Length; ++i)
             {
@@ -95,8 +118,8 @@
                     continue;
                 }
 
-                _genericTypeArguments[i] = type;
-                GenericArgumentExpression = ((OpenGenericArgumentExpression)parameter).Close(type);
+                _genericTypeArguments[i] = closedType;
+                GenericArgumentExpression = parameter.Close(closedType);
                 return;
             }
         }

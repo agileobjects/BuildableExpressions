@@ -26,7 +26,7 @@
         ICustomTranslationExpression
     {
         private List<GenericParameterExpression> _genericParameters;
-        private ReadOnlyCollection<GenericParameterExpression> _readonlyGenericParameters;
+        private ReadOnlyCollection<GenericParameterExpression> _readOnlyGenericParameters;
         private readonly List<MethodExpression> _methodExpressions;
         private ReadOnlyCollection<MethodExpression> _readOnlyMethodExpressions;
         private Type _type;
@@ -137,7 +137,7 @@
         {
             get
             {
-                return _readonlyGenericParameters ??= IsGeneric
+                return _readOnlyGenericParameters ??= IsGeneric
                     ? _genericParameters.ToReadOnlyCollection()
                     : Enumerable<GenericParameterExpression>.EmptyReadOnlyCollection;
             }
@@ -315,7 +315,7 @@
         {
             _genericParameters ??= new List<GenericParameterExpression>();
             _genericParameters.Add(parameter);
-            _readonlyGenericParameters = null;
+            _readOnlyGenericParameters = null;
             return parameter;
         }
 

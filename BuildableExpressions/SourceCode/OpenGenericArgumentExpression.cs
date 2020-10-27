@@ -6,8 +6,6 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using Api;
-    using BuildableExpressions.Extensions;
-    using Compilation;
     using Extensions;
     using NetStandardPolyfills;
     using ReadableExpressions.Extensions;
@@ -30,6 +28,14 @@
         private ReadOnlyCollection<Type> _readonlyTypeConstraints;
 
         internal OpenGenericArgumentExpression(
+            Type type,
+            Action<IGenericParameterExpressionConfigurator> configuration)
+            : this(type.Name, configuration)
+        {
+            _type = type;
+        }
+
+        internal OpenGenericArgumentExpression(
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
             : base(name.ThrowIfInvalidName<ArgumentException>("Generic Parameter"))
@@ -38,97 +44,7 @@
         }
 
         public override Type Type
-            => _type ??= _typeCache.GetOrAdd(this, CreateType);
-
-        #region Type Creation
-
-        private static Type CreateType(OpenGenericArgumentExpression parameter)
-        {
-            var paramSourceCode = BuildableExpression.SourceCode(sc =>
-            {
-                sc.SetNamespace(BuildConstants.GenericParameterTypeNamespace);
-
-                if (parameter._hasStructConstraint)
-                {
-                    sc.AddStruct(parameter.Name, parameter.ConfigureStruct);
-                }
-                else
-                {
-                    sc.AddClass(parameter.Name, parameter.ConfigureClass);
-                }
-            });
-
-            var compiledTypes = paramSourceCode
-                .Compile()
-                .CompiledAssembly
-                .GetTypes();
-
-            return compiledTypes[0];
-        }
-
-        private void ConfigureStruct(IStructExpressionConfigurator structConfig)
-            => ConfigureType((StructExpression)structConfig, baseTypeCallback: null);
-
-        private void ConfigureClass(IClassExpressionConfigurator classConfig)
-        {
-            var @class = (ClassExpression)classConfig;
-
-            ConfigureType(@class, (cfg, baseType) =>
-            {
-                cfg.SetBaseType(baseType);
-
-                if (baseType.IsAbstract())
-                {
-                    cfg.SetAbstract();
-                }
-            });
-        }
-
-        private void ConfigureType<TTypeExpression>(
-            TTypeExpression typeExpression,
-            Action<TTypeExpression, Type> baseTypeCallback)
-            where TTypeExpression : TypeExpression
-        {
-            if (_typeConstraints == null)
-            {
-                return;
-            }
-
-            foreach (var type in _typeConstraints)
-            {
-                if (type.IsInterface())
-                {
-                    typeExpression.SetImplements(type);
-                    AddDefaultImplementations(typeExpression, type);
-                    continue;
-                }
-
-                baseTypeCallback.Invoke(typeExpression, type);
-            }
-        }
-
-        private static void AddDefaultImplementations(
-            TypeExpression typeExpression,
-            Type type)
-        {
-            var methods = type
-                .GetPublicInstanceMethods()
-                .Concat(type.GetNonPublicInstanceMethods())
-                .Filter(m => m.IsAbstract);
-
-            foreach (var method in methods)
-            {
-                var parameters = method
-                    .GetParameters()
-                    .ProjectToArray(p => Parameter(p.ParameterType, p.Name));
-
-                var methodLambda = Default(method.ReturnType).ToLambdaExpression(parameters);
-
-                typeExpression.AddMethod(method.Name, methodLambda);
-            }
-        }
-
-        #endregion
+            => _type ??= _typeCache.GetOrAdd(this, p => p.ToType());
 
         public override bool IsClosed => false;
 
@@ -227,6 +143,8 @@
         protected override bool HasStructConstraint => _hasStructConstraint;
 
         protected override bool HasNewableConstraint => _hasNewableConstraint;
+
+        public IEnumerable<Type> TypeConstraintsAccessor => _typeConstraints;
 
         protected override ReadOnlyCollection<Type> TypeConstraints
         {
