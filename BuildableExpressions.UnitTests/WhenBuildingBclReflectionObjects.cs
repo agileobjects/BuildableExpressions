@@ -51,13 +51,14 @@
                 {
                     sc.AddStruct("MessagerStruct", str =>
                     {
-                        str.SetImplements<IMessager>();
+                        str.SetImplements<IMessager>(impl =>
+                        {
+                            var sendMessageLamba = Lambda<Action<object>>(
+                                Default(typeof(void)),
+                                Parameter(typeof(object), "message"));
 
-                        var sendMessageLamba = Lambda<Action<object>>(
-                            Default(typeof(void)),
-                            Parameter(typeof(object), "message"));
-
-                        str.AddMethod(nameof(IMessager.SendMessage), sendMessageLamba);
+                            impl.AddMethod(nameof(IMessager.SendMessage), sendMessageLamba);
+                        });
                     });
                 });
 

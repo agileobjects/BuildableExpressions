@@ -8,6 +8,18 @@
     public interface IInterfaceExpressionConfigurator : ITypeExpressionConfigurator
     {
         /// <summary>
+        /// Configures the <see cref="InterfaceExpression"/> to implement the given
+        /// <paramref name="interface"/>, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="interface">
+        /// The interface type the <see cref="InterfaceExpression"/> should implement.
+        /// </param>
+        /// <param name="configuration">The configuration to use.</param>
+        void SetImplements(
+            Type @interface,
+            Action<IImplementationConfigurator> configuration);
+
+        /// <summary>
         /// Add a <see cref="MethodExpression"/> to the <see cref="InterfaceExpression"/>, with
         /// the given <paramref name="name"/> and <paramref name="configuration"/>.
         /// </summary>

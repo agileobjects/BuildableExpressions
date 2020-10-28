@@ -63,6 +63,13 @@
 
         #region IClassExpressionConfigurator Members
 
+        void IClassExpressionConfigurator.SetImplements(
+            Type @interface,
+            Action<IClassImplementationConfigurator> configuration)
+        {
+            SetImplements(@interface, configuration);
+        }
+
         void IClassExpressionConfigurator.SetStatic()
         {
             if (IsAbstract)
@@ -93,7 +100,7 @@
 
         void IClassExpressionConfigurator.SetBaseType(
             Type baseType,
-            Action<ImplementationConfigurator> configuration)
+            Action<IClassImplementationConfigurator> configuration)
         {
             SetBaseType(baseType, configuration);
         }
@@ -103,7 +110,7 @@
 
         private void SetBaseType(
             Type baseType,
-            Action<ImplementationConfigurator> configuration)
+            Action<IClassImplementationConfigurator> configuration)
         {
             ThrowIfBaseTypeAlreadySet(baseType);
             ThrowIfInvalidBaseType(baseType);
@@ -138,7 +145,7 @@
             }
         }
 
-        MethodExpression IClassExpressionConfigurator.AddMethod(
+        MethodExpression IClassMethodConfigurator.AddMethod(
             string name,
             Action<IClassMethodExpressionConfigurator> configuration)
         {

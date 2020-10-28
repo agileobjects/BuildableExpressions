@@ -34,13 +34,13 @@
         /// The Type to which to close the <see cref="GenericParameterExpression"/> with the given
         /// <paramref name="genericParameterName"/>.
         /// </typeparam>
-        /// <param name="implConfig">The <see cref="ImplementationConfigurator"/> to configure.</param>
+        /// <param name="implConfig">The <see cref="IImplementationConfigurator"/> to configure.</param>
         /// <param name="genericParameterName">
         /// The name of the <see cref="GenericParameterExpression"/> describing the open generic
         /// parameter to close to the given <typeparamref name="TClosed"/> type.
         /// </param>
         public static void SetGenericArgument<TClosed>(
-            this ImplementationConfigurator implConfig,
+            this IImplementationConfigurator implConfig,
             string genericParameterName)
         {
             implConfig.SetGenericArgument(genericParameterName, typeof(TClosed));
@@ -53,13 +53,13 @@
         /// <typeparam name="TClosed">
         /// The Type to which to close the given <paramref name="parameter"/>.
         /// </typeparam>
-        /// <param name="implConfig">The <see cref="ImplementationConfigurator"/> to configure.</param>
+        /// <param name="implConfig">The <see cref="IImplementationConfigurator"/> to configure.</param>
         /// <param name="parameter">
         /// The <see cref="GenericParameterExpression"/> describing the open generic parameter to
         /// close to the given <typeparamref name="TClosed"/> type.
         /// </param>
         public static void SetGenericArgument<TClosed>(
-            this ImplementationConfigurator implConfig,
+            this IImplementationConfigurator implConfig,
             GenericParameterExpression parameter)
         {
             implConfig.SetGenericArgument(parameter, typeof(TClosed));
@@ -122,72 +122,150 @@
         public static void SetBaseType(
             this IClassExpressionConfigurator classConfig,
             ClassExpression baseTypeExpression,
-            Action<ImplementationConfigurator> configuration)
+            Action<IClassImplementationConfigurator> configuration)
         {
             classConfig.SetBaseType(baseTypeExpression.Type, configuration);
         }
 
         /// <summary>
-        /// Configures the <see cref="TypeExpression"/> to implement the given
-        /// <typeparamref name="TEmptyInterface"/>. This overload enables implementation of 'marker'
-        /// interfaces.
+        /// Configures the <see cref="InterfaceExpression"/> to implement the given
+        /// <typeparamref name="TInterface"/>.
         /// </summary>
-        /// <typeparam name="TEmptyInterface">
-        /// The interface Type <see cref="TypeExpression"/> should implement.
-        /// </typeparam>
-        /// <param name="typeConfig">The <see cref="ITypeExpressionConfigurator"/> to configure.</param>
-        public static void SetImplements<TEmptyInterface>(
-            this ITypeExpressionConfigurator typeConfig)
-            where TEmptyInterface : class
+        /// <typeparam name="TInterface">The interface Type the <see cref="InterfaceExpression"/> should implement.</typeparam>
+        /// <param name="interfaceConfig">The <see cref="IInterfaceExpressionConfigurator"/> to configure.</param>
+        public static void SetImplements<TInterface>(
+            this IInterfaceExpressionConfigurator interfaceConfig)
         {
-            typeConfig.SetImplements(typeof(TEmptyInterface));
+            interfaceConfig.SetImplements(typeof(TInterface));
         }
 
         /// <summary>
-        /// Configures the <see cref="TypeExpression"/> to implement the given empty
-        /// <paramref name="interfaceExpression"/>. This overload enables implementation of 'marker'
-        /// interfaces.
+        /// Configures the <see cref="InterfaceExpression"/> to implement the given
+        /// <paramref name="interface"/>.
         /// </summary>
-        /// <param name="typeConfig">The <see cref="ITypeExpressionConfigurator"/> to configure.</param>
-        /// <param name="interfaceExpression">
-        /// The empty <see cref="InterfaceExpression"/> the <see cref="TypeExpression"/> should
-        /// implement.
-        /// </param>
+        /// <param name="interface">The interface Type the <see cref="InterfaceExpression"/> should implement.</param>
+        /// <param name="interfaceConfig">The <see cref="IInterfaceExpressionConfigurator"/> to configure.</param>
         public static void SetImplements(
-            this ITypeExpressionConfigurator typeConfig,
-            InterfaceExpression interfaceExpression)
-        {
-            typeConfig.SetImplements(interfaceExpression.Type);
-        }
-
-        /// <summary>
-        /// Configures the <see cref="TypeExpression"/> to implement the given empty
-        /// <paramref name="interface"/>. This overload enables implementation of 'marker' interfaces.
-        /// </summary>
-        /// <param name="interface">The interface Type <see cref="TypeExpression"/> should implement.</param>
-        /// <param name="typeConfig">The <see cref="ITypeExpressionConfigurator"/> to configure.</param>
-        public static void SetImplements(
-            this ITypeExpressionConfigurator typeConfig,
+            this IInterfaceExpressionConfigurator interfaceConfig,
             Type @interface)
         {
-            typeConfig.SetImplements(@interface, itf => { });
+            interfaceConfig.SetImplements(@interface, configuration: null);
         }
 
         /// <summary>
-        /// Configures the <see cref="TypeExpression"/> to implement the Type of the given
+        /// Configures the <see cref="InterfaceExpression"/> to implement the given
+        /// <typeparamref name="TInterface"/>, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <typeparam name="TInterface">The interface Type the <see cref="InterfaceExpression"/> should implement.</typeparam>
+        /// <param name="interfaceConfig">The <see cref="IInterfaceExpressionConfigurator"/> to configure.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        public static void SetImplements<TInterface>(
+            this IInterfaceExpressionConfigurator interfaceConfig,
+            Action<IImplementationConfigurator> configuration)
+        {
+            interfaceConfig.SetImplements(typeof(TInterface), configuration);
+        }
+
+        /// <summary>
+        /// Configures the <see cref="ClassExpression"/> to implement the given
+        /// <typeparamref name="TInterface"/>, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <typeparam name="TInterface">The interface Type <see cref="ClassExpression"/> should implement.</typeparam>
+        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        public static void SetImplements<TInterface>(
+            this IClassExpressionConfigurator classConfig,
+            Action<IClassImplementationConfigurator> configuration)
+        {
+            classConfig.SetImplements(typeof(TInterface), configuration);
+        }
+
+        /// <summary>
+        /// Configures the <see cref="StructExpression"/> to implement the given
+        /// <typeparamref name="TInterface"/>, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <typeparam name="TInterface">The interface Type <see cref="StructExpression"/> should implement.</typeparam>
+        /// <param name="structConfig">The <see cref="IStructExpressionConfigurator"/> to configure.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        public static void SetImplements<TInterface>(
+            this IStructExpressionConfigurator structConfig,
+            Action<IStructImplementationConfigurator> configuration)
+        {
+            structConfig.SetImplements(typeof(TInterface), configuration);
+        }
+
+        /// <summary>
+        /// Configures the <see cref="ClassExpression"/> to implement the Type of the given
         /// <paramref name="interfaceExpression"/>, using the given <paramref name="configuration"/>.
         /// </summary>
-        /// <param name="typeConfig">The <see cref="ITypeExpressionConfigurator"/> to configure.</param>
+        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
         /// <param name="interfaceExpression">
-        /// The <see cref="InterfaceExpression"/> the <see cref="TypeExpression"/> should implement.
+        /// The <see cref="InterfaceExpression"/> the <see cref="ClassExpression"/> should implement.
         /// </param>
         /// <param name="configuration">The configuration to use.</param>
         public static void SetImplements(
-            this ITypeExpressionConfigurator typeConfig,
+            this IClassExpressionConfigurator classConfig,
             InterfaceExpression interfaceExpression,
-            Action<ImplementationConfigurator> configuration)
+            Action<IClassImplementationConfigurator> configuration)
         {
-            typeConfig.SetImplements(interfaceExpression.Type, configuration);
+            classConfig.SetImplements(interfaceExpression.Type, configuration);
+        }
+
+        /// <summary>
+        /// Configures the <see cref="StructExpression"/> to implement the Type of the given
+        /// <paramref name="interfaceExpression"/>, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="structConfig">The <see cref="IStructExpressionConfigurator"/> to configure.</param>
+        /// <param name="interfaceExpression">
+        /// The <see cref="InterfaceExpression"/> the <see cref="StructExpression"/> should implement.
+        /// </param>
+        /// <param name="configuration">The configuration to use.</param>
+        public static void SetImplements(
+            this IStructExpressionConfigurator structConfig,
+            InterfaceExpression interfaceExpression,
+            Action<IStructImplementationConfigurator> configuration)
+        {
+            structConfig.SetImplements(interfaceExpression.Type, configuration);
+        }
+
+        /// <summary>
+        /// Add a public, instance-scoped <see cref="MethodExpression"/> to the
+        /// <see cref="ClassExpression"/>, with the given <paramref name="name"/> and
+        /// <paramref name="body"/>.
+        /// </summary>
+        /// <param name="classConfig">The <see cref="IClassImplementationConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
+        /// <param name="body">
+        /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
+        /// body.
+        /// </param>
+        /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
+        public static MethodExpression AddMethod(
+            this IClassImplementationConfigurator classConfig,
+            string name,
+            Expression body)
+        {
+            return classConfig.AddMethod(name, cfg => cfg.SetBody(body));
+        }
+
+        /// <summary>
+        /// Add a public, instance-scoped <see cref="MethodExpression"/> to the
+        /// <see cref="StructExpression"/>, with the given <paramref name="name"/> and
+        /// <paramref name="body"/>.
+        /// </summary>
+        /// <param name="structConfig">The <see cref="IStructImplementationConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
+        /// <param name="body">
+        /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
+        /// body.
+        /// </param>
+        /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
+        public static MethodExpression AddMethod(
+            this IStructImplementationConfigurator structConfig,
+            string name,
+            Expression body)
+        {
+            return structConfig.AddMethod(name, cfg => cfg.SetBody(body));
         }
 
         /// <summary>

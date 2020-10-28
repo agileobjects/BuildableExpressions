@@ -23,6 +23,13 @@
 
         #region IInterfaceExpressionConfigurator Members
 
+        void IInterfaceExpressionConfigurator.SetImplements(
+            Type @interface,
+            Action<IImplementationConfigurator> configuration)
+        {
+            SetImplements(@interface, configuration);
+        }
+
         MethodExpression IInterfaceExpressionConfigurator.AddMethod(
             string name,
             Type returnType,

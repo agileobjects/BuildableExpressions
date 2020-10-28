@@ -2,7 +2,6 @@
 {
     using System;
     using System.IO;
-    using System.Reflection;
     using System.Text;
     using Common;
     using ReadableExpressions;
@@ -141,7 +140,7 @@
                 {
                     sc.AddClass(cls =>
                     {
-                        cls.SetImplements(typeof(StringBuilder));
+                        cls.SetImplements(typeof(StringBuilder), impl => { });
                     });
                 });
             });
@@ -160,36 +159,16 @@
                 {
                     sc.AddClass(cls =>
                     {
-                        cls.SetImplements(typeof(IMessager));
-                        cls.AddMethod("GetMsg", getString);
+                        cls.SetImplements(typeof(IMessager), impl =>
+                        {
+                            impl.AddMethod("GetMsg", getString);
+                        });
                     });
                 });
             });
 
             interfaceEx.Message.ShouldContain("'string WhenBuildingSourceCodeIncorrectly.IMessager.GetMessage()'");
             interfaceEx.Message.ShouldContain("has not been implemented");
-        }
-
-        [Fact]
-        public void ShouldErrorIfAmbiguousInterfacesImplemented()
-        {
-            var interfaceEx = Should.Throw<AmbiguousMatchException>(() =>
-            {
-                var getString = Lambda<Func<string>>(Default(typeof(string)));
-
-                BuildableExpression.SourceCode(sc =>
-                {
-                    sc.AddClass("Stringy", cls =>
-                    {
-                        cls.SetImplements(typeof(ICodeGenerator));
-                        cls.SetImplements(typeof(IRandomStringFactory));
-                        cls.AddMethod(nameof(ICodeGenerator.Generate), getString);
-                    });
-                });
-            });
-
-            interfaceEx.Message.ShouldContain("'string Stringy.Generate()'");
-            interfaceEx.Message.ShouldContain("matches multiple interface methods");
         }
 
         [Fact]

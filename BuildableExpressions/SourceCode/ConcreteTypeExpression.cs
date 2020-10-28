@@ -1,5 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
+    using System;
     using System.Linq.Expressions;
     using Api;
 
@@ -19,6 +20,14 @@
 
         internal Expression ThisInstanceExpression
             => _thisInstanceExpression ??= new ThisInstanceExpression(this);
+
+        internal override void SetImplements(
+            Type @interface,
+            Action<ImplementationConfigurator> configuration)
+        {
+            base.SetImplements(@interface, configuration);
+            ThrowIfInterfaceMethodNotImplemented(@interface);
+        }
 
         #region IConcreteTypeExpressionConfigurator Members
 

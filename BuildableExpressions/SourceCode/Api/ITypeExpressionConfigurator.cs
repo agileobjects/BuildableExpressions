@@ -1,6 +1,5 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Api
 {
-    using System;
     using ReadableExpressions;
 
     /// <summary>
@@ -8,18 +7,6 @@
     /// </summary>
     public interface ITypeExpressionConfigurator : IGenericParameterConfigurator
     {
-        /// <summary>
-        /// Configures the <see cref="TypeExpression"/> to implement the given
-        /// <paramref name="interface"/>, using the given <paramref name="configuration"/>.
-        /// </summary>
-        /// <param name="interface">
-        /// The interface type the <see cref="TypeExpression"/> should implement.
-        /// </param>
-        /// <param name="configuration">The configuration to use.</param>
-        void SetImplements(
-            Type @interface,
-            Action<ImplementationConfigurator> configuration);
-
         /// <summary>
         /// Set the summary documentation of the <see cref="TypeExpression"/>.
         /// </summary>

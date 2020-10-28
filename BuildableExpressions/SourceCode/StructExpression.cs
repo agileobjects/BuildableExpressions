@@ -22,12 +22,23 @@
             Validate();
         }
 
-        MethodExpression IStructExpressionConfigurator.AddMethod(
+        #region IStructExpressionConfigurator Members
+
+        MethodExpression IStructMethodConfigurator.AddMethod(
             string name,
             Action<IConcreteTypeMethodExpressionConfigurator> configuration)
         {
             return AddMethod(name, configuration);
         }
+
+        void IStructExpressionConfigurator.SetImplements(
+            Type @interface,
+            Action<IStructImplementationConfigurator> configuration)
+        {
+            SetImplements(@interface, configuration);
+        }
+
+        #endregion
 
         internal override ITranslation GetTranslation(ITranslationContext context)
             => new StructTranslation(this, context);

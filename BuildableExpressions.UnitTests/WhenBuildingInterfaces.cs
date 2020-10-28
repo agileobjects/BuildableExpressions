@@ -70,7 +70,7 @@ namespace GeneratedExpressionCode
                 {
                     sc.AddInterface("IDisposableMarker", itf =>
                     {
-                        itf.SetImplements(typeof(IDisposable));
+                        itf.SetImplements<IDisposable>();
                     });
                 })
                 .ToCSharpString();
@@ -98,9 +98,9 @@ namespace GeneratedExpressionCode
                     {
                         itf.AddGenericParameter("TValue");
 
-                        itf.SetImplements(typeof(IDictionary<,>), itf2 =>
+                        itf.SetImplements(typeof(IDictionary<,>), impl =>
                         {
-                            itf2.SetGenericArgument<string>("TKey");
+                            impl.SetGenericArgument<string>("TKey");
                         });
                     });
                 })

@@ -1,10 +1,8 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
-    using System.Linq;
     using BuildableExpressions.SourceCode;
     using Common;
-    using NetStandardPolyfills;
     using SourceCode;
     using Xunit;
     using static System.Linq.Expressions.Expression;
@@ -20,8 +18,10 @@
                 .SourceCode(sc => sc
                     .AddClass("Messager", cls =>
                     {
-                        cls.SetImplements<IMessager>();
-                        cls.AddMethod(nameof(IMessager.GetMessage), sayHello);
+                        cls.SetImplements<IMessager>(impl =>
+                        {
+                            impl.AddMethod(nameof(IMessager.GetMessage), sayHello);
+                        });
                     }))
                 .ToCSharpString();
 
@@ -52,10 +52,16 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls =>
                     {
-                        cls.SetImplements(typeof(IMessager));
-                        cls.SetImplements(typeof(INumberSource));
-                        cls.AddMethod(nameof(IMessager.GetMessage), sayHello);
-                        cls.AddMethod(nameof(INumberSource.GetNumber), return123);
+                        cls.SetImplements(typeof(IMessager), impl =>
+                        {
+                            impl.AddMethod(nameof(IMessager.GetMessage), sayHello);
+                        });
+
+                        cls.SetImplements(typeof(INumberSource), impl =>
+                        {
+                            impl.AddMethod(nameof(INumberSource.GetNumber), return123);
+                        });
+
                     }))
                 .ToCSharpString();
 
@@ -166,11 +172,12 @@ namespace GeneratedExpressionCode
 
                     sc.AddClass("ClassImpl", cls =>
                     {
-                        cls.SetImplements(@interface);
-
-                        cls.AddMethod("GetMessage", m =>
+                        cls.SetImplements(@interface, impl =>
                         {
-                            m.SetBody(Constant("Hello!", typeof(string)));
+                            impl.AddMethod("GetMessage", m =>
+                            {
+                                m.SetBody(Constant("Hello!", typeof(string)));
+                            });
                         });
                     });
                 })
@@ -204,34 +211,31 @@ namespace GeneratedExpressionCode
                 {
                     sc.AddClass("StringComparer", cls =>
                     {
-                        cls.SetImplements<IComparable<string>>();
-
-                        cls.AddMethod("CompareTo", m =>
+                        cls.SetImplements<IComparable<string>>(impl =>
                         {
-                            var parameterType = typeof(IComparable<>)
-                                .GetGenericTypeArguments()
-                                .First();
-
-                            m.AddParameter(Parameter(parameterType, "T"));
-                            m.SetBody(Constant(-1, typeof(int)));
+                            impl.AddMethod("CompareTo", m =>
+                            {
+                                m.AddParameter(Parameter(typeof(string), "other"));
+                                m.SetBody(Constant(-1, typeof(int)));
+                            });
                         });
                     });
                 })
                 .ToCSharpString();
 
             const string EXPECTED = @"
+using System;
+
 namespace GeneratedExpressionCode
 {
-    public interface IMyInterface
+    public class StringComparer : IComparable<string>
     {
-        string GetMessage();
-    }
-
-    public class ClassImpl : IMyInterface
-    {
-        public string GetMessage()
+        public int CompareTo
+        (
+            string other
+        )
         {
-            return ""Hello!"";
+            return -1;
         }
     }
 }";

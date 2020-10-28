@@ -76,8 +76,8 @@
             {
                 if (type.IsInterface())
                 {
-                    typeExpression.SetImplements(type);
                     AddDefaultImplementations(typeExpression, type);
+                    typeExpression.SetImplements(type);
                     continue;
                 }
 

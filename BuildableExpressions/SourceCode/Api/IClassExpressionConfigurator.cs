@@ -5,7 +5,9 @@
     /// <summary>
     /// Provides options to configure a <see cref="ClassExpression"/>.
     /// </summary>
-    public interface IClassExpressionConfigurator : IConcreteTypeExpressionConfigurator
+    public interface IClassExpressionConfigurator :
+        IConcreteTypeExpressionConfigurator,
+        IClassMethodConfigurator
     {
         /// <summary>
         /// Configures the <see cref="ClassExpression"/> to derive from the given
@@ -15,7 +17,19 @@
         /// The base type from which the <see cref="ClassExpression"/> being built should derive.
         /// </param>
         /// <param name="configuration">The configuration to use.</param>
-        void SetBaseType(Type baseType, Action<ImplementationConfigurator> configuration);
+        void SetBaseType(Type baseType, Action<IClassImplementationConfigurator> configuration);
+
+        /// <summary>
+        /// Configures the <see cref="ClassExpression"/> to implement the given
+        /// <paramref name="interface"/>, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="interface">
+        /// The interface type the <see cref="ClassExpression"/> should implement.
+        /// </param>
+        /// <param name="configuration">The configuration to use.</param>
+        void SetImplements(
+            Type @interface,
+            Action<IClassImplementationConfigurator> configuration);
 
         /// <summary>
         /// Mark the <see cref="ClassExpression"/> as static. Added methods will be made static
@@ -27,18 +41,5 @@
         /// Mark the <see cref="ClassExpression"/> as abstract.
         /// </summary>
         void SetAbstract();
-
-        /// <summary>
-        /// Add a <see cref="MethodExpression"/> to the <see cref="ClassExpression"/>, with
-        /// the given <paramref name="name"/> and <paramref name="configuration"/>.
-        /// </summary>
-        /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
-        /// <param name="configuration">
-        /// The configuration with which to configure the new <see cref="MethodExpression"/>.
-        /// </param>
-        /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
-        MethodExpression AddMethod(
-            string name,
-            Action<IClassMethodExpressionConfigurator> configuration);
     }
 }

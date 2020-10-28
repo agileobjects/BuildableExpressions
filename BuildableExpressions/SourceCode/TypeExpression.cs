@@ -192,31 +192,7 @@
                     .SelectMany(it => it.GetPublicMethods()))
                 .ToList();
 
-            ThrowIfInterfaceMethodNotImplemented(interfaceMethods);
             ThrowIfAmbiguousImplementation(interfaceMethods);
-        }
-
-        private void ThrowIfInterfaceMethodNotImplemented(IEnumerable<MethodInfo> interfaceMethods)
-        {
-            var unimplementedMethod = interfaceMethods.FirstOrDefault(method =>
-            {
-                var implementationExists = MethodExpressions.Any(m =>
-                    m.Name == method.Name &&
-                    m.Parameters.Project(p => p.Type)
-                        .SequenceEqual(method.GetParameters().Project(p => p.ParameterType)));
-
-                return !implementationExists;
-            });
-
-            if (unimplementedMethod == null)
-            {
-                return;
-            }
-
-            var wrapper = new BclMethodWrapper(unimplementedMethod, Settings);
-
-            throw new InvalidOperationException(
-                $"Method '{wrapper.GetSignature()}' has not been implemented");
         }
 
         private void ThrowIfAmbiguousImplementation(IEnumerable<MethodInfo> interfaceMethods)
@@ -245,19 +221,67 @@
 
         #region ITypeExpressionConfigurator Members
 
-        void ITypeExpressionConfigurator.SetImplements(
+        internal virtual void SetImplements(
             Type @interface,
             Action<ImplementationConfigurator> configuration)
         {
+            ThrowIfNonInterfaceType(@interface);
+
+            if (configuration == null)
+            {
+                SetImplements(@interface);
+                return;
+            }
+
             var configurator = new ImplementationConfigurator(this, @interface);
             configuration.Invoke(configurator);
-            SetImplements(configurator.GetImplementedType());
+
+            @interface = configurator.GetImplementedType();
+            SetImplements(@interface);
+        }
+
+        private static void ThrowIfNonInterfaceType(Type type)
+        {
+            if (!type.IsInterface())
+            {
+                throw new InvalidOperationException(
+                    $"Type '{type.GetFriendlyName()}' is not an interface type.");
+            }
+        }
+
+        /// <summary>
+        /// Throws an InvalidOperationException if this <see cref="TypeExpression"/> has not
+        /// implemented any of the given <paramref name="interface"/>'s methods.
+        /// </summary>
+        /// <param name="interface">The type the implementation of which should be validated.</param>
+        protected void ThrowIfInterfaceMethodNotImplemented(Type @interface)
+        {
+            var unimplementedMethod = new[] { @interface }
+                .Concat(@interface.GetAllInterfaces())
+                .SelectMany(it => it.GetPublicMethods())
+                .FirstOrDefault(method =>
+                {
+                    var implementationExists = MethodExpressions.Any(m =>
+                        m.Name == method.Name &&
+                        m.Parameters.Project(p => p.Type)
+                            .SequenceEqual(method.GetParameters().Project(p => p.ParameterType)));
+
+                    return !implementationExists;
+                });
+
+            if (unimplementedMethod == null)
+            {
+                return;
+            }
+
+            var wrapper = new BclMethodWrapper(unimplementedMethod, Settings);
+
+            throw new InvalidOperationException(
+                $"Method '{wrapper.GetSignature()}' has not been implemented");
         }
 
         internal void SetImplements(Type @interface)
         {
-            ThrowIfNonInterfaceType(@interface);
-
             if (_interfaceTypes == null)
             {
                 _interfaceTypes = new List<Type>();
@@ -268,15 +292,6 @@
             }
 
             _interfaceTypes.Add(@interface);
-        }
-
-        private static void ThrowIfNonInterfaceType(Type type)
-        {
-            if (!type.IsInterface())
-            {
-                throw new InvalidOperationException(
-                    $"Type '{type.GetFriendlyName()}' is not an interface type.");
-            }
         }
 
         internal void Add(ClosedGenericTypeArgumentExpression argument)

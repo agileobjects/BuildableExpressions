@@ -1,6 +1,5 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
-    using System.Linq.Expressions;
     using System.Text;
     using BuildableExpressions.SourceCode;
     using Common;
@@ -16,7 +15,7 @@
             var translated = BuildableExpression
                 .SourceCode(sc => sc
                     .AddStruct("MyStruct", cls => cls
-                        .AddMethod(Expression.Default(typeof(void)))))
+                        .AddMethod(Default(typeof(void)))))
                 .ToCSharpString();
 
             const string EXPECTED = @"
@@ -46,11 +45,12 @@ namespace GeneratedExpressionCode
 
                     sc.AddStruct("StructImpl", cls =>
                     {
-                        cls.SetImplements(@interface);
-
-                        cls.AddMethod("DoNothing", m =>
+                        cls.SetImplements(@interface, impl =>
                         {
-                            m.SetBody(Default(typeof(void)));
+                            impl.AddMethod("DoNothing", m =>
+                            {
+                                m.SetBody(Default(typeof(void)));
+                            });
                         });
                     });
                 })
@@ -93,11 +93,13 @@ namespace GeneratedExpressionCode
                     sc.AddStruct("StructTypeGetter", str =>
                     {
                         str.AddGenericParameter(param);
-                        str.SetImplements(@interface);
 
-                        str.AddMethod("GetTypeName", m =>
+                        str.SetImplements(@interface, impl =>
                         {
-                            m.SetBody(BuildableExpression.NameOf(param));
+                            impl.AddMethod("GetTypeName", m =>
+                            {
+                                m.SetBody(BuildableExpression.NameOf(param));
+                            });
                         });
                     });
                 })
@@ -140,14 +142,14 @@ namespace GeneratedExpressionCode
 
                     sc.AddStruct("StringBuilderTypeGetter", str =>
                     {
-                        str.SetImplements(@interface, itf =>
+                        str.SetImplements(@interface, impl =>
                         {
-                            itf.SetGenericArgument<StringBuilder>(param);
-                        });
+                            impl.SetGenericArgument<StringBuilder>(param);
 
-                        str.AddMethod("GetTypeName", m =>
-                        {
-                            m.SetBody(BuildableExpression.NameOf(param));
+                            impl.AddMethod("GetTypeName", m =>
+                            {
+                                m.SetBody(BuildableExpression.NameOf(param));
+                            });
                         });
                     });
                 })
