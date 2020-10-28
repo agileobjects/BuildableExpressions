@@ -1,8 +1,10 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using System.Linq;
     using BuildableExpressions.SourceCode;
     using Common;
+    using NetStandardPolyfills;
     using SourceCode;
     using Xunit;
     using static System.Linq.Expressions.Expression;
@@ -50,9 +52,10 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls =>
                     {
-                        cls.SetImplements(typeof(IMessager), typeof(INumberSource));
-                        ConfigurationExtensions.AddMethod(cls, nameof(IMessager.GetMessage), sayHello);
-                        ConfigurationExtensions.AddMethod(cls, nameof(INumberSource.GetNumber), return123);
+                        cls.SetImplements(typeof(IMessager));
+                        cls.SetImplements(typeof(INumberSource));
+                        cls.AddMethod(nameof(IMessager.GetMessage), sayHello);
+                        cls.AddMethod(nameof(INumberSource.GetNumber), return123);
                     }))
                 .ToCSharpString();
 
@@ -108,7 +111,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildAClassWithAPartClosedGenericBaseType()
+        public void ShouldBuildAGenericClassWithAPartClosedGenericBaseType()
         {
             var translated = BuildableExpression
                 .SourceCode(sc =>
@@ -118,7 +121,7 @@ namespace GeneratedExpressionCode
                     var baseType = sc.AddClass("Basey", cls =>
                     {
                         cls.SetAbstract();
-                        
+
                         param1 = cls.AddGenericParameter("T1");
                         cls.AddGenericParameter("T2");
                     });
@@ -151,7 +154,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildAnInterfaceAndImplementingClass()
+        public void ShouldBuildAClassImplementingAnInterfaceExpression()
         {
             var translated = BuildableExpression
                 .SourceCode(sc =>
@@ -168,6 +171,49 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("GetMessage", m =>
                         {
                             m.SetBody(Constant("Hello!", typeof(string)));
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public interface IMyInterface
+    {
+        string GetMessage();
+    }
+
+    public class ClassImpl : IMyInterface
+    {
+        public string GetMessage()
+        {
+            return ""Hello!"";
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAClassImplementingAClosedGenericInterfaceType()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("StringComparer", cls =>
+                    {
+                        cls.SetImplements<IComparable<string>>();
+
+                        cls.AddMethod("CompareTo", m =>
+                        {
+                            var parameterType = typeof(IComparable<>)
+                                .GetGenericTypeArguments()
+                                .First();
+
+                            m.AddParameter(Parameter(parameterType, "T"));
+                            m.SetBody(Constant(-1, typeof(int)));
                         });
                     });
                 })

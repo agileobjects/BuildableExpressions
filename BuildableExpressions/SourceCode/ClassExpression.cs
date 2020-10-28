@@ -116,9 +116,7 @@
 
             var configurator = new ImplementationConfigurator(this, baseType);
             configuration.Invoke(configurator);
-
             BaseType = configurator.GetImplementedType();
-            Add(configurator.GenericArgumentExpression);
         }
 
         private void ThrowIfBaseTypeAlreadySet(Type baseType)

@@ -63,7 +63,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildAnInterfaceTypeDerivedInterface()
+        public void ShouldBuildAnInterfaceImplementingAnInterfaceType()
         {
             var translated = BuildableExpression
                 .SourceCode(sc =>
@@ -89,7 +89,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildAnInterfaceTypeDerivedPartClosedGenericInterface()
+        public void ShouldBuildAnInterfaceImplementingAPartClosedGenericInterfaceType()
         {
             var translated = BuildableExpression
                 .SourceCode(sc =>

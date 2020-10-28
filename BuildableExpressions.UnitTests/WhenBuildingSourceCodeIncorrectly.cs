@@ -181,7 +181,8 @@
                 {
                     sc.AddClass("Stringy", cls =>
                     {
-                        cls.SetImplements(typeof(ICodeGenerator), typeof(IRandomStringFactory));
+                        cls.SetImplements(typeof(ICodeGenerator));
+                        cls.SetImplements(typeof(IRandomStringFactory));
                         cls.AddMethod(nameof(ICodeGenerator.Generate), getString);
                     });
                 });

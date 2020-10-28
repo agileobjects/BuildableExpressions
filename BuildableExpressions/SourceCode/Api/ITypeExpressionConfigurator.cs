@@ -10,15 +10,6 @@
     {
         /// <summary>
         /// Configures the <see cref="TypeExpression"/> to implement the given
-        /// <paramref name="interfaces"/>.
-        /// </summary>
-        /// <param name="interfaces">
-        /// The interface types the <see cref="TypeExpression"/> should implement.
-        /// </param>
-        void SetImplements(params Type[] interfaces);
-
-        /// <summary>
-        /// Configures the <see cref="TypeExpression"/> to implement the given
         /// <paramref name="interface"/>, using the given <paramref name="configuration"/>.
         /// </summary>
         /// <param name="interface">

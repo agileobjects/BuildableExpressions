@@ -34,7 +34,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildAnInterfaceAndImplementingStruct()
+        public void ShouldBuildAStructImplementingAnInterfaceExpression()
         {
             var translated = BuildableExpression
                 .SourceCode(sc =>
@@ -76,7 +76,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildAGenericInterfaceAndOpenImplementingStruct()
+        public void ShouldBuildAGenericStructImplementingAGenericInterfaceExpression()
         {
             var translated = BuildableExpression
                 .SourceCode(sc =>
@@ -124,7 +124,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildAGenericInterfaceAndClosedImplementingStruct()
+        public void ShouldBuildAStructImplementingAClosedGenericInterfaceExpression()
         {
             var translated = BuildableExpression
                 .SourceCode(sc =>
@@ -197,7 +197,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildAGenericParameterStruct()
+        public void ShouldBuildAGenericStruct()
         {
             var sourceCode = BuildableExpression.SourceCode(sc =>
             {

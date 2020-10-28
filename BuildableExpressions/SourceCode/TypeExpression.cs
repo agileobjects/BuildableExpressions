@@ -245,22 +245,19 @@
 
         #region ITypeExpressionConfigurator Members
 
-        void ITypeExpressionConfigurator.SetImplements(params Type[] interfaces)
-            => SetImplements(interfaces);
-
         void ITypeExpressionConfigurator.SetImplements(
             Type @interface,
             Action<ImplementationConfigurator> configuration)
         {
             var configurator = new ImplementationConfigurator(this, @interface);
             configuration.Invoke(configurator);
-
             SetImplements(configurator.GetImplementedType());
-            Add(configurator.GenericArgumentExpression);
         }
 
-        internal void SetImplements(params Type[] interfaces)
+        internal void SetImplements(Type @interface)
         {
+            ThrowIfNonInterfaceType(@interface);
+
             if (_interfaceTypes == null)
             {
                 _interfaceTypes = new List<Type>();
@@ -270,11 +267,7 @@
                 _readOnlyInterfaceTypes = null;
             }
 
-            foreach (var @interface in interfaces)
-            {
-                ThrowIfNonInterfaceType(@interface);
-                _interfaceTypes.Add(@interface);
-            }
+            _interfaceTypes.Add(@interface);
         }
 
         private static void ThrowIfNonInterfaceType(Type type)

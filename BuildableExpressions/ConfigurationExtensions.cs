@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using Extensions;
     using ReadableExpressions;
     using SourceCode;
     using SourceCode.Api;
@@ -130,42 +129,57 @@
 
         /// <summary>
         /// Configures the <see cref="TypeExpression"/> to implement the given
-        /// <typeparamref name="TInterface"/>.
+        /// <typeparamref name="TEmptyInterface"/>. This overload enables implementation of 'marker'
+        /// interfaces.
         /// </summary>
-        /// <typeparam name="TInterface">
-        /// The type of interface the <see cref="TypeExpression"/> being built should implement.
+        /// <typeparam name="TEmptyInterface">
+        /// The interface Type <see cref="TypeExpression"/> should implement.
         /// </typeparam>
         /// <param name="typeConfig">The <see cref="ITypeExpressionConfigurator"/> to configure.</param>
-        public static void SetImplements<TInterface>(
+        public static void SetImplements<TEmptyInterface>(
             this ITypeExpressionConfigurator typeConfig)
-            where TInterface : class
+            where TEmptyInterface : class
         {
-            typeConfig.SetImplements(typeof(TInterface));
+            typeConfig.SetImplements(typeof(TEmptyInterface));
         }
 
         /// <summary>
-        /// Configures the <see cref="TypeExpression"/> to implement the Types of the given
-        /// <paramref name="interfaceExpressions"/>.
+        /// Configures the <see cref="TypeExpression"/> to implement the given empty
+        /// <paramref name="interfaceExpression"/>. This overload enables implementation of 'marker'
+        /// interfaces.
         /// </summary>
         /// <param name="typeConfig">The <see cref="ITypeExpressionConfigurator"/> to configure.</param>
-        /// <param name="interfaceExpressions">
-        /// One or more <see cref="InterfaceExpression"/>s the <see cref="TypeExpression"/> should
+        /// <param name="interfaceExpression">
+        /// The empty <see cref="InterfaceExpression"/> the <see cref="TypeExpression"/> should
         /// implement.
         /// </param>
         public static void SetImplements(
             this ITypeExpressionConfigurator typeConfig,
-            params InterfaceExpression[] interfaceExpressions)
+            InterfaceExpression interfaceExpression)
         {
-            typeConfig.SetImplements(interfaceExpressions.ProjectToArray(ie => ie.Type));
+            typeConfig.SetImplements(interfaceExpression.Type);
         }
 
         /// <summary>
-        /// Configures the <see cref="TypeExpression"/> to implement the Types of the given
+        /// Configures the <see cref="TypeExpression"/> to implement the given empty
+        /// <paramref name="interface"/>. This overload enables implementation of 'marker' interfaces.
+        /// </summary>
+        /// <param name="interface">The interface Type <see cref="TypeExpression"/> should implement.</param>
+        /// <param name="typeConfig">The <see cref="ITypeExpressionConfigurator"/> to configure.</param>
+        public static void SetImplements(
+            this ITypeExpressionConfigurator typeConfig,
+            Type @interface)
+        {
+            typeConfig.SetImplements(@interface, itf => { });
+        }
+
+        /// <summary>
+        /// Configures the <see cref="TypeExpression"/> to implement the Type of the given
         /// <paramref name="interfaceExpression"/>, using the given <paramref name="configuration"/>.
         /// </summary>
         /// <param name="typeConfig">The <see cref="ITypeExpressionConfigurator"/> to configure.</param>
         /// <param name="interfaceExpression">
-        /// The <see cref="InterfaceExpression"/>s the <see cref="TypeExpression"/> should implement.
+        /// The <see cref="InterfaceExpression"/> the <see cref="TypeExpression"/> should implement.
         /// </param>
         /// <param name="configuration">The configuration to use.</param>
         public static void SetImplements(

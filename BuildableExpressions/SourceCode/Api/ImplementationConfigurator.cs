@@ -11,6 +11,7 @@
     /// </summary>
     public class ImplementationConfigurator
     {
+        private readonly TypeExpression _typeExpression;
         private readonly TypeExpression _implementedTypeExpression;
         private readonly Type _implementedType;
         private readonly Type[] _genericTypeArguments;
@@ -19,6 +20,7 @@
             TypeExpression typeExpression,
             Type implementedType)
         {
+            _typeExpression = typeExpression;
             _implementedType = implementedType;
             _genericTypeArguments = implementedType.GetGenericTypeArguments();
 
@@ -30,12 +32,6 @@
 
         internal Type GetImplementedType()
             => _implementedType.MakeGenericType(_genericTypeArguments);
-
-        internal ClosedGenericTypeArgumentExpression GenericArgumentExpression
-        {
-            get;
-            private set;
-        }
 
         /// <summary>
         /// Closes the <see cref="GenericParameterExpression"/> with the given
@@ -119,7 +115,7 @@
                 }
 
                 _genericTypeArguments[i] = closedType;
-                GenericArgumentExpression = parameter.Close(closedType);
+                _typeExpression.Add(parameter.Close(closedType));
                 return;
             }
         }
