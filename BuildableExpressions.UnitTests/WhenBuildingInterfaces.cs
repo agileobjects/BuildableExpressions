@@ -94,9 +94,9 @@ namespace GeneratedExpressionCode
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
-                    sc.AddInterface("IStringEquator", itf =>
+                    sc.AddInterface("IStringEquatable", itf =>
                     {
-                        itf.SetImplements<IDisposable>();
+                        itf.SetImplements<IEquatable<string>>();
                     });
                 })
                 .ToCSharpString();
@@ -106,7 +106,7 @@ using System;
 
 namespace GeneratedExpressionCode
 {
-    public interface IDisposableMarker : IDisposable
+    public interface IStringEquatable : IEquatable<string>
     {
     }
 }";
