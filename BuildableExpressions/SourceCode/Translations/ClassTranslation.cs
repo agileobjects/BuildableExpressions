@@ -7,12 +7,11 @@
 
     internal class ClassTranslation : ITranslation
     {
-        private const string _staticString = "static ";
-        private const string _abstractString = "abstract ";
         private const string _classString = "class ";
 
         private readonly TypeTranslation _typeTranslation;
         private readonly ClassExpression _class;
+        private readonly string _modifier;
         private readonly ITranslatable _baseTypeTranslation;
 
         public ClassTranslation(ClassExpression type, ITranslationContext context)
@@ -26,11 +25,20 @@
 
             if (type.IsStatic)
             {
-                translationSize += _staticString.Length;
+                _modifier = "static ";
             }
             else if (type.IsAbstract)
             {
-                translationSize += _abstractString.Length;
+                _modifier = "abstract ";
+            }
+            else if (type.IsSealed)
+            {
+                _modifier = "sealed ";
+            }
+
+            if (_modifier != null)
+            {
+                translationSize += _modifier.Length;
             }
 
             if (hasBaseType)
@@ -58,18 +66,7 @@
 
         public void WriteTo(TranslationWriter writer)
         {
-            var declarationModifiers = string.Empty;
-
-            if (_class.IsStatic)
-            {
-                declarationModifiers += _staticString;
-            }
-            else if (_class.IsAbstract)
-            {
-                declarationModifiers += _abstractString;
-            }
-
-            _typeTranslation.WriteTypeDeclarationTo(writer, declarationModifiers);
+            _typeTranslation.WriteTypeDeclarationTo(writer, _modifier);
             _typeTranslation.WriteTypeListTo(writer, _baseTypeTranslation);
             _typeTranslation.WriteMembersTo(writer);
         }

@@ -41,5 +41,10 @@
         /// Mark the <see cref="ClassExpression"/> as abstract.
         /// </summary>
         void SetAbstract();
+
+        /// <summary>
+        /// Mark the <see cref="ClassExpression"/> as sealed.
+        /// </summary>
+        void SetSealed();
     }
 }

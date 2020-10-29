@@ -333,6 +333,104 @@ namespace AgileObjects.Tests.Yo
         }
 
         [Fact]
+        public void ShouldBuildAnAbstractClass()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetAbstract();
+                        cls.AddMethod("GetString", Default(typeof(string)));
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public abstract class GeneratedExpressionClass
+    {
+        public string GetString()
+        {
+            return null;
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildASealedClass()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("MySealedClass", cls =>
+                    {
+                        cls.SetSealed();
+                        cls.AddMethod("GetString", Constant("String!"));
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public sealed class MySealedClass
+    {
+        public string GetString()
+        {
+            return ""String!"";
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldUseStaticClassAndMethodScopes()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetStatic();
+
+                        cls.AddMethod("GetString", Default(typeof(string)));
+
+                        cls.AddMethod("GetInt", Default(typeof(int)), m =>
+                        {
+                            m.SetStatic();
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public static class GeneratedExpressionClass
+    {
+        public static string GetString()
+        {
+            return null;
+        }
+
+        public static int GetInt()
+        {
+            return default(int);
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAnEmptyClass()
         {
             var translated = BuildableExpression

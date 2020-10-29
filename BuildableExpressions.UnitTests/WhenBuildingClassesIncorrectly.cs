@@ -60,5 +60,58 @@
 
             baseTypeEx.Message.ShouldContain("'IDisposable' is not a valid base type");
         }
+
+        [Fact]
+        public void ShouldErrorIfStructTypeGivenAsBaseType()
+        {
+            var baseTypeEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetBaseType(typeof(DateTime));
+                    });
+                });
+            });
+
+            baseTypeEx.Message.ShouldContain("'DateTime' is not a valid base type");
+        }
+
+        [Fact]
+        public void ShouldErrorIfClassMarkedStaticAndAbstract()
+        {
+            var classEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetStatic();
+                        cls.SetAbstract();
+                    });
+                });
+            });
+
+            classEx.Message.ShouldContain("cannot be both static and abstract");
+        }
+
+        [Fact]
+        public void ShouldErrorIfClassMarkedAbstractAndStatic()
+        {
+            var classEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetAbstract();
+                        cls.SetStatic();
+                    });
+                });
+            });
+
+            classEx.Message.ShouldContain("cannot be both abstract and static");
+        }
     }
 }

@@ -38,6 +38,11 @@
         public bool IsAbstract { get; private set; }
 
         /// <summary>
+        /// Gets a value indicating whether this <see cref="ClassExpression"/> is abstract.
+        /// </summary>
+        public bool IsSealed { get; private set; }
+
+        /// <summary>
         /// Gets the base type from which this <see cref="ClassExpression"/> derives.
         /// </summary>
         public Type BaseType { get; private set; }
@@ -82,6 +87,11 @@
         }
 
         void IClassExpressionConfigurator.SetAbstract() => SetAbstract();
+
+        void IClassExpressionConfigurator.SetSealed()
+        {
+            IsSealed = true;
+        }
 
         internal void SetAbstract()
         {
