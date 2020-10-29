@@ -17,6 +17,9 @@
         /// The base type from which the <see cref="ClassExpression"/> being built should derive.
         /// </param>
         /// <param name="configuration">The configuration to use.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the <see cref="ClassExpression"/> has already been given a base type.
+        /// </exception>
         void SetBaseType(Type baseType, Action<IClassImplementationConfigurator> configuration);
 
         /// <summary>
