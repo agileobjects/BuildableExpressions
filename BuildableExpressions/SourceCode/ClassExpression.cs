@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Api;
+    using BuildableExpressions.Extensions;
     using NetStandardPolyfills;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
@@ -112,6 +113,7 @@
             Type baseType,
             Action<IClassImplementationConfigurator> configuration)
         {
+            baseType.ThrowIfNull(nameof(baseType));
             ThrowIfBaseTypeAlreadySet(baseType);
             ThrowIfInvalidBaseType(baseType);
 

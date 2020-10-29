@@ -1,7 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
-    using System.IO;
     using System.Text;
     using Common;
     using ReadableExpressions;
@@ -96,45 +95,26 @@
         }
 
         [Fact]
-        public void ShouldErrorIfClassGivenMultipleBaseTypes()
+        public void ShouldErrorIfNullTypeGivenAsStructInterface()
         {
-            var baseTypeEx = Should.Throw<InvalidOperationException>(() =>
+            var interfaceEx = Should.Throw<ArgumentNullException>(() =>
             {
                 BuildableExpression.SourceCode(sc =>
                 {
-                    sc.AddClass(cls =>
+                    sc.AddStruct(str =>
                     {
-                        cls.SetBaseType(typeof(Stream));
-                        cls.SetBaseType(typeof(TestClassBase));
+                        str.SetImplements(default, impl => { });
                     });
                 });
             });
 
-            baseTypeEx.Message.ShouldContain("Unable to set class base type");
-            baseTypeEx.Message.ShouldContain("already been set to 'Stream'");
-        }
-
-        [Fact]
-        public void ShouldErrorIfInterfaceTypeGivenAsBaseType()
-        {
-            var baseTypeEx = Should.Throw<InvalidOperationException>(() =>
-            {
-                BuildableExpression.SourceCode(sc =>
-                {
-                    sc.AddClass(cls =>
-                    {
-                        cls.SetBaseType(typeof(IDisposable));
-                    });
-                });
-            });
-
-            baseTypeEx.Message.ShouldContain("'IDisposable' is not a valid base type");
+            interfaceEx.Message.ShouldContain("cannot be null");
         }
 
         [Fact]
         public void ShouldErrorIfConcreteTypeGivenAsInterface()
         {
-            var interfaceEx = Should.Throw<InvalidOperationException>(() =>
+            var interfaceEx = Should.Throw<ArgumentException>(() =>
             {
                 BuildableExpression.SourceCode(sc =>
                 {

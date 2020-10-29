@@ -225,6 +225,7 @@
             Type @interface,
             Action<ImplementationConfigurator> configuration)
         {
+            @interface.ThrowIfNull(nameof(@interface));
             ThrowIfNonInterfaceType(@interface);
 
             if (configuration == null)
@@ -244,7 +245,7 @@
         {
             if (!type.IsInterface())
             {
-                throw new InvalidOperationException(
+                throw new ArgumentException(
                     $"Type '{type.GetFriendlyName()}' is not an interface type.");
             }
         }

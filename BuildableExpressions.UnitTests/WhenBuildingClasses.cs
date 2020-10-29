@@ -117,6 +117,41 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldBuildAClassWithABaseClassExpression()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var baseType = sc.AddClass("BaseType", cls => { });
+
+                    sc.AddClass("DerivedType", cls =>
+                    {
+                        cls.SetBaseType(baseType);
+                        cls.AddMethod("SayGoodbye", Constant("Goodbye!"));
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public class BaseType
+    {
+    }
+
+    public class DerivedType : BaseType
+    {
+        public string SayGoodbye()
+        {
+            return ""Goodbye!"";
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAGenericClassWithAPartClosedGenericBaseType()
         {
             var translated = BuildableExpression

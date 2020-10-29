@@ -153,20 +153,6 @@
         }
 
         /// <summary>
-        /// Configures the <see cref="InterfaceExpression"/> to implement the given
-        /// <typeparamref name="TInterface"/>, using the given <paramref name="configuration"/>.
-        /// </summary>
-        /// <typeparam name="TInterface">The interface Type the <see cref="InterfaceExpression"/> should implement.</typeparam>
-        /// <param name="interfaceConfig">The <see cref="IInterfaceExpressionConfigurator"/> to configure.</param>
-        /// <param name="configuration">The configuration to use.</param>
-        public static void SetImplements<TInterface>(
-            this IInterfaceExpressionConfigurator interfaceConfig,
-            Action<IImplementationConfigurator> configuration)
-        {
-            interfaceConfig.SetImplements(typeof(TInterface), configuration);
-        }
-
-        /// <summary>
         /// Configures the <see cref="ClassExpression"/> to implement the given
         /// <typeparamref name="TInterface"/>, using the given <paramref name="configuration"/>.
         /// </summary>

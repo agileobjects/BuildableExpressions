@@ -89,6 +89,32 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldBuildAnInterfaceImplementingAClosedInterfaceType()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddInterface("IStringEquator", itf =>
+                    {
+                        itf.SetImplements<IDisposable>();
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    public interface IDisposableMarker : IDisposable
+    {
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAnInterfaceImplementingAPartClosedGenericInterfaceType()
         {
             var translated = BuildableExpression
