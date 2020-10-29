@@ -10,6 +10,7 @@
     using Api;
     using BuildableExpressions.Extensions;
     using Extensions;
+    using Generics;
     using NetStandardPolyfills;
     using ReadableExpressions;
     using ReadableExpressions.Translations;
@@ -197,7 +198,7 @@
             ThrowIfDuplicateGenericParameterName(name);
             ThrowIfTypeGenericParameterNameClash(name);
 
-            var parameter = new OpenGenericArgumentExpression(name, configuration);
+            var parameter = new ConfiguredOpenGenericArgumentExpression(name, configuration);
 
             _genericParameters ??= new List<GenericParameterExpression>();
             _readonlyGenericParameters = null;

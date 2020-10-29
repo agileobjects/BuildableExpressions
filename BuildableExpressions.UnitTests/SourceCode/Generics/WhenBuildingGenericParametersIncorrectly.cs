@@ -1,9 +1,8 @@
-﻿namespace AgileObjects.BuildableExpressions.UnitTests
+﻿namespace AgileObjects.BuildableExpressions.UnitTests.Generics
 {
     using System;
     using System.IO;
     using Common;
-    using SourceCode;
     using Xunit;
 
     public class WhenBuildingGenericParametersIncorrectly

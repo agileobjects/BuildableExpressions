@@ -1,4 +1,4 @@
-﻿namespace AgileObjects.BuildableExpressions.SourceCode
+﻿namespace AgileObjects.BuildableExpressions.SourceCode.Extensions
 {
     using System;
     using System.Linq;

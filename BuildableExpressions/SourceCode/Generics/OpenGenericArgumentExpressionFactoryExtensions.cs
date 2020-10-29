@@ -1,4 +1,4 @@
-﻿namespace AgileObjects.BuildableExpressions.SourceCode
+﻿namespace AgileObjects.BuildableExpressions.SourceCode.Generics
 {
     using System;
     using System.Linq;
@@ -107,13 +107,5 @@
         }
 
         #endregion
-
-        public static OpenGenericArgumentExpression ToParameterExpression(
-            this Type parameterType)
-        {
-            return new OpenGenericArgumentExpression(parameterType, gp =>
-            {
-            });
-        }
     }
 }

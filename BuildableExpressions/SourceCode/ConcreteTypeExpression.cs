@@ -3,6 +3,7 @@
     using System;
     using System.Linq.Expressions;
     using Api;
+    using Generics;
 
     /// <summary>
     /// Represents a concrete (non-interface) type in a piece of source code.

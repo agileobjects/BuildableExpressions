@@ -3,6 +3,8 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using Generics;
+    using Operators;
     using ReadableExpressions;
     using static System.Linq.Expressions.ExpressionType;
     using static SourceCodeTranslationSettings;

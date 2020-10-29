@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using Analysis;
     using Api;
+    using Extensions;
 
     internal class StandardMethodExpression : MethodExpression
     {

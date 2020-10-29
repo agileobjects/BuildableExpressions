@@ -4,6 +4,7 @@
     using System.Linq;
     using Api;
     using BuildableExpressions.Extensions;
+    using Generics;
     using NetStandardPolyfills;
     using ReadableExpressions.Extensions;
 
@@ -52,7 +53,7 @@
 
             if (parameterType != null)
             {
-                SetGenericArgument(parameterType.ToParameterExpression(), closedType);
+                SetGenericArgument(new TypedOpenGenericArgumentExpression(parameterType), closedType);
                 return;
             }
 

@@ -1,4 +1,4 @@
-﻿namespace AgileObjects.BuildableExpressions.UnitTests.SourceCode.Translations
+﻿namespace AgileObjects.BuildableExpressions.UnitTests.Translations
 {
     using System;
     using Common;

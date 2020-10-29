@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions
 {
-    using SourceCode;
+    using SourceCode.Generics;
+    using SourceCode.Operators;
 
     /// <summary>
     /// Provides buildable Expression factory methods.

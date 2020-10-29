@@ -10,6 +10,7 @@
     using BuildableExpressions.Extensions;
     using Compilation;
     using Extensions;
+    using Generics;
     using NetStandardPolyfills;
     using ReadableExpressions;
     using ReadableExpressions.Extensions;
@@ -311,7 +312,7 @@
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
         {
-            return AddGenericParameter(new OpenGenericArgumentExpression(name, configuration));
+            return AddGenericParameter(new ConfiguredOpenGenericArgumentExpression(name, configuration));
         }
 
         /// <summary>

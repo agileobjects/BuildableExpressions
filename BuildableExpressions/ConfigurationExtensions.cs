@@ -7,6 +7,7 @@
     using ReadableExpressions;
     using SourceCode;
     using SourceCode.Api;
+    using SourceCode.Generics;
 
     /// <summary>
     /// Provides extension methods for easier API use.

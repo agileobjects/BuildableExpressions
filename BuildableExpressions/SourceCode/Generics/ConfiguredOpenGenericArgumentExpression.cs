@@ -1,4 +1,4 @@
-﻿namespace AgileObjects.BuildableExpressions.SourceCode
+﻿namespace AgileObjects.BuildableExpressions.SourceCode.Generics
 {
     using System;
     using System.Collections.Concurrent;
@@ -10,13 +10,13 @@
     using NetStandardPolyfills;
     using ReadableExpressions.Extensions;
 
-    internal class OpenGenericArgumentExpression :
-        GenericParameterExpression,
+    internal class ConfiguredOpenGenericArgumentExpression :
+        OpenGenericArgumentExpression,
         IGenericParameterExpressionConfigurator,
-        IEquatable<OpenGenericArgumentExpression>
+        IEquatable<ConfiguredOpenGenericArgumentExpression>
     {
-        private static readonly ConcurrentDictionary<OpenGenericArgumentExpression, Type> _typeCache =
-            new ConcurrentDictionary<OpenGenericArgumentExpression, Type>(
+        private static readonly ConcurrentDictionary<ConfiguredOpenGenericArgumentExpression, Type> _typeCache =
+            new ConcurrentDictionary<ConfiguredOpenGenericArgumentExpression, Type>(
                 new GenericParameterExpressionComparer());
 
         private Type _type;
@@ -27,7 +27,7 @@
         private List<Type> _typeConstraints;
         private ReadOnlyCollection<Type> _readonlyTypeConstraints;
 
-        internal OpenGenericArgumentExpression(
+        public ConfiguredOpenGenericArgumentExpression(
             Type type,
             Action<IGenericParameterExpressionConfigurator> configuration)
             : this(type.Name, configuration)
@@ -35,7 +35,7 @@
             _type = type;
         }
 
-        internal OpenGenericArgumentExpression(
+        public ConfiguredOpenGenericArgumentExpression(
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
             : base(name.ThrowIfInvalidName<ArgumentException>("Generic Parameter"))
@@ -45,11 +45,6 @@
 
         public override Type Type
             => _type ??= _typeCache.GetOrAdd(this, p => p.ToType());
-
-        public override bool IsClosed => false;
-
-        public ClosedGenericTypeArgumentExpression Close(Type type)
-            => new ClosedGenericTypeArgumentExpression(this, type);
 
         #region IGenericParameterExpressionConfigurator Members
 
@@ -115,7 +110,7 @@
         private void ThrowIfAlreadyHasClassConstraint(string conflictingTypeConstraint)
         {
             var existingClassConstraint = _typeConstraints
-                .FirstOrDefault(t => t.IsClass());
+                .FirstOrDefault(t => TypeExtensionsPolyfill.IsClass(t));
 
             if (existingClassConstraint != null)
             {
@@ -144,7 +139,7 @@
 
         protected override bool HasNewableConstraint => _hasNewableConstraint;
 
-        public IEnumerable<Type> TypeConstraintsAccessor => _typeConstraints;
+        public override IEnumerable<Type> TypeConstraintsAccessor => _typeConstraints;
 
         protected override ReadOnlyCollection<Type> TypeConstraints
         {
@@ -160,7 +155,7 @@
 
         #region IEquatable Members
 
-        bool IEquatable<OpenGenericArgumentExpression>.Equals(OpenGenericArgumentExpression other)
+        bool IEquatable<ConfiguredOpenGenericArgumentExpression>.Equals(ConfiguredOpenGenericArgumentExpression other)
         {
             if (ReferenceEquals(other, null))
             {
@@ -193,12 +188,17 @@
                 .SequenceEqual(other._typeConstraints.OrderBy(t => t));
         }
 
-        private class GenericParameterExpressionComparer : IEqualityComparer<OpenGenericArgumentExpression>
+        private class GenericParameterExpressionComparer :
+            IEqualityComparer<ConfiguredOpenGenericArgumentExpression>
         {
-            public bool Equals(OpenGenericArgumentExpression x, OpenGenericArgumentExpression y)
-                => ((IEquatable<OpenGenericArgumentExpression>)x)?.Equals(y) == true;
+            public bool Equals(
+                ConfiguredOpenGenericArgumentExpression x,
+                ConfiguredOpenGenericArgumentExpression y)
+            {
+                return ((IEquatable<ConfiguredOpenGenericArgumentExpression>)x)?.Equals(y) == true;
+            }
 
-            public int GetHashCode(OpenGenericArgumentExpression obj) => 0;
+            public int GetHashCode(ConfiguredOpenGenericArgumentExpression obj) => 0;
         }
 
         #endregion

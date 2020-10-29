@@ -1,9 +1,8 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System.Text;
-    using BuildableExpressions.SourceCode;
+    using BuildableExpressions.SourceCode.Generics;
     using Common;
-    using SourceCode;
     using Xunit;
     using static System.Linq.Expressions.Expression;
 

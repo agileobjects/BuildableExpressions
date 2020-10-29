@@ -1,4 +1,4 @@
-﻿namespace AgileObjects.BuildableExpressions.UnitTests.SourceCode
+﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
     using System.Linq.Expressions;

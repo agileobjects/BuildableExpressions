@@ -1,4 +1,4 @@
-﻿namespace AgileObjects.BuildableExpressions.SourceCode
+﻿namespace AgileObjects.BuildableExpressions.SourceCode.Generics
 {
     using System;
     using System.Collections.ObjectModel;

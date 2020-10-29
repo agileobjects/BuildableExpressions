@@ -1,12 +1,13 @@
-﻿namespace AgileObjects.BuildableExpressions.UnitTests
+﻿namespace AgileObjects.BuildableExpressions.UnitTests.Generics
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using BuildableExpressions.SourceCode;
+    using System.Linq;
+    using BuildableExpressions.SourceCode.Generics;
     using Common;
     using NetStandardPolyfills;
-    using SourceCode;
+    using ReadableExpressions.Translations.Reflection;
     using Xunit;
     using static System.Linq.Expressions.Expression;
 
@@ -35,6 +36,25 @@
             param.Type.ShouldNotBeNull().Name.ShouldBe("T");
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
+        }
+
+        [Fact]
+        public void ShouldCreateAnUnconstrainedParameterExpression()
+        {
+            var typeParameter = new TypedOpenGenericArgumentExpression(
+                typeof(List<>)
+                    .GetGenericTypeArguments()
+                    .First());
+
+            typeParameter.ShouldNotBeNull();
+            typeParameter.IsClosed.ShouldBeFalse();
+
+            var typeArgument = (IGenericArgument)typeParameter;
+            typeArgument.HasConstraints.ShouldBeFalse();
+            typeArgument.HasClassConstraint.ShouldBeFalse();
+            typeArgument.HasNewableConstraint.ShouldBeFalse();
+            typeArgument.HasStructConstraint.ShouldBeFalse();
+            typeArgument.TypeConstraints.ShouldBeEmpty();
         }
 
         [Fact]
@@ -69,6 +89,25 @@
         }
 
         [Fact]
+        public void ShouldCreateAnNewableClassParameterExpression()
+        {
+            var typeParameter = new TypedOpenGenericArgumentExpression(
+                typeof(NewableClassParameter<>)
+                    .GetGenericTypeArguments()
+                    .First());
+
+            typeParameter.ShouldNotBeNull();
+            typeParameter.IsClosed.ShouldBeFalse();
+
+            var typeArgument = (IGenericArgument)typeParameter;
+            typeArgument.HasConstraints.ShouldBeTrue();
+            typeArgument.HasClassConstraint.ShouldBeTrue();
+            typeArgument.HasNewableConstraint.ShouldBeTrue();
+            typeArgument.HasStructConstraint.ShouldBeFalse();
+            typeArgument.TypeConstraints.ShouldBeEmpty();
+        }
+
+        [Fact]
         public void ShouldBuildAStructParameter()
         {
             var param = default(GenericParameterExpression);
@@ -95,6 +134,25 @@
             param.Type.ShouldNotBeNull().Name.ShouldBe("TStruct");
             param.Type.IsClass().ShouldBeFalse();
             param.Type.IsValueType().ShouldBeTrue();
+        }
+
+        [Fact]
+        public void ShouldCreateAStructParameterExpression()
+        {
+            var typeParameter = new TypedOpenGenericArgumentExpression(
+                typeof(StructParameter<>)
+                    .GetGenericTypeArguments()
+                    .First());
+
+            typeParameter.ShouldNotBeNull();
+            typeParameter.IsClosed.ShouldBeFalse();
+
+            var typeArgument = (IGenericArgument)typeParameter;
+            typeArgument.HasConstraints.ShouldBeTrue();
+            typeArgument.HasClassConstraint.ShouldBeFalse();
+            typeArgument.HasNewableConstraint.ShouldBeFalse();
+            typeArgument.HasStructConstraint.ShouldBeTrue();
+            typeArgument.TypeConstraints.ShouldBeEmpty();
         }
 
         [Fact]
@@ -125,6 +183,25 @@
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
             param.Type.BaseType.ShouldBe(typeof(BaseType));
+        }
+
+        [Fact]
+        public void ShouldCreateATypeConstrainedParameterExpression()
+        {
+            var typeParameter = new TypedOpenGenericArgumentExpression(
+                typeof(TypeConstrainedParameter<>)
+                    .GetGenericTypeArguments()
+                    .First());
+
+            typeParameter.ShouldNotBeNull();
+            typeParameter.IsClosed.ShouldBeFalse();
+
+            var typeArgument = (IGenericArgument)typeParameter;
+            typeArgument.HasConstraints.ShouldBeTrue();
+            typeArgument.HasClassConstraint.ShouldBeFalse();
+            typeArgument.HasNewableConstraint.ShouldBeFalse();
+            typeArgument.HasStructConstraint.ShouldBeFalse();
+            typeArgument.TypeConstraints.ShouldHaveSingleItem().ShouldBe(typeof(BaseType));
         }
 
         [Fact]
@@ -160,6 +237,25 @@
         }
 
         [Fact]
+        public void ShouldCreateAnInterfaceConstrainedParameterExpression()
+        {
+            var typeParameter = new TypedOpenGenericArgumentExpression(
+                typeof(InterfaceConstrainedParameter<>)
+                    .GetGenericTypeArguments()
+                    .First());
+
+            typeParameter.ShouldNotBeNull();
+            typeParameter.IsClosed.ShouldBeFalse();
+
+            var typeArgument = (IGenericArgument)typeParameter;
+            typeArgument.HasConstraints.ShouldBeTrue();
+            typeArgument.HasClassConstraint.ShouldBeFalse();
+            typeArgument.HasNewableConstraint.ShouldBeFalse();
+            typeArgument.HasStructConstraint.ShouldBeFalse();
+            typeArgument.TypeConstraints.ShouldHaveSingleItem().ShouldBe(typeof(IMessager));
+        }
+
+        [Fact]
         public void ShouldBuildAnAbstractTypeConstrainedParameter()
         {
             var param = default(GenericParameterExpression);
@@ -188,6 +284,27 @@
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
             param.Type.BaseType.ShouldBe(typeof(AbstractBaseType));
+        }
+
+        [Fact]
+        public void ShouldCreateANewableTypeAndInterfaceConstrainedParameterExpression()
+        {
+            var typeParameter = new TypedOpenGenericArgumentExpression(
+                typeof(NewableTypeAndInterfaceConstrainedParameter<>)
+                    .GetGenericTypeArguments()
+                    .First());
+
+            typeParameter.ShouldNotBeNull();
+            typeParameter.IsClosed.ShouldBeFalse();
+
+            var typeArgument = (IGenericArgument)typeParameter;
+            typeArgument.HasConstraints.ShouldBeTrue();
+            typeArgument.HasClassConstraint.ShouldBeFalse();
+            typeArgument.HasNewableConstraint.ShouldBeTrue();
+            typeArgument.HasStructConstraint.ShouldBeFalse();
+            typeArgument.TypeConstraints.Count.ShouldBe(2);
+            typeArgument.TypeConstraints.First().ShouldBe(typeof(AbstractBaseType));
+            typeArgument.TypeConstraints.Last().ShouldBe(typeof(IMessager));
         }
 
         [Fact]
@@ -518,6 +635,36 @@
         public interface IMessager
         {
             void SendMessage(string message);
+        }
+
+        // ReSharper disable once UnusedTypeParameter
+        public class NewableClassParameter<T>
+            where T : class, new()
+        {
+        }
+
+        // ReSharper disable once UnusedTypeParameter
+        public class StructParameter<T>
+            where T : struct
+        {
+        }
+
+        // ReSharper disable once UnusedTypeParameter
+        public class TypeConstrainedParameter<T>
+            where T : BaseType
+        {
+        }
+
+        // ReSharper disable once UnusedTypeParameter
+        public class InterfaceConstrainedParameter<T>
+            where T : IMessager
+        {
+        }
+
+        // ReSharper disable once UnusedTypeParameter
+        public class NewableTypeAndInterfaceConstrainedParameter<T>
+            where T : AbstractBaseType, IMessager, new()
+        {
         }
 
         #endregion

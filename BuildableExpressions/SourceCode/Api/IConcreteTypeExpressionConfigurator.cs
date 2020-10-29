@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Api
 {
     using System.Linq.Expressions;
+    using Generics;
 
     /// <summary>
     /// Provides options to configure a <see cref="ConcreteTypeExpression"/>.

@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Api
 {
     using System;
+    using Generics;
 
     /// <summary>
     /// Provides options to configure how a <see cref="TypeExpression"/> implements a base type or

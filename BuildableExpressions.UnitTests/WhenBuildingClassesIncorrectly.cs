@@ -3,7 +3,6 @@
     using System;
     using System.IO;
     using Common;
-    using SourceCode;
     using Xunit;
 
     public class WhenBuildingClassesIncorrectly

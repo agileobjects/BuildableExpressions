@@ -5,7 +5,6 @@
     using System.Linq.Expressions;
     using Common;
     using NetStandardPolyfills;
-    using SourceCode;
     using Xunit;
 
     public class WhenBuildingMethods : TestClassBase
