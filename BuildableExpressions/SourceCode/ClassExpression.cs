@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
     using Api;
     using BuildableExpressions.Extensions;
     using NetStandardPolyfills;
@@ -16,6 +18,9 @@
         ConcreteTypeExpression,
         IClassExpressionConfigurator
     {
+        private ClassExpression _baseTypeExpression;
+        private Expression _baseInstanceExpression;
+
         internal ClassExpression(
             SourceCodeExpression sourceCode,
             string name,
@@ -129,6 +134,9 @@
                 $"Class '{Name}' cannot be both {modifier} and {conflictingModifier}.");
         }
 
+        Expression IClassExpressionConfigurator.BaseInstanceExpression
+            => _baseInstanceExpression ??= new InstanceExpression(_baseTypeExpression, "base");
+
         void IClassExpressionConfigurator.SetBaseType(
             Type baseType,
             Action<IClassImplementationConfigurator> configuration)
@@ -149,13 +157,13 @@
 
             if (configuration == null)
             {
-                BaseType = baseType;
+                SetBaseTypeTo(baseType);
                 return;
             }
 
             var configurator = new ImplementationConfigurator(this, baseType);
             configuration.Invoke(configurator);
-            BaseType = configurator.GetImplementedType();
+            SetBaseTypeTo(configurator.GetImplementedType());
         }
 
         private void ThrowIfBaseTypeAlreadySet(Type baseType)
@@ -175,6 +183,15 @@
                 throw new InvalidOperationException(
                     $"Type '{baseType.GetFriendlyName()}' is not a valid base type.");
             }
+        }
+
+        private void SetBaseTypeTo(Type baseType)
+        {
+            BaseType = baseType;
+
+            _baseTypeExpression = (ClassExpression)SourceCode
+                .TypeExpressions
+                .FirstOrDefault(t => t.TypeAccessor == baseType);
         }
 
         MethodExpression IClassMethodConfigurator.AddMethod(

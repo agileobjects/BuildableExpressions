@@ -9,7 +9,7 @@
     {
         /// <summary>
         /// Gets an Expression to use to refer to the instance of the type being created in the
-        /// current scope. Use this property to access the 'this' keyword in a class method.
+        /// current scope. Use this property to access the 'this' keyword in a class or struct method.
         /// </summary>
         Expression ThisInstanceExpression { get; }
 

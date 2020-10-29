@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Api
 {
     using System;
+    using System.Linq.Expressions;
 
     /// <summary>
     /// Provides options to configure a <see cref="ClassExpression"/>.
@@ -9,6 +10,12 @@
         IConcreteTypeExpressionConfigurator,
         IClassMethodConfigurator
     {
+        /// <summary>
+        /// Gets an Expression to use to refer to the base class instance of the type being created
+        /// in the current scope. Use this property to access the 'base' keyword in a class method.
+        /// </summary>
+        Expression BaseInstanceExpression { get; }
+
         /// <summary>
         /// Configures the <see cref="ClassExpression"/> to derive from the given
         /// <paramref name="baseType"/>.

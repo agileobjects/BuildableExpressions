@@ -333,6 +333,64 @@ namespace AgileObjects.Tests.Yo
         }
 
         [Fact]
+        public void ShouldCallAnAbstractBaseTypeMethodFromADerivedType()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var baseTypeMethod = default(MethodExpression);
+
+                    var baseType = sc.AddClass("BaseType", cls =>
+                    {
+                        cls.SetAbstract();
+
+                        baseTypeMethod = cls.AddMethod("GetNameBase", m =>
+                        {
+                            m.SetVisibility(MemberVisibility.Protected);
+                            m.SetBody(Constant("Steve", typeof(string)));
+                        });
+                    });
+
+                    sc.AddClass("DerivedType", cls =>
+                    {
+                        cls.SetBaseType(baseType);
+
+                        cls.AddMethod("GetName", m =>
+                        {
+                            var baseTypeMethodCall = Call(
+                                cls.BaseInstanceExpression,
+                                baseTypeMethod.MethodInfo);
+
+                            m.SetBody(baseTypeMethodCall);
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public abstract class BaseType
+    {
+        protected string GetNameBase()
+        {
+            return ""Steve"";
+        }
+    }
+
+    public class DerivedType : BaseType
+    {
+        public string GetName()
+        {
+            return base.GetNameBase();
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAnAbstractClass()
         {
             var translated = BuildableExpression
