@@ -97,6 +97,24 @@
         }
 
         [Fact]
+        public void ShouldErrorIfClassMarkedStaticAndSealed()
+        {
+            var classEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetStatic();
+                        cls.SetSealed();
+                    });
+                });
+            });
+
+            classEx.Message.ShouldContain("cannot be both static and sealed");
+        }
+
+        [Fact]
         public void ShouldErrorIfClassMarkedAbstractAndStatic()
         {
             var classEx = Should.Throw<InvalidOperationException>(() =>
@@ -112,6 +130,60 @@
             });
 
             classEx.Message.ShouldContain("cannot be both abstract and static");
+        }
+
+        [Fact]
+        public void ShouldErrorIfClassMarkedAbstractAndSealed()
+        {
+            var classEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetAbstract();
+                        cls.SetSealed();
+                    });
+                });
+            });
+
+            classEx.Message.ShouldContain("cannot be both abstract and sealed");
+        }
+
+        [Fact]
+        public void ShouldErrorIfClassMarkedSealedAndStatic()
+        {
+            var classEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetSealed();
+                        cls.SetStatic();
+                    });
+                });
+            });
+
+            classEx.Message.ShouldContain("cannot be both sealed and static");
+        }
+
+        [Fact]
+        public void ShouldErrorIfClassMarkedSealedAndAbstract()
+        {
+            var classEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetSealed();
+                        cls.SetAbstract();
+                    });
+                });
+            });
+
+            classEx.Message.ShouldContain("cannot be both sealed and abstract");
         }
     }
 }

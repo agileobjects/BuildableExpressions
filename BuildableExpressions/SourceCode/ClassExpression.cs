@@ -78,29 +78,49 @@
 
         void IClassExpressionConfigurator.SetStatic()
         {
-            if (IsAbstract)
-            {
-                ThrowModifierConflict("abstract", "static");
-            }
-
+            ThrowIfAbstract("static");
+            ThrowIfSealed("static");
             IsStatic = true;
         }
 
         void IClassExpressionConfigurator.SetAbstract() => SetAbstract();
 
+        internal void SetAbstract()
+        {
+            ThrowIfStatic("abstract");
+            ThrowIfSealed("abstract");
+            IsAbstract = true;
+        }
+
         void IClassExpressionConfigurator.SetSealed()
         {
+            ThrowIfStatic("sealed");
+            ThrowIfAbstract("sealed");
             IsSealed = true;
         }
 
-        internal void SetAbstract()
+        private void ThrowIfStatic(string conflictingModifier)
         {
             if (IsStatic)
             {
-                ThrowModifierConflict("static", "abstract");
+                ThrowModifierConflict("static", conflictingModifier);
             }
+        }
 
-            IsAbstract = true;
+        private void ThrowIfAbstract(string conflictingModifier)
+        {
+            if (IsAbstract)
+            {
+                ThrowModifierConflict("abstract", conflictingModifier);
+            }
+        }
+
+        private void ThrowIfSealed(string conflictingModifier)
+        {
+            if (IsSealed)
+            {
+                ThrowModifierConflict("sealed", conflictingModifier);
+            }
         }
 
         private void ThrowModifierConflict(string modifier, string conflictingModifier)
