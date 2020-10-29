@@ -170,7 +170,7 @@
 
         private static void ThrowIfInvalidBaseType(Type baseType)
         {
-            if (!baseType.IsClass())
+            if (!baseType.IsClass() || baseType.IsSealed())
             {
                 throw new InvalidOperationException(
                     $"Type '{baseType.GetFriendlyName()}' is not a valid base type.");

@@ -62,6 +62,45 @@
         }
 
         [Fact]
+        public void ShouldErrorIfSealedClassExpressionGivenAsBaseType()
+        {
+            var baseTypeEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    var sealedClass = sc.AddClass("MySealedClass", cls =>
+                    {
+                        cls.SetSealed();
+                    });
+
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetBaseType(sealedClass);
+                    });
+                });
+            });
+
+            baseTypeEx.Message.ShouldContain("'MySealedClass' is not a valid base type");
+        }
+
+        [Fact]
+        public void ShouldErrorIfSealedClassTypeGivenAsBaseType()
+        {
+            var baseTypeEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetBaseType<MySealedClass>();
+                    });
+                });
+            });
+
+            baseTypeEx.Message.ShouldContain("MySealedClass' is not a valid base type");
+        }
+
+        [Fact]
         public void ShouldErrorIfStructTypeGivenAsBaseType()
         {
             var baseTypeEx = Should.Throw<InvalidOperationException>(() =>
@@ -185,5 +224,11 @@
 
             classEx.Message.ShouldContain("cannot be both sealed and abstract");
         }
+
+        #region Helper Members
+
+        public sealed class MySealedClass { }
+
+        #endregion
     }
 }

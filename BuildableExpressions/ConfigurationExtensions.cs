@@ -82,21 +82,6 @@
 
         /// <summary>
         /// Configures the <see cref="ClassExpression"/> to derive from the given
-        /// <paramref name="baseType"/>.
-        /// </summary>
-        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
-        /// <param name="baseType">
-        /// The base type from which the <see cref="ClassExpression"/> being built should derive.
-        /// </param>
-        public static void SetBaseType(
-            this IClassExpressionConfigurator classConfig,
-            Type baseType)
-        {
-            classConfig.SetBaseType(baseType, configuration: null);
-        }
-
-        /// <summary>
-        /// Configures the <see cref="ClassExpression"/> to derive from the given
         /// <paramref name="baseTypeExpression"/>.
         /// </summary>
         /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
@@ -108,6 +93,21 @@
             ClassExpression baseTypeExpression)
         {
             classConfig.SetBaseType(baseTypeExpression.Type);
+        }
+
+        /// <summary>
+        /// Configures the <see cref="ClassExpression"/> to derive from the given
+        /// <paramref name="baseType"/>.
+        /// </summary>
+        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="baseType">
+        /// The base type from which the <see cref="ClassExpression"/> being built should derive.
+        /// </param>
+        public static void SetBaseType(
+            this IClassExpressionConfigurator classConfig,
+            Type baseType)
+        {
+            classConfig.SetBaseType(baseType, configuration: null);
         }
 
         /// <summary>
