@@ -48,7 +48,7 @@
             this OpenGenericArgumentExpression parameter,
             IClassExpressionConfigurator classConfig)
         {
-            var @class = (ClassExpression)classConfig;
+            var @class = (ConfiguredClassExpression)classConfig;
 
             parameter.ConfigureType(@class, (cfg, baseType) =>
             {

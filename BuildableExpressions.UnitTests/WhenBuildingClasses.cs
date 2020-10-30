@@ -152,6 +152,67 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldBuildAClassWithADerivedBaseType()
+        {
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass("GrandchildClass", cls =>
+                {
+                    cls.SetBaseType<ChildBaseType>();
+                    cls.AddMethod("SayHello", Constant("Hello!"));
+                });
+            });
+
+            var grandchildClass = sourceCode
+                .TypeExpressions
+                .ShouldHaveSingleItem()
+                .ShouldBeOfType<ClassExpression>();
+
+            grandchildClass.Name.ShouldBe("GrandchildClass");
+            grandchildClass.BaseType.ShouldBe(typeof(ChildBaseType));
+
+            var parentClassExpression = grandchildClass
+                .BaseTypeExpression.ShouldNotBeNull();
+
+            parentClassExpression.Type.ShouldBe(typeof(ChildBaseType));
+            parentClassExpression.BaseType.ShouldBe(typeof(BaseType));
+            parentClassExpression.IsStatic.ShouldBeFalse();
+            parentClassExpression.IsSealed.ShouldBeFalse();
+            parentClassExpression.IsAbstract.ShouldBeFalse();
+            parentClassExpression.IsGeneric.ShouldBeFalse();
+            sourceCode.TypeExpressions.ShouldNotContain(parentClassExpression);
+
+            var grandparentClassExpression = parentClassExpression
+                .BaseTypeExpression.ShouldNotBeNull();
+
+            grandparentClassExpression.Type.ShouldBe(typeof(BaseType));
+            grandparentClassExpression.BaseType.ShouldBe(typeof(object));
+            grandparentClassExpression.IsStatic.ShouldBeFalse();
+            grandparentClassExpression.IsSealed.ShouldBeFalse();
+            grandparentClassExpression.IsAbstract.ShouldBeTrue();
+            grandparentClassExpression.IsGeneric.ShouldBeFalse();
+            sourceCode.TypeExpressions.ShouldNotContain(grandparentClassExpression);
+
+            var translated = sourceCode.ToCSharpString();
+
+            const string EXPECTED = @"
+using AgileObjects.BuildableExpressions.UnitTests;
+
+namespace GeneratedExpressionCode
+{
+    public class GrandchildClass : WhenBuildingClasses.ChildBaseType
+    {
+        public string SayHello()
+        {
+            return ""Hello!"";
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAGenericClassWithAPartClosedGenericBaseType()
         {
             var translated = BuildableExpression
@@ -511,7 +572,9 @@ namespace GeneratedExpressionCode
 
         #region Helper Members
 
-        public class BaseType { }
+        public abstract class BaseType { }
+
+        public class ChildBaseType : BaseType { }
 
         public interface IMessager
         {

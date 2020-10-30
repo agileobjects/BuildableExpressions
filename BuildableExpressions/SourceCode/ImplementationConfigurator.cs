@@ -98,7 +98,7 @@
                 }
 
                 _genericTypeArguments[i] = closedType;
-                _typeExpression.Add(parameter.Close(closedType));
+                _typeExpression.AddGenericArgument(parameter.Close(closedType));
                 return;
             }
         }

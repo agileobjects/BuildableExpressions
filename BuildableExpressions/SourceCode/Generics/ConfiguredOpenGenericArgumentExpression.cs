@@ -28,14 +28,6 @@
         private ReadOnlyCollection<Type> _readonlyTypeConstraints;
 
         public ConfiguredOpenGenericArgumentExpression(
-            Type type,
-            Action<IGenericParameterExpressionConfigurator> configuration)
-            : this(type.Name, configuration)
-        {
-            _type = type;
-        }
-
-        public ConfiguredOpenGenericArgumentExpression(
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
             : base(name.ThrowIfInvalidName<ArgumentException>("Generic Parameter"))

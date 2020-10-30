@@ -3,54 +3,81 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Linq.Expressions;
-    using Api;
-    using BuildableExpressions.Extensions;
-    using NetStandardPolyfills;
-    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using Translations;
 
     /// <summary>
     /// Represents a class in a piece of source code.
     /// </summary>
-    public class ClassExpression :
-        ConcreteTypeExpression,
-        IClassExpressionConfigurator
+    public abstract class ClassExpression : ConcreteTypeExpression
     {
         private ClassExpression _baseTypeExpression;
-        private Expression _baseInstanceExpression;
 
         internal ClassExpression(
             SourceCodeExpression sourceCode,
-            string name,
-            Action<IClassExpressionConfigurator> configuration)
+            Type baseType,
+            string name)
             : base(sourceCode, name)
         {
-            BaseType = typeof(object);
-            configuration.Invoke(this);
-            Validate();
+            BaseType = baseType;
         }
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="ClassExpression"/> is static.
         /// </summary>
-        public bool IsStatic { get; private set; }
+        public bool IsStatic { get; protected set; }
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="ClassExpression"/> is abstract.
         /// </summary>
-        public bool IsAbstract { get; private set; }
+        public bool IsAbstract { get; protected set; }
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="ClassExpression"/> is abstract.
         /// </summary>
-        public bool IsSealed { get; private set; }
+        public bool IsSealed { get; protected set; }
 
         /// <summary>
-        /// Gets the base type from which this <see cref="ClassExpression"/> derives.
+        /// Gets the <see cref="ClassExpression"/> from which this <see cref="ClassExpression"/>
+        /// derives. If no base type has been set, returns null.
         /// </summary>
-        public Type BaseType { get; private set; }
+        public ClassExpression BaseTypeExpression
+            => _baseTypeExpression ??= GetBaseTypeExpressionOrNull();
+
+        #region BaseTypeExpression Creation
+
+        private ClassExpression GetBaseTypeExpressionOrNull()
+        {
+            if (!HasObjectBaseType)
+            {
+                return null;
+            }
+
+            var configuredBaseTypeExpression = (ClassExpression)SourceCode
+                .TypeExpressions
+                .FirstOrDefault(t => t.TypeAccessor == BaseType);
+
+            if (configuredBaseTypeExpression != null)
+            {
+                return configuredBaseTypeExpression;
+            }
+
+            return new TypedClassExpression(SourceCode, BaseType);
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Gets the base type from which this <see cref="ClassExpression"/> derives. If no base
+        /// type has been set, returns typeof(System.Object).
+        /// </summary>
+        public Type BaseType { get; protected set; }
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="ClassExpression"/> has the default
+        /// System.Object base type.
+        /// </summary>
+        protected bool HasObjectBaseType => BaseType != typeof(object);
 
         /// <summary>
         /// Gets the non-object base type and interfaces types implemented by this
@@ -60,7 +87,7 @@
         {
             get
             {
-                if (BaseType != typeof(object))
+                if (HasObjectBaseType)
                 {
                     yield return BaseType;
                 }
@@ -71,147 +98,6 @@
                 }
             }
         }
-
-        #region IClassExpressionConfigurator Members
-
-        void IClassExpressionConfigurator.SetImplements(
-            Type @interface,
-            Action<IClassImplementationConfigurator> configuration)
-        {
-            SetImplements(@interface, configuration);
-        }
-
-        void IClassExpressionConfigurator.SetStatic()
-        {
-            ThrowIfAbstract("static");
-            ThrowIfSealed("static");
-            IsStatic = true;
-        }
-
-        void IClassExpressionConfigurator.SetAbstract() => SetAbstract();
-
-        internal void SetAbstract()
-        {
-            ThrowIfStatic("abstract");
-            ThrowIfSealed("abstract");
-            IsAbstract = true;
-        }
-
-        void IClassExpressionConfigurator.SetSealed()
-        {
-            ThrowIfStatic("sealed");
-            ThrowIfAbstract("sealed");
-            IsSealed = true;
-        }
-
-        private void ThrowIfStatic(string conflictingModifier)
-        {
-            if (IsStatic)
-            {
-                ThrowModifierConflict("static", conflictingModifier);
-            }
-        }
-
-        private void ThrowIfAbstract(string conflictingModifier)
-        {
-            if (IsAbstract)
-            {
-                ThrowModifierConflict("abstract", conflictingModifier);
-            }
-        }
-
-        private void ThrowIfSealed(string conflictingModifier)
-        {
-            if (IsSealed)
-            {
-                ThrowModifierConflict("sealed", conflictingModifier);
-            }
-        }
-
-        private void ThrowModifierConflict(string modifier, string conflictingModifier)
-        {
-            throw new InvalidOperationException(
-                $"Class '{Name}' cannot be both {modifier} and {conflictingModifier}.");
-        }
-
-        Expression IClassExpressionConfigurator.BaseInstanceExpression
-            => _baseInstanceExpression ??= new InstanceExpression(_baseTypeExpression, "base");
-
-        void IClassExpressionConfigurator.SetBaseType(
-            Type baseType,
-            Action<IClassImplementationConfigurator> configuration)
-        {
-            SetBaseType(baseType, configuration);
-        }
-
-        internal void SetBaseType(Type baseType)
-            => SetBaseType(baseType, configuration: null);
-
-        private void SetBaseType(
-            Type baseType,
-            Action<IClassImplementationConfigurator> configuration)
-        {
-            baseType.ThrowIfNull(nameof(baseType));
-            ThrowIfBaseTypeAlreadySet(baseType);
-            ThrowIfInvalidBaseType(baseType);
-
-            if (configuration == null)
-            {
-                SetBaseTypeTo(baseType);
-                return;
-            }
-
-            var configurator = new ImplementationConfigurator(this, baseType);
-            configuration.Invoke(configurator);
-            SetBaseTypeTo(configurator.GetImplementedType());
-        }
-
-        private void ThrowIfBaseTypeAlreadySet(Type baseType)
-        {
-            if (BaseType != typeof(object))
-            {
-                throw new InvalidOperationException(
-                    $"Unable to set class base type to '{baseType.GetFriendlyName()}' " +
-                    $"as it has already been set to '{BaseType.GetFriendlyName()}'");
-            }
-        }
-
-        private static void ThrowIfInvalidBaseType(Type baseType)
-        {
-            if (!baseType.IsClass() || baseType.IsSealed())
-            {
-                throw new InvalidOperationException(
-                    $"Type '{baseType.GetFriendlyName()}' is not a valid base type.");
-            }
-        }
-
-        private void SetBaseTypeTo(Type baseType)
-        {
-            BaseType = baseType;
-
-            _baseTypeExpression = (ClassExpression)SourceCode
-                .TypeExpressions
-                .FirstOrDefault(t => t.TypeAccessor == baseType);
-        }
-
-        MethodExpression IClassMethodConfigurator.AddMethod(
-            string name,
-            Action<IClassMethodExpressionConfigurator> configuration)
-        {
-            return AddMethod(name, configuration);
-        }
-
-        internal override StandardMethodExpression Add(StandardMethodExpression method)
-        {
-            if (IsStatic)
-            {
-                ((IConcreteTypeMethodExpressionConfigurator)method).SetStatic();
-            }
-
-            return base.Add(method);
-        }
-
-        #endregion
 
         internal override ITranslation GetTranslation(ITranslationContext context)
             => new ClassTranslation(this, context);

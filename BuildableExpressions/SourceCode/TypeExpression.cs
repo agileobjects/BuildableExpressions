@@ -296,12 +296,6 @@
             _interfaceTypes.Add(@interface);
         }
 
-        internal void Add(ClosedGenericTypeArgumentExpression argument)
-        {
-            GenericArguments ??= new List<ClosedGenericTypeArgumentExpression>();
-            GenericArguments.Add(argument);
-        }
-
         void ITypeExpressionConfigurator.SetSummary(CommentExpression summary)
             => Summary = summary;
 
@@ -327,6 +321,12 @@
             _genericParameters.Add(parameter);
             _readOnlyGenericParameters = null;
             return parameter;
+        }
+
+        internal void AddGenericArgument(ClosedGenericTypeArgumentExpression argument)
+        {
+            GenericArguments ??= new List<ClosedGenericTypeArgumentExpression>();
+            GenericArguments.Add(argument);
         }
 
         internal MethodExpression AddMethod(string name, Expression body)

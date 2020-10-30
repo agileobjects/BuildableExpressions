@@ -26,13 +26,25 @@
                 throw Create<TException>(symbolType + " names cannot be blank");
             }
 
-            if (char.IsDigit(name[0]) ||
-                name.ToCharArray().Any(c => !char.IsLetterOrDigit(c) && c != '_'))
+            if (char.IsDigit(name[0]) || name.Any(IsInvalidTypeNameCharacter))
             {
                 throw Create<TException>($"'{name}' is an invalid {symbolType.ToLowerInvariant()} name");
             }
 
             return name;
+        }
+
+        private static bool IsInvalidTypeNameCharacter(char character)
+        {
+            switch (character)
+            {
+                case '_':
+                case '.':
+                    return false;
+
+                default:
+                    return !char.IsLetterOrDigit(character);
+            }
         }
 
         private static Exception Create<TException>(string message)

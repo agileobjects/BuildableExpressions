@@ -11,13 +11,30 @@
         private readonly string _keyword;
         private ITranslation _translation;
 
-        public InstanceExpression(
-            ConcreteTypeExpression instance,
-            string keyword)
+        private InstanceExpression(ConcreteTypeExpression instance, string keyword)
+            : this(keyword)
         {
             _instance = instance;
+        }
+
+        protected InstanceExpression(string keyword)
+        {
             _keyword = keyword;
         }
+
+        #region Factory Methods
+
+        public static InstanceExpression Base(ClassExpression baseInstance)
+        {
+            return baseInstance != null
+                ? new InstanceExpression(baseInstance, "base")
+                : BaseObjectInstanceExpression.Instance;
+        }
+
+        public static InstanceExpression This(ConcreteTypeExpression instance)
+            => new InstanceExpression(instance, "this");
+
+        #endregion
 
         public override ExpressionType NodeType
             => (ExpressionType)SourceCodeExpressionType.ThisInstance;
@@ -35,5 +52,21 @@
                 TokenType.Keyword,
                 context.Settings);
         }
+
+        #region Helper Class
+
+        private class BaseObjectInstanceExpression : InstanceExpression
+        {
+            public static readonly InstanceExpression Instance = new BaseObjectInstanceExpression();
+
+            private BaseObjectInstanceExpression()
+                : base("base")
+            {
+            }
+
+            public override Type Type => typeof(object);
+        }
+
+        #endregion
     }
 }

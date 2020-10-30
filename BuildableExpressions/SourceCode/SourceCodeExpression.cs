@@ -209,7 +209,7 @@
             string name,
             Action<IClassExpressionConfigurator> configuration)
         {
-            return Add(new ClassExpression(this, name, configuration));
+            return Add(new ConfiguredClassExpression(this, name, configuration));
         }
 
         StructExpression ISourceCodeExpressionConfigurator.AddStruct(

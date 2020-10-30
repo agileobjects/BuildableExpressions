@@ -20,7 +20,7 @@
         }
 
         internal Expression ThisInstanceExpression
-            => _thisInstanceExpression ??= new InstanceExpression(this, "this");
+            => _thisInstanceExpression ??= InstanceExpression.This(this);
 
         internal override void SetImplements(
             Type @interface,
