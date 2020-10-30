@@ -152,6 +152,55 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldBuildAGenericClassWithAGenericBaseType()
+        {
+            var sourceCode = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass("GenericDerivedType", cls =>
+                    {
+                        cls.AddGenericParameter("T");
+                        cls.SetBaseType(typeof(GenericBaseType<>));
+                        cls.AddMethod("SayHello", Constant("Hello!"));
+                    }));
+
+            var genericDerivedClass = sourceCode
+                .TypeExpressions
+                .ShouldHaveSingleItem()
+                .ShouldBeOfType<ClassExpression>();
+
+            genericDerivedClass.Name.ShouldBe("GenericDerivedType");
+            genericDerivedClass.IsGeneric.ShouldBeTrue();
+            genericDerivedClass.GenericParameters.ShouldHaveSingleItem();
+            genericDerivedClass.BaseType.ShouldBe(typeof(GenericBaseType<>));
+
+            var genericBaseType = genericDerivedClass
+                .BaseTypeExpression.ShouldNotBeNull();
+
+            genericBaseType.Name.ShouldBe("GenericBaseType<T>");
+            genericBaseType.IsGeneric.ShouldBeTrue();
+            genericBaseType.GenericParameters.ShouldHaveSingleItem();
+            genericBaseType.BaseType.ShouldBe(typeof(object));
+
+            var translated = sourceCode.ToCSharpString();
+
+            const string EXPECTED = @"
+using AgileObjects.BuildableExpressions.UnitTests;
+
+namespace GeneratedExpressionCode
+{
+    public class GenericDerivedType<T> : WhenBuildingClasses.GenericBaseType<T>
+    {
+        public string SayHello()
+        {
+            return ""Hello!"";
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAClassWithADerivedBaseType()
         {
             var sourceCode = BuildableExpression.SourceCode(sc =>
@@ -575,6 +624,9 @@ namespace GeneratedExpressionCode
         #region Helper Members
 
         public abstract class BaseType { }
+
+        // ReSharper disable once UnusedTypeParameter
+        public class GenericBaseType<T> { }
 
         public class ChildBaseType : BaseType { }
 
