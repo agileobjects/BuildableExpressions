@@ -8,30 +8,27 @@
     internal class TypedClassExpression : ClassExpression
     {
         public TypedClassExpression(SourceCodeExpression sourceCode, Type type)
-            : base(sourceCode, type.GetBaseType(), type.GetFriendlyName())
+            : base(sourceCode, type.GetBaseType(), GetName(type))
         {
             Type = type;
-            IsStatic = type.IsAbstract() && type.IsSealed();
 
-            if (!IsStatic)
-            {
-                IsAbstract = type.IsAbstract();
-
-                if (!IsAbstract)
-                {
-                    IsSealed = type.IsSealed();
-                }
-            }
-
-            if (!type.IsGenericType())
-            {
-                return;
-            }
+            var isAbstract = type.IsAbstract();
+            IsStatic = isAbstract && type.IsSealed();
+            IsAbstract = isAbstract && !IsStatic;
 
             foreach (var parameterType in type.GetGenericTypeArguments())
             {
                 AddGenericParameter(new TypedOpenGenericArgumentExpression(parameterType));
             }
+        }
+
+        private static string GetName(Type type)
+        {
+            var name = type.GetFriendlyName();
+
+            return type.IsNested
+                ? name.Substring(name.LastIndexOf('.') + 1)
+                : name;
         }
 
         public override Type Type { get; }

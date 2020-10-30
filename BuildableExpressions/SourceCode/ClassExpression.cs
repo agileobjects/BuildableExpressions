@@ -48,7 +48,7 @@
 
         private ClassExpression GetBaseTypeExpressionOrNull()
         {
-            if (!HasObjectBaseType)
+            if (HasObjectBaseType)
             {
                 return null;
             }
@@ -77,7 +77,7 @@
         /// Gets a value indicating whether this <see cref="ClassExpression"/> has the default
         /// System.Object base type.
         /// </summary>
-        protected bool HasObjectBaseType => BaseType != typeof(object);
+        protected bool HasObjectBaseType => BaseType == typeof(object);
 
         /// <summary>
         /// Gets the non-object base type and interfaces types implemented by this
@@ -87,7 +87,7 @@
         {
             get
             {
-                if (HasObjectBaseType)
+                if (!HasObjectBaseType)
                 {
                     yield return BaseType;
                 }

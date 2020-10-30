@@ -119,7 +119,7 @@
 
         private void ThrowIfBaseTypeAlreadySet(Type baseType)
         {
-            if (HasObjectBaseType)
+            if (!HasObjectBaseType)
             {
                 throw new InvalidOperationException(
                     $"Unable to set class base type to '{baseType.GetFriendlyName()}' " +

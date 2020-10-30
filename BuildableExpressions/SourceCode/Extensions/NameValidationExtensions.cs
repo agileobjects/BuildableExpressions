@@ -35,17 +35,7 @@
         }
 
         private static bool IsInvalidTypeNameCharacter(char character)
-        {
-            switch (character)
-            {
-                case '_':
-                case '.':
-                    return false;
-
-                default:
-                    return !char.IsLetterOrDigit(character);
-            }
-        }
+            => character != '_' && !char.IsLetterOrDigit(character);
 
         private static Exception Create<TException>(string message)
             => (Exception)Activator.CreateInstance(typeof(TException), message);

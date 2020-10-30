@@ -174,6 +174,7 @@ namespace GeneratedExpressionCode
             var parentClassExpression = grandchildClass
                 .BaseTypeExpression.ShouldNotBeNull();
 
+            parentClassExpression.Name.ShouldBe(nameof(ChildBaseType));
             parentClassExpression.Type.ShouldBe(typeof(ChildBaseType));
             parentClassExpression.BaseType.ShouldBe(typeof(BaseType));
             parentClassExpression.IsStatic.ShouldBeFalse();
@@ -185,6 +186,7 @@ namespace GeneratedExpressionCode
             var grandparentClassExpression = parentClassExpression
                 .BaseTypeExpression.ShouldNotBeNull();
 
+            grandparentClassExpression.Name.ShouldBe(nameof(BaseType));
             grandparentClassExpression.Type.ShouldBe(typeof(BaseType));
             grandparentClassExpression.BaseType.ShouldBe(typeof(object));
             grandparentClassExpression.IsStatic.ShouldBeFalse();
