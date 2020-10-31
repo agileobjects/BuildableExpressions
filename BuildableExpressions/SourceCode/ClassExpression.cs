@@ -99,7 +99,8 @@
             }
         }
 
-        internal override ITranslation GetTranslation(ITranslationContext context)
+        /// <inheritdoc />
+        protected override ITranslation GetTranslation(ITranslationContext context)
             => new ClassTranslation(this, context);
     }
 }

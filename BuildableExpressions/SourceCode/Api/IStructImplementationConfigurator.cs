@@ -5,7 +5,7 @@
     /// </summary>
     public interface IStructImplementationConfigurator :
         IImplementationConfigurator,
-        IStructMethodConfigurator
+        IStructMemberConfigurator
     {
     }
 }

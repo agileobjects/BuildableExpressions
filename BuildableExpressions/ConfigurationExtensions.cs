@@ -216,6 +216,27 @@
         }
 
         /// <summary>
+        /// Add a public, instance-scoped, get-set <see cref="PropertyOrFieldExpression"/> to the
+        /// <see cref="ClassExpression"/>, with the given <paramref name="name"/> and
+        /// <paramref name="type"/>.
+        /// </summary>
+        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="PropertyOrFieldExpression"/>.</param>
+        /// <param name="type">The type of the <see cref="PropertyOrFieldExpression"/>.</param>
+        /// <returns>The newly-created <see cref="PropertyOrFieldExpression"/>.</returns>
+        public static PropertyOrFieldExpression AddProperty(
+            this IClassExpressionConfigurator classConfig,
+            string name,
+            Type type)
+        {
+            return classConfig.AddProperty(name, type, p =>
+            {
+                p.SetGetter(g => { });
+                p.SetSetter(g => { });
+            });
+        }
+
+        /// <summary>
         /// Add a public, instance-scoped <see cref="MethodExpression"/> to the
         /// <see cref="ClassExpression"/>, with the given <paramref name="name"/> and
         /// <paramref name="body"/>.
@@ -232,7 +253,7 @@
             string name,
             Expression body)
         {
-            return classConfig.AddMethod(name, cfg => cfg.SetBody(body));
+            return classConfig.AddMethod(name, m => m.SetBody(body));
         }
 
         /// <summary>

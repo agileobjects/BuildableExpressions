@@ -16,19 +16,24 @@
         Type = 1001,
 
         /// <summary>
-        /// 1002. The instance of an object to which the 'this' keyword relates in the current
-        /// context.
+        /// 1002. The instance of an object to which the 'base' or 'this' keywords relate in the
+        /// current context.
         /// </summary>
-        ThisInstance = 1002,
+        Instance = 1002,
 
         /// <summary>
-        /// 1003. A source code class method.
+        /// 1003. A source code type or method generic parameter or argument.
         /// </summary>
-        Method = 1003,
+        GenericArgument = 1003,
 
         /// <summary>
-        /// 1004. A source code type or method generic argument.
+        /// 1004. A source code type method.
         /// </summary>
-        GenericArgument = 1004
+        Method = 1004,
+
+        /// <summary>
+        /// 1005. A source code type property.
+        /// </summary>
+        Property = 1005
     }
 }

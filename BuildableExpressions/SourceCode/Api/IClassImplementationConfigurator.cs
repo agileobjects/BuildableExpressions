@@ -6,7 +6,7 @@
     /// </summary>
     public interface IClassImplementationConfigurator :
         IImplementationConfigurator,
-        IClassMethodConfigurator
+        IClassMemberConfigurator
     {
     }
 }

@@ -103,14 +103,22 @@
             }
         }
 
-        MethodExpression IClassMethodConfigurator.AddMethod(
+        PropertyOrFieldExpression IClassMemberConfigurator.AddProperty(
+            string name,
+            Type type,
+            Action<IClassPropertyExpressionConfigurator> configuration)
+        {
+            return ((ClassExpression)_typeExpression).AddProperty(name, type, configuration);
+        }
+
+        MethodExpression IClassMemberConfigurator.AddMethod(
             string name,
             Action<IClassMethodExpressionConfigurator> configuration)
         {
             return ((ClassExpression)_typeExpression).AddMethod(name, configuration);
         }
 
-        MethodExpression IStructMethodConfigurator.AddMethod(
+        MethodExpression IStructMemberConfigurator.AddMethod(
             string name,
             Action<IConcreteTypeMethodExpressionConfigurator> configuration)
         {

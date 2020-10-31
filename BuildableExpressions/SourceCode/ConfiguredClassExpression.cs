@@ -136,26 +136,31 @@
             }
         }
 
-        private void SetBaseTypeTo(Type baseType)
+        private void SetBaseTypeTo(Type baseType) => BaseType = baseType;
+
+        PropertyOrFieldExpression IClassMemberConfigurator.AddProperty(
+            string name,
+            Type type,
+            Action<IClassPropertyExpressionConfigurator> configuration)
         {
-            BaseType = baseType;
+            return AddProperty(name, type, configuration);
         }
 
-        MethodExpression IClassMethodConfigurator.AddMethod(
+        MethodExpression IClassMemberConfigurator.AddMethod(
             string name,
             Action<IClassMethodExpressionConfigurator> configuration)
         {
             return AddMethod(name, configuration);
         }
 
-        internal override StandardMethodExpression Add(StandardMethodExpression method)
+        internal override StandardMethodExpression AddMethod(StandardMethodExpression method)
         {
             if (IsStatic)
             {
                 ((IConcreteTypeMethodExpressionConfigurator)method).SetStatic();
             }
 
-            return base.Add(method);
+            return base.AddMethod(method);
         }
 
         #endregion

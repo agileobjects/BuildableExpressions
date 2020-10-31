@@ -22,10 +22,9 @@
     /// Represents a method in a type in a piece of source code.
     /// </summary>
     public abstract class MethodExpression :
-        Expression,
+        MemberExpression,
         IClassMethodExpressionConfigurator,
-        IMethod,
-        ICustomTranslationExpression
+        IMethod
     {
         private List<ParameterExpression> _parameters;
         private List<GenericParameterExpression> _genericParameters;
@@ -33,19 +32,27 @@
         private ReadOnlyCollection<IGenericArgument> _readonlyGenericArguments;
         private ReadOnlyCollection<IParameter> _readonlyParameters;
         private MethodInfo _methodInfo;
+        private string _name;
 
-        internal MethodExpression(
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MethodExpression"/> class.
+        /// </summary>
+        /// <param name="declaringTypeExpression">
+        /// This <see cref="MethodExpression"/>'s parent <see cref="TypeExpression"/>.</param>
+        /// <param name="name">The name of this <see cref="MethodExpression"/>.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        protected MethodExpression(
             TypeExpression declaringTypeExpression,
             string name,
             Action<MethodExpression> configuration)
+            : base(declaringTypeExpression, name)
         {
-            DeclaringTypeExpression = declaringTypeExpression;
-            Name = name;
+            _name = name;
             configuration.Invoke(this);
         }
 
         /// <summary>
-        /// Gets the <see cref="SourceCodeExpressionType"/> value (1003) indicating the type of this
+        /// Gets the <see cref="SourceCodeExpressionType"/> value (1004) indicating the type of this
         /// <see cref="MethodExpression"/> as an ExpressionType.
         /// </summary>
         public override ExpressionType NodeType
@@ -72,48 +79,25 @@
             }
 
             visitor.Visit(Body);
-            return this;
+
+            return base.Accept(visitor);
         }
 
-        internal MethodExpressionAnalysis Analysis { get; set; }
+        internal MethodExpressionAnalysis Analysis { get; private protected set; }
 
         internal abstract bool HasGeneratedName { get; }
 
         internal abstract bool HasBody { get; }
 
         /// <summary>
-        /// Gets this <see cref="MethodExpression"/>'s parent <see cref="TypeExpression"/>.
-        /// </summary>
-        public TypeExpression DeclaringTypeExpression { get; }
-
-        /// <inheritdoc />
-        public Type DeclaringType => DeclaringTypeExpression.Type;
-
-        /// <summary>
-        /// Gets a <see cref="CommentExpression"/> describing this <see cref="MethodExpression"/>,
-        /// if a summary has been set.
-        /// </summary>
-        public CommentExpression Summary { get; private set; }
-
-        /// <summary>
-        /// Gets the <see cref="MemberVisibility"/> of this <see cref="MethodExpression"/>.
-        /// </summary>
-        public MemberVisibility? Visibility { get; private set; }
-
-        /// <summary>
-        /// Gets a value indicating whether this <see cref="MethodExpression"/> is static.
-        /// </summary>
-        public bool IsStatic { get; private set; }
-
-        /// <summary>
         /// Gets a value indicating whether this <see cref="MethodExpression"/> is abstract.
         /// </summary>
         public bool IsAbstract { get; private set; }
 
-        /// <summary>
-        /// Gets the name of this <see cref="MethodExpression"/>.
-        /// </summary>
-        public string Name { get; internal set; }
+        /// <inheritdoc cref="MemberExpression" />
+        public override string Name => _name;
+
+        internal void SetName(string name) => _name = name;
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="MethodExpression"/> is generic.
@@ -360,19 +344,9 @@
 
         #region IMethod Members
 
-        bool IMethod.IsPublic => Visibility == Public;
+        bool IComplexMember.IsVirtual => false;
 
-        bool IMethod.IsProtectedInternal => Visibility == ProtectedInternal;
-
-        bool IMethod.IsInternal => Visibility == Internal;
-
-        bool IMethod.IsProtected => Visibility == Protected;
-
-        bool IMethod.IsPrivate => Visibility == Private;
-
-        bool IMethod.IsVirtual => false;
-
-        bool IMethod.IsOverride => false;
+        bool IComplexMember.IsOverride => false;
 
         bool IMethod.IsGenericMethod => IsGeneric;
 
@@ -414,11 +388,12 @@
 
         /// <summary>
         /// Throws an InvalidOperationException if this <see cref="MethodExpression"/> has the same
-        /// signature as another method on the <see cref="DeclaringTypeExpression"/>.
+        /// signature as another method on the
+        /// <see cref="MemberExpression.DeclaringTypeExpression"/>.
         /// </summary>
         /// <exception cref="InvalidOperationException">
         /// Thrown if this <see cref="MethodExpression"/> has the same signature as another method
-        /// on the <see cref="DeclaringTypeExpression"/>.
+        /// on the <see cref="MemberExpression.DeclaringTypeExpression"/>.
         /// </exception>
         protected void ThrowIfDuplicateMethodSignature()
         {
@@ -456,7 +431,8 @@
 
         #endregion
 
-        ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
+        /// <inheritdoc />
+        protected override ITranslation GetTranslation(ITranslationContext context)
             => new MethodTranslation(this, context);
 
         internal void Update(Expression updatedBody)

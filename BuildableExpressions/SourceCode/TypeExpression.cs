@@ -28,7 +28,9 @@
     {
         private List<GenericParameterExpression> _genericParameters;
         private ReadOnlyCollection<GenericParameterExpression> _readOnlyGenericParameters;
-        private readonly List<MethodExpression> _methodExpressions;
+        private List<PropertyOrFieldExpression> _propertyExpressions;
+        private ReadOnlyCollection<PropertyOrFieldExpression> _readOnlyPropertyExpressions;
+        private List<MethodExpression> _methodExpressions;
         private ReadOnlyCollection<MethodExpression> _readOnlyMethodExpressions;
         private Type _type;
         private List<Type> _interfaceTypes;
@@ -38,7 +40,6 @@
         {
             SourceCode = sourceCode;
             Name = name.ThrowIfInvalidName<ArgumentException>("Type");
-            _methodExpressions = new List<MethodExpression>();
         }
 
         /// <summary>
@@ -151,7 +152,14 @@
         }
 
         /// <summary>
-        /// Gets the <see cref="MethodExpression"/>s which make up this <see cref="TypeExpression"/>'s
+        /// Gets the <see cref="PropertyOrFieldExpression"/>s which describe this
+        /// <see cref="TypeExpression"/>'s properties.
+        /// </summary>
+        public ReadOnlyCollection<PropertyOrFieldExpression> PropertyExpressions
+            => _readOnlyPropertyExpressions ??= _propertyExpressions.ToReadOnlyCollection();
+
+        /// <summary>
+        /// Gets the <see cref="MethodExpression"/>s which describe this <see cref="TypeExpression"/>'s
         /// methods.
         /// </summary>
         public ReadOnlyCollection<MethodExpression> MethodExpressions
@@ -329,6 +337,26 @@
             GenericArguments.Add(argument);
         }
 
+        internal PropertyOrFieldExpression AddProperty(
+            string name,
+            Type type,
+            Action<PropertyOrFieldExpression> configuration)
+        {
+            return AddProperty(new PropertyOrFieldExpression(this, name, type, configuration));
+        }
+
+        /// <summary>
+        /// Adds the given <paramref name="property"/> to this <see cref="TypeExpression"/>.
+        /// </summary>
+        /// <param name="property">The <see cref="PropertyOrFieldExpression"/> to add.</param>
+        /// <returns>The given <paramref name="property"/>.</returns>
+        protected PropertyOrFieldExpression AddProperty(PropertyOrFieldExpression property)
+        {
+            _propertyExpressions ??= new List<PropertyOrFieldExpression>();
+            _propertyExpressions.Add(property);
+            return property;
+        }
+
         internal MethodExpression AddMethod(string name, Expression body)
             => AddMethod(name, cfg => cfg.SetBody(body));
 
@@ -336,12 +364,13 @@
             string name,
             Action<MethodExpression> configuration)
         {
-            return Add(new StandardMethodExpression(this, name, configuration));
+            return AddMethod(new StandardMethodExpression(this, name, configuration));
         }
 
-        internal virtual StandardMethodExpression Add(StandardMethodExpression method)
+        internal virtual StandardMethodExpression AddMethod(
+            StandardMethodExpression method)
         {
-            Add((MethodExpression)method);
+            AddMethod((MethodExpression)method);
 
             if (!method.HasBlockMethods)
             {
@@ -351,7 +380,7 @@
             foreach (var blockMethod in method.BlockMethods)
             {
                 blockMethod.Finalise();
-                Add(blockMethod);
+                AddMethod(blockMethod);
             }
 
             return method;
@@ -362,17 +391,21 @@
         /// </summary>
         /// <param name="method">The <see cref="MethodExpression"/> to add.</param>
         /// <returns>The given <paramref name="method"/>.</returns>
-        protected internal MethodExpression Add(MethodExpression method)
+        protected MethodExpression AddMethod(MethodExpression method)
         {
+            _methodExpressions ??= new List<MethodExpression>();
             _methodExpressions.Add(method);
             _readOnlyMethodExpressions = null;
+            ResetTypeIfRequired();
+            return method;
+        }
 
+        private void ResetTypeIfRequired()
+        {
             if (_type != null)
             {
                 _type = CreateType();
             }
-
-            return method;
         }
 
         #endregion
@@ -380,6 +413,14 @@
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => GetTranslation(context);
 
-        internal abstract ITranslation GetTranslation(ITranslationContext context);
+        /// <summary>
+        /// When overridden in a derived class, gets an <see cref="ITranslation"/> with which to
+        /// translate this <see cref="TypeExpression"/>.
+        /// </summary>
+        /// <param name="context">The ITranslationContext describing the current translation.</param>
+        /// <returns>
+        /// An <see cref="ITranslation"/> with which to translate this <see cref="TypeExpression"/>.
+        /// </returns>
+        protected abstract ITranslation GetTranslation(ITranslationContext context);
     }
 }

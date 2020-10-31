@@ -7,7 +7,7 @@
     /// </summary>
     public interface IStructExpressionConfigurator :
         IConcreteTypeExpressionConfigurator,
-        IStructMethodConfigurator
+        IStructMemberConfigurator
     {
         /// <summary>
         /// Configures the <see cref="StructExpression"/> to implement the given

@@ -8,7 +8,7 @@
     /// </summary>
     public interface IClassExpressionConfigurator :
         IConcreteTypeExpressionConfigurator,
-        IClassMethodConfigurator
+        IClassMemberConfigurator
     {
         /// <summary>
         /// Gets an Expression to use to refer to the base class instance of the type being created

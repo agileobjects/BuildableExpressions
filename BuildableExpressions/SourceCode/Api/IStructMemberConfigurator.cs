@@ -6,7 +6,7 @@
     /// Provides options to configure a <see cref="MethodExpression"/> for a
     /// <see cref="StructExpression"/>.
     /// </summary>
-    public interface IStructMethodConfigurator
+    public interface IStructMemberConfigurator
     {
         /// <summary>
         /// Add a <see cref="MethodExpression"/> to the <see cref="StructExpression"/>, with

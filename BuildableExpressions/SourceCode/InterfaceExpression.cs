@@ -35,7 +35,7 @@
             Type returnType,
             Action<IMethodExpressionConfigurator> configuration)
         {
-            return Add(new InterfaceMethodExpression(
+            return AddMethod(new InterfaceMethodExpression(
                 this,
                 name,
                 returnType,
@@ -44,7 +44,8 @@
 
         #endregion
 
-        internal override ITranslation GetTranslation(ITranslationContext context)
+        /// <inheritdoc />
+        protected override ITranslation GetTranslation(ITranslationContext context)
             => new InterfaceTranslation(this, context);
     }
 }

@@ -24,7 +24,7 @@
 
         #region IStructExpressionConfigurator Members
 
-        MethodExpression IStructMethodConfigurator.AddMethod(
+        MethodExpression IStructMemberConfigurator.AddMethod(
             string name,
             Action<IConcreteTypeMethodExpressionConfigurator> configuration)
         {
@@ -39,8 +39,9 @@
         }
 
         #endregion
-
-        internal override ITranslation GetTranslation(ITranslationContext context)
+        
+        /// <inheritdoc />
+        protected override ITranslation GetTranslation(ITranslationContext context)
             => new StructTranslation(this, context);
     }
 }

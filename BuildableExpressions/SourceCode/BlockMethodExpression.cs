@@ -22,7 +22,7 @@
 
         public Expression CallExpression { get; }
 
-        public void Finalise() => Name = GetName();
+        public void Finalise() => SetName(GetName());
 
         #region Name Generation
 
@@ -63,7 +63,7 @@
                     {
                         if (m.HasGeneratedName)
                         {
-                            m.Name += "1";
+                            m.SetName(m.Name + "1");
                         }
 
                         return new { Suffix = 1 };

@@ -16,8 +16,11 @@
         private readonly string _visibility;
         private readonly IList<ITranslation> _interfaceTypeTranslations;
         private readonly int _interfaceTypeCount;
-        private readonly IList<ITranslation> _methodTranslations;
+        private readonly int _memberCount;
+        private readonly int _propertyCount;
+        private readonly IList<ITranslation> _propertyTranslations;
         private readonly int _methodCount;
+        private readonly IList<ITranslation> _methodTranslations;
         private readonly ITranslatable _genericParametersTranslation;
         private readonly ITranslatable _genericParameterConstraintsTranslation;
 
@@ -69,9 +72,6 @@
 
             _interfaceTypeCount = type.InterfaceTypes.Count;
 
-            _methodCount = type.MethodExpressions.Count;
-            _methodTranslations = new ITranslation[_methodCount];
-
             if (_interfaceTypeCount != 0)
             {
                 translationSize += 3; // <- for ' : '
@@ -87,8 +87,37 @@
                 }
             }
 
+            _propertyCount = type.PropertyExpressions.Count;
+
+            if (_propertyCount != 0)
+            {
+                _memberCount += _propertyCount;
+                _propertyTranslations = new ITranslation[_propertyCount];
+
+                for (var i = 0; ;)
+                {
+                    var property = _propertyTranslations[i] = context.GetTranslationFor(type.PropertyExpressions[i]);
+                    translationSize += property.TranslationSize;
+                    formattingSize += property.FormattingSize;
+
+                    ++i;
+
+                    if (i == _propertyCount)
+                    {
+                        break;
+                    }
+
+                    translationSize += 2; // <- for new line
+                }
+            }
+
+            _methodCount = type.MethodExpressions.Count;
+
             if (_methodCount != 0)
             {
+                _memberCount += _methodCount;
+                _methodTranslations = new ITranslation[_methodCount];
+
                 for (var i = 0; ;)
                 {
                     var method = _methodTranslations[i] = context.GetTranslationFor(type.MethodExpressions[i]);
@@ -233,7 +262,7 @@
 
         public void WriteMembersTo(TranslationWriter writer)
         {
-            if (_methodCount == 0)
+            if (_memberCount == 0)
             {
                 writer.WriteNewLineToTranslation();
                 writer.WriteToTranslation('{');
@@ -244,12 +273,44 @@
 
             writer.WriteOpeningBraceToTranslation();
 
+            WritePropertiesTo(writer);
+            WriteMethodsTo(writer);
+
+            writer.WriteClosingBraceToTranslation();
+        }
+
+        private void WritePropertiesTo(TranslationWriter writer)
+        {
+            if (_propertyCount != 0)
+            {
+                WriteTo(writer, _propertyCount, _propertyTranslations);
+            }
+        }
+
+        private void WriteMethodsTo(TranslationWriter writer)
+        {
+            if (_methodCount != 0)
+            {
+                WriteTo(writer, _memberCount, _methodTranslations);
+            }
+        }
+
+        private static void WriteTo(
+            TranslationWriter writer,
+            int memberCount,
+            IList<ITranslation> memberTranslations)
+        {
+            if (memberCount == 0)
+            {
+                return;
+            }
+
             for (var i = 0; ;)
             {
-                _methodTranslations[i].WriteTo(writer);
+                memberTranslations[i].WriteTo(writer);
                 ++i;
 
-                if (i == _methodCount)
+                if (i == memberCount)
                 {
                     break;
                 }
@@ -257,8 +318,6 @@
                 writer.WriteNewLineToTranslation();
                 writer.WriteNewLineToTranslation();
             }
-
-            writer.WriteClosingBraceToTranslation();
         }
     }
 }

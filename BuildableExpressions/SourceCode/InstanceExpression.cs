@@ -37,7 +37,7 @@
         #endregion
 
         public override ExpressionType NodeType
-            => (ExpressionType)SourceCodeExpressionType.ThisInstance;
+            => (ExpressionType)SourceCodeExpressionType.Instance;
 
         public override Type Type => _instance.Type;
 
