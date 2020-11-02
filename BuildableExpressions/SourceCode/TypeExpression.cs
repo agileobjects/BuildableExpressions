@@ -28,8 +28,8 @@
     {
         private List<GenericParameterExpression> _genericParameters;
         private ReadOnlyCollection<GenericParameterExpression> _readOnlyGenericParameters;
-        private List<PropertyOrFieldExpression> _propertyExpressions;
-        private ReadOnlyCollection<PropertyOrFieldExpression> _readOnlyPropertyExpressions;
+        private List<PropertyExpression> _propertyExpressions;
+        private ReadOnlyCollection<PropertyExpression> _readOnlyPropertyExpressions;
         private List<MethodExpression> _methodExpressions;
         private ReadOnlyCollection<MethodExpression> _readOnlyMethodExpressions;
         private Type _type;
@@ -152,10 +152,10 @@
         }
 
         /// <summary>
-        /// Gets the <see cref="PropertyOrFieldExpression"/>s which describe this
+        /// Gets the <see cref="PropertyExpression"/>s which describe this
         /// <see cref="TypeExpression"/>'s properties.
         /// </summary>
-        public ReadOnlyCollection<PropertyOrFieldExpression> PropertyExpressions
+        public ReadOnlyCollection<PropertyExpression> PropertyExpressions
             => _readOnlyPropertyExpressions ??= _propertyExpressions.ToReadOnlyCollection();
 
         /// <summary>
@@ -337,22 +337,22 @@
             GenericArguments.Add(argument);
         }
 
-        internal PropertyOrFieldExpression AddProperty(
+        internal PropertyExpression AddProperty(
             string name,
             Type type,
-            Action<PropertyOrFieldExpression> configuration)
+            Action<PropertyExpression> configuration)
         {
-            return AddProperty(new PropertyOrFieldExpression(this, name, type, configuration));
+            return AddProperty(new PropertyExpression(this, name, type, configuration));
         }
 
         /// <summary>
         /// Adds the given <paramref name="property"/> to this <see cref="TypeExpression"/>.
         /// </summary>
-        /// <param name="property">The <see cref="PropertyOrFieldExpression"/> to add.</param>
+        /// <param name="property">The <see cref="PropertyExpression"/> to add.</param>
         /// <returns>The given <paramref name="property"/>.</returns>
-        protected PropertyOrFieldExpression AddProperty(PropertyOrFieldExpression property)
+        protected PropertyExpression AddProperty(PropertyExpression property)
         {
-            _propertyExpressions ??= new List<PropertyOrFieldExpression>();
+            _propertyExpressions ??= new List<PropertyExpression>();
             _propertyExpressions.Add(property);
             return property;
         }

@@ -7,9 +7,9 @@
     using ReadableExpressions.Translations.Reflection;
 
     /// <summary>
-    /// Represents a property of field in a type in a piece of source code.
+    /// Represents a property in a type in a piece of source code.
     /// </summary>
-    public class PropertyOrFieldExpression :
+    public class PropertyExpression :
         MemberExpression,
         IClassPropertyExpressionConfigurator,
         IProperty
@@ -19,11 +19,11 @@
         private PropertyAccessor _setter;
         private IMember _setterMember;
 
-        internal PropertyOrFieldExpression(
+        internal PropertyExpression(
             TypeExpression declaringTypeExpression,
             string name,
             Type type,
-            Action<PropertyOrFieldExpression> configuration)
+            Action<PropertyExpression> configuration)
             : base(declaringTypeExpression, name)
         {
             Type = type;
@@ -37,28 +37,28 @@
 
         /// <summary>
         /// Gets the <see cref="SourceCodeExpressionType"/> value (1005) indicating the type of this
-        /// <see cref="PropertyOrFieldExpression"/> as an ExpressionType.
+        /// <see cref="PropertyExpression"/> as an ExpressionType.
         /// </summary>
         public override ExpressionType NodeType
             => (ExpressionType)SourceCodeExpressionType.Property;
 
         /// <summary>
-        /// Gets the type of this <see cref="PropertyOrFieldExpression"/>.
+        /// Gets the type of this <see cref="PropertyExpression"/>.
         /// </summary>
         public override Type Type { get; }
 
         /// <summary>
-        /// Visits this <see cref="PropertyOrFieldExpression"/>.
+        /// Visits this <see cref="PropertyExpression"/>.
         /// </summary>
-        /// <param name="visitor">The visitor with which to visit this <see cref="PropertyOrFieldExpression"/>.</param>
-        /// <returns>This <see cref="PropertyOrFieldExpression"/>.</returns>
+        /// <param name="visitor">The visitor with which to visit this <see cref="PropertyExpression"/>.</param>
+        /// <returns>This <see cref="PropertyExpression"/>.</returns>
         protected override Expression Accept(ExpressionVisitor visitor)
         {
             return this;
         }
 
         /// <summary>
-        /// Gets a value indicating whether this <see cref="PropertyOrFieldExpression"/> is abstract.
+        /// Gets a value indicating whether this <see cref="PropertyExpression"/> is abstract.
         /// </summary>
         public bool IsAbstract { get; private set; }
 

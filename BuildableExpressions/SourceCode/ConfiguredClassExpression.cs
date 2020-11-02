@@ -138,7 +138,7 @@
 
         private void SetBaseTypeTo(Type baseType) => BaseType = baseType;
 
-        PropertyOrFieldExpression IClassMemberConfigurator.AddProperty(
+        PropertyExpression IClassMemberConfigurator.AddProperty(
             string name,
             Type type,
             Action<IClassPropertyExpressionConfigurator> configuration)

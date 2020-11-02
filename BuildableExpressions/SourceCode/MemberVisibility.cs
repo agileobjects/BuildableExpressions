@@ -8,26 +8,31 @@
         /// <summary>
         /// 0. Public - the member will have public accessibility.
         /// </summary>
-        Public,
+        Public = 0,
 
         /// <summary>
-        /// 1. Internal - the member will have internal accessibility.
+        /// 1. ProtectedInternal - the member will have protected internal accessibility.
         /// </summary>
-        Internal,
+        ProtectedInternal = 1,
 
         /// <summary>
-        /// 2. ProtectedInternal - the member will have protected internal accessibility.
+        /// 2. Internal - the member will have internal accessibility.
         /// </summary>
-        ProtectedInternal,
+        Internal = 2,
 
         /// <summary>
         /// 3. Protected - the member will have protected accessibility.
         /// </summary>
-        Protected,
+        Protected = 3,
 
         /// <summary>
-        /// 4. Private - the member will have private accessibility.
+        /// 4. PrivateProtected - the member will have private protected accessibility.
         /// </summary>
-        Private
+        PrivateProtected = 4,
+
+        /// <summary>
+        /// 5. Private - the member will have private accessibility.
+        /// </summary>
+        Private = 5
     }
 }

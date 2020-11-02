@@ -3,20 +3,20 @@
     using System;
 
     /// <summary>
-    /// Provides options to configure a <see cref="PropertyOrFieldExpression"/> for a
+    /// Provides options to configure a <see cref="PropertyExpression"/> for a
     /// <see cref="ClassExpression"/>.
     /// </summary>
     public interface IClassPropertyExpressionConfigurator : IConcreteTypePropertyExpressionConfigurator
     {
         /// <summary>
-        /// Mark the <see cref="PropertyOrFieldExpression"/> as abstract.
+        /// Mark the <see cref="PropertyExpression"/> as abstract.
         /// </summary>
         /// <exception cref="InvalidOperationException">
         /// Thrown if the <see cref="ClassExpression"/> which declares the
-        /// <see cref="PropertyOrFieldExpression"/> has not been marked as abstract.
+        /// <see cref="PropertyExpression"/> has not been marked as abstract.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown if this <see cref="PropertyOrFieldExpression"/> has already been marked as static.
+        /// Thrown if this <see cref="PropertyExpression"/> has already been marked as static.
         /// </exception>
         void SetAbstract();
     }

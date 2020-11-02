@@ -49,6 +49,8 @@
 
         bool IMember.IsProtected => Visibility == Protected;
 
+        bool IMember.IsPrivateProtected => Visibility == PrivateProtected;
+
         bool IMember.IsPrivate => Visibility == Private;
 
         #endregion

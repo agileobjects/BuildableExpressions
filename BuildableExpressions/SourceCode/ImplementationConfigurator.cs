@@ -103,7 +103,7 @@
             }
         }
 
-        PropertyOrFieldExpression IClassMemberConfigurator.AddProperty(
+        PropertyExpression IClassMemberConfigurator.AddProperty(
             string name,
             Type type,
             Action<IClassPropertyExpressionConfigurator> configuration)
