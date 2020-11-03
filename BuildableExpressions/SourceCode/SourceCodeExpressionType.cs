@@ -34,6 +34,11 @@
         /// <summary>
         /// 1005. A source code type property.
         /// </summary>
-        Property = 1005
+        Property = 1005,
+
+        /// <summary>
+        /// 1006. A source code type property accessor.
+        /// </summary>
+        PropertyAccessor = 1006
     }
 }

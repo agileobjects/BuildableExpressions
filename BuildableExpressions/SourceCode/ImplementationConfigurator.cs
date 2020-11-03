@@ -118,6 +118,14 @@
             return ((ClassExpression)_typeExpression).AddMethod(name, configuration);
         }
 
+        PropertyExpression IStructMemberConfigurator.AddProperty(
+            string name,
+            Type type,
+            Action<IConcreteTypePropertyExpressionConfigurator> configuration)
+        {
+            return ((StructExpression)_typeExpression).AddProperty(name, type, configuration);
+        }
+
         MethodExpression IStructMemberConfigurator.AddMethod(
             string name,
             Action<IConcreteTypeMethodExpressionConfigurator> configuration)

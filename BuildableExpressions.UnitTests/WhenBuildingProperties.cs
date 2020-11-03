@@ -2,6 +2,7 @@
 {
     using Common;
     using Xunit;
+    using static System.Linq.Expressions.Expression;
     using static BuildableExpressions.SourceCode.MemberVisibility;
 
     public class WhenBuildingProperties
@@ -14,7 +15,7 @@
                 {
                     sc.AddClass(cls =>
                     {
-                        cls.AddProperty("MyProperty", typeof(string));
+                        cls.AddProperty<string>("MyProperty");
                     });
                 })
                 .ToCSharpString();
@@ -54,6 +55,64 @@ namespace GeneratedExpressionCode
     public class GeneratedExpressionClass
     {
         public int MyProperty { get; private set; }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAStructInternalCalculatedProperty()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddStruct("IntPair", str =>
+                    {
+                        var intOneProperty = str.AddProperty<int>("IntOne");
+                        var intTwoProperty = str.AddProperty<int>("IntTwo");
+
+                        str.AddProperty<int>("GreaterValue", p =>
+                        {
+                            p.SetGetter(g =>
+                            {
+                                var intOneAccess = Property(
+                                    str.ThisInstanceExpression,
+                                    intOneProperty.PropertyInfo);
+
+                                var intTwoAccess = Property(
+                                    str.ThisInstanceExpression,
+                                    intTwoProperty.PropertyInfo);
+
+                                var intOneGreaterThanIntTwo =
+                                    GreaterThan(intOneAccess, intTwoAccess);
+
+                                var getGreatestValue =
+                                    Condition(intOneGreaterThanIntTwo, intOneAccess, intTwoAccess);
+
+                                g.SetBody(getGreatestValue);
+                            });
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public struct IntPair
+    {
+        public int IntOne { get; set; }
+
+        public int IntTwo { get; set; }
+
+        public int GreaterValue
+        {
+            get
+            {
+                return (this.IntOne > this.IntTwo) ? this.IntOne : this.IntTwo;
+            }
+        }
     }
 }";
             EXPECTED.ShouldCompile();

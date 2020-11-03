@@ -24,6 +24,14 @@
 
         #region IStructExpressionConfigurator Members
 
+        PropertyExpression IStructMemberConfigurator.AddProperty(
+            string name,
+            Type type,
+            Action<IConcreteTypePropertyExpressionConfigurator> configuration)
+        {
+            return AddProperty(name, type, configuration);
+        }
+
         MethodExpression IStructMemberConfigurator.AddMethod(
             string name,
             Action<IConcreteTypeMethodExpressionConfigurator> configuration)
@@ -39,7 +47,7 @@
         }
 
         #endregion
-        
+
         /// <inheritdoc />
         protected override ITranslation GetTranslation(ITranslationContext context)
             => new StructTranslation(this, context);

@@ -2,9 +2,13 @@
 {
     using System;
     using System.Linq.Expressions;
+    using System.Reflection;
     using Api;
+    using NetStandardPolyfills;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
+    using Translations;
+    using static MemberVisibility;
 
     /// <summary>
     /// Represents a property in a type in a piece of source code.
@@ -14,10 +18,9 @@
         IClassPropertyExpressionConfigurator,
         IProperty
     {
-        private PropertyAccessor _getter;
         private IMember _getterMember;
-        private PropertyAccessor _setter;
         private IMember _setterMember;
+        private PropertyInfo _propertyInfo;
 
         internal PropertyExpression(
             TypeExpression declaringTypeExpression,
@@ -31,7 +34,7 @@
 
             if (!Visibility.HasValue)
             {
-                SetVisibility(MemberVisibility.Public);
+                SetVisibility(Public);
             }
         }
 
@@ -62,6 +65,47 @@
         /// </summary>
         public bool IsAbstract { get; private set; }
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="PropertyExpression"/> represents an
+        /// auto-property.
+        /// </summary>
+        public bool IsAutoProperty
+            => GetterExpression?.HasBody != true && SetterExpression?.HasBody != true;
+
+        /// <summary>
+        /// Gets a <see cref="PropertyAccessorExpression"/> describing this
+        /// <see cref="PropertyExpression"/>'s get accessor, or null if none exists.
+        /// </summary>
+        public PropertyAccessorExpression GetterExpression { get; private set; }
+
+        /// <summary>
+        /// Gets a <see cref="PropertyAccessorExpression"/> describing this
+        /// <see cref="PropertyExpression"/>'s set accessor, or null if none exists.
+        /// </summary>
+        public PropertyAccessorExpression SetterExpression { get; private set; }
+
+        /// <summary>
+        /// Gets the PropertyInfo for this <see cref="PropertyExpression"/>, which is lazily,
+        /// dynamically generated using this property's definition.
+        /// </summary>
+        public PropertyInfo PropertyInfo
+            => _propertyInfo ??= CreatePropertyInfo();
+
+        #region PropertyInfo Creation
+
+        private PropertyInfo CreatePropertyInfo()
+        {
+            var declaringType = DeclaringTypeExpression.Type;
+
+            var property = Visibility == Public
+                ? declaringType.GetPublicInstanceProperty(Name)
+                : declaringType.GetNonPublicInstanceProperty(Name);
+
+            return property;
+        }
+
+        #endregion
+
         #region IClassPropertyExpressionConfigurator Members
 
         void IPropertyExpressionConfigurator.SetVisibility(MemberVisibility visibility)
@@ -83,15 +127,15 @@
         void IConcreteTypePropertyExpressionConfigurator.SetGetter(
             Action<IPropertyGetterConfigurator> configuration)
         {
-            _getterMember = _getter = new PropertyAccessor(this, isGetter: true);
-            configuration.Invoke(_getter);
+            _getterMember = GetterExpression = new PropertyAccessorExpression(this, isGetter: true);
+            configuration.Invoke(GetterExpression);
         }
 
         void IConcreteTypePropertyExpressionConfigurator.SetSetter(
             Action<IPropertySetterConfigurator> configuration)
         {
-            _setterMember = _setter = new PropertyAccessor(this, isGetter: false);
-            configuration.Invoke(_setter);
+            _setterMember = SetterExpression = new PropertyAccessorExpression(this, isGetter: false);
+            configuration.Invoke(SetterExpression);
         }
 
         #endregion
@@ -104,53 +148,94 @@
 
         bool IProperty.IsReadable => _getterMember?.IsPublic == true;
 
-        IComplexMember IProperty.Getter => _getter;
+        IComplexMember IProperty.Getter => GetterExpression;
 
         bool IProperty.IsWritable => _setterMember?.IsPublic == true;
 
-        IComplexMember IProperty.Setter => _setter;
+        IComplexMember IProperty.Setter => SetterExpression;
 
         #endregion
 
         /// <inheritdoc />
         protected override ITranslation GetTranslation(ITranslationContext context)
-        {
-            return new PropertyDefinitionTranslation(
-                this,
-                includeDeclaringType: false,
-                context.Settings);
-        }
+            => new PropertyTranslation(this, context);
 
         #region Accessor Class
 
-        private class PropertyAccessor :
+        /// <summary>
+        /// Represents a property accessor in a piece of source code.
+        /// </summary>
+        public class PropertyAccessorExpression :
             MemberExpressionBase,
             IComplexMember,
             IPropertyGetterConfigurator,
-            IPropertySetterConfigurator
+            IPropertySetterConfigurator,
+            ICustomTranslationExpression
         {
             private readonly IProperty _property;
 
-            public PropertyAccessor(IProperty property, bool isGetter)
+            internal PropertyAccessorExpression(IProperty property, bool isGetter)
                 : base(isGetter ? "get" : "set")
             {
                 _property = property;
                 Type = isGetter ? property.Type : typeof(void);
             }
 
+            /// <summary>
+            /// Gets the <see cref="SourceCodeExpressionType"/> value (1006) indicating the type of this
+            /// <see cref="PropertyAccessorExpression"/> as an ExpressionType.
+            /// </summary>
+            public override ExpressionType NodeType
+                => (ExpressionType)SourceCodeExpressionType.PropertyAccessor;
+
+            /// <summary>
+            /// Gets the type of this <see cref="PropertyAccessorExpression"/>.
+            /// </summary>
             public override Type Type { get; }
 
+            /// <summary>
+            /// Visits this <see cref="PropertyAccessorExpression"/>.
+            /// </summary>
+            /// <param name="visitor">
+            /// The visitor with which to visit this <see cref="PropertyAccessorExpression"/>.
+            /// </param>
+            /// <returns>This <see cref="PropertyAccessorExpression"/>.</returns>
+            protected override Expression Accept(ExpressionVisitor visitor)
+            {
+                return this;
+            }
+
+            /// <inheritdoc />
             public override Type DeclaringType => _property.DeclaringType;
 
+            /// <inheritdoc />
             public bool IsAbstract => _property.IsAbstract;
 
+            /// <inheritdoc />
             public bool IsVirtual => _property.IsVirtual;
 
+            /// <inheritdoc />
             public bool IsOverride => _property.IsOverride;
 
+            /// <summary>
+            /// Gets a value indicating whether this <see cref="PropertyAccessorExpression"/> has
+            /// a body.
+            /// </summary>
+            public bool HasBody => Body != null;
+
+            /// <summary>
+            /// Gets an Expression describing this <see cref="PropertyAccessorExpression"/>'s body,
+            /// or null if the parent <see cref="PropertyExpression"/> is an auto-property.
+            /// </summary>
             public Expression Body { get; private set; }
 
-            public void SetVisibility(MemberVisibility visibility)
+            void IPropertyGetterConfigurator.SetVisibility(MemberVisibility visibility)
+                => SetVisibility(visibility);
+
+            void IPropertySetterConfigurator.SetVisibility(MemberVisibility visibility)
+                => SetVisibility(visibility);
+
+            internal void SetVisibility(MemberVisibility visibility)
             {
                 Visibility = visibility;
             }
@@ -169,6 +254,9 @@
                     new[] { valueVariable },
                     bodyFactory.Invoke(valueVariable));
             }
+
+            ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
+                => context.GetTranslationFor(Body);
         }
 
         #endregion

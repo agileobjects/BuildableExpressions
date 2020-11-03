@@ -218,6 +218,22 @@
         /// <summary>
         /// Add a public, instance-scoped, get-set <see cref="PropertyExpression"/> to the
         /// <see cref="ClassExpression"/>, with the given <paramref name="name"/> and
+        /// <typeparamref name="TProperty"/> type.
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the <see cref="PropertyExpression"/>.</typeparam>
+        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="PropertyExpression"/>.</param>
+        /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
+        public static PropertyExpression AddProperty<TProperty>(
+            this IClassExpressionConfigurator classConfig,
+            string name)
+        {
+            return classConfig.AddProperty(name, typeof(TProperty));
+        }
+
+        /// <summary>
+        /// Add a public, instance-scoped, get-set <see cref="PropertyExpression"/> to the
+        /// <see cref="ClassExpression"/>, with the given <paramref name="name"/> and
         /// <paramref name="type"/>.
         /// </summary>
         /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
@@ -229,11 +245,65 @@
             string name,
             Type type)
         {
-            return classConfig.AddProperty(name, type, p =>
-            {
-                p.SetGetter(g => { });
-                p.SetSetter(g => { });
-            });
+            return classConfig.AddProperty(name, type, PublicGetSet);
+        }
+
+        /// <summary>
+        /// Add a public, instance-scoped, get-set <see cref="PropertyExpression"/> to the
+        /// <see cref="StructExpression"/>, with the given <paramref name="name"/> and
+        /// <typeparamref name="TProperty"/> type.
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the <see cref="PropertyExpression"/>.</typeparam>
+        /// <param name="structConfig">The <see cref="IStructExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="PropertyExpression"/>.</param>
+        /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
+        public static PropertyExpression AddProperty<TProperty>(
+            this IStructExpressionConfigurator structConfig,
+            string name)
+        {
+            return structConfig.AddProperty(name, typeof(TProperty));
+        }
+
+        /// <summary>
+        /// Add a <see cref="PropertyExpression"/> to the <see cref="StructExpression"/>, with the
+        /// given <paramref name="name"/>, <typeparamref name="TProperty"/> type and
+        /// <paramref name="configuration"/>.
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the <see cref="PropertyExpression"/>.</typeparam>
+        /// <param name="structConfig">The <see cref="IStructExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="PropertyExpression"/>.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
+        public static PropertyExpression AddProperty<TProperty>(
+            this IStructExpressionConfigurator structConfig,
+            string name,
+            Action<IConcreteTypePropertyExpressionConfigurator> configuration)
+        {
+            return structConfig.AddProperty(name, typeof(TProperty), configuration);
+        }
+
+        /// <summary>
+        /// Add a public, instance-scoped, get-set <see cref="PropertyExpression"/> to the
+        /// <see cref="StructExpression"/>, with the given <paramref name="name"/> and
+        /// <paramref name="type"/>.
+        /// </summary>
+        /// <param name="structConfig">The <see cref="IStructExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="PropertyExpression"/>.</param>
+        /// <param name="type">The type of the <see cref="PropertyExpression"/>.</param>
+        /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
+        public static PropertyExpression AddProperty(
+            this IStructExpressionConfigurator structConfig,
+            string name,
+            Type type)
+        {
+            return structConfig.AddProperty(name, type, PublicGetSet);
+        }
+
+        private static void PublicGetSet(
+            IConcreteTypePropertyExpressionConfigurator propertyConfig)
+        {
+            propertyConfig.SetGetter(g => { });
+            propertyConfig.SetSetter(g => { });
         }
 
         /// <summary>
