@@ -343,22 +343,36 @@
         }
 
         /// <summary>
-        /// Add an auto-property setter with the given <paramref name="visibility"/> to the
-        /// <see cref="PropertyExpression"/>.
+        /// Add auto-property accessors with the given <paramref name="getterVisibility"/> and
+        /// <paramref name="setterVisibility"/> to the <see cref="PropertyExpression"/>.
         /// </summary>
         /// <param name="propertyConfig">
         /// The <see cref="IConcreteTypePropertyExpressionConfigurator"/> to configure.
         /// </param>
-        /// <param name="visibility">
+        /// <param name="getterVisibility">
+        /// The <see cref="MemberVisibility"/> of the auto-property getter to add. Defaults to
+        /// MemberVisibility.Public.
+        /// </param>
+        /// <param name="setterVisibility">
         /// The <see cref="MemberVisibility"/> of the auto-property setter to add. Defaults to
         /// MemberVisibility.Public.
+        /// </param>
+        /// <param name="isStatic">
+        /// A value indicating whether the auto-property shold have static scope. Defaults to false.
         /// </param>
         public static void SetAutoProperty(
             this IConcreteTypePropertyExpressionConfigurator propertyConfig,
             MemberVisibility getterVisibility = MemberVisibility.Public,
-            MemberVisibility setterVisibility = MemberVisibility.Public)
+            MemberVisibility setterVisibility = MemberVisibility.Public,
+            bool isStatic = false)
         {
-            propertyConfig.SetSetter(p => p.SetVisibility(visibility));
+            if (isStatic)
+            {
+                propertyConfig.SetStatic();
+            }
+
+            propertyConfig.SetGetter(p => p.SetVisibility(getterVisibility));
+            propertyConfig.SetSetter(p => p.SetVisibility(setterVisibility));
         }
 
         /// <summary>

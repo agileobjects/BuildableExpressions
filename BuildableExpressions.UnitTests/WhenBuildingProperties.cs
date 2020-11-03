@@ -1,5 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
+    using System;
     using Common;
     using Xunit;
     using static System.Linq.Expressions.Expression;
@@ -42,8 +43,7 @@ namespace GeneratedExpressionCode
                     {
                         cls.AddProperty("MyProperty", typeof(int), p =>
                         {
-                            p.SetGetter();
-                            p.SetSetter(Private);
+                            p.SetAutoProperty(setterVisibility: Private);
                         });
                     });
                 })
@@ -62,7 +62,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildAStructInternalCalculatedProperty()
+        public void ShouldBuildAStructInternalComputedProperty()
         {
             var translated = BuildableExpression
                 .SourceCode(sc =>
@@ -111,6 +111,47 @@ namespace GeneratedExpressionCode
             get
             {
                 return (this.IntOne > this.IntTwo) ? this.IntOne : this.IntTwo;
+            }
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAStructStaticComputedProperty()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddStruct("MyStruct", str =>
+                    {
+                        str.AddProperty<DateTime>("Doomsday", p =>
+                        {
+                            p.SetStatic();
+
+                            p.SetGetter(g =>
+                            {
+                                g.SetBody(Property(null, typeof(DateTime), nameof(DateTime.Now)));
+                            });
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    public struct MyStruct
+    {
+        public static DateTime Doomsday
+        {
+            get
+            {
+                return DateTime.Now;
             }
         }
     }

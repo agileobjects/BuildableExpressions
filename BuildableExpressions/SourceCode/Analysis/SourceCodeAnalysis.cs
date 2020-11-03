@@ -48,6 +48,9 @@
                 case (ExpressionType)SourceCodeExpressionType.Method:
                     return VisitAndConvert((MethodExpression)expression);
 
+                case (ExpressionType)SourceCodeExpressionType.Property:
+                    return VisitAndConvert((PropertyExpression)expression);
+
                 default:
                     return base.VisitAndConvert(expression);
             }
@@ -67,6 +70,11 @@
         {
             _namespaceAnalysis.Visit(type);
 
+            foreach (Expression propertyExpression in type.PropertyExpressions)
+            {
+                VisitAndConvert(propertyExpression);
+            }
+
             foreach (Expression methodExpression in type.MethodExpressions)
             {
                 VisitAndConvert(methodExpression);
@@ -82,6 +90,12 @@
             _namespaceAnalysis.Merge(methodAnalysis.NamespaceAnalysis);
 
             return method;
+        }
+
+        private PropertyExpression VisitAndConvert(PropertyExpression property)
+        {
+            _namespaceAnalysis.Visit(property);
+            return property;
         }
 
         protected override ExpressionAnalysis Finalise()

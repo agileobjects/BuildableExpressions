@@ -105,6 +105,9 @@
             AddNamespaceIfRequired(method);
         }
 
+        public void Visit(PropertyExpression property)
+            => AddNamespaceIfRequired(property);
+
         protected override Expression VisitNewArray(NewArrayExpression newArray)
         {
             Visit(newArray);
