@@ -42,8 +42,8 @@ namespace GeneratedExpressionCode
                     {
                         cls.AddProperty("MyProperty", typeof(int), p =>
                         {
-                            p.SetGetter(g => g.SetVisibility(Public));
-                            p.SetSetter(s => s.SetVisibility(Private));
+                            p.SetGetter();
+                            p.SetSetter(Private);
                         });
                     });
                 })

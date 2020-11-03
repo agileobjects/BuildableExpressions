@@ -302,8 +302,63 @@
         private static void PublicGetSet(
             IConcreteTypePropertyExpressionConfigurator propertyConfig)
         {
-            propertyConfig.SetGetter(g => { });
-            propertyConfig.SetSetter(g => { });
+            propertyConfig.SetGetter();
+            propertyConfig.SetSetter();
+        }
+
+        /// <summary>
+        /// Add an auto-property getter with the given <paramref name="visibility"/> to the
+        /// <see cref="PropertyExpression"/>.
+        /// </summary>
+        /// <param name="propertyConfig">
+        /// The <see cref="IConcreteTypePropertyExpressionConfigurator"/> to configure.
+        /// </param>
+        /// <param name="visibility">
+        /// The <see cref="MemberVisibility"/> of the auto-property getter to add. Defaults to
+        /// MemberVisibility.Public.
+        /// </param>
+        public static void SetGetter(
+            this IConcreteTypePropertyExpressionConfigurator propertyConfig,
+            MemberVisibility visibility = MemberVisibility.Public)
+        {
+            propertyConfig.SetGetter(p => p.SetVisibility(visibility));
+        }
+
+        /// <summary>
+        /// Add an auto-property setter with the given <paramref name="visibility"/> to the
+        /// <see cref="PropertyExpression"/>.
+        /// </summary>
+        /// <param name="propertyConfig">
+        /// The <see cref="IConcreteTypePropertyExpressionConfigurator"/> to configure.
+        /// </param>
+        /// <param name="visibility">
+        /// The <see cref="MemberVisibility"/> of the auto-property setter to add. Defaults to
+        /// MemberVisibility.Public.
+        /// </param>
+        public static void SetSetter(
+            this IConcreteTypePropertyExpressionConfigurator propertyConfig,
+            MemberVisibility visibility = MemberVisibility.Public)
+        {
+            propertyConfig.SetSetter(p => p.SetVisibility(visibility));
+        }
+
+        /// <summary>
+        /// Add an auto-property setter with the given <paramref name="visibility"/> to the
+        /// <see cref="PropertyExpression"/>.
+        /// </summary>
+        /// <param name="propertyConfig">
+        /// The <see cref="IConcreteTypePropertyExpressionConfigurator"/> to configure.
+        /// </param>
+        /// <param name="visibility">
+        /// The <see cref="MemberVisibility"/> of the auto-property setter to add. Defaults to
+        /// MemberVisibility.Public.
+        /// </param>
+        public static void SetAutoProperty(
+            this IConcreteTypePropertyExpressionConfigurator propertyConfig,
+            MemberVisibility getterVisibility = MemberVisibility.Public,
+            MemberVisibility setterVisibility = MemberVisibility.Public)
+        {
+            propertyConfig.SetSetter(p => p.SetVisibility(visibility));
         }
 
         /// <summary>
