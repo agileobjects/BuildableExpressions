@@ -217,6 +217,24 @@
 
         /// <summary>
         /// Add a public, instance-scoped, get-set <see cref="PropertyExpression"/> to the
+        /// <see cref="InterfaceExpression"/>, with the given <paramref name="name"/> and
+        /// <typeparamref name="TProperty"/> type.
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the <see cref="PropertyExpression"/>.</typeparam>
+        /// <param name="interfaceConfig">The <see cref="IInterfaceExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="PropertyExpression"/>.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
+        public static PropertyExpression AddProperty<TProperty>(
+            this IInterfaceExpressionConfigurator interfaceConfig,
+            string name,
+            Action<IInterfacePropertyExpressionConfigurator> configuration)
+        {
+            return interfaceConfig.AddProperty(name, typeof(TProperty), configuration);
+        }
+
+        /// <summary>
+        /// Add a public, instance-scoped, get-set <see cref="PropertyExpression"/> to the
         /// <see cref="ClassExpression"/>, with the given <paramref name="name"/> and
         /// <typeparamref name="TProperty"/> type.
         /// </summary>

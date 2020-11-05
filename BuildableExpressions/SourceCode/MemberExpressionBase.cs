@@ -32,7 +32,7 @@
         /// <summary>
         /// Gets a value indicating whether this <see cref="MemberExpressionBase"/> is static.
         /// </summary>
-        public bool IsStatic { get; protected set; }
+        public virtual bool IsStatic { get; protected set; }
 
         /// <summary>
         /// Gets the name of this <see cref="MemberExpressionBase"/>.

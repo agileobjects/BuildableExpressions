@@ -17,14 +17,14 @@
         void SetStatic();
 
         /// <summary>
-        /// Add a getter to the <see cref="PropertyExpression"/>'s, using the given
+        /// Add a getter to the <see cref="PropertyExpression"/>, using the given
         /// <paramref name="configuration"/>.
         /// </summary>
         /// <param name="configuration">The <see cref="IPropertyGetterConfigurator"/> to use.</param>
         void SetGetter(Action<IPropertyGetterConfigurator> configuration);
 
         /// <summary>
-        /// Add a setter to the <see cref="PropertyExpression"/>'s, using the given
+        /// Add a setter to the <see cref="PropertyExpression"/>, using the given
         /// <paramref name="configuration"/>.
         /// </summary>
         /// <param name="configuration">The <see cref="IPropertySetterConfigurator"/> to use.</param>

@@ -159,5 +159,49 @@ namespace GeneratedExpressionCode
             EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
+
+        [Fact]
+        public void ShouldBuildAnInterfaceGetOnlyPropertyAndImplementingClass()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var @interface = sc.AddInterface("IHasName", itf =>
+                    {
+                        itf.AddProperty<string>("Name", p =>
+                        {
+                            p.SetGetter();
+                        });
+                    });
+
+                    sc.AddClass("Person", cls =>
+                    {
+                        cls.SetImplements(@interface, impl =>
+                        {
+                            impl.AddProperty("Name", typeof(string), p =>
+                            {
+                                p.SetGetter();
+                            });
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public interface IHasName
+    {
+        public string Name { get; }
+    }
+
+    public class Person
+    {
+        public string Name { get; }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
     }
 }

@@ -209,6 +209,13 @@
             public override Type DeclaringType => _property.DeclaringType;
 
             /// <inheritdoc />
+            public override bool IsStatic
+            {
+                get => _property.IsStatic || base.IsStatic;
+                protected set => base.IsStatic = value;
+            }
+
+            /// <inheritdoc />
             public bool IsAbstract => _property.IsAbstract;
 
             /// <inheritdoc />

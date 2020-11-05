@@ -30,6 +30,14 @@
             SetImplements(@interface, configuration);
         }
 
+        PropertyExpression IInterfaceExpressionConfigurator.AddProperty(
+            string name, 
+            Type type, 
+            Action<IInterfacePropertyExpressionConfigurator> configuration)
+        {
+            throw new NotImplementedException();
+        }
+
         MethodExpression IInterfaceExpressionConfigurator.AddMethod(
             string name,
             Type returnType,
