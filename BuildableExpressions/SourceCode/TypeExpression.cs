@@ -62,15 +62,12 @@
 
         private Type GetOrCreateType()
         {
-            if (_type != null)
+            if (!_rebuildType && _type != null)
             {
-                if (!_rebuildType)
-                {
-                    return _type;
-                }
-
-                _rebuildType = false;
+                return _type;
             }
+
+            _rebuildType = false;
 
             var sourceCode = new SourceCodeExpression(SourceCode.Namespace);
             sourceCode.Add(this);
