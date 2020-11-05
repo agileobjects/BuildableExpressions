@@ -35,7 +35,11 @@
             Type type, 
             Action<IInterfacePropertyExpressionConfigurator> configuration)
         {
-            throw new NotImplementedException();
+            return AddProperty(new PropertyExpression(
+                this,
+                name,
+                type,
+                configuration));
         }
 
         MethodExpression IInterfaceExpressionConfigurator.AddMethod(

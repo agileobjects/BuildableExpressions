@@ -16,36 +16,11 @@
                 propertyExpression,
                 propertyExpression.GetAccessors().ToList(),
                 includeDeclaringType: false,
-                (p, acc, stg) => GetAccessorTranslation(p, propertyExpression, acc, context),
+                (p, acc, stg) => PropertyAccessorTranslation.For(propertyExpression, acc, p, context),
                 context.Settings)
         {
             _isAutoProperty = propertyExpression.IsAutoProperty;
         }
-
-        #region Setup
-
-        private static ITranslatable GetAccessorTranslation(
-            PropertyDefinitionTranslation parent,
-            PropertyExpression propertyExpression,
-            IMember accessor,
-            ITranslationContext context)
-        {
-            if (propertyExpression.IsAutoProperty)
-            {
-                return new PropertyAccessorDefinitionTranslation(
-                    parent,
-                    accessor,
-                    context.Settings);
-            }
-
-            return new PropertyAccessorTranslation(
-                parent,
-                propertyExpression,
-                accessor,
-                context);
-        }
-
-        #endregion
 
         protected override void WriteAccessorsStartTo(TranslationWriter writer)
         {
@@ -73,7 +48,7 @@
         {
             private readonly ITranslation _accessorTranslation;
 
-            public PropertyAccessorTranslation(
+            private PropertyAccessorTranslation(
                 PropertyDefinitionTranslation parent,
                 PropertyExpression propertyExpression,
                 IMember accessor,
@@ -100,6 +75,31 @@
                 FormattingSize = base.FormattingSize + accessorCodeBlock.FormattingSize;
                 _accessorTranslation = accessorCodeBlock;
             }
+
+            #region Factory Method
+
+            public static ITranslatable For(
+                PropertyExpression propertyExpression,
+                IMember accessor,
+                PropertyDefinitionTranslation parent,
+                ITranslationContext context)
+            {
+                if (propertyExpression.IsAutoProperty)
+                {
+                    return new PropertyAccessorDefinitionTranslation(
+                        parent,
+                        accessor,
+                        context.Settings);
+                }
+
+                return new PropertyAccessorTranslation(
+                    parent,
+                    propertyExpression,
+                    accessor,
+                    context);
+            }
+
+            #endregion
 
             public override int TranslationSize { get; }
 

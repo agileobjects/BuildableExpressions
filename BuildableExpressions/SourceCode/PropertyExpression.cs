@@ -15,6 +15,7 @@
     /// </summary>
     public class PropertyExpression :
         MemberExpression,
+        IInterfacePropertyExpressionConfigurator,
         IClassPropertyExpressionConfigurator,
         IProperty
     {
@@ -106,6 +107,16 @@
 
         #endregion
 
+        #region IInterfacePropertyExpressionConfigurator Members
+
+        void IInterfacePropertyExpressionConfigurator.SetGetter()
+            => SetGetter(g => { });
+
+        void IInterfacePropertyExpressionConfigurator.SetSetter()
+            => SetSetter(s => { });
+
+        #endregion
+
         #region IClassPropertyExpressionConfigurator Members
 
         void IPropertyExpressionConfigurator.SetVisibility(MemberVisibility visibility)
@@ -127,12 +138,22 @@
         void IConcreteTypePropertyExpressionConfigurator.SetGetter(
             Action<IPropertyGetterConfigurator> configuration)
         {
+            SetGetter(configuration);
+        }
+
+        private void SetGetter(Action<PropertyAccessorExpression> configuration)
+        {
             _getterMember = GetterExpression = new PropertyAccessorExpression(this, isGetter: true);
             configuration.Invoke(GetterExpression);
         }
 
         void IConcreteTypePropertyExpressionConfigurator.SetSetter(
             Action<IPropertySetterConfigurator> configuration)
+        {
+            SetSetter(configuration);
+        }
+
+        private void SetSetter(Action<PropertyAccessorExpression> configuration)
         {
             _setterMember = SetterExpression = new PropertyAccessorExpression(this, isGetter: false);
             configuration.Invoke(SetterExpression);
