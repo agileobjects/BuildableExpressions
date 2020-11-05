@@ -33,6 +33,7 @@
         private List<MethodExpression> _methodExpressions;
         private ReadOnlyCollection<MethodExpression> _readOnlyMethodExpressions;
         private Type _type;
+        private bool _rebuildType;
         private List<Type> _interfaceTypes;
         private ReadOnlyCollection<Type> _readOnlyInterfaceTypes;
 
@@ -53,14 +54,24 @@
         /// Gets the type of this <see cref="TypeExpression"/>, which is lazily, dynamically created
         /// using this type's definition.
         /// </summary>
-        public override Type Type => _type ??= CreateType();
+        public override Type Type => GetOrCreateType();
 
         internal Type TypeAccessor => _type;
 
         #region Type Creation
 
-        private Type CreateType()
+        private Type GetOrCreateType()
         {
+            if (_type != null)
+            {
+                if (!_rebuildType)
+                {
+                    return _type;
+                }
+
+                _rebuildType = false;
+            }
+
             var sourceCode = new SourceCodeExpression(SourceCode.Namespace);
             sourceCode.Add(this);
 
@@ -69,7 +80,7 @@
                 .CompiledAssembly
                 .GetTypes();
 
-            return compiledTypes[0];
+            return _type = compiledTypes[0];
         }
 
         #endregion
@@ -404,7 +415,8 @@
         {
             if (_type != null)
             {
-                _type = CreateType();
+                _rebuildType = true;
+                //   _type = CreateType();
             }
         }
 
