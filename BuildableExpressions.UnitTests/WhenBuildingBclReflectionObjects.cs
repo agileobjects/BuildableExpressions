@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Reflection;
     using AgileObjects.BuildableExpressions.SourceCode.Extensions;
     using Common;
     using NetStandardPolyfills;
@@ -228,11 +229,99 @@
 
             method.DeclaringType.ShouldBe(@class.Type);
             method.ReturnType.ShouldBe(typeof(void));
+            method.Name.ShouldBe("DoNothing");
             method.GetParameters().ShouldBeEmpty();
             method.IsGenericMethod.ShouldBeFalse();
+            method.IsPublic.ShouldBeTrue();
             method.IsStatic.ShouldBeFalse();
             method.IsAbstract.ShouldBeFalse();
-            method.IsPublic.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void ShouldCreateAnInstanceGetSetStructPropertyInfo()
+        {
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddStruct("MyStruct", str =>
+                {
+                    str.AddProperty<string>("Name", p =>
+                    {
+                        p.SetAutoProperty();
+                    });
+                });
+            });
+
+            var @struct = sourceCode
+                .TypeExpressions
+                .FirstOrDefault()
+                .ShouldNotBeNull();
+
+            var property = @struct
+                .PropertyExpressions
+                .FirstOrDefault()
+                .ShouldNotBeNull()
+                .PropertyInfo
+                .ShouldNotBeNull();
+
+            property.DeclaringType.ShouldBe(@struct.Type);
+            property.PropertyType.ShouldBe(typeof(string));
+            property.Name.ShouldBe("Name");
+            property.IsPublic().ShouldBeTrue();
+            property.IsStatic().ShouldBeFalse();
+        }
+
+        [Fact]
+        public void ShouldCreateReflectionObjectsAtBuildTime()
+        {
+            var buildTimeClassType = default(Type);
+            var buildTimePropertyInfo = default(PropertyInfo);
+
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass("MyClass", cls =>
+                {
+                    // This type won't contain any of the properties:
+                    buildTimeClassType = cls.ThisInstanceExpression.Type;
+
+                    var propertyExpression = cls.AddProperty("Me", buildTimeClassType, p =>
+                    {
+                        p.SetAutoProperty();
+                    });
+
+                    // This will regenerate the class Type for its
+                    // DeclaringType, including the 'Me' property:
+                    buildTimePropertyInfo = propertyExpression.PropertyInfo;
+
+                    // Add another property referencing the first to
+                    // reset the class Type:
+                    cls.AddProperty("MeAgain", buildTimeClassType, p =>
+                    {
+                        p.SetGetter(g =>
+                        {
+                            g.SetBody(Property(
+                                cls.ThisInstanceExpression,
+                                buildTimePropertyInfo));
+                        });
+                    });
+                });
+
+            });
+
+            buildTimeClassType.ShouldNotBeNull();
+            buildTimePropertyInfo.ShouldNotBeNull();
+
+            var finalClassType = sourceCode
+                .TypeExpressions
+                .FirstOrDefault()
+                .ShouldNotBeNull()
+                .Type
+                .ShouldNotBeNull();
+
+            finalClassType.ShouldNotBeSameAs(buildTimeClassType);
+            finalClassType.GetProperties().Length.ShouldBe(2);
+
+            var finalPropertyInfo = finalClassType.GetProperties()[0];
+            finalPropertyInfo.ShouldNotBeSameAs(buildTimePropertyInfo);
         }
 
         #region Helper Members

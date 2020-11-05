@@ -362,6 +362,8 @@
         {
             _propertyExpressions ??= new List<PropertyExpression>();
             _propertyExpressions.Add(property);
+            _readOnlyPropertyExpressions = null;
+            ResetTypeIfRequired();
             return property;
         }
 
