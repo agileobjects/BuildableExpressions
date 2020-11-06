@@ -182,6 +182,10 @@
 
         /// <inheritdoc />
         protected override ITranslation GetTranslation(ITranslationContext context)
-            => new PropertyTranslation(this, context);
+        {
+            return DeclaringTypeExpression.SourceCode.IsComplete
+                ? (ITranslation)new PropertyTranslation(this, context)
+                : new TransientPropertyTranslation(this, context);
+        }
     }
 }
