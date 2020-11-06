@@ -15,7 +15,6 @@
     /// </summary>
     public class PropertyExpression :
         MemberExpression,
-        IInterfacePropertyExpressionConfigurator,
         IClassPropertyExpressionConfigurator,
         IProperty
     {
@@ -70,7 +69,7 @@
         /// Gets a value indicating whether this <see cref="PropertyExpression"/> represents an
         /// auto-property.
         /// </summary>
-        public bool IsAutoProperty
+        public virtual bool IsAutoProperty
             => GetterExpression?.HasBody != true && SetterExpression?.HasBody != true;
 
         /// <summary>
@@ -96,24 +95,16 @@
 
         private PropertyInfo CreatePropertyInfo()
         {
-            var declaringType = DeclaringTypeExpression.Type;
-
             var property = Visibility == Public
-                ? declaringType.GetPublicInstanceProperty(Name)
-                : declaringType.GetNonPublicInstanceProperty(Name);
+                ? IsStatic
+                    ? DeclaringType.GetPublicStaticProperty(Name)
+                    : DeclaringType.GetPublicInstanceProperty(Name)
+                : IsStatic
+                    ? DeclaringType.GetNonPublicStaticProperty(Name)
+                    : DeclaringType.GetNonPublicInstanceProperty(Name);
 
             return property;
         }
-
-        #endregion
-
-        #region IInterfacePropertyExpressionConfigurator Members
-
-        void IInterfacePropertyExpressionConfigurator.SetGetter()
-            => SetGetter(g => { });
-
-        void IInterfacePropertyExpressionConfigurator.SetSetter()
-            => SetSetter(s => { });
 
         #endregion
 
@@ -122,18 +113,20 @@
         void IPropertyExpressionConfigurator.SetVisibility(MemberVisibility visibility)
             => SetVisibility(visibility);
 
-        private void SetVisibility(MemberVisibility visibility)
-            => Visibility = visibility;
-
         void IConcreteTypePropertyExpressionConfigurator.SetStatic()
         {
-            IsStatic = true;
+            SetStatic();
         }
 
         void IClassPropertyExpressionConfigurator.SetAbstract()
         {
-            IsAbstract = true;
+            SetAbstract();
         }
+
+        /// <summary>
+        /// Mark this <see cref="PropertyExpression"/> as abstract.
+        /// </summary>
+        protected void SetAbstract() => IsAbstract = true;
 
         void IConcreteTypePropertyExpressionConfigurator.SetGetter(
             Action<IPropertyGetterConfigurator> configuration)
@@ -141,7 +134,12 @@
             SetGetter(configuration);
         }
 
-        private void SetGetter(Action<PropertyAccessorExpression> configuration)
+        /// <summary>
+        /// Add a getter to this <see cref="PropertyExpression"/>, using the given
+        /// <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="configuration">The configuration to use.</param>
+        protected void SetGetter(Action<PropertyAccessorExpression> configuration)
         {
             _getterMember = GetterExpression = new PropertyAccessorExpression(this, isGetter: true);
             configuration.Invoke(GetterExpression);
@@ -153,7 +151,12 @@
             SetSetter(configuration);
         }
 
-        private void SetSetter(Action<PropertyAccessorExpression> configuration)
+        /// <summary>
+        /// Add a setter to this <see cref="PropertyExpression"/>, using the given
+        /// <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="configuration">The configuration to use.</param>
+        protected void SetSetter(Action<PropertyAccessorExpression> configuration)
         {
             _setterMember = SetterExpression = new PropertyAccessorExpression(this, isGetter: false);
             configuration.Invoke(SetterExpression);
@@ -180,113 +183,5 @@
         /// <inheritdoc />
         protected override ITranslation GetTranslation(ITranslationContext context)
             => new PropertyTranslation(this, context);
-
-        #region Accessor Class
-
-        /// <summary>
-        /// Represents a property accessor in a piece of source code.
-        /// </summary>
-        public class PropertyAccessorExpression :
-            MemberExpressionBase,
-            IComplexMember,
-            IPropertyGetterConfigurator,
-            IPropertySetterConfigurator,
-            ICustomTranslationExpression
-        {
-            private readonly IProperty _property;
-
-            internal PropertyAccessorExpression(IProperty property, bool isGetter)
-                : base(isGetter ? "get" : "set")
-            {
-                _property = property;
-                Type = isGetter ? property.Type : typeof(void);
-            }
-
-            /// <summary>
-            /// Gets the <see cref="SourceCodeExpressionType"/> value (1006) indicating the type of this
-            /// <see cref="PropertyAccessorExpression"/> as an ExpressionType.
-            /// </summary>
-            public override ExpressionType NodeType
-                => (ExpressionType)SourceCodeExpressionType.PropertyAccessor;
-
-            /// <summary>
-            /// Gets the type of this <see cref="PropertyAccessorExpression"/>.
-            /// </summary>
-            public override Type Type { get; }
-
-            /// <summary>
-            /// Visits this <see cref="PropertyAccessorExpression"/>.
-            /// </summary>
-            /// <param name="visitor">
-            /// The visitor with which to visit this <see cref="PropertyAccessorExpression"/>.
-            /// </param>
-            /// <returns>This <see cref="PropertyAccessorExpression"/>.</returns>
-            protected override Expression Accept(ExpressionVisitor visitor)
-            {
-                return this;
-            }
-
-            /// <inheritdoc />
-            public override Type DeclaringType => _property.DeclaringType;
-
-            /// <inheritdoc />
-            public override bool IsStatic
-            {
-                get => _property.IsStatic || base.IsStatic;
-                protected set => base.IsStatic = value;
-            }
-
-            /// <inheritdoc />
-            public bool IsAbstract => _property.IsAbstract;
-
-            /// <inheritdoc />
-            public bool IsVirtual => _property.IsVirtual;
-
-            /// <inheritdoc />
-            public bool IsOverride => _property.IsOverride;
-
-            /// <summary>
-            /// Gets a value indicating whether this <see cref="PropertyAccessorExpression"/> has
-            /// a body.
-            /// </summary>
-            public bool HasBody => Body != null;
-
-            /// <summary>
-            /// Gets an Expression describing this <see cref="PropertyAccessorExpression"/>'s body,
-            /// or null if the parent <see cref="PropertyExpression"/> is an auto-property.
-            /// </summary>
-            public Expression Body { get; private set; }
-
-            void IPropertyGetterConfigurator.SetVisibility(MemberVisibility visibility)
-                => SetVisibility(visibility);
-
-            void IPropertySetterConfigurator.SetVisibility(MemberVisibility visibility)
-                => SetVisibility(visibility);
-
-            internal void SetVisibility(MemberVisibility visibility)
-            {
-                Visibility = visibility;
-            }
-
-            void IPropertyGetterConfigurator.SetBody(Expression body)
-            {
-                Body = body;
-            }
-
-            void IPropertySetterConfigurator.SetBody(
-                Func<ParameterExpression, Expression> bodyFactory)
-            {
-                var valueVariable = Variable(Type, "value");
-
-                Body = Block(
-                    new[] { valueVariable },
-                    bodyFactory.Invoke(valueVariable));
-            }
-
-            ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
-                => context.GetTranslationFor(Body);
-        }
-
-        #endregion
     }
 }

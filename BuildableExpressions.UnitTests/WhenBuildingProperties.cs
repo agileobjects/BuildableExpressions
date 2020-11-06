@@ -192,10 +192,10 @@ namespace GeneratedExpressionCode
 {
     public interface IHasName
     {
-        public string Name { get; }
+        string Name { get; }
     }
 
-    public class Person
+    public class Person : IHasName
     {
         public string Name { get; }
     }

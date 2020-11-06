@@ -132,15 +132,17 @@
 
         private MethodInfo CreateMethodInfo()
         {
-            var declaringType = DeclaringTypeExpression.Type;
-
             var parameterTypes =
                 _parameters?.ProjectToArray(p => p.Type) ??
                 Type.EmptyTypes;
 
             var method = Visibility == Public
-                ? declaringType.GetPublicInstanceMethod(Name, parameterTypes)
-                : declaringType.GetNonPublicInstanceMethod(Name, parameterTypes);
+                ? IsStatic
+                    ? DeclaringType.GetPublicStaticMethod(Name, parameterTypes)
+                    : DeclaringType.GetPublicInstanceMethod(Name, parameterTypes)
+                : IsStatic
+                    ? DeclaringType.GetNonPublicStaticMethod(Name, parameterTypes)
+                    : DeclaringType.GetNonPublicInstanceMethod(Name, parameterTypes);
 
             return method;
         }
@@ -239,15 +241,6 @@
         void IMethodExpressionConfigurator.SetVisibility(MemberVisibility visibility)
             => SetVisibility(visibility);
 
-        /// <summary>
-        /// Gives the <see cref="MethodExpression"/> the given <paramref name="visibility"/>.
-        /// </summary>
-        /// <param name="visibility">
-        /// The <see cref="MemberVisibility"/> to give the <see cref="MethodExpression"/>.
-        /// </param>
-        protected void SetVisibility(MemberVisibility visibility)
-            => Visibility = visibility;
-
         void IMethodExpressionConfigurator.AddParameters(
             params ParameterExpression[] parameters)
         {
@@ -277,7 +270,7 @@
         void IConcreteTypeMethodExpressionConfigurator.SetStatic()
         {
             ThrowIfAbstract();
-            IsStatic = true;
+            SetStatic();
         }
 
         private void ThrowIfAbstract()
@@ -309,8 +302,7 @@
         {
             ThrowIfNonAbstractClass();
             ThrowIfStatic();
-
-            IsAbstract = true;
+            SetAbstract();
         }
 
         private void ThrowIfNonAbstractClass()
@@ -339,6 +331,11 @@
                 $"Method '{this.GetSignature()}' cannot be " +
                 $"both {modifier} and {conflictingModifier}.");
         }
+
+        /// <summary>
+        /// Mark this <see cref="MethodExpression"/> as abstract.
+        /// </summary>
+        protected void SetAbstract() => IsAbstract = true;
 
         #endregion
 

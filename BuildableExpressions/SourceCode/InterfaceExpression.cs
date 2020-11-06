@@ -31,11 +31,11 @@
         }
 
         PropertyExpression IInterfaceExpressionConfigurator.AddProperty(
-            string name, 
-            Type type, 
+            string name,
+            Type type,
             Action<IInterfacePropertyExpressionConfigurator> configuration)
         {
-            return AddProperty(new PropertyExpression(
+            return AddProperty(new InterfacePropertyExpression(
                 this,
                 name,
                 type,

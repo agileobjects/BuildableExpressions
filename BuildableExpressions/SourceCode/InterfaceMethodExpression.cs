@@ -5,8 +5,11 @@
     using System.Linq.Expressions;
     using Analysis;
     using Extensions;
+    using ReadableExpressions.Translations.Reflection;
 
-    internal class InterfaceMethodExpression : MethodExpression
+    internal class InterfaceMethodExpression :
+        MethodExpression,
+        IPotentialInterfaceMember
     {
         public InterfaceMethodExpression(
             InterfaceExpression declaringInterfaceExpression,
@@ -16,6 +19,7 @@
             : base(declaringInterfaceExpression, name, configuration)
         {
             ReturnType = returnType;
+            SetAbstract();
             Analysis = MethodExpressionAnalysis.For(this);
             Validate();
         }
@@ -35,5 +39,7 @@
 
         public override ReadOnlyCollection<ParameterExpression> Parameters
             => ParametersAccessor.ToReadOnlyCollection();
+
+        bool IPotentialInterfaceMember.IsInterfaceMember => true;
     }
 }

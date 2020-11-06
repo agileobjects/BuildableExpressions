@@ -25,10 +25,23 @@
         private ReadOnlyCollection<TypeExpression> _readOnlyTypeExpressions;
         private ReadOnlyCollection<Assembly> _referencedAssemblies;
 
-        internal SourceCodeExpression(Action<ISourceCodeExpressionConfigurator> configuration)
-            : this("GeneratedExpressionCode", configuration)
+        internal SourceCodeExpression(string @namespace)
         {
+            _typeExpressions = new List<TypeExpression>();
+            Namespace = @namespace;
+            Analysis = SourceCodeAnalysis.For(this);
+        }
+
+        internal SourceCodeExpression(Action<ISourceCodeExpressionConfigurator> configuration)
+        {
+            _typeExpressions = new List<TypeExpression>();
+            Namespace = "GeneratedExpressionCode";
+
+            configuration.Invoke(this);
             Validate();
+
+            Analysis = SourceCodeAnalysis.For(this);
+            IsComplete = true;
         }
 
         #region Validation
@@ -50,22 +63,7 @@
 
         #endregion
 
-        internal SourceCodeExpression(string @namespace)
-            : this(@namespace, sc => { })
-        {
-        }
-
-        private SourceCodeExpression(
-            string @namespace,
-            Action<ISourceCodeExpressionConfigurator> configuration)
-        {
-            Namespace = @namespace;
-            _typeExpressions = new List<TypeExpression>();
-
-            configuration.Invoke(this);
-
-            Analysis = SourceCodeAnalysis.For(this);
-        }
+        internal bool IsComplete { get; }
 
         internal SourceCodeAnalysis Analysis { get; }
 

@@ -8,7 +8,9 @@
     /// <summary>
     /// Abstract base class for types describing a member.
     /// </summary>
-    public abstract class MemberExpressionBase : Expression, IMember
+    public abstract class MemberExpressionBase :
+        Expression,
+        IPotentialInterfaceMember
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberExpressionBase"/> class.
@@ -27,12 +29,23 @@
         /// <summary>
         /// Gets the <see cref="MemberVisibility"/> of this <see cref="MemberExpressionBase"/>.
         /// </summary>
-        public MemberVisibility? Visibility { get; protected set; }
+        public MemberVisibility? Visibility { get; private set; }
+
+        /// <summary>
+        /// Give this <see cref="MemberExpressionBase"/> the given <paramref name="visibility"/>.
+        /// </summary>
+        protected void SetVisibility(MemberVisibility visibility)
+            => Visibility = visibility;
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="MemberExpressionBase"/> is static.
         /// </summary>
-        public virtual bool IsStatic { get; protected set; }
+        public virtual bool IsStatic { get; private set; }
+
+        /// <summary>
+        /// Mark this <see cref="MemberExpressionBase"/> as static.
+        /// </summary>
+        protected void SetStatic() => IsStatic = true;
 
         /// <summary>
         /// Gets the name of this <see cref="MemberExpressionBase"/>.
@@ -54,5 +67,7 @@
         bool IMember.IsPrivate => Visibility == Private;
 
         #endregion
+
+        bool IPotentialInterfaceMember.IsInterfaceMember => false;
     }
 }
