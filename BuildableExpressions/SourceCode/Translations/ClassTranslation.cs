@@ -14,24 +14,24 @@
         private readonly string _modifier;
         private readonly ITranslatable _baseTypeTranslation;
 
-        public ClassTranslation(ClassExpression type, ITranslationContext context)
+        public ClassTranslation(ClassExpression @class, ITranslationContext context)
         {
-            _class = type;
-            _typeTranslation = new TypeTranslation(type, _classString, context);
-            var hasBaseType = type.BaseType != typeof(object);
+            _class = @class;
+            _typeTranslation = new TypeTranslation(@class, _classString, context);
+            var hasBaseType = @class.BaseType != typeof(object);
 
             var translationSize = _typeTranslation.TranslationSize;
             var formattingSize = _typeTranslation.FormattingSize;
 
-            if (type.IsStatic)
+            if (@class.IsStatic)
             {
                 _modifier = "static ";
             }
-            else if (type.IsAbstract)
+            else if (@class.IsAbstract)
             {
                 _modifier = "abstract ";
             }
-            else if (type.IsSealed)
+            else if (@class.IsSealed)
             {
                 _modifier = "sealed ";
             }
@@ -43,7 +43,7 @@
 
             if (hasBaseType)
             {
-                _baseTypeTranslation = context.GetTranslationFor(type.BaseType);
+                _baseTypeTranslation = context.GetTranslationFor(@class.BaseType);
                 translationSize += _baseTypeTranslation.TranslationSize;
                 formattingSize += _baseTypeTranslation.FormattingSize;
             }

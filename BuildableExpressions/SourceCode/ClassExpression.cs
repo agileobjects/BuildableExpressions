@@ -13,7 +13,15 @@
     {
         private ClassExpression _baseTypeExpression;
 
-        internal ClassExpression(
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClassExpression"/> class.
+        /// </summary>
+        /// <param name="sourceCode">
+        /// The <see cref="ClassExpression"/>'s parent <see cref="SourceCodeExpression"/>.
+        /// </param>
+        /// <param name="baseType">The base type from which the <see cref="ClassExpression"/> derives.</param>
+        /// <param name="name">The name of the <see cref="ClassExpression"/>.</param>
+        protected ClassExpression(
             SourceCodeExpression sourceCode,
             Type baseType,
             string name)
@@ -80,6 +88,26 @@
         protected bool HasObjectBaseType => BaseType == typeof(object);
 
         /// <summary>
+        /// Gets the non-object <see cref="BaseTypeExpression"/> and <see cref="InterfaceExpression"/>s
+        /// implemented by this <see cref="ClassExpression"/>.
+        /// </summary>
+        public override IEnumerable<TypeExpression> ImplementedTypeExpressions
+        {
+            get
+            {
+                if (!HasObjectBaseType)
+                {
+                    yield return BaseTypeExpression;
+                }
+
+                foreach (var @interface in base.ImplementedTypeExpressions)
+                {
+                    yield return @interface;
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the non-object base type and interfaces types implemented by this
         /// <see cref="ClassExpression"/>.
         /// </summary>
@@ -92,7 +120,7 @@
                     yield return BaseType;
                 }
 
-                foreach (var @interface in InterfaceTypes)
+                foreach (var @interface in base.ImplementedTypes)
                 {
                     yield return @interface;
                 }

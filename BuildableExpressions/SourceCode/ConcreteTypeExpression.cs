@@ -14,7 +14,14 @@
     {
         private Expression _thisInstanceExpression;
 
-        internal ConcreteTypeExpression(SourceCodeExpression sourceCode, string name)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConcreteTypeExpression"/> class.
+        /// </summary>
+        /// <param name="sourceCode">
+        /// The <see cref="ConcreteTypeExpression"/>'s parent <see cref="SourceCodeExpression"/>.
+        /// </param>
+        /// <param name="name">The name of the <see cref="ConcreteTypeExpression"/>.</param>
+        protected ConcreteTypeExpression(SourceCodeExpression sourceCode, string name)
             : base(sourceCode, name)
         {
         }

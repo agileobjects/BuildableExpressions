@@ -3,6 +3,7 @@
     using System;
     using BuildableExpressions.SourceCode;
     using Common;
+    using NetStandardPolyfills;
     using Xunit;
     using static System.Linq.Expressions.Expression;
     using static BuildableExpressions.SourceCode.MemberVisibility;
@@ -197,7 +198,88 @@ namespace GeneratedExpressionCode
 
     public class Person : IHasName
     {
-        public string Name { get; }
+        public string Name { get; private set; }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAnInterfaceGetOnlyPropertyAndImplementingStruct()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var interfaceProperty = default(PropertyExpression);
+
+                    var @interface = sc.AddInterface("IHasName", itf =>
+                    {
+                        interfaceProperty = itf.AddProperty<string>("Name", p =>
+                        {
+                            p.SetGetter();
+                        });
+                    });
+
+                    sc.AddStruct("NameOwner", str =>
+                    {
+                        var firstNameProperty = str.AddProperty<string>("FirstName", p =>
+                        {
+                            p.SetGetter();
+                        });
+
+                        var lastNameProperty = str.AddProperty<string>("LastName", p =>
+                        {
+                            p.SetGetter();
+                        });
+
+                        str.SetImplements(@interface, impl =>
+                        {
+                            impl.AddProperty(interfaceProperty, p =>
+                            {
+                                p.SetGetter(g =>
+                                {
+                                    var concatNames = Call(
+                                        typeof(string).GetPublicStaticMethod(
+                                            "Concat",
+                                            typeof(string), typeof(string), typeof(string)),
+                                        Property(
+                                            str.ThisInstanceExpression,
+                                            firstNameProperty.PropertyInfo),
+                                        Constant(" ", typeof(string)),
+                                        Property(
+                                            str.ThisInstanceExpression,
+                                            lastNameProperty.PropertyInfo));
+
+                                    g.SetBody(concatNames);
+                                });
+                            });
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public interface IHasName
+    {
+        string Name { get; }
+    }
+
+    public struct NameOwner : IHasName
+    {
+        public string FirstName { get; private set; }
+
+        public string LastName { get; private set; }
+
+        public string Name
+        {
+            get
+            {
+                return this.FirstName + "" "" + this.LastName;
+            }
+        }
     }
 }";
             EXPECTED.ShouldCompile();

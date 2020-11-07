@@ -3,12 +3,11 @@
     using System;
     using Generics;
     using NetStandardPolyfills;
-    using ReadableExpressions.Extensions;
 
     internal class TypedClassExpression : ClassExpression
     {
         public TypedClassExpression(SourceCodeExpression sourceCode, Type type)
-            : base(sourceCode, type.GetBaseType(), GetName(type))
+            : base(sourceCode, type.GetBaseType(), type.GetTypedExpressionName())
         {
             Type = type;
 
@@ -20,15 +19,6 @@
             {
                 AddGenericParameter(new TypedOpenGenericArgumentExpression(parameterType));
             }
-        }
-
-        private static string GetName(Type type)
-        {
-            var name = type.GetFriendlyName();
-
-            return type.IsNested
-                ? name.Substring(name.LastIndexOf('.') + 1)
-                : name;
         }
 
         public override Type Type { get; }

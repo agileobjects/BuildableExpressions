@@ -200,7 +200,7 @@
             string name,
             Action<IInterfaceExpressionConfigurator> configuration)
         {
-            return Add(new InterfaceExpression(this, name, configuration));
+            return Add(new ConfiguredInterfaceExpression(this, name, configuration));
         }
 
         ClassExpression ISourceCodeExpressionConfigurator.AddClass(

@@ -9,13 +9,11 @@
     using NetStandardPolyfills;
     using Xunit;
 
-    public abstract class CompilerTestsBase
+    public class CSharpCompilerTests
     {
         [Fact]
         public void ShouldCompileSimpleSourceCode()
         {
-            var compiler = CreateCompiler();
-
             const string SOURCE = @"
 namespace MyNamespace
 {
@@ -27,7 +25,7 @@ namespace MyNamespace
         }
     }
 }";
-            var result = compiler.Compile(SOURCE);
+            var result = CSharpCompiler.Instance.Compile(SOURCE);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -43,8 +41,6 @@ namespace MyNamespace
         [Fact]
         public void ShouldCompileMultipleSimpleSourceCodeFiles()
         {
-            var compiler = CreateCompiler();
-
             const string SOURCE1 = @"
 namespace MyNamespace
 {
@@ -80,7 +76,8 @@ namespace MyNamespace
         }
     }
 }";
-            var result = compiler.Compile(new[] { SOURCE1, SOURCE2, SOURCE3 }.AsEnumerable());
+            var result = CSharpCompiler.Instance
+                .Compile(new[] { SOURCE1, SOURCE2, SOURCE3 }.AsEnumerable());
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -95,8 +92,6 @@ namespace MyNamespace
         [Fact]
         public void ShouldCompileSourceCodeWithPassedInDependencies()
         {
-            var compiler = CreateCompiler();
-
             const string SOURCE = @"
 namespace MyNamespace
 {
@@ -111,7 +106,7 @@ namespace MyNamespace
         }
     }
 }";
-            var result = compiler.Compile(SOURCE);
+            var result = CSharpCompiler.Instance.Compile(SOURCE);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -135,8 +130,6 @@ namespace MyNamespace
         [Fact]
         public void ShouldCompileSourceCodeExpressionSourceCode()
         {
-            var compiler = CreateCompiler();
-
             const string SOURCE = @"
 namespace MyNamespace
 {
@@ -165,7 +158,7 @@ namespace MyNamespace
     }
 }
     ";
-            var result = compiler.Compile(SOURCE);
+            var result = CSharpCompiler.Instance.Compile(SOURCE);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -188,15 +181,5 @@ namespace MyNamespace
             methodExpression.Name.ShouldBe("DoNothing");
             methodExpression.Parameters.ShouldBeEmpty();
         }
-
-        #region Helper Members
-
-        internal abstract ICSharpCompiler CreateCompiler();
-
-        public class TestClass
-        {
-        }
-
-        #endregion
     }
 }

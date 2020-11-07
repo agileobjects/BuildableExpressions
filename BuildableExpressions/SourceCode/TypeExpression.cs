@@ -36,8 +36,16 @@
         private bool _rebuildType;
         private List<Type> _interfaceTypes;
         private ReadOnlyCollection<Type> _readOnlyInterfaceTypes;
+        private ReadOnlyCollection<InterfaceExpression> _readOnlyInterfaceTypeExpressions;
 
-        internal TypeExpression(SourceCodeExpression sourceCode, string name)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TypeExpression"/> class.
+        /// </summary>
+        /// <param name="sourceCode">
+        /// The <see cref="TypeExpression"/>'s parent <see cref="SourceCodeExpression"/>.
+        /// </param>
+        /// <param name="name">The name of the <see cref="TypeExpression"/>.</param>
+        protected TypeExpression(SourceCodeExpression sourceCode, string name)
         {
             SourceCode = sourceCode;
             Name = name.ThrowIfInvalidName<ArgumentException>("Type");
@@ -70,6 +78,12 @@
             _rebuildType = false;
 
             var sourceCode = new SourceCodeExpression(SourceCode.Namespace);
+
+            foreach (var typeExpression in ImplementedTypeExpressions)
+            {
+                sourceCode.Add(typeExpression);
+            }
+            
             sourceCode.Add(this);
 
             var compiledTypes = sourceCode
@@ -108,9 +122,21 @@
         public SourceCodeExpression SourceCode { get; }
 
         /// <summary>
+        /// Gets a <see cref="CommentExpression"/> describing this <see cref="TypeExpression"/>,
+        /// if a summary has been set.
+        /// </summary>
+        public CommentExpression Summary { get; private set; }
+
+        /// <summary>
         /// Gets this <see cref="TypeExpression"/>'s <see cref="TypeVisibility" />.
         /// </summary>
         public TypeVisibility Visibility { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="TypeExpression"/>s implemented by this <see cref="TypeExpression"/>.
+        /// </summary>
+        public virtual IEnumerable<TypeExpression> ImplementedTypeExpressions
+            => InterfaceTypeExpressions;
 
         /// <summary>
         /// Gets the types implemented by this <see cref="TypeExpression"/>.
@@ -118,16 +144,38 @@
         public virtual IEnumerable<Type> ImplementedTypes => InterfaceTypes;
 
         /// <summary>
+        /// Gets the <see cref="InterfaceExpression"/>s implemented by this
+        /// <see cref="TypeExpression"/>.
+        /// </summary>
+        public ReadOnlyCollection<InterfaceExpression> InterfaceTypeExpressions
+            => _readOnlyInterfaceTypeExpressions ??= GetInterfaceExpressions().ToReadOnlyCollection();
+
+        #region InterfaceExpression Creation
+
+        private IList<InterfaceExpression> GetInterfaceExpressions()
+        {
+            return InterfaceTypes.ProjectToArray(@interface =>
+            {
+                var matchingTypeExpression = SourceCode
+                    .TypeExpressions
+                    .FirstOrDefault(type => type.TypeAccessor == @interface);
+
+                if (matchingTypeExpression != null)
+                {
+                    return (InterfaceExpression)matchingTypeExpression;
+                }
+
+                return new TypedInterfaceExpression(SourceCode, @interface);
+            });
+        }
+
+        #endregion
+
+        /// <summary>
         /// Gets the interface types implemented by this <see cref="TypeExpression"/>.
         /// </summary>
         public ReadOnlyCollection<Type> InterfaceTypes
             => _readOnlyInterfaceTypes ??= _interfaceTypes.ToReadOnlyCollection();
-
-        /// <summary>
-        /// Gets a <see cref="CommentExpression"/> describing this <see cref="TypeExpression"/>,
-        /// if a summary has been set.
-        /// </summary>
-        public CommentExpression Summary { get; private set; }
 
         /// <summary>
         /// Gets the name of this <see cref="TypeExpression"/>.
@@ -300,16 +348,10 @@
 
         internal void SetImplements(Type @interface)
         {
-            if (_interfaceTypes == null)
-            {
-                _interfaceTypes = new List<Type>();
-            }
-            else
-            {
-                _readOnlyInterfaceTypes = null;
-            }
-
+            _interfaceTypes ??= new List<Type>();
             _interfaceTypes.Add(@interface);
+            _readOnlyInterfaceTypeExpressions = null;
+            _readOnlyInterfaceTypes = null;
         }
 
         void ITypeExpressionConfigurator.SetSummary(CommentExpression summary)
@@ -336,6 +378,7 @@
             _genericParameters ??= new List<GenericParameterExpression>();
             _genericParameters.Add(parameter);
             _readOnlyGenericParameters = null;
+            ResetTypeIfRequired();
             return parameter;
         }
 
@@ -343,6 +386,7 @@
         {
             GenericArguments ??= new List<ClosedGenericTypeArgumentExpression>();
             GenericArguments.Add(argument);
+            ResetTypeIfRequired();
         }
 
         internal PropertyExpression AddProperty(

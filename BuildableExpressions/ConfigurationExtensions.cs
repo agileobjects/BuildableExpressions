@@ -247,15 +247,7 @@
         {
             return classConfig.AddProperty(implementedProperty, p =>
             {
-                if (implementedProperty.GetterExpression != null)
-                {
-                    p.SetGetter();
-                }
-
-                if (implementedProperty.SetterExpression != null)
-                {
-                    p.SetSetter();
-                }
+                Implement(implementedProperty, p);
             });
         }
 
@@ -327,6 +319,58 @@
             Type type)
         {
             return classConfig.AddProperty(name, type, PublicGetSet);
+        }
+
+        /// <summary>
+        /// Add an implementation or override of the given <paramref name="implementedProperty"/>
+        /// to the <see cref="StructExpression"/> by creating a public auto-property with the
+        /// appropriate accessor(s).
+        /// </summary>
+        /// <param name="structConfig">The <see cref="IStructImplementationConfigurator"/> to configure.</param>
+        /// <param name="implementedProperty">The <see cref="PropertyExpression"/> to implement.</param>
+        /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
+        public static PropertyExpression AddProperty(
+            this IStructImplementationConfigurator structConfig,
+            PropertyExpression implementedProperty)
+        {
+            return structConfig.AddProperty(implementedProperty, p =>
+            {
+                Implement(implementedProperty, p);
+            });
+        }
+
+        private static void Implement(
+            PropertyExpression property,
+            IConcreteTypePropertyExpressionConfigurator propertyConfig)
+        {
+            if (property.GetterExpression != null)
+            {
+                propertyConfig.SetGetter();
+            }
+
+            if (property.SetterExpression != null)
+            {
+                propertyConfig.SetSetter();
+            }
+        }
+
+        /// <summary>
+        /// Add an implementation or override of the given <paramref name="implementedProperty"/>
+        /// to the <see cref="StructExpression"/>, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="structConfig">The <see cref="IStructImplementationConfigurator"/> to configure.</param>
+        /// <param name="implementedProperty">The <see cref="PropertyExpression"/> to implement.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
+        public static PropertyExpression AddProperty(
+            this IStructImplementationConfigurator structConfig,
+            PropertyExpression implementedProperty,
+            Action<IConcreteTypePropertyExpressionConfigurator> configuration)
+        {
+            return structConfig.AddProperty(
+                implementedProperty.Name,
+                implementedProperty.Type,
+                configuration);
         }
 
         /// <summary>

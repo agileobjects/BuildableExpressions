@@ -82,6 +82,9 @@
         void IPropertySetterConfigurator.SetVisibility(MemberVisibility visibility)
             => SetVisibility(visibility);
 
+        internal new void SetVisibility(MemberVisibility visibility)
+            => base.SetVisibility(visibility);
+
         void IPropertyGetterConfigurator.SetBody(Expression body)
         {
             Body = body;

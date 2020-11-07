@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using BuildableExpressions.Extensions;
+    using ReadableExpressions.Extensions;
     using static System.Linq.Expressions.Expression;
 
     internal static class SourceCodeExtensions
@@ -59,6 +60,15 @@
 
                 return Lambda(lambdaType, expression, parameters);
             }
+        }
+
+        public static string GetTypedExpressionName(this Type type)
+        {
+            var name = type.GetFriendlyName();
+
+            return type.IsNested
+                ? name.Substring(name.LastIndexOf('.') + 1)
+                : name;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿#if NET_STANDARD
 namespace AgileObjects.BuildableExpressions.Compilation
 {
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -13,6 +14,13 @@ namespace AgileObjects.BuildableExpressions.Compilation
 
     internal class NetStandardCSharpCompiler : ICSharpCompiler
     {
+        private readonly ConcurrentDictionary<string, MetadataReference> _references;
+
+        public NetStandardCSharpCompiler()
+        {
+            _references = new ConcurrentDictionary<string, MetadataReference>();
+        }
+
         public CompilationResult Compile(
             IEnumerable<Assembly> referenceAssemblies,
             params string[] sourceCodes)
@@ -47,7 +55,7 @@ namespace AgileObjects.BuildableExpressions.Compilation
             return new CompilationResult { CompiledAssembly = compiledAssembly };
         }
 
-        private static IEnumerable<MetadataReference> CreateReferences(
+        private IEnumerable<MetadataReference> CreateReferences(
             IEnumerable<Assembly> passedInAssemblies)
         {
             var referencedAssemblies = CompilationAssemblies
@@ -69,7 +77,8 @@ namespace AgileObjects.BuildableExpressions.Compilation
             Assembly assembly,
             ICollection<Assembly> assemblies)
         {
-            if (assemblies.Contains(assembly))
+            if (string.IsNullOrEmpty(assembly.Location) ||
+                assemblies.Contains(assembly))
             {
                 return;
             }
@@ -82,8 +91,12 @@ namespace AgileObjects.BuildableExpressions.Compilation
             }
         }
 
-        private static MetadataReference CreateReference(Assembly assembly)
-            => MetadataReference.CreateFromFile(assembly.Location);
+        private MetadataReference CreateReference(Assembly assembly)
+        {
+            return _references.GetOrAdd(
+                assembly.Location,
+                loc => MetadataReference.CreateFromFile(loc));
+        }
     }
 }
 #endif

@@ -15,12 +15,9 @@
             string name,
             Type type,
             Action<InterfacePropertyExpression> configuration)
-            : base(
-                declaringInterfaceExpression,
-                name,
-                type,
-                p => configuration.Invoke((InterfacePropertyExpression)p))
+            : base(declaringInterfaceExpression, name, type)
         {
+            configuration.Invoke(this);
             SetVisibility(Public);
             SetAbstract();
         }

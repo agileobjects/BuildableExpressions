@@ -27,15 +27,41 @@
             string name,
             Type type,
             Action<PropertyExpression> configuration)
-            : base(declaringTypeExpression, name)
+            : this(declaringTypeExpression, name, type)
         {
-            Type = type;
             configuration.Invoke(this);
 
             if (!Visibility.HasValue)
             {
                 SetVisibility(Public);
             }
+
+            if (GetterExpression?.HasBody == false && SetterExpression == null)
+            {
+                SetSetter(s => s.SetVisibility(Private));
+            }
+
+            if (SetterExpression?.HasBody == false && GetterExpression == null)
+            {
+                SetGetter(s => s.SetVisibility(Private));
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyExpression"/> class.
+        /// </summary>
+        /// <param name="declaringTypeExpression">
+        /// This <see cref="PropertyExpression"/>'s parent <see cref="TypeExpression"/>.
+        /// </param>
+        /// <param name="name">The name of this <see cref="PropertyExpression"/>.</param>
+        /// <param name="type">The type of this <see cref="PropertyExpression"/>.</param>
+        protected PropertyExpression(
+            TypeExpression declaringTypeExpression,
+            string name,
+            Type type)
+            : base(declaringTypeExpression, name)
+        {
+            Type = type;
         }
 
         /// <summary>
