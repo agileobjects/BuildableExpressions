@@ -428,9 +428,17 @@
 
         #endregion
 
+        #region Translation
+
         /// <inheritdoc />
-        protected override ITranslation GetTranslation(ITranslationContext context)
+        protected override ITranslation GetFullTranslation(ITranslationContext context)
             => new MethodTranslation(this, context);
+
+        /// <inheritdoc />
+        protected override ITranslation GetTransientTranslation(ITranslationContext context)
+            => new TransientMethodTranslation(this, context);
+
+        #endregion
 
         internal void Update(Expression updatedBody)
         {

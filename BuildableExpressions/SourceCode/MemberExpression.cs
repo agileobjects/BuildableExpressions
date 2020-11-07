@@ -52,17 +52,34 @@
         public CommentExpression Summary { get; protected set; }
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
-            => GetTranslation(context);
+        {
+            return DeclaringTypeExpression.SourceCode.IsComplete
+                ? GetFullTranslation(context) : GetTransientTranslation(context);
+        }
 
         /// <summary>
         /// When overridden in a derived class, gets an <see cref="ITranslation"/> with which to
-        /// translate this <see cref="MemberExpression"/>.
+        /// translate this <see cref="MemberExpression"/>. This method is used if a
+        /// <see cref="TypeExpression"/> needs to generate its Type object once configuration is
+        /// complete.
         /// </summary>
         /// <param name="context">The ITranslationContext describing the current translation.</param>
         /// <returns>
-        /// An <see cref="ITranslation"/> with which to translate this
+        /// An <see cref="ITranslation"/> with which to fully translate this
         /// <see cref="MemberExpression"/>.
         /// </returns>
-        protected abstract ITranslation GetTranslation(ITranslationContext context);
+        protected abstract ITranslation GetFullTranslation(ITranslationContext context);
+
+        /// <summary>
+        /// When overridden in a derived class, gets an <see cref="ITranslation"/> with which to
+        /// minimally translate this <see cref="MemberExpression"/>. This method is used if a
+        /// <see cref="TypeExpression"/> needs to generate its Type object during configuration.
+        /// </summary>
+        /// <param name="context">The ITranslationContext describing the current translation.</param>
+        /// <returns>
+        /// An <see cref="ITranslation"/> with which to minimally translate this
+        /// <see cref="MemberExpression"/>.
+        /// </returns>
+        protected abstract ITranslation GetTransientTranslation(ITranslationContext context);
     }
 }

@@ -9,19 +9,21 @@
 
     internal class MethodTranslation : ITranslation
     {
-        private readonly MethodExpression _method;
+        private readonly MethodExpression _methodExpression;
         private readonly ITranslatable _summary;
         private readonly ITranslatable _definitionTranslation;
         private readonly bool _methodHasBody;
         private readonly ITranslation _bodyTranslation;
 
-        public MethodTranslation(MethodExpression method, ITranslationContext context)
+        public MethodTranslation(
+            MethodExpression methodExpression,
+            ITranslationContext context)
         {
-            _method = method;
-            _summary = SummaryTranslation.For(method.Summary, context);
+            _methodExpression = methodExpression;
+            _summary = SummaryTranslation.For(methodExpression.Summary, context);
 
             _definitionTranslation = new MethodDefinitionTranslation(
-                method,
+                methodExpression,
                 includeDeclaringType: false,
                 context.Settings);
 
@@ -33,16 +35,16 @@
                 _summary.FormattingSize +
                 _definitionTranslation.FormattingSize;
 
-            _methodHasBody = _method.HasBody;
+            _methodHasBody = _methodExpression.HasBody;
 
             if (_methodHasBody)
             {
                 var bodyCodeBlock = context
-                    .GetCodeBlockTranslationFor(method.Body)
+                    .GetCodeBlockTranslationFor(methodExpression.Body)
                     .WithBraces()
                     .WithTermination();
 
-                if (method.HasReturnType())
+                if (methodExpression.HasReturnType())
                 {
                     bodyCodeBlock.WithReturnKeyword();
                 }
@@ -56,9 +58,9 @@
             FormattingSize = formattingSize;
         }
 
-        public ExpressionType NodeType => _method.NodeType;
+        public ExpressionType NodeType => _methodExpression.NodeType;
 
-        public Type Type => _method.Type;
+        public Type Type => _methodExpression.Type;
 
         public int TranslationSize { get; }
 

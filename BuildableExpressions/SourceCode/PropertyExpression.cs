@@ -180,12 +180,16 @@
 
         #endregion
 
+        #region Translation
+
         /// <inheritdoc />
-        protected override ITranslation GetTranslation(ITranslationContext context)
-        {
-            return DeclaringTypeExpression.SourceCode.IsComplete
-                ? (ITranslation)new PropertyTranslation(this, context)
-                : new TransientPropertyTranslation(this, context);
-        }
+        protected override ITranslation GetFullTranslation(ITranslationContext context)
+            => new PropertyTranslation(this, context);
+
+        /// <inheritdoc />
+        protected override ITranslation GetTransientTranslation(ITranslationContext context)
+            => new TransientPropertyTranslation(this, context);
+
+        #endregion
     }
 }

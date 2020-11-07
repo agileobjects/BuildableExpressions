@@ -9,7 +9,7 @@
     internal class TransientPropertyTranslation : ITranslation
     {
         private readonly PropertyExpression _propertyExpression;
-        private readonly TypeNameTranslation _typeNameTranslation;
+        private readonly ITranslatable _typeNameTranslation;
         private readonly bool _writeModifiers;
         private readonly string _accessibility;
         private readonly string _modifiers;
@@ -83,7 +83,7 @@
 
         #endregion
 
-        public ExpressionType NodeType => ExpressionType.MemberAccess;
+        public ExpressionType NodeType => _propertyExpression.NodeType;
 
         public Type Type => _propertyExpression.Type;
 
