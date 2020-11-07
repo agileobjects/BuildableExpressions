@@ -234,6 +234,51 @@
         }
 
         /// <summary>
+        /// Add an implementation or override of the given <paramref name="implementedProperty"/>
+        /// to the <see cref="ClassExpression"/> by creating a public auto-property with the
+        /// appropriate accessor(s).
+        /// </summary>
+        /// <param name="classConfig">The <see cref="IClassImplementationConfigurator"/> to configure.</param>
+        /// <param name="implementedProperty">The <see cref="PropertyExpression"/> to implement.</param>
+        /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
+        public static PropertyExpression AddProperty(
+            this IClassImplementationConfigurator classConfig,
+            PropertyExpression implementedProperty)
+        {
+            return classConfig.AddProperty(implementedProperty, p =>
+            {
+                if (implementedProperty.GetterExpression != null)
+                {
+                    p.SetGetter();
+                }
+
+                if (implementedProperty.SetterExpression != null)
+                {
+                    p.SetSetter();
+                }
+            });
+        }
+
+        /// <summary>
+        /// Add an implementation or override of the given <paramref name="implementedProperty"/>
+        /// to the <see cref="ClassExpression"/>, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="classConfig">The <see cref="IClassImplementationConfigurator"/> to configure.</param>
+        /// <param name="implementedProperty">The <see cref="PropertyExpression"/> to implement.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
+        public static PropertyExpression AddProperty(
+            this IClassImplementationConfigurator classConfig,
+            PropertyExpression implementedProperty,
+            Action<IClassPropertyExpressionConfigurator> configuration)
+        {
+            return classConfig.AddProperty(
+                implementedProperty.Name,
+                implementedProperty.Type,
+                configuration);
+        }
+
+        /// <summary>
         /// Add a public, instance-scoped, get-set <see cref="PropertyExpression"/> to the
         /// <see cref="ClassExpression"/>, with the given <paramref name="name"/> and
         /// <typeparamref name="TProperty"/> type.

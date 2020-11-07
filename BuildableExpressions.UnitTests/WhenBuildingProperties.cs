@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using BuildableExpressions.SourceCode;
     using Common;
     using Xunit;
     using static System.Linq.Expressions.Expression;
@@ -166,9 +167,11 @@ namespace GeneratedExpressionCode
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
+                    var interfaceProperty = default(PropertyExpression);
+
                     var @interface = sc.AddInterface("IHasName", itf =>
                     {
-                        itf.AddProperty<string>("Name", p =>
+                        interfaceProperty = itf.AddProperty<string>("Name", p =>
                         {
                             p.SetGetter();
                         });
@@ -178,10 +181,7 @@ namespace GeneratedExpressionCode
                     {
                         cls.SetImplements(@interface, impl =>
                         {
-                            impl.AddProperty("Name", typeof(string), p =>
-                            {
-                                p.SetGetter();
-                            });
+                            impl.AddProperty(interfaceProperty);
                         });
                     });
                 })
