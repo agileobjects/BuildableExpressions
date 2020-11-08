@@ -24,7 +24,9 @@
     public abstract class MethodExpression :
         MemberExpression,
         IClassMethodExpressionConfigurator,
-        IMethod
+        IMethod,
+        IHasSignature,
+        IConcreteTypeExpression
     {
         private List<ParameterExpression> _parameters;
         private List<GenericParameterExpression> _genericParameters;
@@ -236,7 +238,7 @@
         #region IMethodExpressionConfigurator Members
 
         void IMethodExpressionConfigurator.SetSummary(CommentExpression summary)
-            => Summary = summary;
+            => SetSummary(summary);
 
         void IMethodExpressionConfigurator.SetVisibility(MemberVisibility visibility)
             => SetVisibility(visibility);
@@ -269,16 +271,8 @@
 
         void IConcreteTypeMethodExpressionConfigurator.SetStatic()
         {
-            ThrowIfAbstract();
+            this.ValidateSetStatic();
             SetStatic();
-        }
-
-        private void ThrowIfAbstract()
-        {
-            if (IsAbstract)
-            {
-                ThrowModifierConflict("abstract", "static");
-            }
         }
 
         void IConcreteTypeMethodExpressionConfigurator.SetBody(Expression body, Type returnType)
@@ -300,36 +294,8 @@
 
         void IClassMethodExpressionConfigurator.SetAbstract()
         {
-            ThrowIfNonAbstractClass();
-            ThrowIfStatic();
+            this.ValidateSetAbstract();
             SetAbstract();
-        }
-
-        private void ThrowIfNonAbstractClass()
-        {
-            if (((ClassExpression)DeclaringTypeExpression).IsAbstract)
-            {
-                return;
-            }
-
-            throw new InvalidOperationException(
-                $"Unable to add abstract method '{this.GetSignature(includeTypeName: false)}' " +
-                $"to non-abstract declaring type '{DeclaringTypeExpression.Name}'.");
-        }
-
-        private void ThrowIfStatic()
-        {
-            if (IsStatic)
-            {
-                ThrowModifierConflict("static", "abstract");
-            }
-        }
-
-        private void ThrowModifierConflict(string modifier, string conflictingModifier)
-        {
-            throw new InvalidOperationException(
-                $"Method '{this.GetSignature()}' cannot be " +
-                $"both {modifier} and {conflictingModifier}.");
         }
 
         /// <summary>
@@ -338,6 +304,8 @@
         protected void SetAbstract() => IsAbstract = true;
 
         #endregion
+
+        string IHasSignature.GetSignature() => this.GetSignature(includeTypeName: false);
 
         #region IMethod Members
 

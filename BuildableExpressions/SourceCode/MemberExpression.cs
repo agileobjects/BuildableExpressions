@@ -49,7 +49,19 @@
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="MemberExpression"/>,
         /// or null if no summary has been set.
         /// </summary>
-        public CommentExpression Summary { get; protected set; }
+        public CommentExpression Summary { get; private set; }
+
+        /// <summary>
+        /// Set the summary documentation of this <see cref="MemberExpression"/>.
+        /// </summary>
+        /// <param name="summary">
+        /// A <see cref="CommentExpression"/> containing summary documentation of the
+        /// <see cref="MemberExpression"/>.
+        /// </param>
+        protected void SetSummary(CommentExpression summary)
+            => Summary = summary;
+
+        #region Translation
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
         {
@@ -81,5 +93,7 @@
         /// <see cref="MemberExpression"/>.
         /// </returns>
         protected abstract ITranslation GetTransientTranslation(ITranslationContext context);
+
+        #endregion
     }
 }

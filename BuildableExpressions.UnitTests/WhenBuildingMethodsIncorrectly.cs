@@ -50,7 +50,7 @@
                 });
             });
 
-            methodEx.Message.ShouldContain("'void MyClass.MyMethod(string str)'");
+            methodEx.Message.ShouldContain("'void MyMethod(string str)'");
             methodEx.Message.ShouldContain("both abstract and static");
         }
 
@@ -76,7 +76,7 @@
                 });
             });
 
-            methodEx.Message.ShouldContain("'void MyClass.MyMethod(DateTime date, long number)'");
+            methodEx.Message.ShouldContain("'void MyMethod(DateTime date, long number)'");
             methodEx.Message.ShouldContain("both static and abstract");
         }
     }

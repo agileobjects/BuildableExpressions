@@ -4,11 +4,23 @@
     using System.Linq.Expressions;
     using System.Reflection;
     using Api;
+    using Extensions;
     using NetStandardPolyfills;
+    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
     using Translations;
     using static MemberVisibility;
+
+    internal interface IHasSignature
+    {
+        string GetSignature();
+    }
+
+    internal interface IConcreteTypeExpression
+    {
+        bool IsAbstract { get; }
+    }
 
     /// <summary>
     /// Represents a property in a type in a piece of source code.
@@ -16,7 +28,9 @@
     public class PropertyExpression :
         MemberExpression,
         IClassPropertyExpressionConfigurator,
-        IProperty
+        IProperty,
+        IHasSignature,
+        IConcreteTypeExpression
     {
         private IMember _getterMember;
         private IMember _setterMember;
@@ -141,11 +155,13 @@
 
         void IConcreteTypePropertyExpressionConfigurator.SetStatic()
         {
+            this.ValidateSetStatic();
             SetStatic();
         }
 
         void IClassPropertyExpressionConfigurator.SetAbstract()
         {
+            this.ValidateSetAbstract();
             SetAbstract();
         }
 
@@ -189,6 +205,8 @@
         }
 
         #endregion
+
+        string IHasSignature.GetSignature() => Type.GetFriendlyName() + " " + Name;
 
         #region IProperty Members
 
