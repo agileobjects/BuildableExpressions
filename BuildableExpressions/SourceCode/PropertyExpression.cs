@@ -183,6 +183,8 @@
         /// <param name="configuration">The configuration to use.</param>
         protected void SetGetter(Action<PropertyAccessorExpression> configuration)
         {
+            ThrowIfDuplicateAccessor(_getterMember);
+
             _getterMember = GetterExpression = new PropertyAccessorExpression(this, isGetter: true);
             configuration.Invoke(GetterExpression);
         }
@@ -200,13 +202,30 @@
         /// <param name="configuration">The configuration to use.</param>
         protected void SetSetter(Action<PropertyAccessorExpression> configuration)
         {
+            ThrowIfDuplicateAccessor(_setterMember);
+
             _setterMember = SetterExpression = new PropertyAccessorExpression(this, isGetter: false);
             configuration.Invoke(SetterExpression);
         }
 
+        private void ThrowIfDuplicateAccessor(IMember accessorMember)
+        {
+            if (accessorMember == null)
+            {
+                return;
+            }
+
+            var accessor = accessorMember == _getterMember ? "get" : "set";
+
+            throw new InvalidOperationException(
+                $"Property '{GetSignature()}' has multiple {accessor} accessors configured.");
+        }
+
         #endregion
 
-        string IHasSignature.GetSignature() => Type.GetFriendlyName() + " " + Name;
+        string IHasSignature.GetSignature() => GetSignature();
+
+        private string GetSignature() => Type.GetFriendlyName() + " " + Name;
 
         #region IProperty Members
 

@@ -468,8 +468,8 @@
         }
 
         /// <summary>
-        /// Add auto-property accessors with the given <paramref name="getterVisibility"/> and
-        /// <paramref name="setterVisibility"/> to the <see cref="PropertyExpression"/>.
+        /// Add auto-property get and set accessors with the given <paramref name="getterVisibility"/>
+        /// and <paramref name="setterVisibility"/> to the <see cref="PropertyExpression"/>.
         /// </summary>
         /// <param name="propertyConfig">
         /// The <see cref="IConcreteTypePropertyExpressionConfigurator"/> to configure.

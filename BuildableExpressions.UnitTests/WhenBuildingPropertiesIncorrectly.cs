@@ -75,5 +75,71 @@
             propertyEx.Message.ShouldContain("'long MyProperty'");
             propertyEx.Message.ShouldContain("both static and abstract");
         }
+
+        [Fact]
+        public void ShouldErrorIfStructAutoPropertyGivenGetter()
+        {
+            var propertyEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddStruct("MyStruct", str =>
+                    {
+                        str.AddProperty<int>("Prop", p =>
+                        {
+                            p.SetAutoProperty();
+                            p.SetGetter();
+                        });
+                    });
+                });
+            });
+
+            propertyEx.Message.ShouldContain("'int Prop'");
+            propertyEx.Message.ShouldContain("multiple get accessors configured");
+        }
+
+        [Fact]
+        public void ShouldErrorIfInterfacePropertyGivenMultipleSetters()
+        {
+            var propertyEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddInterface("INameable", itf =>
+                    {
+                        itf.AddProperty<string>("Name", p =>
+                        {
+                            p.SetSetter();
+                            p.SetSetter();
+                        });
+                    });
+                });
+            });
+
+            propertyEx.Message.ShouldContain("'string Name'");
+            propertyEx.Message.ShouldContain("multiple set accessors configured");
+        }
+
+        [Fact]
+        public void ShouldErrorIfClassGetPropertyMadeAutoProperty()
+        {
+            var propertyEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("MyTestClass", cls =>
+                    {
+                        cls.AddProperty<TimeSpan>("Prop", p =>
+                        {
+                            p.SetGetter();
+                            p.SetAutoProperty();
+                        });
+                    });
+                });
+            });
+
+            propertyEx.Message.ShouldContain("'TimeSpan Prop'");
+            propertyEx.Message.ShouldContain("multiple get accessors configured");
+        }
     }
 }
