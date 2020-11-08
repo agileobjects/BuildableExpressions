@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Linq.Expressions;
     using Api;
     using ReadableExpressions.Translations;
     using Translations;
@@ -27,6 +28,13 @@
             _members = new Dictionary<string, int>();
             configuration.Invoke(this);
         }
+
+        /// <summary>
+        /// Gets the <see cref="SourceCodeExpressionType"/> value (1002) indicating the type of this
+        /// <see cref="MethodExpression"/> as an ExpressionType.
+        /// </summary>
+        public override ExpressionType NodeType
+            => (ExpressionType)SourceCodeExpressionType.Enum;
 
         /// <summary>
         /// Gets the members belonging to this <see cref="EnumExpression"/>.

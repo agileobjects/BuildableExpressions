@@ -26,7 +26,7 @@
         }
 
         /// <summary>
-        /// Gets the <see cref="SourceCodeExpressionType"/> value (1006) indicating the type of this
+        /// Gets the <see cref="SourceCodeExpressionType"/> value (1008) indicating the type of this
         /// <see cref="PropertyAccessorExpression"/> as an ExpressionType.
         /// </summary>
         public override ExpressionType NodeType

@@ -15,7 +15,7 @@
     public static class ConfigurationExtensions
     {
         /// <summary>
-        /// Adds a new <see cref="EnumExpression"/> to this <see cref="SourceCodeExpression"/>.
+        /// Adds a public <see cref="EnumExpression"/> to this <see cref="SourceCodeExpression"/>.
         /// </summary>
         /// <param name="sourceCodeConfig">The <see cref="ISourceCodeExpressionConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="EnumExpression"/>.</param>

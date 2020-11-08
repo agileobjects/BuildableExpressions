@@ -12,16 +12,6 @@
     using Translations;
     using static MemberVisibility;
 
-    internal interface IHasSignature
-    {
-        string GetSignature();
-    }
-
-    internal interface IConcreteTypeExpression
-    {
-        bool IsAbstract { get; }
-    }
-
     /// <summary>
     /// Represents a property in a type in a piece of source code.
     /// </summary>
@@ -79,7 +69,7 @@
         }
 
         /// <summary>
-        /// Gets the <see cref="SourceCodeExpressionType"/> value (1005) indicating the type of this
+        /// Gets the <see cref="SourceCodeExpressionType"/> value (1007) indicating the type of this
         /// <see cref="PropertyExpression"/> as an ExpressionType.
         /// </summary>
         public override ExpressionType NodeType
