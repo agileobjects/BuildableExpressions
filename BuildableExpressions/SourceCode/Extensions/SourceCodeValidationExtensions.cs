@@ -54,16 +54,8 @@
         public static void ValidateSetStatic<TMember>(this TMember memberExpression)
             where TMember : MemberExpression, IConcreteTypeExpression, IHasSignature
         {
-            memberExpression.ThrowIfAbstract();
-        }
-
-        private static void ThrowIfAbstract<TMember>(this TMember memberExpression)
-            where TMember : MemberExpression, IConcreteTypeExpression, IHasSignature
-        {
-            if (memberExpression.IsAbstract)
-            {
-                memberExpression.ThrowModifierConflict("abstract", "static");
-            }
+            memberExpression.ThrowIfAbstract("static");
+            memberExpression.ThrowIfVirtual("static");
         }
 
         public static void ValidateSetAbstract<TMember>(
@@ -71,7 +63,8 @@
             where TMember : MemberExpression, IConcreteTypeExpression, IHasSignature
         {
             memberExpression.ThrowIfNonAbstractClass();
-            memberExpression.ThrowIfStatic();
+            memberExpression.ThrowIfStatic("abstract");
+            memberExpression.ThrowIfVirtual("abstract");
         }
 
         private static void ThrowIfNonAbstractClass<TMember>(this TMember memberExpression)
@@ -93,12 +86,43 @@
                 $"to non-abstract declaring type '{declaringTypeExpression.Name}'.");
         }
 
-        private static void ThrowIfStatic<TMember>(this TMember memberExpression)
+        public static void ValidateSetVirtual<TMember>(this TMember memberExpression)
+            where TMember : MemberExpression, IConcreteTypeExpression, IHasSignature
+        {
+            memberExpression.ThrowIfStatic("virtual");
+            memberExpression.ThrowIfAbstract("virtual");
+        }
+
+        private static void ThrowIfStatic<TMember>(
+            this TMember memberExpression,
+            string conflictingModifier)
             where TMember : MemberExpression, IHasSignature
         {
             if (memberExpression.IsStatic)
             {
-                memberExpression.ThrowModifierConflict("static", "abstract");
+                memberExpression.ThrowModifierConflict("static", conflictingModifier);
+            }
+        }
+
+        private static void ThrowIfAbstract<TMember>(
+            this TMember memberExpression,
+            string conflictingModifier)
+            where TMember : MemberExpression, IConcreteTypeExpression, IHasSignature
+        {
+            if (memberExpression.IsAbstract)
+            {
+                memberExpression.ThrowModifierConflict("abstract", conflictingModifier);
+            }
+        }
+
+        private static void ThrowIfVirtual<TMember>(
+            this TMember memberExpression,
+            string conflictingModifier)
+            where TMember : MemberExpression, IConcreteTypeExpression, IHasSignature
+        {
+            if (memberExpression.IsVirtual)
+            {
+                memberExpression.ThrowModifierConflict("virtual", conflictingModifier);
             }
         }
 

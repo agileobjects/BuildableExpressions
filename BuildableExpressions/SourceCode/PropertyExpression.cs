@@ -96,6 +96,11 @@
         public bool IsAbstract { get; private set; }
 
         /// <summary>
+        /// Gets a value indicating whether this <see cref="PropertyExpression"/> is virtual.
+        /// </summary>
+        public bool IsVirtual { get; private set; }
+
+        /// <summary>
         /// Gets a value indicating whether this <see cref="PropertyExpression"/> represents an
         /// auto-property.
         /// </summary>
@@ -218,8 +223,6 @@
         private string GetSignature() => Type.GetFriendlyName() + " " + Name;
 
         #region IProperty Members
-
-        bool IComplexMember.IsVirtual { get; }
 
         bool IComplexMember.IsOverride { get; }
 

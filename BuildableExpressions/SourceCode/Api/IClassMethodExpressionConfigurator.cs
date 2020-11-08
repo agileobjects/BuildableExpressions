@@ -18,6 +18,20 @@
         /// <exception cref="InvalidOperationException">
         /// Thrown if this <see cref="MethodExpression"/> has already been marked as static.
         /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this <see cref="MethodExpression"/> has already been marked as virtual.
+        /// </exception>
         void SetAbstract();
+
+        /// <summary>
+        /// Mark the <see cref="MethodExpression"/> as virtual.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this <see cref="MethodExpression"/> has already been marked as static.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this <see cref="MethodExpression"/> has already been marked as abstract.
+        /// </exception>
+        void SetVirtual();
     }
 }

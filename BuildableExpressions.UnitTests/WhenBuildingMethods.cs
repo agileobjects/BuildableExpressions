@@ -6,6 +6,7 @@
     using Common;
     using NetStandardPolyfills;
     using Xunit;
+    using static System.Linq.Expressions.Expression;
 
     public class WhenBuildingMethods : TestClassBase
     {
@@ -443,6 +444,37 @@ namespace GeneratedExpressionCode
     public abstract class BaseClass
     {
         public abstract void AbstractMethod();
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAVirtualMethod()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("MyClass", cls =>
+                    {
+                        cls.AddMethod("VirtualMethod", m =>
+                        {
+                            m.SetVirtual();
+                            m.SetBody(Default(typeof(void)));
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public class MyClass
+    {
+        public virtual void VirtualMethod()
+        {
+        }
     }
 }";
             EXPECTED.ShouldCompile();

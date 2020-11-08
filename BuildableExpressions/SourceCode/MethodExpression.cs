@@ -96,6 +96,11 @@
         /// </summary>
         public bool IsAbstract { get; private set; }
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="MethodExpression"/> is virtual.
+        /// </summary>
+        public bool IsVirtual { get; private set; }
+
         /// <inheritdoc cref="MemberExpression" />
         public override string Name => _name;
 
@@ -301,15 +306,25 @@
         /// <summary>
         /// Mark this <see cref="MethodExpression"/> as abstract.
         /// </summary>
-        protected void SetAbstract() => IsAbstract = true;
+        protected void SetAbstract()
+        {
+            IsAbstract = true;
+            SetVirtual();
+        }
+
+        void IClassMethodExpressionConfigurator.SetVirtual()
+        {
+            this.ValidateSetVirtual();
+            SetVirtual();
+        }
+
+        private void SetVirtual() => IsVirtual = true;
 
         #endregion
 
         string IHasSignature.GetSignature() => this.GetSignature(includeTypeName: false);
 
         #region IMethod Members
-
-        bool IComplexMember.IsVirtual => false;
 
         bool IComplexMember.IsOverride => false;
 

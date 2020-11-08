@@ -3,5 +3,7 @@
     internal interface IConcreteTypeExpression
     {
         bool IsAbstract { get; }
+        
+        bool IsVirtual { get; }
     }
 }

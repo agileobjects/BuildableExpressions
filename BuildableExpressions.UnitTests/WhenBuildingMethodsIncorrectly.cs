@@ -197,6 +197,30 @@
         }
 
         [Fact]
+        public void ShouldErrorIfClassMethodMarkedBothAbstractAndVirtual()
+        {
+            var methodEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("MyClass", cls =>
+                    {
+                        cls.SetAbstract();
+
+                        cls.AddMethod("MyMethod", m =>
+                        {
+                            m.SetAbstract();
+                            m.SetVirtual();
+                        });
+                    });
+                });
+            });
+
+            methodEx.Message.ShouldContain("'void MyMethod()'");
+            methodEx.Message.ShouldContain("both abstract and virtual");
+        }
+
+        [Fact]
         public void ShouldErrorIfClassMethodMarkedBothStaticAndAbstract()
         {
             var methodEx = Should.Throw<InvalidOperationException>(() =>
@@ -220,6 +244,78 @@
 
             methodEx.Message.ShouldContain("'void MyMethod(DateTime date, long number)'");
             methodEx.Message.ShouldContain("both static and abstract");
+        }
+
+        [Fact]
+        public void ShouldErrorIfClassMethodMarkedBothStaticAndVirtual()
+        {
+            var methodEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("MyClass", cls =>
+                    {
+                        cls.AddMethod("MyMethod", m =>
+                        {
+                            m.AddParameter(Parameter(typeof(DateTime), "date"));
+                            m.SetStatic();
+                            m.SetVirtual();
+                        });
+                    });
+                });
+            });
+
+            methodEx.Message.ShouldContain("'void MyMethod(DateTime date)'");
+            methodEx.Message.ShouldContain("both static and virtual");
+        }
+
+        [Fact]
+        public void ShouldErrorIfClassMethodMarkedBothVirtualAndAbstract()
+        {
+            var methodEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("MyClass", cls =>
+                    {
+                        cls.SetAbstract();
+
+                        cls.AddMethod("MyMethod", m =>
+                        {
+                            m.AddParameter(Parameter(typeof(DateTime), "date"));
+                            m.AddParameter(Parameter(typeof(long), "number"));
+                            m.SetVirtual();
+                            m.SetAbstract();
+                        });
+                    });
+                });
+            });
+
+            methodEx.Message.ShouldContain("'void MyMethod(DateTime date, long number)'");
+            methodEx.Message.ShouldContain("both virtual and abstract");
+        }
+
+        [Fact]
+        public void ShouldErrorIfClassMethodMarkedBothVirtualAndStatic()
+        {
+            var methodEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("MyClass", cls =>
+                    {
+                        cls.AddMethod("MyMethod", m =>
+                        {
+                            m.AddParameter(Parameter(typeof(long), "number"));
+                            m.SetVirtual();
+                            m.SetStatic();
+                        });
+                    });
+                });
+            });
+
+            methodEx.Message.ShouldContain("'void MyMethod(long number)'");
+            methodEx.Message.ShouldContain("both virtual and static");
         }
 
         [Fact]
