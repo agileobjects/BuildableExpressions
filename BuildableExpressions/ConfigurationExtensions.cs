@@ -234,6 +234,19 @@
         }
 
         /// <summary>
+        /// Add a member to the <see cref="EnumExpression"/> with the given <paramref name="name"/>
+        /// and an auto-generated value.
+        /// </summary>
+        /// <param name="enumConfig">The <see cref="IEnumExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the enum member.</param>
+        public static void AddMember(
+            this IEnumExpressionConfigurator enumConfig,
+            string name)
+        {
+            enumConfig.AddMembers(name);
+        }
+
+        /// <summary>
         /// Add a public, instance-scoped, get-set <see cref="PropertyExpression"/> to the
         /// <see cref="InterfaceExpression"/>, with the given <paramref name="name"/> and
         /// <typeparamref name="TProperty"/> type.

@@ -205,6 +205,35 @@
         }
 
         [Fact]
+        public void ShouldBuildAnEnumType()
+        {
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddEnum("Title", enm =>
+                {
+                    enm.AddMember("Dr");
+                    enm.AddMember("Mr");
+                    enm.AddMember("Mrs");
+                });
+            });
+
+            var @enum = sourceCode.TypeExpressions.FirstOrDefault().ShouldNotBeNull();
+
+            @enum.Type.ShouldNotBeNull();
+            @enum.Type.Name.ShouldBe("Title");
+            @enum.Type.IsValueType().ShouldBeTrue();
+            @enum.Type.IsGenericType().ShouldBeFalse();
+            @enum.Type.IsEnum().ShouldBeTrue();
+
+            Enum.IsDefined(@enum.Type, "Dr").ShouldBeTrue();
+            Enum.IsDefined(@enum.Type, 0).ShouldBeTrue();
+            Enum.IsDefined(@enum.Type, "Mr").ShouldBeTrue();
+            Enum.IsDefined(@enum.Type, 1).ShouldBeTrue();
+            Enum.IsDefined(@enum.Type, "Mrs").ShouldBeTrue();
+            Enum.IsDefined(@enum.Type, 2).ShouldBeTrue();
+        }
+
+        [Fact]
         public void ShouldCreateAParameterlessVoidClassMethodInfo()
         {
             var sourceCode = BuildableExpression.SourceCode(sc =>
