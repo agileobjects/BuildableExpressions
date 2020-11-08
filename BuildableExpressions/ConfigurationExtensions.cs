@@ -15,6 +15,24 @@
     public static class ConfigurationExtensions
     {
         /// <summary>
+        /// Adds a new <see cref="EnumExpression"/> to this <see cref="SourceCodeExpression"/>.
+        /// </summary>
+        /// <param name="sourceCodeConfig">The <see cref="ISourceCodeExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="EnumExpression"/>.</param>
+        /// <param name="memberNames">The names of the members of the new <see cref="EnumExpression"/>.</param>
+        /// <returns>The newly-created <see cref="EnumExpression"/>.</returns>
+        public static EnumExpression AddEnum(
+            this ISourceCodeExpressionConfigurator sourceCodeConfig,
+            string name,
+            params string[] memberNames)
+        {
+            return sourceCodeConfig.AddEnum(name, enm =>
+            {
+                enm.AddMembers(memberNames);
+            });
+        }
+
+        /// <summary>
         /// Set the summary documentation of the <see cref="TypeExpression"/>.
         /// </summary>
         /// <param name="typeConfig">The <see cref="ITypeExpressionConfigurator"/> to configure.</param>

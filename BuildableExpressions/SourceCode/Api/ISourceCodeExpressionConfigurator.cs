@@ -56,5 +56,15 @@
         /// </param>
         /// <returns>The newly-created <see cref="StructExpression"/>.</returns>
         StructExpression AddStruct(string name, Action<IStructExpressionConfigurator> configuration);
+
+        /// <summary>
+        /// Adds a new <see cref="EnumExpression"/> to this <see cref="SourceCodeExpression"/>.
+        /// </summary>
+        /// <param name="name">The name of the <see cref="EnumExpression"/>.</param>
+        /// <param name="configuration">
+        /// The configuration with which to configure the new <see cref="EnumExpression"/>.
+        /// </param>
+        /// <returns>The newly-created <see cref="EnumExpression"/>.</returns>
+        EnumExpression AddEnum(string name, Action<IEnumExpressionConfigurator> configuration);
     }
 }

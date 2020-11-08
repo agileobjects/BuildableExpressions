@@ -46,7 +46,8 @@
 
             var formattingSize =
                 _summaryTranslation.FormattingSize +
-                keywordFormattingSize; // <- for accessibility + type name
+                keywordFormattingSize + // <- for accessibility, modifiers + type string
+                keywordFormattingSize;  // <- for type name
 
             if (_isGenericType)
             {

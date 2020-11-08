@@ -5,7 +5,7 @@
     /// <summary>
     /// Provides options to configure an <see cref="InterfaceExpression"/>.
     /// </summary>
-    public interface IInterfaceExpressionConfigurator : ITypeExpressionConfigurator
+    public interface IInterfaceExpressionConfigurator : ITypeableTypeExpressionConfigurator
     {
         /// <summary>
         /// Configures the <see cref="InterfaceExpression"/> to implement the given

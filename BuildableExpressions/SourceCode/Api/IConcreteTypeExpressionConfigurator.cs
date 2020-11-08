@@ -6,7 +6,7 @@
     /// <summary>
     /// Provides options to configure a <see cref="ConcreteTypeExpression"/>.
     /// </summary>
-    public interface IConcreteTypeExpressionConfigurator : ITypeExpressionConfigurator
+    public interface IConcreteTypeExpressionConfigurator : ITypeableTypeExpressionConfigurator
     {
         /// <summary>
         /// Gets an Expression to use to refer to the instance of the type being created in the

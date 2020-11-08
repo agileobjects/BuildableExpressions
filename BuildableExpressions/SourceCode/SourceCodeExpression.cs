@@ -217,6 +217,13 @@
             return Add(new StructExpression(this, name, configuration));
         }
 
+        EnumExpression ISourceCodeExpressionConfigurator.AddEnum(
+            string name,
+            Action<IEnumExpressionConfigurator> configuration)
+        {
+            return Add(new EnumExpression(this, name, configuration));
+        }
+
         internal TType Add<TType>(TType type)
             where TType : TypeExpression
         {

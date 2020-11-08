@@ -23,7 +23,7 @@
     /// </summary>
     public abstract class TypeExpression :
         Expression,
-        ITypeExpressionConfigurator,
+        ITypeableTypeExpressionConfigurator,
         ICustomTranslationExpression
     {
         private List<GenericParameterExpression> _genericParameters;
@@ -83,7 +83,7 @@
             {
                 sourceCode.Add(typeExpression);
             }
-            
+
             sourceCode.Add(this);
 
             var compiledTypes = sourceCode
