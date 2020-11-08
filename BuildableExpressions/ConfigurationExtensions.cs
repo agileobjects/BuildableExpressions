@@ -8,6 +8,7 @@
     using SourceCode;
     using SourceCode.Api;
     using SourceCode.Generics;
+    using static SourceCode.MemberVisibility;
 
     /// <summary>
     /// Provides extension methods for easier API use.
@@ -475,9 +476,10 @@
         /// </param>
         public static void SetGetter(
             this IConcreteTypePropertyExpressionConfigurator propertyConfig,
-            MemberVisibility visibility = MemberVisibility.Public)
+            MemberVisibility? visibility = null)
         {
-            propertyConfig.SetGetter(p => p.SetVisibility(visibility));
+            propertyConfig.SetGetter(p => p.SetVisibility(
+                visibility ?? ((PropertyExpression)propertyConfig).Visibility ?? Public));
         }
 
         /// <summary>
@@ -493,9 +495,10 @@
         /// </param>
         public static void SetSetter(
             this IConcreteTypePropertyExpressionConfigurator propertyConfig,
-            MemberVisibility visibility = MemberVisibility.Public)
+            MemberVisibility? visibility = null)
         {
-            propertyConfig.SetSetter(p => p.SetVisibility(visibility));
+            propertyConfig.SetSetter(p => p.SetVisibility(
+                visibility ?? ((PropertyExpression)propertyConfig).Visibility ?? Public));
         }
 
         /// <summary>
@@ -518,8 +521,8 @@
         /// </param>
         public static void SetAutoProperty(
             this IConcreteTypePropertyExpressionConfigurator propertyConfig,
-            MemberVisibility getterVisibility = MemberVisibility.Public,
-            MemberVisibility setterVisibility = MemberVisibility.Public,
+            MemberVisibility? getterVisibility = null,
+            MemberVisibility? setterVisibility = null,
             bool isStatic = false)
         {
             if (isStatic)
@@ -527,8 +530,8 @@
                 propertyConfig.SetStatic();
             }
 
-            propertyConfig.SetGetter(p => p.SetVisibility(getterVisibility));
-            propertyConfig.SetSetter(p => p.SetVisibility(setterVisibility));
+            propertyConfig.SetGetter(getterVisibility);
+            propertyConfig.SetSetter(setterVisibility);
         }
 
         /// <summary>

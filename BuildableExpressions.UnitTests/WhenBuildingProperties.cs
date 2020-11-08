@@ -285,5 +285,67 @@ namespace GeneratedExpressionCode
             EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
+
+        [Fact]
+        public void ShouldBuildAnAbstractClassAbstractProperty()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("BaseClass", cls =>
+                    {
+                        cls.SetAbstract();
+
+                        cls.AddProperty<string>("AbstractProperty", p =>
+                        {
+                            p.SetVisibility(Protected);
+                            p.SetAbstract();
+                            p.SetGetter();
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public abstract class BaseClass
+    {
+        protected abstract string AbstractProperty { get; }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAVirtualProperty()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("MyClass", cls =>
+                    {
+                        cls.AddProperty<int>("VirtualProperty", p =>
+                        {
+                            p.SetVisibility(ProtectedInternal);
+                            p.SetVirtual();
+                            p.SetGetter();
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public class MyClass
+    {
+        protected internal virtual int VirtualProperty { get; private set; }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
     }
 }

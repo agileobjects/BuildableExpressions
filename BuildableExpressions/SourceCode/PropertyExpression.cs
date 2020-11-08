@@ -6,6 +6,7 @@
     using Api;
     using Extensions;
     using NetStandardPolyfills;
+    using ReadableExpressions;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
@@ -38,6 +39,11 @@
             if (!Visibility.HasValue)
             {
                 SetVisibility(Public);
+            }
+
+            if (IsAbstract)
+            {
+                return;
             }
 
             if (GetterExpression?.HasBody == false && SetterExpression == null)
@@ -143,10 +149,17 @@
 
         #endregion
 
-        #region IClassPropertyExpressionConfigurator Members
+        #region IMemberExpressionConfigurator Members
 
-        void IPropertyExpressionConfigurator.SetVisibility(MemberVisibility visibility)
+        void IMemberExpressionConfigurator.SetSummary(CommentExpression summary)
+            => SetSummary(summary);
+
+        void IMemberExpressionConfigurator.SetVisibility(MemberVisibility visibility)
             => SetVisibility(visibility);
+
+        #endregion
+
+        #region IConcreteTypePropertyExpressionConfigurator Members
 
         void IConcreteTypePropertyExpressionConfigurator.SetStatic()
         {
@@ -154,7 +167,11 @@
             SetStatic();
         }
 
-        void IClassPropertyExpressionConfigurator.SetAbstract()
+        #endregion
+
+        #region IClassMemberExpressionConfigurator Members
+
+        void IClassMemberExpressionConfigurator.SetAbstract()
         {
             this.ValidateSetAbstract();
             SetAbstract();
@@ -163,7 +180,19 @@
         /// <summary>
         /// Mark this <see cref="PropertyExpression"/> as abstract.
         /// </summary>
-        protected void SetAbstract() => IsAbstract = true;
+        protected void SetAbstract()
+        {
+            IsAbstract = true;
+            SetVirtual();
+        }
+
+        void IClassMemberExpressionConfigurator.SetVirtual()
+        {
+            this.ValidateSetVirtual();
+            SetVirtual();
+        }
+
+        private void SetVirtual() => IsVirtual = true;
 
         void IConcreteTypePropertyExpressionConfigurator.SetGetter(
             Action<IPropertyGetterConfigurator> configuration)

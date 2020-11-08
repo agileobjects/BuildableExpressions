@@ -240,13 +240,17 @@
 
         #endregion
 
-        #region IMethodExpressionConfigurator Members
+        #region IMemberExpressionConfigurator Members
 
-        void IMethodExpressionConfigurator.SetSummary(CommentExpression summary)
+        void IMemberExpressionConfigurator.SetSummary(CommentExpression summary)
             => SetSummary(summary);
 
-        void IMethodExpressionConfigurator.SetVisibility(MemberVisibility visibility)
+        void IMemberExpressionConfigurator.SetVisibility(MemberVisibility visibility)
             => SetVisibility(visibility);
+
+        #endregion
+
+        #region IMethodExpressionConfigurator Members
 
         void IMethodExpressionConfigurator.AddParameters(
             params ParameterExpression[] parameters)
@@ -295,9 +299,9 @@
 
         #endregion
 
-        #region IClassMethodExpressionConfigurator
+        #region IClassMemberExpressionConfigurator
 
-        void IClassMethodExpressionConfigurator.SetAbstract()
+        void IClassMemberExpressionConfigurator.SetAbstract()
         {
             this.ValidateSetAbstract();
             SetAbstract();
@@ -312,7 +316,7 @@
             SetVirtual();
         }
 
-        void IClassMethodExpressionConfigurator.SetVirtual()
+        void IClassMemberExpressionConfigurator.SetVirtual()
         {
             this.ValidateSetVirtual();
             SetVirtual();

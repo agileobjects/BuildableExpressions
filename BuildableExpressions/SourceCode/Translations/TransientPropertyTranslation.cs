@@ -46,24 +46,25 @@
 
         #region Setup
 
-        private string CreateGetter(IMember accessor)
+        private string CreateGetter(IMember getter)
         {
-            return CreateAccessor(accessor, "get", acc =>
+            return CreateAccessor(getter, acc =>
                 "{return default(" + acc.Type.GetFriendlyName() + ")}");
         }
 
-        private string CreateSetter(IMember accessor)
-            => CreateAccessor(accessor, "set", _ => "{}");
+        private string CreateSetter(IMember setter)
+            => CreateAccessor(setter, _ => "{}");
 
         private string CreateAccessor(
             IMember accessor,
-            string accessorName,
             Func<IMember, string> bodyFactory)
         {
             if (accessor == null)
             {
                 return string.Empty;
             }
+
+            var accessorName = accessor == _propertyExpression.GetterExpression ? "get" : "set";
 
             var accessorTranslation = accessorName + (_propertyExpression.IsAutoProperty
                 ? ";" : bodyFactory.Invoke(accessor));

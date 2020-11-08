@@ -3,8 +3,8 @@
     using System;
 
     /// <summary>
-    /// Provides options to configure a <see cref="MethodExpression"/> for a
-    /// <see cref="ClassExpression"/>.
+    /// Provides options to add a <see cref="PropertyExpression"/> or <see cref="MethodExpression"/>
+    /// to a <see cref="ClassExpression"/>.
     /// </summary>
     public interface IClassMemberConfigurator
     {

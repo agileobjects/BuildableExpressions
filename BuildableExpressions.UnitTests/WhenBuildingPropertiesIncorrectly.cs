@@ -53,6 +53,30 @@
         }
 
         [Fact]
+        public void ShouldErrorIfClassPropertyMarkedBothAbstractAndVirtual()
+        {
+            var propertyEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("MyClass", cls =>
+                    {
+                        cls.SetAbstract();
+
+                        cls.AddProperty("MyProperty", typeof(DateTime), p =>
+                        {
+                            p.SetAbstract();
+                            p.SetVirtual();
+                        });
+                    });
+                });
+            });
+
+            propertyEx.Message.ShouldContain("'DateTime MyProperty'");
+            propertyEx.Message.ShouldContain("both abstract and virtual");
+        }
+
+        [Fact]
         public void ShouldErrorIfClassPropertyMarkedBothStaticAndAbstract()
         {
             var propertyEx = Should.Throw<InvalidOperationException>(() =>
@@ -74,6 +98,74 @@
 
             propertyEx.Message.ShouldContain("'long MyProperty'");
             propertyEx.Message.ShouldContain("both static and abstract");
+        }
+
+        [Fact]
+        public void ShouldErrorIfClassPropertyMarkedBothStaticAndVirtual()
+        {
+            var propertyEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("MyClass", cls =>
+                    {
+                        cls.AddProperty<long>("MyProperty", p =>
+                        {
+                            p.SetStatic();
+                            p.SetVirtual();
+                        });
+                    });
+                });
+            });
+
+            propertyEx.Message.ShouldContain("'long MyProperty'");
+            propertyEx.Message.ShouldContain("both static and virtual");
+        }
+
+        [Fact]
+        public void ShouldErrorIfClassPropertyMarkedBothVirtualAndStatic()
+        {
+            var propertyEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("MyClass", cls =>
+                    {
+                        cls.AddProperty<long>("MyProperty", p =>
+                        {
+                            p.SetVirtual();
+                            p.SetStatic();
+                        });
+                    });
+                });
+            });
+
+            propertyEx.Message.ShouldContain("'long MyProperty'");
+            propertyEx.Message.ShouldContain("both virtual and static");
+        }
+
+        [Fact]
+        public void ShouldErrorIfClassPropertyMarkedBothVirtualAndAbstract()
+        {
+            var propertyEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("MyClass", cls =>
+                    {
+                        cls.SetAbstract();
+
+                        cls.AddProperty<long>("MyProperty", p =>
+                        {
+                            p.SetVirtual();
+                            p.SetAbstract();
+                        });
+                    });
+                });
+            });
+
+            propertyEx.Message.ShouldContain("'long MyProperty'");
+            propertyEx.Message.ShouldContain("both virtual and abstract");
         }
 
         [Fact]
