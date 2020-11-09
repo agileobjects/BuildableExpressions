@@ -6,6 +6,7 @@
     using AgileObjects.BuildableExpressions.SourceCode.Extensions;
     using Common;
     using NetStandardPolyfills;
+    using ReadableExpressions.Translations.Reflection;
     using Xunit;
     using static System.Linq.Expressions.Expression;
 
@@ -288,15 +289,28 @@
             var property = @struct
                 .PropertyExpressions
                 .FirstOrDefault()
-                .ShouldNotBeNull()
-                .PropertyInfo
                 .ShouldNotBeNull();
 
-            property.DeclaringType.ShouldBe(@struct.Type);
-            property.PropertyType.ShouldBe(typeof(string));
-            property.Name.ShouldBe("Name");
-            property.IsPublic().ShouldBeTrue();
-            property.IsStatic().ShouldBeFalse();
+            var iProperty = (IProperty)property;
+            iProperty.IsReadable.ShouldBeTrue();
+            iProperty.Getter.ShouldNotBeNull();
+            iProperty.Getter.IsPublic.ShouldBeTrue();
+            iProperty.Getter.Type.ShouldBe(typeof(string));
+            iProperty.Getter.Name.ShouldBe("get");
+            iProperty.IsWritable.ShouldBeTrue();
+            iProperty.Setter.ShouldNotBeNull();
+            iProperty.Setter.IsPublic.ShouldBeTrue();
+            iProperty.Setter.Type.ShouldBe(typeof(void));
+            iProperty.Setter.Name.ShouldBe("set");
+
+            var propertyInfo = property
+                .PropertyInfo.ShouldNotBeNull();
+
+            propertyInfo.DeclaringType.ShouldBe(@struct.Type);
+            propertyInfo.PropertyType.ShouldBe(typeof(string));
+            propertyInfo.Name.ShouldBe("Name");
+            propertyInfo.IsPublic().ShouldBeTrue();
+            propertyInfo.IsStatic().ShouldBeFalse();
         }
 
         [Fact]
