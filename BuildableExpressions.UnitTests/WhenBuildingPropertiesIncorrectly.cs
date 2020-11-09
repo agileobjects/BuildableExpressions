@@ -3,6 +3,7 @@
     using System;
     using Common;
     using Xunit;
+    using static BuildableExpressions.SourceCode.MemberVisibility;
 
     public class WhenBuildingPropertiesIncorrectly
     {
@@ -232,6 +233,54 @@
 
             propertyEx.Message.ShouldContain("'TimeSpan Prop'");
             propertyEx.Message.ShouldContain("multiple get accessors configured");
+        }
+
+        [Fact]
+        public void ShouldErrorIfInternalPropertyGivenPublicGetter()
+        {
+            var propertyEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("MyTestClass", cls =>
+                    {
+                        cls.AddProperty<TimeSpan>("Duration", p =>
+                        {
+                            p.SetVisibility(Internal);
+                            p.SetGetter(Public);
+                        });
+                    });
+                });
+            });
+
+            propertyEx.Message.ShouldContain("'TimeSpan Duration'");
+            propertyEx.Message.ShouldContain("with visibility 'internal'");
+            propertyEx.Message.ShouldContain("cannot have a get accessor");
+            propertyEx.Message.ShouldContain("less restrictive visibility 'public'");
+        }
+
+        [Fact]
+        public void ShouldErrorIfPrivateProtectedPropertyGivenInternalSetter()
+        {
+            var propertyEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("MyTestClass", cls =>
+                    {
+                        cls.AddProperty<TimeSpan>("Duration", p =>
+                        {
+                            p.SetVisibility(PrivateProtected);
+                            p.SetSetter(Internal);
+                        });
+                    });
+                });
+            });
+
+            propertyEx.Message.ShouldContain("'TimeSpan Duration'");
+            propertyEx.Message.ShouldContain("with visibility 'private protected'");
+            propertyEx.Message.ShouldContain("cannot have a set accessor");
+            propertyEx.Message.ShouldContain("less restrictive visibility 'internal'");
         }
     }
 }

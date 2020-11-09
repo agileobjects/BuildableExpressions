@@ -211,6 +211,8 @@
 
             _getterMember = GetterExpression = new PropertyAccessorExpression(this, isGetter: true);
             configuration.Invoke(GetterExpression);
+
+            ThrowIfInvalidVisibility(GetterExpression);
         }
 
         void IConcreteTypePropertyExpressionConfigurator.SetSetter(
@@ -230,6 +232,8 @@
 
             _setterMember = SetterExpression = new PropertyAccessorExpression(this, isGetter: false);
             configuration.Invoke(SetterExpression);
+
+            ThrowIfInvalidVisibility(SetterExpression);
         }
 
         private void ThrowIfDuplicateAccessor(IMember accessorMember)
@@ -243,6 +247,23 @@
 
             throw new InvalidOperationException(
                 $"Property '{GetSignature()}' has multiple {accessor} accessors configured.");
+        }
+
+        private void ThrowIfInvalidVisibility(PropertyAccessorExpression accessorExpression)
+        {
+            if ((accessorExpression.Visibility ?? Public) >= (Visibility ?? Public))
+            {
+                return;
+            }
+
+            var visibility = this.GetAccessibility();
+            var accessor = accessorExpression.Name;
+            var accessorVisibility = accessorExpression.GetAccessibility();
+
+            throw new InvalidOperationException(
+                $"Property '{GetSignature()}' with visibility '{visibility}' " +
+                $"cannot have a {accessor} accessor with " +
+                $"less restrictive visibility '{accessorVisibility}'");
         }
 
         #endregion
