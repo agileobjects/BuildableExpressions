@@ -28,6 +28,8 @@
     {
         private List<GenericParameterExpression> _genericParameters;
         private ReadOnlyCollection<GenericParameterExpression> _readOnlyGenericParameters;
+        private readonly List<MemberExpression> _memberExpressions;
+        private ReadOnlyCollection<MemberExpression> _readOnlyMemberExpressions;
         private List<PropertyExpression> _propertyExpressions;
         private ReadOnlyCollection<PropertyExpression> _readOnlyPropertyExpressions;
         private List<MethodExpression> _methodExpressions;
@@ -49,6 +51,7 @@
         {
             SourceCode = sourceCode;
             Name = name.ThrowIfInvalidName<ArgumentException>("Type");
+            _memberExpressions = new List<MemberExpression>();
         }
 
         /// <summary>
@@ -206,6 +209,15 @@
             get;
             private set;
         }
+
+        /// <summary>
+        /// Gets the <see cref="MemberExpression"/>s which describe this
+        /// <see cref="TypeExpression"/>'s properties and methods.
+        /// </summary>
+        public ReadOnlyCollection<MemberExpression> MemberExpressions
+            => _readOnlyMemberExpressions ??= _memberExpressions.ToReadOnlyCollection();
+
+        internal ICollection<MemberExpression> MemberExpressionsAccessor => _memberExpressions;
 
         /// <summary>
         /// Gets the <see cref="PropertyExpression"/>s which describe this
@@ -392,9 +404,9 @@
         internal PropertyExpression AddProperty(
             string name,
             Type type,
-            Action<PropertyExpression> configuration)
+            Action<StandardPropertyExpression> configuration)
         {
-            return AddProperty(new PropertyExpression(this, name, type, configuration));
+            return AddProperty(new StandardPropertyExpression(this, name, type, configuration));
         }
 
         /// <summary>
@@ -407,7 +419,7 @@
             _propertyExpressions ??= new List<PropertyExpression>();
             _propertyExpressions.Add(property);
             _readOnlyPropertyExpressions = null;
-            ResetTypeIfRequired();
+            AddMember(property);
             return property;
         }
 
@@ -450,8 +462,15 @@
             _methodExpressions ??= new List<MethodExpression>();
             _methodExpressions.Add(method);
             _readOnlyMethodExpressions = null;
-            ResetTypeIfRequired();
+            AddMember(method);
             return method;
+        }
+
+        private void AddMember(MemberExpression member)
+        {
+            _memberExpressions.Add(member);
+            _readOnlyMemberExpressions = null;
+            ResetTypeIfRequired();
         }
 
         private void ResetTypeIfRequired()

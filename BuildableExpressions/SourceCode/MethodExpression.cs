@@ -101,6 +101,12 @@
         /// </summary>
         public bool IsVirtual { get; private set; }
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="MethodExpression"/> overrides a method
+        /// from a base type.
+        /// </summary>
+        public abstract bool IsOverride { get; }
+
         /// <inheritdoc cref="MemberExpression" />
         public override string Name => _name;
 
@@ -330,7 +336,7 @@
 
         #region IMethod Members
 
-        bool IComplexMember.IsOverride => false;
+        bool IComplexMember.IsOverride => IsOverride;
 
         bool IMethod.IsGenericMethod => IsGeneric;
 

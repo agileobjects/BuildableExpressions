@@ -20,6 +20,8 @@
 
         internal override bool HasBody => true;
 
+        public override bool IsOverride => false;
+
         public Expression CallExpression { get; }
 
         public void Finalise() => SetName(GetName());

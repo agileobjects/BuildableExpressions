@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using static System.StringComparison;
 
     internal static class SourceCodeValidationExtensions
     {
@@ -143,6 +144,11 @@
         {
             var memberName = typeof(TMember).Name;
             var memberType = memberName.Substring(0, memberName.Length - "Expression".Length);
+
+            if (memberType.StartsWith("Standard", Ordinal))
+            {
+                memberType = memberType.Substring("Standard".Length);
+            }
 
             return memberType;
         }

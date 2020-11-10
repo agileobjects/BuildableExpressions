@@ -22,6 +22,8 @@
             SetAbstract();
         }
 
+        public override bool IsOverride => false;
+
         public override bool IsAutoProperty => true;
 
         #region IInterfacePropertyExpressionConfigurator Members

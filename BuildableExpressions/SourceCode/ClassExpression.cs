@@ -12,6 +12,7 @@
     public abstract class ClassExpression : ConcreteTypeExpression
     {
         private ClassExpression _baseTypeExpression;
+        private Type _baseType;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassExpression"/> class.
@@ -27,7 +28,7 @@
             string name)
             : base(sourceCode, name)
         {
-            BaseType = baseType;
+            _baseType = baseType;
         }
 
         /// <summary>
@@ -50,7 +51,10 @@
         /// derives. If no base type has been set, returns null.
         /// </summary>
         public ClassExpression BaseTypeExpression
-            => _baseTypeExpression ??= GetBaseTypeExpressionOrNull();
+        {
+            get => _baseTypeExpression ??= GetBaseTypeExpressionOrNull();
+            protected set => _baseTypeExpression = value;
+        }
 
         #region BaseTypeExpression Creation
 
@@ -63,14 +67,10 @@
 
             var configuredBaseTypeExpression = (ClassExpression)SourceCode
                 .TypeExpressions
-                .FirstOrDefault(t => t.TypeAccessor == BaseType);
+                .FirstOrDefault(t => t.TypeAccessor == _baseType);
 
-            if (configuredBaseTypeExpression != null)
-            {
-                return configuredBaseTypeExpression;
-            }
-
-            return new TypedClassExpression(SourceCode, BaseType);
+            return configuredBaseTypeExpression ??
+                   new TypedClassExpression(SourceCode, _baseType);
         }
 
         #endregion
@@ -79,13 +79,17 @@
         /// Gets the base type from which this <see cref="ClassExpression"/> derives. If no base
         /// type has been set, returns typeof(System.Object).
         /// </summary>
-        public Type BaseType { get; protected set; }
+        public Type BaseType
+        {
+            get => _baseType ??= BaseTypeExpression.Type;
+            protected set => _baseType = value;
+        }
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="ClassExpression"/> has the default
         /// System.Object base type.
         /// </summary>
-        protected bool HasObjectBaseType => BaseType == typeof(object);
+        protected bool HasObjectBaseType => _baseType == typeof(object);
 
         /// <summary>
         /// Gets the non-object <see cref="BaseTypeExpression"/> and <see cref="InterfaceExpression"/>s
@@ -117,7 +121,7 @@
             {
                 if (!HasObjectBaseType)
                 {
-                    yield return BaseType;
+                    yield return _baseType;
                 }
 
                 foreach (var @interface in base.ImplementedTypes)

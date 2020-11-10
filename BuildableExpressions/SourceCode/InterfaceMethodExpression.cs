@@ -37,6 +37,8 @@
 
         internal override bool HasBody => false;
 
+        public override bool IsOverride => false;
+
         public override ReadOnlyCollection<ParameterExpression> Parameters
             => ParametersAccessor.ToReadOnlyCollection();
 

@@ -354,6 +354,43 @@
         }
 
         /// <summary>
+        /// Add an override of the given <paramref name="overriddenProperty"/> to the
+        /// <see cref="ClassExpression"/> by creating a public auto-property with the appropriate
+        /// accessor(s).
+        /// </summary>
+        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="overriddenProperty">The <see cref="PropertyExpression"/> to override.</param>
+        /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
+        public static PropertyExpression AddProperty(
+            this IClassExpressionConfigurator classConfig,
+            PropertyExpression overriddenProperty)
+        {
+            return classConfig.AddProperty(overriddenProperty, p =>
+            {
+                Implement(overriddenProperty, p);
+            });
+        }
+
+        /// <summary>
+        /// Add an override of the given <paramref name="overriddenProperty"/> to the
+        /// <see cref="ClassExpression"/>, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="overriddenProperty">The <see cref="PropertyExpression"/> to override.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
+        public static PropertyExpression AddProperty(
+            this IClassExpressionConfigurator classConfig,
+            PropertyExpression overriddenProperty,
+            Action<IClassPropertyExpressionConfigurator> configuration)
+        {
+            return classConfig.AddProperty(
+                overriddenProperty.Name,
+                overriddenProperty.Type,
+                configuration);
+        }
+
+        /// <summary>
         /// Add an implementation or override of the given <paramref name="implementedProperty"/>
         /// to the <see cref="StructExpression"/> by creating a public auto-property with the
         /// appropriate accessor(s).
@@ -456,15 +493,15 @@
             return structConfig.AddProperty(name, type, PublicGetSet);
         }
 
-        private static void PublicGetSet(
-            IConcreteTypePropertyExpressionConfigurator propertyConfig)
+        internal static void PublicGetSet(
+            this IConcreteTypePropertyExpressionConfigurator propertyConfig)
         {
             propertyConfig.SetGetter();
             propertyConfig.SetSetter();
         }
 
         /// <summary>
-        /// Add an auto-property getter with the given <paramref name="visibility"/> to the
+        /// Add an auto-property getter with the optional given <paramref name="visibility"/> to the
         /// <see cref="PropertyExpression"/>.
         /// </summary>
         /// <param name="propertyConfig">
@@ -483,7 +520,7 @@
         }
 
         /// <summary>
-        /// Add an auto-property setter with the given <paramref name="visibility"/> to the
+        /// Add an auto-property setter with the optional given <paramref name="visibility"/> to the
         /// <see cref="PropertyExpression"/>.
         /// </summary>
         /// <param name="propertyConfig">

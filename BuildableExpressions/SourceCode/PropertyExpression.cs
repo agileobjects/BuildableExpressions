@@ -3,10 +3,7 @@
     using System;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Api;
-    using Extensions;
     using NetStandardPolyfills;
-    using ReadableExpressions;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
@@ -16,46 +13,14 @@
     /// <summary>
     /// Represents a property in a type in a piece of source code.
     /// </summary>
-    public class PropertyExpression :
+    public abstract class PropertyExpression :
         MemberExpression,
-        IClassPropertyExpressionConfigurator,
         IProperty,
-        IHasSignature,
-        IConcreteTypeExpression
+        IHasSignature
     {
         private IMember _getterMember;
         private IMember _setterMember;
         private PropertyInfo _propertyInfo;
-
-        internal PropertyExpression(
-            TypeExpression declaringTypeExpression,
-            string name,
-            Type type,
-            Action<PropertyExpression> configuration)
-            : this(declaringTypeExpression, name, type)
-        {
-            configuration.Invoke(this);
-
-            if (!Visibility.HasValue)
-            {
-                SetVisibility(Public);
-            }
-
-            if (IsAbstract)
-            {
-                return;
-            }
-
-            if (GetterExpression?.HasBody == false && SetterExpression == null)
-            {
-                SetSetter(s => s.SetVisibility(Private));
-            }
-
-            if (SetterExpression?.HasBody == false && GetterExpression == null)
-            {
-                SetGetter(s => s.SetVisibility(Private));
-            }
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyExpression"/> class.
@@ -107,11 +72,16 @@
         public bool IsVirtual { get; private set; }
 
         /// <summary>
+        /// Gets a value indicating whether this <see cref="PropertyExpression"/> overrides a base
+        /// type property.
+        /// </summary>
+        public abstract bool IsOverride { get; }
+
+        /// <summary>
         /// Gets a value indicating whether this <see cref="PropertyExpression"/> represents an
         /// auto-property.
         /// </summary>
-        public virtual bool IsAutoProperty
-            => GetterExpression?.HasBody != true && SetterExpression?.HasBody != true;
+        public abstract bool IsAutoProperty { get; }
 
         /// <summary>
         /// Gets a <see cref="PropertyAccessorExpression"/> describing this
@@ -149,33 +119,9 @@
 
         #endregion
 
-        #region IMemberExpressionConfigurator Members
+        string IHasSignature.GetSignature() => GetSignature();
 
-        void IMemberExpressionConfigurator.SetSummary(CommentExpression summary)
-            => SetSummary(summary);
-
-        void IMemberExpressionConfigurator.SetVisibility(MemberVisibility visibility)
-            => SetVisibility(visibility);
-
-        #endregion
-
-        #region IConcreteTypePropertyExpressionConfigurator Members
-
-        void IConcreteTypePropertyExpressionConfigurator.SetStatic()
-        {
-            this.ValidateSetStatic();
-            SetStatic();
-        }
-
-        #endregion
-
-        #region IClassMemberExpressionConfigurator Members
-
-        void IClassMemberExpressionConfigurator.SetAbstract()
-        {
-            this.ValidateSetAbstract();
-            SetAbstract();
-        }
+        private string GetSignature() => Type.GetFriendlyName() + " " + Name;
 
         /// <summary>
         /// Mark this <see cref="PropertyExpression"/> as abstract.
@@ -186,19 +132,10 @@
             SetVirtual();
         }
 
-        void IClassMemberExpressionConfigurator.SetVirtual()
-        {
-            this.ValidateSetVirtual();
-            SetVirtual();
-        }
-
-        private void SetVirtual() => IsVirtual = true;
-
-        void IConcreteTypePropertyExpressionConfigurator.SetGetter(
-            Action<IPropertyGetterConfigurator> configuration)
-        {
-            SetGetter(configuration);
-        }
+        /// <summary>
+        /// Mark this <see cref="PropertyExpression"/> as virtual.
+        /// </summary>
+        protected void SetVirtual() => IsVirtual = true;
 
         /// <summary>
         /// Add a getter to this <see cref="PropertyExpression"/>, using the given
@@ -213,12 +150,6 @@
             configuration.Invoke(GetterExpression);
 
             ThrowIfInvalidVisibility(GetterExpression);
-        }
-
-        void IConcreteTypePropertyExpressionConfigurator.SetSetter(
-            Action<IPropertySetterConfigurator> configuration)
-        {
-            SetSetter(configuration);
         }
 
         /// <summary>
@@ -266,15 +197,9 @@
                 $"less restrictive visibility '{accessorVisibility}'");
         }
 
-        #endregion
-
-        string IHasSignature.GetSignature() => GetSignature();
-
-        private string GetSignature() => Type.GetFriendlyName() + " " + Name;
-
         #region IProperty Members
 
-        bool IComplexMember.IsOverride { get; }
+        bool IComplexMember.IsOverride => IsOverride;
 
         bool IProperty.IsReadable => _getterMember?.IsPublic == true;
 
