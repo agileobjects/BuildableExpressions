@@ -23,16 +23,16 @@
     /// </summary>
     public abstract class MethodExpression :
         MemberExpression,
-        IClassMethodExpressionConfigurator,
+        IConcreteTypeMethodExpressionConfigurator,
         IMethod,
         IHasSignature,
         IConcreteTypeExpression
     {
         private List<ParameterExpression> _parameters;
         private List<GenericParameterExpression> _genericParameters;
-        private ReadOnlyCollection<GenericParameterExpression> _readonlyGenericParameters;
-        private ReadOnlyCollection<IGenericArgument> _readonlyGenericArguments;
-        private ReadOnlyCollection<IParameter> _readonlyParameters;
+        private ReadOnlyCollection<GenericParameterExpression> _readOnlyGenericParameters;
+        private ReadOnlyCollection<IGenericArgument> _readOnlyGenericArguments;
+        private ReadOnlyCollection<IParameter> _readOnlyParameters;
         private MethodInfo _methodInfo;
         private string _name;
 
@@ -42,15 +42,10 @@
         /// <param name="declaringTypeExpression">
         /// This <see cref="MethodExpression"/>'s parent <see cref="TypeExpression"/>.</param>
         /// <param name="name">The name of this <see cref="MethodExpression"/>.</param>
-        /// <param name="configuration">The configuration to use.</param>
-        protected MethodExpression(
-            TypeExpression declaringTypeExpression,
-            string name,
-            Action<MethodExpression> configuration)
+        protected MethodExpression(TypeExpression declaringTypeExpression, string name)
             : base(declaringTypeExpression, name)
         {
             _name = name;
-            configuration.Invoke(this);
         }
 
         /// <summary>
@@ -125,7 +120,7 @@
         {
             get
             {
-                return _readonlyGenericParameters ??= IsGeneric
+                return _readOnlyGenericParameters ??= IsGeneric
                     ? _genericParameters.ToReadOnlyCollection()
                     : Enumerable<GenericParameterExpression>.EmptyReadOnlyCollection;
             }
@@ -178,8 +173,8 @@
         /// Gets the <see cref="ParameterExpression"/>s describing the parameters of this
         /// <see cref="MethodExpression"/>, if any.
         /// </summary>
-        public virtual ReadOnlyCollection<ParameterExpression> Parameters
-            => Definition?.Parameters ?? Enumerable<ParameterExpression>.EmptyReadOnlyCollection;
+        public ReadOnlyCollection<ParameterExpression> Parameters
+            => Definition?.Parameters ?? _parameters.ToReadOnlyCollection();
 
         internal IList<ParameterExpression> ParametersAccessor => _parameters;
 
@@ -200,8 +195,8 @@
             var parameter = new ConfiguredOpenGenericArgumentExpression(name, configuration);
 
             _genericParameters ??= new List<GenericParameterExpression>();
-            _readonlyGenericParameters = null;
-            _readonlyGenericArguments = null;
+            _readOnlyGenericParameters = null;
+            _readOnlyGenericArguments = null;
 
             _genericParameters.Add(parameter);
             return parameter;
@@ -258,11 +253,8 @@
 
         #region IMethodExpressionConfigurator Members
 
-        void IMethodExpressionConfigurator.AddParameters(
-            params ParameterExpression[] parameters)
-        {
-            AddParameters(parameters);
-        }
+        void IMethodExpressionConfigurator.AddParameters(params ParameterExpression[] parameters)
+            => AddParameters(parameters);
 
         private void AddParameters(IList<ParameterExpression> parameters)
         {
@@ -278,11 +270,12 @@
             }
 
             _parameters.AddRange(parameters.Except(_parameters));
+            _readOnlyParameters = null;
         }
 
         #endregion
 
-        #region IConcreteTypeMethodExpressionConfigurator
+        #region IConcreteTypeMethodExpressionConfigurator Members
 
         void IConcreteTypeMethodExpressionConfigurator.SetStatic()
         {
@@ -305,14 +298,6 @@
 
         #endregion
 
-        #region IClassMemberExpressionConfigurator
-
-        void IClassMemberExpressionConfigurator.SetAbstract()
-        {
-            this.ValidateSetAbstract();
-            SetAbstract();
-        }
-
         /// <summary>
         /// Mark this <see cref="MethodExpression"/> as abstract.
         /// </summary>
@@ -322,15 +307,10 @@
             SetVirtual();
         }
 
-        void IClassMemberExpressionConfigurator.SetVirtual()
-        {
-            this.ValidateSetVirtual();
-            SetVirtual();
-        }
-
-        private void SetVirtual() => IsVirtual = true;
-
-        #endregion
+        /// <summary>
+        /// Mark this <see cref="MethodExpression"/> as virtual.
+        /// </summary>
+        protected void SetVirtual() => IsVirtual = true;
 
         string IHasSignature.GetSignature() => this.GetSignature(includeTypeName: false);
 
@@ -346,16 +326,16 @@
 
         ReadOnlyCollection<IGenericArgument> IMethod.GetGenericArguments()
         {
-            return _readonlyGenericArguments ??= IsGeneric
+            return _readOnlyGenericArguments ??= IsGeneric
                 ? _genericParameters.ProjectToArray(arg => (IGenericArgument)arg).ToReadOnlyCollection()
                 : Enumerable<IGenericArgument>.EmptyReadOnlyCollection;
         }
 
         ReadOnlyCollection<IParameter> IMethod.GetParameters()
         {
-            if (_readonlyParameters != null)
+            if (_readOnlyParameters != null)
             {
-                return _readonlyParameters;
+                return _readOnlyParameters;
             }
 
             var parameters = Definition?.Parameters ?? (IList<ParameterExpression>)_parameters;
@@ -366,7 +346,7 @@
 
             if (Definition != null)
             {
-                _readonlyParameters = readonlyParameters;
+                _readOnlyParameters = readonlyParameters;
             }
 
             return readonlyParameters;

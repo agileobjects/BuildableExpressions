@@ -1,10 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
-    using System.Collections.ObjectModel;
-    using System.Linq.Expressions;
     using Analysis;
-    using Extensions;
     using ReadableExpressions.Translations.Reflection;
 
     internal class InterfaceMethodExpression :
@@ -16,8 +13,10 @@
             string name,
             Type returnType,
             Action<MethodExpression> configuration)
-            : base(declaringInterfaceExpression, name, configuration)
+            : base(declaringInterfaceExpression, name)
         {
+            configuration.Invoke(this);
+
             ReturnType = returnType;
             SetAbstract();
             Analysis = MethodExpressionAnalysis.For(this);
@@ -38,9 +37,6 @@
         internal override bool HasBody => false;
 
         public override bool IsOverride => false;
-
-        public override ReadOnlyCollection<ParameterExpression> Parameters
-            => ParametersAccessor.ToReadOnlyCollection();
 
         bool IPotentialInterfaceMember.IsInterfaceMember => true;
     }

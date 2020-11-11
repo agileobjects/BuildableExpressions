@@ -29,7 +29,6 @@
         {
             _typeExpressions = new List<TypeExpression>();
             Namespace = @namespace;
-            Analysis = SourceCodeAnalysis.For(this);
         }
 
         internal SourceCodeExpression(Action<ISourceCodeExpressionConfigurator> configuration)
@@ -40,7 +39,7 @@
             configuration.Invoke(this);
             Validate();
 
-            Analysis = SourceCodeAnalysis.For(this);
+            Analyse();
             IsComplete = true;
         }
 
@@ -65,7 +64,7 @@
 
         internal bool IsComplete { get; }
 
-        internal SourceCodeAnalysis Analysis { get; }
+        internal SourceCodeAnalysis Analysis { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="SourceCodeExpressionType"/> value (1000) indicating the type of this
@@ -230,6 +229,11 @@
             _typeExpressions.Add(type);
             _readOnlyTypeExpressions = null;
             return type;
+        }
+
+        internal void Analyse()
+        {
+            Analysis = SourceCodeAnalysis.For(this);
         }
 
         #endregion

@@ -39,7 +39,8 @@
         {
             if (typeExpression is ClassExpression classExpression)
             {
-                return classExpression.GetAllVirtualMembersOfType<TMemberExpression>();
+                return classExpression.BaseTypeExpression
+                    .GetAllVirtualMembersOfType<TMemberExpression>();
             }
 
             return Enumerable<TMemberExpression>.EmptyArray;
@@ -49,19 +50,22 @@
             this ClassExpression classExpression)
             where TMemberExpression : IConcreteTypeExpression
         {
+            if (classExpression == null)
+            {
+                yield break;
+            }
+
             var candidateMembers = classExpression
                 .MemberExpressionsAccessor
                 .OfType<TMemberExpression>()
-                .Where(m => m.IsVirtual);
+                .Filter(m => m.IsVirtual)
+                .Concat(classExpression.BaseTypeExpression
+                    .GetAllVirtualMembersOfType<TMemberExpression>());
 
-            if (classExpression.BaseTypeExpression != null)
+            foreach (var candidateMember in candidateMembers)
             {
-                candidateMembers = candidateMembers
-                    .Concat(classExpression.BaseTypeExpression
-                        .GetAllVirtualMembersOfType<TMemberExpression>());
+                yield return candidateMember;
             }
-
-            return candidateMembers;
         }
     }
 }

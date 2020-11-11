@@ -84,12 +84,6 @@
 
         #region IClassMemberExpressionConfigurator Members
 
-        void IClassMemberExpressionConfigurator.SetAbstract()
-        {
-            this.ValidateSetAbstract();
-            SetAbstract();
-        }
-
         void IClassMemberExpressionConfigurator.SetVirtual()
         {
             this.ValidateSetVirtual();
@@ -106,6 +100,16 @@
             Action<IPropertySetterConfigurator> configuration)
         {
             SetSetter(configuration);
+        }
+
+        #endregion
+
+        #region IClassPropertyExpressionConfigurator Members
+
+        void IClassPropertyExpressionConfigurator.SetAbstract()
+        {
+            this.ValidateSetAbstract();
+            SetAbstract();
         }
 
         #endregion

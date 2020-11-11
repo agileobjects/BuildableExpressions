@@ -11,8 +11,9 @@
         public BlockMethodExpression(
             TypeExpression declaringTypeExpression,
             Action<MethodExpression> configuration)
-            : base(declaringTypeExpression, name: null, configuration)
+            : base(declaringTypeExpression, name: null)
         {
+            configuration.Invoke(this);
             CallExpression = new BlockMethodCallExpression(this);
         }
 

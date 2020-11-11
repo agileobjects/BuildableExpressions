@@ -9,21 +9,6 @@
     public interface IClassMemberExpressionConfigurator
     {
         /// <summary>
-        /// Mark the class <see cref="MemberExpression"/> as abstract.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown if the <see cref="ClassExpression"/> which declares the class
-        /// <see cref="MemberExpression"/> has not been marked as abstract.
-        /// </exception>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown if the class <see cref="MemberExpression"/> has already been marked as static.
-        /// </exception>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown if the class <see cref="MemberExpression"/> has already been marked as virtual.
-        /// </exception>
-        void SetAbstract();
-
-        /// <summary>
         /// Mark the class <see cref="MemberExpression"/> as virtual.
         /// </summary>
         /// <exception cref="InvalidOperationException">

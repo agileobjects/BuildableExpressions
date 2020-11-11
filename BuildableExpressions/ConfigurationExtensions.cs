@@ -424,6 +424,18 @@
         }
 
         /// <summary>
+        /// Set the summary documentation of the <see cref="SourceCode.MemberExpression"/>.
+        /// </summary>
+        /// <param name="memberConfig">The <see cref="IMemberExpressionConfigurator"/> to configure.</param>
+        /// <param name="summary">The summary documentation of the <see cref="SourceCode.MemberExpression"/>.</param>
+        public static void SetSummary(
+            this IMemberExpressionConfigurator memberConfig,
+            string summary)
+        {
+            memberConfig.SetSummary(ReadableExpression.Comment(summary));
+        }
+
+        /// <summary>
         /// Add an implementation or override of the given <paramref name="implementedProperty"/>
         /// to the <see cref="StructExpression"/>, using the given <paramref name="configuration"/>.
         /// </summary>
@@ -612,6 +624,30 @@
         }
 
         /// <summary>
+        /// Add an override of the given <paramref name="overriddenMethod"/> to the
+        /// <see cref="ClassExpression"/>, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="classConfig">The <see cref="IClassImplementationConfigurator"/> to configure.</param>
+        /// <param name="overriddenMethod">The <see cref="MethodExpression"/> to override.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
+        public static MethodExpression AddMethod(
+            this IClassImplementationConfigurator classConfig,
+            MethodExpression overriddenMethod,
+            Action<IClassMethodExpressionConfigurator> configuration)
+        {
+            return classConfig.AddMethod(overriddenMethod.Name, m =>
+            {
+                if (overriddenMethod.ParametersAccessor != null)
+                {
+                    m.AddParameters(overriddenMethod.ParametersAccessor);
+                }
+
+                configuration.Invoke(m);
+            });
+        }
+
+        /// <summary>
         /// Add a parameterless <see cref="MethodExpression"/> to the
         /// <see cref="InterfaceExpression"/>, with the given <paramref name="name"/> and
         /// <paramref name="returnType"/>.
@@ -725,6 +761,45 @@
         }
 
         /// <summary>
+        /// Add an override of the given <paramref name="overriddenMethod"/> to the
+        /// <see cref="ClassExpression"/>, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="overriddenMethod">The <see cref="MethodExpression"/> to override.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
+        public static MethodExpression AddMethod(
+            this IClassExpressionConfigurator classConfig,
+            MethodExpression overriddenMethod,
+            Action<IClassMethodExpressionConfigurator> configuration)
+        {
+            return classConfig.AddMethod(overriddenMethod.Name, m =>
+            {
+                if (overriddenMethod.ParametersAccessor != null)
+                {
+                    m.AddParameters(overriddenMethod.ParametersAccessor);
+                }
+
+                configuration.Invoke(m);
+            });
+        }
+
+        /// <summary>
+        /// Add an unconstrained <see cref="GenericParameterExpression"/> with the given
+        /// <paramref name="name"/> to the <see cref="TypeExpression"/> or
+        /// <see cref="MethodExpression"/>.
+        /// </summary>
+        /// <param name="methodConfig">The <see cref="IGenericParameterConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="GenericParameterExpression"/>.</param>
+        /// <returns>The newly-created <see cref="GenericParameterExpression"/>.</returns>
+        public static GenericParameterExpression AddGenericParameter(
+            this IGenericParameterConfigurator methodConfig,
+            string name)
+        {
+            return methodConfig.AddGenericParameter(name, gp => { });
+        }
+
+        /// <summary>
         /// Set the <see cref="GenericParameterExpression"/> to be constrained to the given
         /// <typeparamref name="T"/> Type.
         /// </summary>
@@ -763,30 +838,32 @@
         }
 
         /// <summary>
-        /// Set the summary documentation of the <see cref="MethodExpression"/>.
+        /// Add a ParameterExpression to the <see cref="MethodExpression"/> with the given
+        /// <paramref name="name"/> and <typeparamref name="TParameter"/>.
         /// </summary>
+        /// <typeparam name="TParameter">The type of the ParameterExpression to add.</typeparam>
         /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
-        /// <param name="summary">The summary documentation of the <see cref="MethodExpression"/>.</param>
-        public static void SetSummary(
+        /// <param name="name">The name of the ParameterExpression to add.</param>
+        public static void AddParameter<TParameter>(
             this IMethodExpressionConfigurator methodConfig,
-            string summary)
+            string name)
         {
-            methodConfig.SetSummary(ReadableExpression.Comment(summary));
+            methodConfig.AddParameter(typeof(TParameter), name);
         }
 
         /// <summary>
-        /// Add an unconstrained <see cref="GenericParameterExpression"/> with the given
-        /// <paramref name="name"/> to the <see cref="TypeExpression"/> or
-        /// <see cref="MethodExpression"/>.
+        /// Add a ParameterExpression to the <see cref="MethodExpression"/> with the given
+        /// <paramref name="name"/> and <paramref name="type"/>.
         /// </summary>
-        /// <param name="methodConfig">The <see cref="IGenericParameterConfigurator"/> to configure.</param>
-        /// <param name="name">The name of the <see cref="GenericParameterExpression"/>.</param>
-        /// <returns>The newly-created <see cref="GenericParameterExpression"/>.</returns>
-        public static GenericParameterExpression AddGenericParameter(
-            this IGenericParameterConfigurator methodConfig,
+        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
+        /// <param name="type">The type of the ParameterExpression to add.</param>
+        /// <param name="name">The name of the ParameterExpression to add.</param>
+        public static void AddParameter(
+            this IMethodExpressionConfigurator methodConfig,
+            Type type,
             string name)
         {
-            return methodConfig.AddGenericParameter(name, gp => { });
+            methodConfig.AddParameter(Expression.Parameter(type, name));
         }
 
         /// <summary>
@@ -811,6 +888,28 @@
             IEnumerable<ParameterExpression> parameters)
         {
             methodConfig.AddParameters(parameters.ToArray());
+        }
+
+        /// <summary>
+        /// Mark the class <see cref="MethodExpression"/> as abstract, with the return type
+        /// <typeparamref name="TReturn"/>.
+        /// </summary>
+        /// <typeparam name="TReturn">The return type to apply to the <see cref="MethodExpression"/>.</typeparam>
+        /// <param name="methodConfig">The <see cref="IClassMethodExpressionConfigurator"/> to configure.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the <see cref="ClassExpression"/> which declares the class
+        /// <see cref="MethodExpression"/> has not been marked as abstract.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the class <see cref="MethodExpression"/> has already been marked as static.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the class <see cref="MethodExpression"/> has already been marked as virtual.
+        /// </exception>
+        public static void SetAbstract<TReturn>(
+            this IClassMethodExpressionConfigurator methodConfig)
+        {
+            methodConfig.SetAbstract(typeof(TReturn));
         }
 
         /// <summary>

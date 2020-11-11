@@ -102,7 +102,7 @@
 
                 var methodLambda = Default(method.ReturnType).ToLambdaExpression(parameters);
 
-                typeExpression.AddMethod(method.Name, methodLambda);
+                typeExpression.AddMethod(method.Name, m => m.SetBody(methodLambda));
             }
         }
 

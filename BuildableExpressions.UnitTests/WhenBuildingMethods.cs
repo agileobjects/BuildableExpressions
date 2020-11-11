@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
+    using BuildableExpressions.SourceCode;
     using Common;
     using NetStandardPolyfills;
     using Xunit;
@@ -432,7 +433,7 @@ namespace GeneratedExpressionCode
 
                         cls.AddMethod("AbstractMethod", m =>
                         {
-                            m.SetAbstract();
+                            m.SetAbstract(typeof(void));
                         });
                     });
                 })
@@ -474,6 +475,117 @@ namespace GeneratedExpressionCode
     {
         public virtual void VirtualMethod()
         {
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldOverrideABaseAbstractMethodExpression()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var overrideMe = default(MethodExpression);
+
+                    var baseType = sc.AddClass("BaseAbstract", cls =>
+                    {
+                        cls.SetAbstract();
+
+                        overrideMe = cls.AddMethod("OverrideMe", m =>
+                        {
+                            m.SetAbstract<string>();
+                            m.AddParameter<DateTime>("when");
+                        });
+                    });
+
+                    sc.AddClass("DerivedAbstract", cls =>
+                    {
+                        cls.SetBaseType(baseType, impl =>
+                        {
+                            impl.AddMethod(overrideMe, m =>
+                            {
+                                m.SetBody(Default(typeof(string)));
+                            });
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    public abstract class BaseAbstract
+    {
+        public abstract string OverrideMe
+        (
+            DateTime when
+        );
+    }
+
+    public class DerivedAbstract : BaseAbstract
+    {
+        public override string OverrideMe
+        (
+            DateTime when
+        )
+        {
+            return null;
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldOverrideABaseVirtualMethodExpression()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var overrideMe = default(MethodExpression);
+
+                    var baseType = sc.AddClass("BaseVirtual", cls =>
+                    {
+                        overrideMe = cls.AddMethod("OverrideMe", p =>
+                        {
+                            p.SetVirtual();
+                            p.SetBody(Default(typeof(string)));
+                        });
+                    });
+
+                    sc.AddClass("DerivedVirtual", cls =>
+                    {
+                        cls.SetBaseType(baseType);
+                        cls.AddMethod(overrideMe, m =>
+                        {
+                            m.SetBody(Constant("Hello!", typeof(string)));
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public class BaseVirtual
+    {
+        public virtual string OverrideMe()
+        {
+            return null;
+        }
+    }
+
+    public class DerivedVirtual : BaseVirtual
+    {
+        public override string OverrideMe()
+        {
+            return ""Hello!"";
         }
     }
 }";

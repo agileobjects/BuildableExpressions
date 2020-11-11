@@ -8,21 +8,25 @@
     using BuildableExpressions.Extensions;
     using Extensions;
 
-    internal class StandardMethodExpression : MethodExpression
+    internal class StandardMethodExpression :
+        MethodExpression,
+        IClassMethodExpressionConfigurator
     {
         private bool? _isOverride;
+        private Type _returnType;
         private List<BlockMethodExpression> _blockMethods;
         private Type[] _parameterTypes;
 
         public StandardMethodExpression(
             TypeExpression declaringTypeExpression,
             string name,
-            Action<MethodExpression> configuration)
+            Action<StandardMethodExpression> configuration)
             : base(
                 declaringTypeExpression,
-                name.ThrowIfInvalidName<ArgumentException>("Method"),
-                configuration)
+                name.ThrowIfInvalidName<ArgumentException>("Method"))
         {
+            configuration.Invoke(this);
+
             if (!Visibility.HasValue)
             {
                 SetVisibility(MemberVisibility.Public);
@@ -68,11 +72,6 @@
 
         private bool IsOverriddenBy(StandardMethodExpression otherMethod)
         {
-            if (Equals(otherMethod, this))
-            {
-                return false;
-            }
-
             if (otherMethod.ReturnType != ReturnType ||
                 otherMethod.Name != Name)
             {
@@ -91,6 +90,9 @@
         private IEnumerable<Type> ParameterTypes
             => _parameterTypes ??= ParametersAccessor.ProjectToArray(p => p.Type);
 
+        public override Type ReturnType
+            => _returnType ?? base.ReturnType;
+
         public bool HasBlockMethods => _blockMethods != null;
 
         public IList<BlockMethodExpression> BlockMethods
@@ -101,5 +103,27 @@
         {
             return new BlockMethodExpression(DeclaringTypeExpression, configuration);
         }
+
+        #region IClassMemberExpressionConfigurator Members
+
+        void IClassMemberExpressionConfigurator.SetVirtual()
+        {
+            this.ValidateSetVirtual();
+            SetVirtual();
+        }
+
+        #endregion
+
+        #region IClassMethodExpressionConfigurator Members
+
+        void IClassMethodExpressionConfigurator.SetAbstract(Type returnType)
+        {
+            this.ValidateSetAbstract();
+
+            _returnType = returnType;
+            SetAbstract();
+        }
+
+        #endregion
     }
 }

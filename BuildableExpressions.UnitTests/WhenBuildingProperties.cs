@@ -349,6 +349,49 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldOverrideABaseAbstractPropertyExpression()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var overrideMe = default(PropertyExpression);
+
+                    var baseType = sc.AddClass("BaseAbstract", cls =>
+                    {
+                        cls.SetAbstract();
+
+                        overrideMe = cls.AddProperty<string>("OverrideMe", p =>
+                        {
+                            p.SetAbstract();
+                        });
+                    });
+
+                    sc.AddClass("DerivedAbstract", cls =>
+                    {
+                        cls.SetBaseType(baseType);
+                        cls.AddProperty(overrideMe);
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public abstract class BaseAbstract
+    {
+        public abstract string OverrideMe { get; set; }
+    }
+
+    public class DerivedAbstract : BaseAbstract
+    {
+        public override string OverrideMe { get; set; }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldOverrideABaseVirtualPropertyExpression()
         {
             var translated = BuildableExpression

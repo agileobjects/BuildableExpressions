@@ -89,6 +89,8 @@
 
             sourceCode.Add(this);
 
+            sourceCode.Analyse();
+
             var compiledTypes = sourceCode
                 .Compile()
                 .CompiledAssembly
@@ -423,12 +425,9 @@
             return property;
         }
 
-        internal MethodExpression AddMethod(string name, Expression body)
-            => AddMethod(name, cfg => cfg.SetBody(body));
-
         internal MethodExpression AddMethod(
             string name,
-            Action<MethodExpression> configuration)
+            Action<StandardMethodExpression> configuration)
         {
             return AddMethod(new StandardMethodExpression(this, name, configuration));
         }

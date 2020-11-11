@@ -160,7 +160,7 @@
                     {
                         cls.AddMethod("AbstractMethod", m =>
                         {
-                            m.SetAbstract();
+                            m.SetAbstract(typeof(void));
                         });
                     });
                 });
@@ -185,7 +185,7 @@
                         cls.AddMethod("MyMethod", m =>
                         {
                             m.AddParameter(Parameter(typeof(string), "str"));
-                            m.SetAbstract();
+                            m.SetAbstract(typeof(void));
                             m.SetStatic();
                         });
                     });
@@ -209,7 +209,7 @@
 
                         cls.AddMethod("MyMethod", m =>
                         {
-                            m.SetAbstract();
+                            m.SetAbstract(typeof(void));
                             m.SetVirtual();
                         });
                     });
@@ -236,7 +236,7 @@
                             m.AddParameter(Parameter(typeof(DateTime), "date"));
                             m.AddParameter(Parameter(typeof(long), "number"));
                             m.SetStatic();
-                            m.SetAbstract();
+                            m.SetAbstract<string>();
                         });
                     });
                 });
@@ -285,7 +285,7 @@
                             m.AddParameter(Parameter(typeof(DateTime), "date"));
                             m.AddParameter(Parameter(typeof(long), "number"));
                             m.SetVirtual();
-                            m.SetAbstract();
+                            m.SetAbstract<DateTime>();
                         });
                     });
                 });
