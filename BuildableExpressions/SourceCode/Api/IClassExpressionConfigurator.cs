@@ -21,7 +21,7 @@
         /// <paramref name="baseType"/>.
         /// </summary>
         /// <param name="baseType">
-        /// The base type from which the <see cref="ClassExpression"/> being built should derive.
+        /// The base type from which the <see cref="ClassExpression"/> should derive.
         /// </param>
         /// <param name="configuration">The configuration to use.</param>
         /// <exception cref="InvalidOperationException">

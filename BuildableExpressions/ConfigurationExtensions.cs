@@ -91,7 +91,7 @@
         /// </summary>
         /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
         /// <typeparam name="TBase">
-        /// The base type from which the <see cref="ClassExpression"/> being built should derive.
+        /// The base type from which the <see cref="ClassExpression"/> should derive.
         /// </typeparam>
         public static void SetBaseType<TBase>(
             this IClassExpressionConfigurator classConfig)
@@ -106,7 +106,7 @@
         /// </summary>
         /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
         /// <param name="baseTypeExpression">
-        /// The base type from which the <see cref="ClassExpression"/> being built should derive.
+        /// The base type from which the <see cref="ClassExpression"/> should derive.
         /// </param>
         public static void SetBaseType(
             this IClassExpressionConfigurator classConfig,
@@ -121,7 +121,7 @@
         /// </summary>
         /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
         /// <param name="baseType">
-        /// The base type from which the <see cref="ClassExpression"/> being built should derive.
+        /// The base type from which the <see cref="ClassExpression"/> should derive.
         /// </param>
         public static void SetBaseType(
             this IClassExpressionConfigurator classConfig,
@@ -136,7 +136,7 @@
         /// </summary>
         /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
         /// <param name="baseTypeExpression">
-        /// The base type from which the <see cref="ClassExpression"/> being built should derive.
+        /// The base type from which the <see cref="ClassExpression"/> should derive.
         /// </param>
         /// <param name="configuration">The configuration to use.</param>
         public static void SetBaseType(
