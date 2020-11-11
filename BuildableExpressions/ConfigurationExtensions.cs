@@ -936,7 +936,11 @@
             this IConcreteTypeMethodExpressionConfigurator methodConfig,
             Expression body)
         {
-            methodConfig.SetBody(body, body.Type);
+            var returnType = body.NodeType == ExpressionType.Lambda
+                ? ((LambdaExpression)body).ReturnType
+                : body.Type;
+
+            methodConfig.SetBody(body, returnType);
         }
     }
 }

@@ -288,9 +288,15 @@
             if (body.NodeType == ExpressionType.Lambda)
             {
                 var lambda = (LambdaExpression)body;
-                returnType = lambda.ReturnType;
                 AddParameters(lambda.Parameters);
-                body = lambda.Body;
+
+                if (lambda.ReturnType == returnType)
+                {
+                    Definition = lambda;
+                    return;
+                }
+
+                body = Convert(lambda.Body, returnType);
             }
 
             Definition = body.ToLambdaExpression(_parameters, returnType);

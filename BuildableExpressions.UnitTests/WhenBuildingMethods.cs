@@ -147,6 +147,39 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldBuildAMethodWithACustomReturnType()
+        {
+
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("Get1000", m =>
+                        {
+                            var returnOneThousand = CreateLambda(() => 1000);
+                            m.SetBody(returnOneThousand, typeof(object));
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public object Get1000()
+        {
+            return 1000;
+        }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAGenericParameterMethod()
         {
             var sourceCode = BuildableExpression.SourceCode(sc =>
