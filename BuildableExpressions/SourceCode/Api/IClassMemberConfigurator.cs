@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Api
 {
     using System;
+    using ReadableExpressions.Translations.Reflection;
 
     /// <summary>
     /// Provides options to add a <see cref="PropertyExpression"/> or <see cref="MethodExpression"/>
@@ -14,12 +15,12 @@
         /// <paramref name="configuration"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="PropertyExpression"/>.</param>
-        /// <param name="type">The type of the <see cref="PropertyExpression"/>.</param>
+        /// <param name="type">The <see cref="IType"/> of the <see cref="PropertyExpression"/>.</param>
         /// <param name="configuration">The configuration to use.</param>
         /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
         PropertyExpression AddProperty(
             string name,
-            Type type,
+            IType type,
             Action<IClassPropertyExpressionConfigurator> configuration);
 
         /// <summary>

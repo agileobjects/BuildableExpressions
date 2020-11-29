@@ -4,29 +4,39 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq.Expressions;
-    using Api;
     using ReadableExpressions.Translations;
+    using ReadableExpressions.Translations.Reflection;
     using Translations;
 
     /// <summary>
     /// Represents an enum in a piece of source code.
     /// </summary>
-    public class EnumExpression :
-        TypeExpression,
-        IEnumExpressionConfigurator
+    public abstract class EnumExpression : TypeExpression, IType
     {
         private readonly Dictionary<string, int> _members;
         private ReadOnlyDictionary<string, int> _readOnlyMembers;
-        private int _nextValue;
 
-        internal EnumExpression(
-            SourceCodeExpression sourceCode,
-            string name,
-            Action<IEnumExpressionConfigurator> configuration)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EnumExpression"/> class for the given
+        /// <paramref name="enumType"/>.
+        /// </summary>
+        /// <param name="enumType">The Type represented by the <see cref="EnumExpression"/>.</param>
+        protected EnumExpression(Type enumType)
+            : base(enumType)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EnumExpression"/> class.
+        /// </summary>
+        /// <param name="sourceCode">
+        /// The <see cref="EnumExpression"/>'s parent <see cref="SourceCodeExpression"/>.
+        /// </param>
+        /// <param name="name">The name of the <see cref="EnumExpression"/>.</param>
+        protected EnumExpression(SourceCodeExpression sourceCode, string name)
             : base(sourceCode, name)
         {
             _members = new Dictionary<string, int>();
-            configuration.Invoke(this);
         }
 
         /// <summary>
@@ -44,33 +54,17 @@
 
         internal IDictionary<string, int> MembersAccessor => _members;
 
-        #region IEnumExpressionConfigurator Members
-
-        void IEnumExpressionConfigurator.AddMembers(params string[] memberNames)
+        internal void AddMember(string name, int value)
         {
-            foreach (var memberName in memberNames)
-            {
-                AddMember(memberName, value: null);
-            }
-        }
-
-        void IEnumExpressionConfigurator.AddMember(string name, int value)
-            => AddMember(name, value);
-
-        internal void AddMember(string name, int? value)
-        {
-            if (value.HasValue)
-            {
-                _nextValue = value.Value + 1;
-            }
-            else
-            {
-                value = _nextValue++;
-            }
-
-            _members.Add(name, value.Value);
+            MembersAccessor.Add(name, value);
             _readOnlyMembers = null;
         }
+
+        #region IType Members
+
+        IType IType.BaseType => BclTypeWrapper.Enum;
+
+        internal override bool IsEnum => true;
 
         #endregion
 

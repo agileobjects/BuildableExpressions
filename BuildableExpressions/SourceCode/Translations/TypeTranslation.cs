@@ -51,16 +51,16 @@
 
             if (_isGenericType)
             {
-                var genericArguments = type.GenericParameters
-                    .ProjectToArray<GenericParameterExpression, IGenericArgument>(p => p);
+                var genericParameters = type.GenericParameters
+                    .ProjectToArray<OpenGenericParameterExpression, IGenericParameter>(p => p);
 
                 var settings = context.Settings;
 
                 _genericParametersTranslation =
-                    new GenericParameterSetDefinitionTranslation(genericArguments, settings);
+                    new GenericParameterSetDefinitionTranslation(genericParameters, settings);
 
                 _genericParameterConstraintsTranslation =
-                    new GenericParameterSetConstraintsTranslation(genericArguments, settings);
+                    new GenericParameterSetConstraintsTranslation(genericParameters, settings);
 
                 translationSize +=
                     _genericParametersTranslation.TranslationSize +
@@ -71,7 +71,7 @@
                     _genericParameterConstraintsTranslation.FormattingSize;
             }
 
-            _interfaceTypeCount = type.InterfaceTypes.Count;
+            _interfaceTypeCount = type.InterfaceTypeExpressions.Count;
 
             if (_interfaceTypeCount != 0)
             {
@@ -81,7 +81,8 @@
 
                 for (var i = 0; i < _interfaceTypeCount; ++i)
                 {
-                    var interfaceTranslation = context.GetTranslationFor(type.InterfaceTypes[i]);
+                    var interfaceType = (IType)type.InterfaceTypeExpressions[i];
+                    var interfaceTranslation = context.GetTranslationFor(interfaceType);
                     _interfaceTypeTranslations[i] = interfaceTranslation;
                     translationSize += interfaceTranslation.TranslationSize;
                     formattingSize += interfaceTranslation.FormattingSize;
@@ -97,7 +98,8 @@
 
                 for (var i = 0; ;)
                 {
-                    var property = _propertyTranslations[i] = context.GetTranslationFor(type.PropertyExpressions[i]);
+                    var propertyTranslation = context.GetTranslationFor(type.PropertyExpressions[i]);
+                    var property = _propertyTranslations[i] = propertyTranslation;
                     translationSize += property.TranslationSize;
                     formattingSize += property.FormattingSize;
 
@@ -121,7 +123,8 @@
 
                 for (var i = 0; ;)
                 {
-                    var method = _methodTranslations[i] = context.GetTranslationFor(type.MethodExpressions[i]);
+                    var methodTranslation = context.GetTranslationFor(type.MethodExpressions[i]);
+                    var method = _methodTranslations[i] = methodTranslation;
                     translationSize += method.TranslationSize;
                     formattingSize += method.FormattingSize;
 

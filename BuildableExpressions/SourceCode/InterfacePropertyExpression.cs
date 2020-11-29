@@ -7,13 +7,12 @@
 
     internal class InterfacePropertyExpression :
         PropertyExpression,
-        IInterfacePropertyExpressionConfigurator,
-        IPotentialInterfaceMember
+        IInterfacePropertyExpressionConfigurator
     {
         public InterfacePropertyExpression(
             InterfaceExpression declaringInterfaceExpression,
             string name,
-            Type type,
+            IType type,
             Action<InterfacePropertyExpression> configuration)
             : base(declaringInterfaceExpression, name, type)
         {
@@ -35,7 +34,5 @@
             => SetSetter(s => { });
 
         #endregion
-
-        bool IPotentialInterfaceMember.IsInterfaceMember => true;
     }
 }

@@ -1,50 +1,40 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
-    using Api;
     using ReadableExpressions.Translations;
+    using ReadableExpressions.Translations.Reflection;
     using Translations;
 
     /// <summary>
     /// Represents a struct in a piece of source code.
     /// </summary>
-    public class StructExpression :
-        ConcreteTypeExpression,
-        IStructExpressionConfigurator
+    public abstract class StructExpression : ConcreteTypeExpression, IType
     {
-        internal StructExpression(
-            SourceCodeExpression sourceCode,
-            string name,
-            Action<IStructExpressionConfigurator> configuration)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StructExpression"/> class for the given
+        /// <paramref name="structType"/>.
+        /// </summary>
+        /// <param name="structType">The Type represented by the <see cref="StructExpression"/>.</param>
+        protected StructExpression(Type structType)
+            : base(structType)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StructExpression"/> class.
+        /// </summary>
+        /// <param name="sourceCode">
+        /// The <see cref="StructExpression"/>'s parent <see cref="SourceCodeExpression"/>.
+        /// </param>
+        /// <param name="name">The name of the <see cref="StructExpression"/>.</param>
+        protected StructExpression(SourceCodeExpression sourceCode, string name)
             : base(sourceCode, name)
         {
-            configuration.Invoke(this);
-            Validate();
         }
 
-        #region IStructExpressionConfigurator Members
+        #region IType Members
 
-        PropertyExpression IStructMemberConfigurator.AddProperty(
-            string name,
-            Type type,
-            Action<IConcreteTypePropertyExpressionConfigurator> configuration)
-        {
-            return AddProperty(name, type, configuration);
-        }
-
-        MethodExpression IStructMemberConfigurator.AddMethod(
-            string name,
-            Action<IConcreteTypeMethodExpressionConfigurator> configuration)
-        {
-            return AddMethod(name, configuration);
-        }
-
-        void IStructExpressionConfigurator.SetImplements(
-            Type @interface,
-            Action<IStructImplementationConfigurator> configuration)
-        {
-            SetImplements(@interface, configuration);
-        }
+        IType IType.BaseType => BclTypeWrapper.ValueType;
 
         #endregion
 

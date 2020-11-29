@@ -6,37 +6,47 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using Api;
+    using BuildableExpressions.Extensions;
     using Extensions;
-    using NetStandardPolyfills;
     using ReadableExpressions.Extensions;
+    using ReadableExpressions.Translations.Reflection;
 
-    internal class ConfiguredOpenGenericArgumentExpression :
-        OpenGenericArgumentExpression,
+    internal class ConfiguredOpenGenericParameterExpression :
+        OpenGenericParameterExpression,
         IGenericParameterExpressionConfigurator,
-        IEquatable<ConfiguredOpenGenericArgumentExpression>
+        IEquatable<ConfiguredOpenGenericParameterExpression>
     {
-        private static readonly ConcurrentDictionary<ConfiguredOpenGenericArgumentExpression, Type> _typeCache =
-            new ConcurrentDictionary<ConfiguredOpenGenericArgumentExpression, Type>(
+        private static readonly ConcurrentDictionary<ConfiguredOpenGenericParameterExpression, Type>
+            _typeCache = new ConcurrentDictionary<ConfiguredOpenGenericParameterExpression, Type>(
                 new GenericParameterExpressionComparer());
 
-        private Type _type;
+        private Type _bclType;
         private bool _hasConstraints;
         private bool _hasStructConstraint;
         private bool _hasClassConstraint;
         private bool _hasNewableConstraint;
-        private List<Type> _typeConstraints;
-        private ReadOnlyCollection<Type> _readonlyTypeConstraints;
+        private List<TypeExpression> _typeConstraints;
+        private ReadOnlyCollection<TypeExpression> _readOnlyTypeConstraints;
+        private ReadOnlyCollection<IType> _readOnlyTypeConstraintTypes;
 
-        public ConfiguredOpenGenericArgumentExpression(
+        public ConfiguredOpenGenericParameterExpression(
+            SourceCodeExpression sourceCode,
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
-            : base(name.ThrowIfInvalidName<ArgumentException>("Generic Parameter"))
+            : this(sourceCode, name.ThrowIfInvalidName<ArgumentException>("Generic Parameter"))
         {
             configuration.Invoke(this);
         }
 
+        private ConfiguredOpenGenericParameterExpression(
+            SourceCodeExpression sourceCode,
+            string name)
+            : base(sourceCode, name)
+        {
+        }
+
         public override Type Type
-            => _type ??= _typeCache.GetOrAdd(this, p => p.ToType());
+            => _bclType ??= _typeCache.GetOrAdd(this, p => p.CreateType());
 
         #region IGenericParameterExpressionConfigurator Members
 
@@ -58,29 +68,30 @@
             _hasConstraints = _hasNewableConstraint = true;
         }
 
-        void IGenericParameterExpressionConfigurator.AddTypeConstraints(params Type[] types)
+        void IGenericParameterExpressionConfigurator.AddTypeConstraints(
+            params TypeExpression[] typeExpressions)
         {
-            _typeConstraints ??= new List<Type>();
+            _typeConstraints ??= new List<TypeExpression>();
 
-            foreach (var type in types)
+            foreach (var typeExpression in typeExpressions)
             {
-                if (type.IsInterface())
+                if (typeExpression.IsInterface)
                 {
-                    _typeConstraints.Add(type);
+                    _typeConstraints.Add(typeExpression);
                     continue;
                 }
 
-                var typeName = type.GetFriendlyName();
+                var typeName = typeExpression.GetFriendlyName();
 
                 ThrowIfHasStructConstraint(conflictingConstraint: typeName);
                 ThrowIfHasClassConstraint(conflictingConstraint: typeName);
                 ThrowIfAlreadyHasClassConstraint(conflictingTypeConstraint: typeName);
 
-                _typeConstraints.Insert(0, type);
+                _typeConstraints.Insert(0, typeExpression);
             }
 
             _hasConstraints = true;
-            _readonlyTypeConstraints = null;
+            _readOnlyTypeConstraints = null;
         }
 
         private void ThrowIfHasStructConstraint(string conflictingConstraint)
@@ -102,7 +113,7 @@
         private void ThrowIfAlreadyHasClassConstraint(string conflictingTypeConstraint)
         {
             var existingClassConstraint = _typeConstraints
-                .FirstOrDefault(t => TypeExtensionsPolyfill.IsClass(t));
+                .FirstOrDefault(t => t.IsClass);
 
             if (existingClassConstraint != null)
             {
@@ -121,33 +132,62 @@
 
         #endregion
 
-        #region IGenericArgument Members
+        #region IGenericParameter Members
 
-        protected override bool HasConstraints => _hasConstraints;
+        public override bool HasConstraints => _hasConstraints;
 
-        protected override bool HasClassConstraint => _hasClassConstraint;
+        public override bool HasClassConstraint => _hasClassConstraint;
 
-        protected override bool HasStructConstraint => _hasStructConstraint;
+        public override bool HasStructConstraint => _hasStructConstraint;
 
-        protected override bool HasNewableConstraint => _hasNewableConstraint;
+        public override bool HasNewableConstraint => _hasNewableConstraint;
 
-        public override IEnumerable<Type> TypeConstraintsAccessor => _typeConstraints;
-
-        protected override ReadOnlyCollection<Type> TypeConstraints
+        protected override ReadOnlyCollection<TypeExpression> ConstraintTypes
         {
             get
             {
-                return _readonlyTypeConstraints ??=
-                    _typeConstraints?.ToReadOnlyCollection() ??
-                    Enumerable<Type>.EmptyReadOnlyCollection;
+                return _readOnlyTypeConstraints ??=
+                    _typeConstraints.ToReadOnlyCollection() ??
+                    Enumerable<TypeExpression>.EmptyReadOnlyCollection;
             }
         }
 
         #endregion
 
+        public override ReadOnlyCollection<IType> TypeConstraints
+        {
+            get
+            {
+                return _readOnlyTypeConstraintTypes ??=
+                    _typeConstraints
+                        .ProjectToArray<TypeExpression, IType>(t => t)
+                        .ToReadOnlyCollection() ??
+                    Enumerable<IType>.EmptyReadOnlyCollection;
+            }
+        }
+
+        internal IEnumerable<TypeExpression> TypeConstraintsAccessor => _typeConstraints;
+
+        internal override OpenGenericParameterExpression Clone()
+        {
+            return new ConfiguredOpenGenericParameterExpression(SourceCode, Name)
+            {
+                _bclType = _bclType,
+                _hasConstraints = _hasConstraints,
+                _hasClassConstraint = _hasClassConstraint,
+                _hasStructConstraint = _hasStructConstraint,
+                _hasNewableConstraint = _hasNewableConstraint,
+                _typeConstraints = _typeConstraints,
+                _readOnlyTypeConstraints = _readOnlyTypeConstraints
+            };
+        }
+
+        protected override TypeExpression CreateInstance() => Clone();
+
         #region IEquatable Members
 
-        bool IEquatable<ConfiguredOpenGenericArgumentExpression>.Equals(ConfiguredOpenGenericArgumentExpression other)
+        bool IEquatable<ConfiguredOpenGenericParameterExpression>.Equals(
+            ConfiguredOpenGenericParameterExpression other)
         {
             if (ReferenceEquals(other, null))
             {
@@ -181,16 +221,16 @@
         }
 
         private class GenericParameterExpressionComparer :
-            IEqualityComparer<ConfiguredOpenGenericArgumentExpression>
+            IEqualityComparer<ConfiguredOpenGenericParameterExpression>
         {
             public bool Equals(
-                ConfiguredOpenGenericArgumentExpression x,
-                ConfiguredOpenGenericArgumentExpression y)
+                ConfiguredOpenGenericParameterExpression x,
+                ConfiguredOpenGenericParameterExpression y)
             {
-                return ((IEquatable<ConfiguredOpenGenericArgumentExpression>)x)?.Equals(y) == true;
+                return ((IEquatable<ConfiguredOpenGenericParameterExpression>)x)?.Equals(y) == true;
             }
 
-            public int GetHashCode(ConfiguredOpenGenericArgumentExpression obj) => 0;
+            public int GetHashCode(ConfiguredOpenGenericParameterExpression obj) => 0;
         }
 
         #endregion

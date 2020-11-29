@@ -1,8 +1,10 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
+    using System.Collections.ObjectModel;
     using System.Linq.Expressions;
     using Api;
+    using Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
 
@@ -11,18 +13,20 @@
     /// </summary>
     public class PropertyAccessorExpression :
         MemberExpressionBase,
-        IComplexMember,
+        IMethod,
         IPropertyGetterConfigurator,
         IPropertySetterConfigurator,
         ICustomTranslationExpression
     {
         private readonly IProperty _property;
+        private readonly IType _type;
+        private Type _bclType;
 
         internal PropertyAccessorExpression(IProperty property, bool isGetter)
             : base(isGetter ? "get" : "set")
         {
             _property = property;
-            Type = isGetter ? property.Type : typeof(void);
+            _type = isGetter ? property.Type : BclTypeWrapper.Void;
         }
 
         /// <summary>
@@ -35,7 +39,7 @@
         /// <summary>
         /// Gets the type of this <see cref="PropertyAccessorExpression"/>.
         /// </summary>
-        public override Type Type { get; }
+        public override Type Type => _bclType ??= _type.AsType();
 
         /// <summary>
         /// Visits this <see cref="PropertyAccessorExpression"/>.
@@ -50,7 +54,7 @@
         }
 
         /// <inheritdoc />
-        public override Type DeclaringType => _property.DeclaringType;
+        public override IType DeclaringType => _property.DeclaringType;
 
         /// <inheritdoc />
         public override bool IsStatic => _property.IsStatic;
@@ -76,6 +80,8 @@
         /// </summary>
         public Expression Body { get; private set; }
 
+        #region IPropertyGetterConfigurator Members
+
         void IPropertyGetterConfigurator.SetVisibility(MemberVisibility visibility)
             => SetVisibility(visibility);
 
@@ -99,6 +105,26 @@
                 new[] { valueVariable },
                 bodyFactory.Invoke(valueVariable));
         }
+
+        #endregion
+
+        #region IMethod Members
+
+        bool IMethod.IsGenericMethod => false;
+
+        IMethod IMethod.GetGenericMethodDefinition() => null;
+
+        ReadOnlyCollection<IGenericParameter> IMethod.GetGenericArguments()
+            => Enumerable<IGenericParameter>.EmptyReadOnlyCollection;
+
+        ReadOnlyCollection<IParameter> IMethod.GetParameters()
+            => Enumerable<IParameter>.EmptyReadOnlyCollection;
+
+        bool IMethod.IsExtensionMethod => false;
+
+        IType IMethod.ReturnType => _type;
+
+        #endregion
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => context.GetTranslationFor(Body);

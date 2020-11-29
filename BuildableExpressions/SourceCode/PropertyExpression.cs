@@ -21,6 +21,7 @@
         private IMember _getterMember;
         private IMember _setterMember;
         private PropertyInfo _propertyInfo;
+        private IType _type;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyExpression"/> class.
@@ -33,10 +34,10 @@
         protected PropertyExpression(
             TypeExpression declaringTypeExpression,
             string name,
-            Type type)
+            IType type)
             : base(declaringTypeExpression, name)
         {
-            Type = type;
+            _type = type;
         }
 
         /// <summary>
@@ -49,7 +50,7 @@
         /// <summary>
         /// Gets the type of this <see cref="PropertyExpression"/>.
         /// </summary>
-        public override Type Type { get; }
+        public override Type Type => _type.AsType();
 
         /// <summary>
         /// Visits this <see cref="PropertyExpression"/>.
@@ -106,13 +107,15 @@
 
         private PropertyInfo CreatePropertyInfo()
         {
+            var declaringType = DeclaringType.AsType();
+
             var property = Visibility == Public
                 ? IsStatic
-                    ? DeclaringType.GetPublicStaticProperty(Name)
-                    : DeclaringType.GetPublicInstanceProperty(Name)
+                    ? declaringType.GetPublicStaticProperty(Name)
+                    : declaringType.GetPublicInstanceProperty(Name)
                 : IsStatic
-                    ? DeclaringType.GetNonPublicStaticProperty(Name)
-                    : DeclaringType.GetNonPublicInstanceProperty(Name);
+                    ? declaringType.GetNonPublicStaticProperty(Name)
+                    : declaringType.GetNonPublicInstanceProperty(Name);
 
             return property;
         }
@@ -197,17 +200,29 @@
                 $"less restrictive visibility '{accessorVisibility}'");
         }
 
-        #region IProperty Members
+        #region IMember Members
+
+        IType IMember.DeclaringType => DeclaringTypeExpression;
+
+        IType IMember.Type => _type ??= BclTypeWrapper.For(Type);
+
+        #endregion
+
+        #region IComplexMember Members
 
         bool IComplexMember.IsOverride => IsOverride;
 
+        #endregion
+
+        #region IProperty Members
+
         bool IProperty.IsReadable => _getterMember?.IsPublic == true;
 
-        IComplexMember IProperty.Getter => GetterExpression;
+        IMethod IProperty.Getter => GetterExpression;
 
         bool IProperty.IsWritable => _setterMember?.IsPublic == true;
 
-        IComplexMember IProperty.Setter => SetterExpression;
+        IMethod IProperty.Setter => SetterExpression;
 
         #endregion
 
@@ -219,7 +234,7 @@
 
         /// <inheritdoc />
         protected override ITranslation GetTransientTranslation(ITranslationContext context)
-            => new TransientPropertyTranslation(this, context);
+            => new ReturnDefaultPropertyTranslation(this, context);
 
         #endregion
     }

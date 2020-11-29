@@ -50,7 +50,7 @@
             this ClassExpression classExpression)
             where TMemberExpression : IConcreteTypeExpression
         {
-            if (classExpression == null)
+            if (classExpression?.MemberExpressionsAccessor == null)
             {
                 yield break;
             }

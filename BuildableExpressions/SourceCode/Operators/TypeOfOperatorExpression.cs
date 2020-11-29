@@ -2,9 +2,7 @@
 {
     using System;
     using System.Linq.Expressions;
-    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
-    using ReadableExpressions.Translations.Formatting;
 
     /// <summary>
     /// Represents a use of the typeof operator.
@@ -13,19 +11,11 @@
         Expression,
         ICustomTranslationExpression
     {
-        private readonly bool _hasOperandType;
-        private string _typeName;
+        private readonly TypeExpression _typeExpression;
 
-        internal TypeOfOperatorExpression(string typeName)
+        internal TypeOfOperatorExpression(TypeExpression typeExpression)
         {
-            OperandType = typeof(void);
-            _typeName = typeName;
-        }
-
-        internal TypeOfOperatorExpression(Type type)
-        {
-            OperandType = type;
-            _hasOperandType = true;
+            _typeExpression = typeExpression;
         }
 
         /// <summary>
@@ -46,29 +36,11 @@
         protected override Expression Accept(ExpressionVisitor visitor) => this;
 
         /// <summary>
-        /// Gets the type to which the typeof operator is being applied. If this Expression represents
-        /// a typeof operation on an open generic argument type, returns void.
+        /// Gets the type to which the typeof operator is being applied.
         /// </summary>
-        public Type OperandType { get; }
-
-        /// <summary>
-        /// Gets the name of the type to which the typeof operator is being applied.
-        /// </summary>
-        public string OperandTypeName
-            => _typeName ??= Type.GetFriendlyName();
+        public Type Operand => _typeExpression.Type;
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
-        {
-            var operandTranslation = _hasOperandType
-                ? (ITranslatable)context.GetTranslationFor(OperandType)
-                : new FixedValueTranslation(
-                    NodeType,
-                    OperandTypeName,
-                    Type,
-                    TokenType.TypeName,
-                    context);
-
-            return new TypeOfOperatorTranslation(operandTranslation, context.Settings);
-        }
+            => new TypeOfOperatorTranslation(_typeExpression, context);
     }
 }

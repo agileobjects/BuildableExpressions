@@ -15,14 +15,16 @@
             var sayHello = Lambda<Func<string>>(Constant("Hello!"));
 
             var translated = BuildableExpression
-                .SourceCode(sc => sc
-                    .AddClass("Messager", cls =>
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("Messager", cls =>
                     {
                         cls.SetImplements<IMessager>(impl =>
                         {
                             impl.AddMethod(nameof(IMessager.GetMessage), sayHello);
                         });
-                    }))
+                    });
+                })
                 .ToCSharpString();
 
             const string EXPECTED = @"
@@ -269,7 +271,7 @@ namespace GeneratedExpressionCode
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
-                    var param1 = default(GenericParameterExpression);
+                    var param1 = default(OpenGenericParameterExpression);
 
                     var baseType = sc.AddClass("Basey", cls =>
                     {

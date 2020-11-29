@@ -3,19 +3,20 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Analysis;
+    using System.Linq.Expressions;
     using Api;
     using BuildableExpressions.Extensions;
     using Extensions;
+    using ReadableExpressions.Translations.Reflection;
 
     internal class StandardMethodExpression :
         MethodExpression,
         IClassMethodExpressionConfigurator
     {
         private bool? _isOverride;
-        private Type _returnType;
+        private IType _returnType;
         private List<BlockMethodExpression> _blockMethods;
-        private Type[] _parameterTypes;
+        private IType[] _parameterTypes;
 
         public StandardMethodExpression(
             TypeExpression declaringTypeExpression,
@@ -32,13 +33,12 @@
                 SetVisibility(MemberVisibility.Public);
             }
 
-            Analysis = MethodExpressionAnalysis.For(this);
             Validate();
         }
 
         #region Validation
 
-        internal void Validate()
+        private void Validate()
         {
             ThrowIfEmptyMethod();
             ThrowIfDuplicateMethodSignature();
@@ -87,11 +87,11 @@
                    ParameterTypes.SequenceEqual(otherMethod.ParameterTypes);
         }
 
-        private IEnumerable<Type> ParameterTypes
-            => _parameterTypes ??= ParametersAccessor.ProjectToArray(p => p.Type);
+        private IEnumerable<IType> ParameterTypes
+            => _parameterTypes ??= ParametersAccessor.ProjectToArray(p => ((IParameter)p).Type);
 
         public override Type ReturnType
-            => _returnType ?? base.ReturnType;
+            => _returnType?.AsType() ?? base.ReturnType;
 
         public bool HasBlockMethods => _blockMethods != null;
 
@@ -116,13 +116,15 @@
 
         #region IClassMethodExpressionConfigurator Members
 
-        void IClassMethodExpressionConfigurator.SetAbstract(Type returnType)
+        void IClassMethodExpressionConfigurator.SetAbstract(IType returnType)
         {
             this.ValidateSetAbstract();
 
             _returnType = returnType;
             SetAbstract();
         }
+
+        protected override IType GetReturnType() => _returnType;
 
         #endregion
     }

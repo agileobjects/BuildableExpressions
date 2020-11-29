@@ -3,134 +3,84 @@
     using System;
     using System.Linq;
     using Api;
-    using BuildableExpressions.Extensions;
     using Generics;
-    using NetStandardPolyfills;
     using ReadableExpressions.Extensions;
+    using ReadableExpressions.Translations.Reflection;
 
     internal class ImplementationConfigurator :
         IClassImplementationConfigurator,
         IStructImplementationConfigurator
     {
-        private readonly TypeExpression _typeExpression;
-        private readonly TypeExpression _implementedTypeExpression;
-        private readonly Type _implementedType;
-        private readonly Type[] _genericTypeArguments;
+        private readonly TypeExpression _implementingTypeExpression;
 
         internal ImplementationConfigurator(
-            TypeExpression typeExpression,
-            Type implementedType)
+            TypeExpression implementingTypeExpression,
+            TypeExpression implementedTypeExpression,
+            Action<ImplementationConfigurator> configuration)
         {
-            _typeExpression = typeExpression;
-            _implementedType = implementedType;
-            _genericTypeArguments = implementedType.GetGenericTypeArguments();
+            _implementingTypeExpression = implementingTypeExpression;
+            ImplementedTypeExpression = implementedTypeExpression;
 
-            _implementedTypeExpression = typeExpression
-                .SourceCode
-                .TypeExpressions
-                .FirstOrDefault(t => t.TypeAccessor == _implementedType);
+            configuration.Invoke(this);
         }
 
-        internal Type GetImplementedType()
+        internal TypeExpression ImplementedTypeExpression { get; private set; }
+
+        public void SetGenericArgument(
+            string genericParameterName,
+            TypeExpression closedTypeExpression)
         {
-            return _genericTypeArguments.Length != 0 && _implementedType.IsGenericTypeDefinition()
-                ? _implementedType.MakeGenericType(_genericTypeArguments)
-                : _implementedType;
-        }
+            var genericParameter = ImplementedTypeExpression
+                .GenericParameters
+                .FirstOrDefault(p => p.Name == genericParameterName);
 
-        public void SetGenericArgument(string genericParameterName, Type closedType)
-        {
-            if (TryGetImplementedTypeParameterExpression(
-                    genericParameterName,
-                    out var parameterExpression))
+            if (genericParameter != null)
             {
-                SetGenericArgument(parameterExpression, closedType);
-                return;
-            }
-
-            var parameterType = _genericTypeArguments
-                .FirstOrDefault(arg => arg.Name == genericParameterName);
-
-            if (parameterType != null)
-            {
-                SetGenericArgument(new TypedOpenGenericArgumentExpression(parameterType), closedType);
+                SetGenericArgument(genericParameter, closedTypeExpression);
                 return;
             }
 
             throw new InvalidOperationException(
-                $"Type '{_implementedType.GetFriendlyName()}' has no " +
+                $"Type '{ImplementedTypeExpression.GetFriendlyName()}' has no " +
                 $"generic parameter named '{genericParameterName}'.");
         }
 
-        private bool TryGetImplementedTypeParameterExpression(
-            string parameterName,
-            out GenericParameterExpression parameterExpression)
-        {
-            if (_implementedTypeExpression == null)
-            {
-                parameterExpression = null;
-                return false;
-            }
-
-            parameterExpression = _implementedTypeExpression
-                .GenericParameters
-                .FirstOrDefault(p => p.Name == parameterName);
-
-            return parameterExpression != null;
-        }
-
         public void SetGenericArgument(
-            GenericParameterExpression parameter,
-            Type closedType)
+            OpenGenericParameterExpression genericParameter,
+            TypeExpression closedType)
         {
-            SetGenericArgument((OpenGenericArgumentExpression)parameter, closedType);
-        }
-
-        private void SetGenericArgument(
-            OpenGenericArgumentExpression parameter,
-            Type closedType)
-        {
-            for (var i = 0; i < _genericTypeArguments.Length; ++i)
-            {
-                if (_genericTypeArguments[i].Name != parameter.Name)
-                {
-                    continue;
-                }
-
-                _genericTypeArguments[i] = closedType;
-                _typeExpression.AddGenericArgument(parameter.Close(closedType));
-                return;
-            }
+            ImplementedTypeExpression = ImplementedTypeExpression
+                .Close(genericParameter, closedType);
         }
 
         PropertyExpression IClassMemberConfigurator.AddProperty(
             string name,
-            Type type,
+            IType type,
             Action<IClassPropertyExpressionConfigurator> configuration)
         {
-            return ((ClassExpression)_typeExpression).AddProperty(name, type, configuration);
+            return _implementingTypeExpression.AddProperty(name, type, configuration);
         }
 
         MethodExpression IClassMemberConfigurator.AddMethod(
             string name,
             Action<IClassMethodExpressionConfigurator> configuration)
         {
-            return ((ClassExpression)_typeExpression).AddMethod(name, configuration);
+            return _implementingTypeExpression.AddMethod(name, configuration);
         }
 
         PropertyExpression IStructMemberConfigurator.AddProperty(
             string name,
-            Type type,
+            IType type,
             Action<IConcreteTypePropertyExpressionConfigurator> configuration)
         {
-            return ((StructExpression)_typeExpression).AddProperty(name, type, configuration);
+            return _implementingTypeExpression.AddProperty(name, type, configuration);
         }
 
         MethodExpression IStructMemberConfigurator.AddMethod(
             string name,
             Action<IConcreteTypeMethodExpressionConfigurator> configuration)
         {
-            return ((StructExpression)_typeExpression).AddMethod(name, configuration);
+            return _implementingTypeExpression.AddMethod(name, configuration);
         }
     }
 }

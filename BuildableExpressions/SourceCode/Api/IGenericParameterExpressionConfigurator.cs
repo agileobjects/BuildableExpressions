@@ -1,6 +1,5 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Api
 {
-    using System;
     using Generics;
 
     /// <summary>
@@ -27,7 +26,10 @@
         /// Set the <see cref="GenericParameterExpression"/> to be constrained to the given
         /// <paramref name="types"/>.
         /// </summary>
-        /// <param name="types">The Type(s) to which to constrain the <see cref="GenericParameterExpression"/>.</param>
-        void AddTypeConstraints(params Type[] types);
+        /// <param name="types">
+        /// The <see cref="TypeExpression"/>(s) to which to constrain the
+        /// <see cref="GenericParameterExpression"/>.
+        /// </param>
+        void AddTypeConstraints(params TypeExpression[] types);
     }
 }

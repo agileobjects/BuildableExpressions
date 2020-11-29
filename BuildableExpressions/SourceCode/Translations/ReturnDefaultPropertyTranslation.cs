@@ -6,41 +6,41 @@
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations.Reflection;
 
-    internal class TransientPropertyTranslation : ITranslation
+    internal class ReturnDefaultPropertyTranslation : ITranslation
     {
-        private readonly PropertyExpression _propertyExpression;
+        private readonly IProperty _property;
         private readonly ITranslatable _typeNameTranslation;
         private readonly bool _writeModifiers;
         private readonly string _accessibility;
         private readonly string _modifiers;
         private readonly string _accessors;
 
-        public TransientPropertyTranslation(
-            PropertyExpression propertyExpression,
+        public ReturnDefaultPropertyTranslation(
+            IProperty property,
             ITranslationContext context)
         {
-            _propertyExpression = propertyExpression;
-            _typeNameTranslation = context.GetTranslationFor(propertyExpression.Type);
+            _property = property;
+            _typeNameTranslation = context.GetTranslationFor(property.Type);
 
             var translationSize = _typeNameTranslation.TranslationSize + 1;
 
-            _writeModifiers = !(propertyExpression is InterfacePropertyExpression);
+            _writeModifiers = !(property is InterfacePropertyExpression);
 
             if (_writeModifiers)
             {
-                _accessibility = propertyExpression.GetAccessibilityForTranslation();
-                _modifiers = propertyExpression.GetModifiersForTranslation();
+                _accessibility = property.GetAccessibilityForTranslation();
+                _modifiers = property.GetModifiersForTranslation();
                 translationSize += _accessibility.Length + _modifiers.Length;
             }
 
-            var getter = CreateGetter(propertyExpression.GetterExpression);
-            var setter = CreateSetter(propertyExpression.SetterExpression);
+            var getter = CreateGetter(property.Getter);
+            var setter = CreateSetter(property.Setter);
 
             _accessors = "{" + getter + setter + "}";
 
             TranslationSize =
                 translationSize +
-                propertyExpression.Name.Length +
+                property.Name.Length +
                _accessors.Length;
         }
 
@@ -64,9 +64,9 @@
                 return string.Empty;
             }
 
-            var accessorName = accessor == _propertyExpression.GetterExpression ? "get" : "set";
+            var accessorName = accessor == _property.Getter ? "get" : "set";
 
-            var accessorTranslation = accessorName + (_propertyExpression.IsAutoProperty
+            var accessorTranslation = accessorName + (_property.IsAutoProperty()
                 ? ";" : bodyFactory.Invoke(accessor));
 
             if (_writeModifiers)
@@ -84,9 +84,10 @@
 
         #endregion
 
-        public ExpressionType NodeType => _propertyExpression.NodeType;
+        public ExpressionType NodeType
+            => (ExpressionType)SourceCodeExpressionType.Property;
 
-        public Type Type => _propertyExpression.Type;
+        public Type Type => _property.Type.AsType();
 
         public int TranslationSize { get; }
 
@@ -105,7 +106,7 @@
 
             _typeNameTranslation.WriteTo(writer);
             writer.WriteToTranslation(' ');
-            writer.WriteToTranslation(_propertyExpression.Name);
+            writer.WriteToTranslation(_property.Name);
             writer.WriteToTranslation(_accessors);
         }
     }

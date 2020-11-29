@@ -1,22 +1,29 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
-    using Generics;
-    using NetStandardPolyfills;
+    using ReadableExpressions.Translations.Reflection;
 
-    internal class TypedInterfaceExpression : InterfaceExpression
+    internal class TypedInterfaceExpression : InterfaceExpression, IType
     {
-        public TypedInterfaceExpression(SourceCodeExpression sourceCode, Type @interface)
-            : base(sourceCode, @interface.GetTypedExpressionName())
-        {
-            Type = @interface;
+        private readonly Type _interfaceType;
 
-            foreach (var parameterType in @interface.GetGenericTypeArguments())
-            {
-                AddGenericParameter(new TypedOpenGenericArgumentExpression(parameterType));
-            }
+        public TypedInterfaceExpression(Type interfaceType)
+            : base(interfaceType)
+        {
+            _interfaceType = interfaceType;
         }
 
-        public override Type Type { get; }
+        #region IType Members
+
+        string IType.FullName => _interfaceType.FullName;
+
+        string IType.Name => _interfaceType.Name;
+
+        bool IType.IsNested => _interfaceType.IsNested;
+
+        #endregion
+
+        protected override TypeExpression CreateInstance()
+            => new TypedInterfaceExpression(_interfaceType);
     }
 }

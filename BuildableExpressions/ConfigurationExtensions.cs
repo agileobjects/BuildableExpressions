@@ -4,7 +4,11 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using Extensions;
+    using NetStandardPolyfills;
     using ReadableExpressions;
+    using ReadableExpressions.Extensions;
+    using ReadableExpressions.Translations.Reflection;
     using SourceCode;
     using SourceCode.Api;
     using SourceCode.Generics;
@@ -67,6 +71,28 @@
         }
 
         /// <summary>
+        /// Closes the <see cref="GenericParameterExpression"/> with the given
+        /// <paramref name="genericParameterName"/> to the given <paramref name="closedType"/> type
+        /// for the <see cref="TypeExpression"/>
+        /// </summary>
+        /// <param name="implConfig">The <see cref="IImplementationConfigurator"/> to configure.</param>
+        /// <param name="genericParameterName">
+        /// The name of the <see cref="GenericParameterExpression"/> describing the open generic
+        /// parameter to close to the given <paramref name="closedType"/> type.
+        /// </param>
+        /// <param name="closedType">
+        /// The Type to which to close the <see cref="GenericParameterExpression"/> with the given
+        /// <paramref name="genericParameterName"/>.
+        /// </param>
+        public static void SetGenericArgument(
+            this IImplementationConfigurator implConfig,
+            string genericParameterName,
+            Type closedType)
+        {
+            implConfig.SetGenericArgument(genericParameterName, (TypeExpression)BclTypeWrapper.For(closedType));
+        }
+
+        /// <summary>
         /// Closes the given <paramref name="parameter"/> to the given <typeparamref name="TClosed"/>
         /// type for the <see cref="TypeExpression"/>
         /// </summary>
@@ -75,14 +101,32 @@
         /// </typeparam>
         /// <param name="implConfig">The <see cref="IImplementationConfigurator"/> to configure.</param>
         /// <param name="parameter">
-        /// The <see cref="GenericParameterExpression"/> describing the open generic parameter to
-        /// close to the given <typeparamref name="TClosed"/> type.
+        /// The <see cref="OpenGenericParameterExpression"/> describing the open generic parameter
+        /// to close to the given <typeparamref name="TClosed"/> type.
         /// </param>
         public static void SetGenericArgument<TClosed>(
             this IImplementationConfigurator implConfig,
-            GenericParameterExpression parameter)
+            OpenGenericParameterExpression parameter)
         {
             implConfig.SetGenericArgument(parameter, typeof(TClosed));
+        }
+
+        /// <summary>
+        /// Closes the given <paramref name="parameter"/> to the given <paramref name="closedType"/>
+        /// type for the <see cref="TypeExpression"/>
+        /// </summary>
+        /// <param name="implConfig">The <see cref="IImplementationConfigurator"/> to configure.</param>
+        /// <param name="parameter">
+        /// The <see cref="OpenGenericParameterExpression"/> describing the open generic parameter
+        /// to close to the given <paramref name="closedType"/>.
+        /// </param>
+        /// <param name="closedType">The Type to which to close the given <paramref name="parameter"/>.</param>
+        public static void SetGenericArgument(
+            this IImplementationConfigurator implConfig,
+            OpenGenericParameterExpression parameter,
+            Type closedType)
+        {
+            implConfig.SetGenericArgument(parameter, TypeExpressionFactory.Create(closedType));
         }
 
         /// <summary>
@@ -102,26 +146,11 @@
 
         /// <summary>
         /// Configures the <see cref="ClassExpression"/> to derive from the given
-        /// <paramref name="baseTypeExpression"/>.
-        /// </summary>
-        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
-        /// <param name="baseTypeExpression">
-        /// The base type from which the <see cref="ClassExpression"/> should derive.
-        /// </param>
-        public static void SetBaseType(
-            this IClassExpressionConfigurator classConfig,
-            ClassExpression baseTypeExpression)
-        {
-            classConfig.SetBaseType(baseTypeExpression.Type);
-        }
-
-        /// <summary>
-        /// Configures the <see cref="ClassExpression"/> to derive from the given
         /// <paramref name="baseType"/>.
         /// </summary>
         /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
         /// <param name="baseType">
-        /// The base type from which the <see cref="ClassExpression"/> should derive.
+        /// The base Type from which the <see cref="ClassExpression"/> should derive.
         /// </param>
         public static void SetBaseType(
             this IClassExpressionConfigurator classConfig,
@@ -132,19 +161,45 @@
 
         /// <summary>
         /// Configures the <see cref="ClassExpression"/> to derive from the given
-        /// <paramref name="baseTypeExpression"/>, using the given <paramref name="configuration"/>.
+        /// <paramref name="baseTypeExpression"/>.
         /// </summary>
         /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
         /// <param name="baseTypeExpression">
         /// The base type from which the <see cref="ClassExpression"/> should derive.
         /// </param>
+        public static void SetBaseType(
+            this IClassExpressionConfigurator classConfig,
+            ClassExpression baseTypeExpression)
+        {
+            classConfig.SetBaseType(baseTypeExpression, configuration: null);
+        }
+
+        /// <summary>
+        /// Configures the <see cref="ClassExpression"/> to derive from the given
+        /// <paramref name="baseType"/>, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="baseType">
+        /// The base Type from which the <see cref="ClassExpression"/> should derive.
+        /// </param>
         /// <param name="configuration">The configuration to use.</param>
         public static void SetBaseType(
             this IClassExpressionConfigurator classConfig,
-            ClassExpression baseTypeExpression,
+            Type baseType,
             Action<IClassImplementationConfigurator> configuration)
         {
-            classConfig.SetBaseType(baseTypeExpression.Type, configuration);
+            ThrowIfInvalidBaseType(baseType);
+
+            classConfig.SetBaseType(new TypedClassExpression(baseType), configuration);
+        }
+
+        private static void ThrowIfInvalidBaseType(Type baseType)
+        {
+            if (!baseType.IsClass() || baseType.IsSealed())
+            {
+                throw new InvalidOperationException(
+                    $"Type '{baseType.GetFriendlyName()}' is not a valid base type.");
+            }
         }
 
         /// <summary>
@@ -170,6 +225,36 @@
             Type @interface)
         {
             interfaceConfig.SetImplements(@interface, configuration: null);
+        }
+
+        /// <summary>
+        /// Configures the <see cref="InterfaceExpression"/> to implement the given
+        /// <paramref name="interface"/>, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="interface">The interface Type the <see cref="InterfaceExpression"/> should implement.</param>
+        /// <param name="interfaceConfig">The <see cref="IInterfaceExpressionConfigurator"/> to configure.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        public static void SetImplements(
+            this IInterfaceExpressionConfigurator interfaceConfig,
+            Type @interface,
+            Action<IImplementationConfigurator> configuration)
+        {
+            ThrowIfNonInterfaceType(@interface);
+
+            var interfaceExpression = new TypedInterfaceExpression(@interface);
+            interfaceConfig.SetImplements(interfaceExpression, configuration);
+        }
+
+        private static void ThrowIfNonInterfaceType(Type @interface)
+        {
+            @interface.ThrowIfNull(nameof(@interface));
+
+            if (!@interface.IsInterface())
+            {
+                throw new ArgumentException(
+                    $"Type '{@interface.GetFriendlyName()}' is not an interface type.",
+                    nameof(@interface));
+            }
         }
 
         /// <summary>
@@ -201,37 +286,37 @@
         }
 
         /// <summary>
-        /// Configures the <see cref="ClassExpression"/> to implement the Type of the given
-        /// <paramref name="interfaceExpression"/>, using the given <paramref name="configuration"/>.
+        /// Configures the <see cref="ClassExpression"/> to implement the given
+        /// <paramref name="interface"/> Type, using the given <paramref name="configuration"/>.
         /// </summary>
         /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
-        /// <param name="interfaceExpression">
-        /// The <see cref="InterfaceExpression"/> the <see cref="ClassExpression"/> should implement.
-        /// </param>
+        /// <param name="interface">The interface Type the <see cref="ClassExpression"/> should implement.</param>
         /// <param name="configuration">The configuration to use.</param>
         public static void SetImplements(
             this IClassExpressionConfigurator classConfig,
-            InterfaceExpression interfaceExpression,
+            Type @interface,
             Action<IClassImplementationConfigurator> configuration)
         {
-            classConfig.SetImplements(interfaceExpression.Type, configuration);
+            ThrowIfNonInterfaceType(@interface);
+
+            var interfaceExpression = new TypedInterfaceExpression(@interface);
+            classConfig.SetImplements(interfaceExpression, configuration);
         }
 
         /// <summary>
-        /// Configures the <see cref="StructExpression"/> to implement the Type of the given
-        /// <paramref name="interfaceExpression"/>, using the given <paramref name="configuration"/>.
+        /// Configures the <see cref="StructExpression"/> to implement the given
+        /// <paramref name="interface"/> Type, using the given <paramref name="configuration"/>.
         /// </summary>
         /// <param name="structConfig">The <see cref="IStructExpressionConfigurator"/> to configure.</param>
-        /// <param name="interfaceExpression">
-        /// The <see cref="InterfaceExpression"/> the <see cref="StructExpression"/> should implement.
-        /// </param>
+        /// <param name="interface">The interface Type the <see cref="StructExpression"/> should implement.</param>
         /// <param name="configuration">The configuration to use.</param>
         public static void SetImplements(
             this IStructExpressionConfigurator structConfig,
-            InterfaceExpression interfaceExpression,
+            Type @interface,
             Action<IStructImplementationConfigurator> configuration)
         {
-            structConfig.SetImplements(interfaceExpression.Type, configuration);
+            var interfaceExpression = new TypedInterfaceExpression(@interface);
+            structConfig.SetImplements(interfaceExpression, configuration);
         }
 
         /// <summary>
@@ -262,7 +347,8 @@
             string name,
             Action<IInterfacePropertyExpressionConfigurator> configuration)
         {
-            return interfaceConfig.AddProperty(name, typeof(TProperty), configuration);
+            return interfaceConfig
+                .AddProperty(name, BclTypeWrapper.For(typeof(TProperty)), configuration);
         }
 
         /// <summary>
@@ -298,7 +384,7 @@
         {
             return classConfig.AddProperty(
                 implementedProperty.Name,
-                implementedProperty.Type,
+              ((IProperty)implementedProperty).Type,
                 configuration);
         }
 
@@ -354,6 +440,25 @@
         }
 
         /// <summary>
+        /// Add a public, instance-scoped, get-set <see cref="PropertyExpression"/> to the
+        /// <see cref="ClassExpression"/>, with the given <paramref name="name"/>,
+        /// <paramref name="type"/> and <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="PropertyExpression"/>.</param>
+        /// <param name="type">The Type of the <see cref="PropertyExpression"/>.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
+        public static PropertyExpression AddProperty(
+            this IClassExpressionConfigurator classConfig,
+            string name,
+            Type type,
+            Action<IClassPropertyExpressionConfigurator> configuration)
+        {
+            return classConfig.AddProperty(name, BclTypeWrapper.For(type), configuration);
+        }
+
+        /// <summary>
         /// Add an override of the given <paramref name="overriddenProperty"/> to the
         /// <see cref="ClassExpression"/> by creating a public auto-property with the appropriate
         /// accessor(s).
@@ -386,7 +491,7 @@
         {
             return classConfig.AddProperty(
                 overriddenProperty.Name,
-                overriddenProperty.Type,
+              ((IProperty)overriddenProperty).Type,
                 configuration);
         }
 
@@ -450,7 +555,7 @@
         {
             return structConfig.AddProperty(
                 implementedProperty.Name,
-                implementedProperty.Type,
+              ((IProperty)implementedProperty).Type,
                 configuration);
         }
 
@@ -485,7 +590,8 @@
             string name,
             Action<IConcreteTypePropertyExpressionConfigurator> configuration)
         {
-            return structConfig.AddProperty(name, typeof(TProperty), configuration);
+            return structConfig
+                .AddProperty(name, BclTypeWrapper.For(typeof(TProperty)), configuration);
         }
 
         /// <summary>
@@ -503,6 +609,25 @@
             Type type)
         {
             return structConfig.AddProperty(name, type, PublicGetSet);
+        }
+
+        /// <summary>
+        /// Add a public, instance-scoped, get-set <see cref="PropertyExpression"/> to the
+        /// <see cref="StructExpression"/>, with the given <paramref name="name"/>,
+        /// <paramref name="type"/> and <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="structConfig">The <see cref="IStructExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="PropertyExpression"/>.</param>
+        /// <param name="type">The type of the <see cref="PropertyExpression"/>.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
+        public static PropertyExpression AddProperty(
+            this IStructExpressionConfigurator structConfig,
+            string name,
+            Type type,
+            Action<IConcreteTypePropertyExpressionConfigurator> configuration)
+        {
+            return structConfig.AddProperty(name, BclTypeWrapper.For(type), configuration);
         }
 
         internal static void PublicGetSet(
@@ -665,6 +790,26 @@
         }
 
         /// <summary>
+        /// Add a parameterless <see cref="MethodExpression"/> to the
+        /// <see cref="InterfaceExpression"/>, with the given <paramref name="name"/>,
+        /// <paramref name="returnType"/> and <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="interfaceConfig">The <see cref="IInterfaceExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
+        /// <param name="returnType">The return type of the <see cref="MethodExpression"/>.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
+        public static MethodExpression AddMethod(
+            this IInterfaceExpressionConfigurator interfaceConfig,
+            string name,
+            Type returnType,
+            Action<IMethodExpressionConfigurator> configuration)
+        {
+            return interfaceConfig
+                .AddMethod(name, BclTypeWrapper.For(returnType), configuration);
+        }
+
+        /// <summary>
         /// Add a public, instance-scoped <see cref="MethodExpression"/> to the
         /// <see cref="ClassExpression"/>, with the given <paramref name="name"/> and
         /// <paramref name="body"/>.
@@ -785,14 +930,14 @@
         }
 
         /// <summary>
-        /// Add an unconstrained <see cref="GenericParameterExpression"/> with the given
+        /// Add an unconstrained <see cref="OpenGenericParameterExpression"/> with the given
         /// <paramref name="name"/> to the <see cref="TypeExpression"/> or
         /// <see cref="MethodExpression"/>.
         /// </summary>
         /// <param name="methodConfig">The <see cref="IGenericParameterConfigurator"/> to configure.</param>
-        /// <param name="name">The name of the <see cref="GenericParameterExpression"/>.</param>
-        /// <returns>The newly-created <see cref="GenericParameterExpression"/>.</returns>
-        public static GenericParameterExpression AddGenericParameter(
+        /// <param name="name">The name of the <see cref="OpenGenericParameterExpression"/>.</param>
+        /// <returns>The newly-created <see cref="OpenGenericParameterExpression"/>.</returns>
+        public static OpenGenericParameterExpression AddGenericParameter(
             this IGenericParameterConfigurator methodConfig,
             string name)
         {
@@ -835,6 +980,19 @@
             IEnumerable<Type> types)
         {
             parameterConfig.AddTypeConstraints(types.ToArray());
+        }
+
+        /// <summary>
+        /// Set the <see cref="GenericParameterExpression"/> to be constrained to the given
+        /// <paramref name="types"/>.
+        /// </summary>
+        /// <param name="parameterConfig">The <see cref="IGenericParameterExpressionConfigurator"/> to configure.</param>
+        /// <param name="types">The Types to which to constrain the <see cref="GenericParameterExpression"/>.</param>
+        public static void AddTypeConstraints(
+            this IGenericParameterExpressionConfigurator parameterConfig,
+            params Type[] types)
+        {
+            parameterConfig.AddTypeConstraints(types.ProjectToArray(TypeExpressionFactory.Create));
         }
 
         /// <summary>
@@ -910,6 +1068,29 @@
             this IClassMethodExpressionConfigurator methodConfig)
         {
             methodConfig.SetAbstract(typeof(TReturn));
+        }
+
+        /// <summary>
+        /// Mark the class <see cref="MethodExpression"/> as abstract, with the given
+        /// <paramref name="returnType"/>.
+        /// </summary>
+        /// <param name="methodConfig">The <see cref="IClassMethodExpressionConfigurator"/> to configure.</param>
+        /// <param name="returnType">The return type to apply to the <see cref="MethodExpression"/>.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the <see cref="ClassExpression"/> which declares the class
+        /// <see cref="MethodExpression"/> has not been marked as abstract.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the class <see cref="MethodExpression"/> has already been marked as static.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the class <see cref="MethodExpression"/> has already been marked as virtual.
+        /// </exception>
+        public static void SetAbstract(
+            this IClassMethodExpressionConfigurator methodConfig,
+            Type returnType)
+        {
+            methodConfig.SetAbstract(BclTypeWrapper.For(returnType));
         }
 
         /// <summary>

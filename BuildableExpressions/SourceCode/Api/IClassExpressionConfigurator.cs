@@ -18,27 +18,31 @@
 
         /// <summary>
         /// Configures the <see cref="ClassExpression"/> to derive from the given
-        /// <paramref name="baseType"/>.
+        /// <paramref name="baseTypeExpression"/>.
         /// </summary>
-        /// <param name="baseType">
-        /// The base type from which the <see cref="ClassExpression"/> should derive.
+        /// <param name="baseTypeExpression">
+        /// The base <see cref="ClassExpression"/> from which the <see cref="ClassExpression"/>
+        /// should derive.
         /// </param>
         /// <param name="configuration">The configuration to use.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown if the <see cref="ClassExpression"/> has already been given a base type.
         /// </exception>
-        void SetBaseType(Type baseType, Action<IClassImplementationConfigurator> configuration);
+        void SetBaseType(
+            ClassExpression baseTypeExpression,
+            Action<IClassImplementationConfigurator> configuration);
 
         /// <summary>
         /// Configures the <see cref="ClassExpression"/> to implement the given
-        /// <paramref name="interface"/>, using the given <paramref name="configuration"/>.
+        /// <paramref name="interfaceExpression"/>, using the given <paramref name="configuration"/>.
         /// </summary>
-        /// <param name="interface">
-        /// The interface type the <see cref="ClassExpression"/> should implement.
+        /// <param name="interfaceExpression">
+        /// The <see cref="InterfaceExpression"/> type the <see cref="ClassExpression"/> should
+        /// implement.
         /// </param>
         /// <param name="configuration">The configuration to use.</param>
         void SetImplements(
-            Type @interface,
+            InterfaceExpression interfaceExpression,
             Action<IClassImplementationConfigurator> configuration);
 
         /// <summary>

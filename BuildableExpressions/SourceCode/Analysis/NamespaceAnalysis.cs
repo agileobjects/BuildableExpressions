@@ -21,7 +21,7 @@
         public void Visit(TypeExpression type)
         {
             _sourceCodeNamespace = type.SourceCode.Namespace;
-            AddNamespacesIfRequired(type.ImplementedTypes);
+            AddNamespacesIfRequired(type.ImplementedTypeExpressions);
         }
 
         protected override Expression VisitConstant(ConstantExpression constant)
@@ -76,8 +76,7 @@
             if (methodCall.Method.IsGenericMethod)
             {
                 AddNamespacesIfRequired(new BclMethodWrapper(methodCall.Method, Settings)
-                    .GetRequiredExplicitGenericArguments(Settings)
-                    .Project(arg => arg.Type));
+                    .GetRequiredExplicitGenericArguments(Settings));
             }
 
             if (methodCall.Method.IsStatic)
@@ -92,9 +91,8 @@
             {
                 AddNamespacesIfRequired(method
                     .GenericParameters
-                    .Cast<IGenericArgument>()
-                    .Filter(ga => ga.HasConstraints)
-                    .SelectMany(ga => ga.TypeConstraints));
+                    .Filter(gp => gp.HasConstraints)
+                    .SelectMany(gp => gp.TypeConstraints));
             }
 
             foreach (var parameter in method.Parameters)
@@ -124,7 +122,7 @@
         }
 
         public void Visit(NewExpression newing)
-            => AddNamespaceIfRequired(newing.Type);
+            => AddNamespaceIfRequired(newing);
 
         protected override CatchBlock VisitCatchBlock(CatchBlock @catch)
         {
@@ -142,7 +140,7 @@
             }
         }
 
-        private void AddNamespacesIfRequired(IEnumerable<Type> accessedTypes)
+        private void AddNamespacesIfRequired(IEnumerable<IType> accessedTypes)
         {
             foreach (var type in accessedTypes)
             {
@@ -153,20 +151,23 @@
         private void AddNamespaceIfRequired(Expression expression)
             => AddNamespaceIfRequired(expression.Type);
 
-        private void AddNamespaceIfRequired(Type accessedType)
+        private void AddNamespaceIfRequired(Type type)
+            => AddNamespaceIfRequired(BclTypeWrapper.For(type));
+
+        private void AddNamespaceIfRequired(IType accessedType)
         {
-            if ((accessedType == typeof(void)) ||
-                (accessedType == typeof(string)) ||
-                (accessedType == typeof(object)) ||
-                 accessedType.IsPrimitive() ||
-                (accessedType.Namespace == BuildConstants.GenericParameterTypeNamespace))
+            if (accessedType.IsPrimitive ||
+                accessedType.Equals(BclTypeWrapper.Void) ||
+                accessedType.Equals(BclTypeWrapper.String) ||
+                accessedType.Equals(BclTypeWrapper.Object) ||
+               (accessedType.Namespace == BuildConstants.GenericParameterTypeNamespace))
             {
                 return;
             }
 
-            if (accessedType.IsGenericType())
+            if (accessedType.IsGeneric)
             {
-                AddNamespacesIfRequired(accessedType.GetGenericTypeArguments());
+                AddNamespacesIfRequired(accessedType.GenericTypeArguments);
             }
 
             var @namespace = accessedType.Namespace;

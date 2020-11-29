@@ -1,13 +1,25 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
+    using System;
     using ReadableExpressions.Translations;
+    using ReadableExpressions.Translations.Reflection;
     using Translations;
 
     /// <summary>
     /// Represents an interface in a piece of source code.
     /// </summary>
-    public abstract class InterfaceExpression : TypeExpression
+    public abstract class InterfaceExpression : TypeExpression, IType
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InterfaceExpression"/> class for the given
+        /// <paramref name="interfaceType"/>.
+        /// </summary>
+        /// <param name="interfaceType">The Type represented by the <see cref="InterfaceExpression"/>.</param>
+        protected InterfaceExpression(Type interfaceType)
+            : base(interfaceType)
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="InterfaceExpression"/> class.
         /// </summary>
@@ -19,6 +31,14 @@
             : base(sourceCode, name)
         {
         }
+
+        #region IType Members
+
+        internal override bool IsInterface => true;
+
+        bool IType.IsAbstract => true;
+
+        #endregion
 
         /// <inheritdoc />
         protected override ITranslation GetTranslation(ITranslationContext context)

@@ -11,14 +11,12 @@
     {
         /// <summary>
         /// Configures the <see cref="StructExpression"/> to implement the given
-        /// <paramref name="interface"/>, using the given <paramref name="configuration"/>.
+        /// <paramref name="interfaceExpression"/>, using the given <paramref name="configuration"/>.
         /// </summary>
-        /// <param name="interface">
-        /// The interface type the <see cref="StructExpression"/> should implement.
-        /// </param>
+        /// <param name="interfaceExpression">The <see cref="InterfaceExpression"/> to implement.</param>
         /// <param name="configuration">The configuration to use.</param>
         void SetImplements(
-            Type @interface,
+            InterfaceExpression interfaceExpression,
             Action<IStructImplementationConfigurator> configuration);
     }
 }

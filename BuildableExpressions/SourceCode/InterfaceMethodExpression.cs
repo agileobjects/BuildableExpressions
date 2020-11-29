@@ -1,25 +1,23 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
-    using Analysis;
     using ReadableExpressions.Translations.Reflection;
 
-    internal class InterfaceMethodExpression :
-        MethodExpression,
-        IPotentialInterfaceMember
+    internal class InterfaceMethodExpression : MethodExpression
     {
+        private readonly IType _returnType;
+
         public InterfaceMethodExpression(
             InterfaceExpression declaringInterfaceExpression,
             string name,
-            Type returnType,
+            IType returnType,
             Action<MethodExpression> configuration)
             : base(declaringInterfaceExpression, name)
         {
+            _returnType = returnType;
             configuration.Invoke(this);
 
-            ReturnType = returnType;
             SetAbstract();
-            Analysis = MethodExpressionAnalysis.For(this);
             Validate();
         }
 
@@ -30,7 +28,7 @@
 
         #endregion
 
-        public override Type ReturnType { get; }
+        public override Type ReturnType => _returnType.AsType();
 
         internal override bool HasGeneratedName => false;
 
@@ -38,6 +36,6 @@
 
         public override bool IsOverride => false;
 
-        bool IPotentialInterfaceMember.IsInterfaceMember => true;
+        protected override IType GetReturnType() => _returnType;
     }
 }

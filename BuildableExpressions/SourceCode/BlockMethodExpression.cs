@@ -25,11 +25,11 @@
 
         public Expression CallExpression { get; }
 
-        public void Finalise() => SetName(GetName());
+        public void Finalise() => SetName(GenerateName());
 
         #region Name Generation
 
-        private string GetName()
+        private string GenerateName()
         {
             var baseName = GetBaseName();
 

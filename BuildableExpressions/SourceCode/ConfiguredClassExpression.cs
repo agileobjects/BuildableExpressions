@@ -4,8 +4,7 @@
     using System.Linq.Expressions;
     using Api;
     using BuildableExpressions.Extensions;
-    using NetStandardPolyfills;
-    using ReadableExpressions.Extensions;
+    using ReadableExpressions.Translations.Reflection;
 
     internal class ConfiguredClassExpression :
         ClassExpression,
@@ -13,23 +12,28 @@
     {
         private Expression _baseInstanceExpression;
 
-        internal ConfiguredClassExpression(
+        public ConfiguredClassExpression(
             SourceCodeExpression sourceCode,
             string name,
             Action<IClassExpressionConfigurator> configuration)
-            : base(sourceCode, typeof(object), name)
+            : this(sourceCode, name)
         {
             configuration.Invoke(this);
             Validate();
         }
 
+        private ConfiguredClassExpression(SourceCodeExpression sourceCode, string name)
+            : base(sourceCode, name)
+        {
+        }
+
         #region IClassExpressionConfigurator Members
 
         void IClassExpressionConfigurator.SetImplements(
-            Type @interface,
+            InterfaceExpression interfaceExpression,
             Action<IClassImplementationConfigurator> configuration)
         {
-            SetImplements(@interface, configuration);
+            SetImplements(interfaceExpression, configuration);
         }
 
         void IClassExpressionConfigurator.SetStatic()
@@ -89,58 +93,48 @@
             => _baseInstanceExpression ??= InstanceExpression.Base(BaseTypeExpression);
 
         void IClassExpressionConfigurator.SetBaseType(
-            Type baseType,
+            ClassExpression baseTypeExpression,
             Action<IClassImplementationConfigurator> configuration)
         {
-            SetBaseType(baseType, configuration);
-        }
+            baseTypeExpression.ThrowIfNull(nameof(baseTypeExpression));
+            ThrowIfBaseTypeAlreadySet(baseTypeExpression);
+            ThrowIfInvalidBaseType(baseTypeExpression);
 
-        internal void SetBaseType(Type baseType)
-            => SetBaseType(baseType, configuration: null);
-
-        private void SetBaseType(
-            Type baseType,
-            Action<IClassImplementationConfigurator> configuration)
-        {
-            baseType.ThrowIfNull(nameof(baseType));
-            ThrowIfBaseTypeAlreadySet(baseType);
-            ThrowIfInvalidBaseType(baseType);
-
-            if (configuration == null)
+            if (configuration != null)
             {
-                SetBaseTypeTo(baseType);
-                return;
+                var configurator = new ImplementationConfigurator(
+                    this,
+                    baseTypeExpression,
+                    configuration);
+
+                baseTypeExpression = (ClassExpression)configurator.ImplementedTypeExpression;
             }
 
-            var configurator = new ImplementationConfigurator(this, baseType);
-            configuration.Invoke(configurator);
-            SetBaseTypeTo(configurator.GetImplementedType());
+            BaseTypeExpression = baseTypeExpression;
         }
 
-        private void ThrowIfBaseTypeAlreadySet(Type baseType)
+        private void ThrowIfBaseTypeAlreadySet(IType baseType)
         {
             if (!HasObjectBaseType)
             {
                 throw new InvalidOperationException(
-                    $"Unable to set class base type to '{baseType.GetFriendlyName()}' " +
-                    $"as it has already been set to '{BaseType.GetFriendlyName()}'");
+                    $"Unable to set class base type to '{baseType.Name}' " +
+                    $"as it has already been set to '{BaseTypeExpression.Name}'");
             }
         }
 
-        private static void ThrowIfInvalidBaseType(Type baseType)
+        private static void ThrowIfInvalidBaseType(ClassExpression baseType)
         {
-            if (!baseType.IsClass() || baseType.IsSealed())
+            if (baseType.IsSealed)
             {
                 throw new InvalidOperationException(
-                    $"Type '{baseType.GetFriendlyName()}' is not a valid base type.");
+                    $"Type '{baseType.Name}' is not a valid base type.");
             }
         }
-
-        private void SetBaseTypeTo(Type baseType) => BaseType = baseType;
 
         PropertyExpression IClassMemberConfigurator.AddProperty(
             string name,
-            Type type,
+            IType type,
             Action<IClassPropertyExpressionConfigurator> configuration)
         {
             return AddProperty(name, type, configuration);
@@ -164,5 +158,16 @@
         }
 
         #endregion
+
+        protected override TypeExpression CreateInstance()
+        {
+            return new ConfiguredClassExpression(SourceCode, Name)
+            {
+                BaseTypeExpression = BaseTypeExpression,
+                IsStatic = IsStatic,
+                IsAbstract = IsAbstract,
+                IsSealed = IsSealed
+            };
+        }
     }
 }

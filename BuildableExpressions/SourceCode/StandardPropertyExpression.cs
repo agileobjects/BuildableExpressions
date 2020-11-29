@@ -5,6 +5,7 @@
     using Api;
     using Extensions;
     using ReadableExpressions;
+    using ReadableExpressions.Translations.Reflection;
     using static MemberVisibility;
 
     internal class StandardPropertyExpression :
@@ -17,7 +18,7 @@
         public StandardPropertyExpression(
             TypeExpression declaringTypeExpression,
             string name,
-            Type type,
+            IType type,
             Action<StandardPropertyExpression> configuration)
             : base(declaringTypeExpression, name, type)
         {
@@ -59,8 +60,7 @@
                 .Any(p => p != this && p.Type == Type && p.Name == Name);
         }
 
-        public override bool IsAutoProperty
-            => GetterExpression?.HasBody != true && SetterExpression?.HasBody != true;
+        public override bool IsAutoProperty => this.IsAutoProperty();
 
         #region IMemberExpressionConfigurator Members
 

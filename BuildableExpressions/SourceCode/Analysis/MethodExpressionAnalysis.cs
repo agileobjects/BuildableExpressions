@@ -103,8 +103,11 @@
                 case (ExpressionType)SourceCodeExpressionType.Method:
                     return VisitAndConvert((MethodExpression)expression);
 
-                case (ExpressionType)SourceCodeExpressionType.GenericArgument:
-                    return VisitAndConvert((GenericParameterExpression)expression);
+                case (ExpressionType)SourceCodeExpressionType.GenericArgument
+                    when expression is OpenGenericParameterExpression genericParameter:
+                    {
+                        return VisitAndConvert(genericParameter);
+                    }
 
                 case Extension when expression is NameOfOperatorExpression nameOf:
                     return nameOf.Update(VisitAndConvert(nameOf.Operand));
@@ -191,19 +194,18 @@
             return base.VisitAndConvert(constant);
         }
 
-        private GenericParameterExpression VisitAndConvert(GenericParameterExpression parameter)
+        private TypeExpression VisitAndConvert(OpenGenericParameterExpression parameter)
         {
-            var inScopedGenericArguments = _method.DeclaringTypeExpression.GenericArguments;
-
-            if (inScopedGenericArguments == null)
+            if (_method.GenericParametersAccessor?.Contains(parameter) == true)
             {
                 return parameter;
             }
 
-            var closedGenericArgument = inScopedGenericArguments
-                .FirstOrDefault(arg => arg.ParameterExpression == parameter);
+            var closedType = _method
+                .DeclaringTypeExpression
+                .TryGetTypeExpressionFor(parameter, out var typeExpression);
 
-            return closedGenericArgument ?? parameter;
+            return closedType ? typeExpression : parameter;
         }
 
         protected override Expression VisitAndConvert(MemberExpression memberAccess)

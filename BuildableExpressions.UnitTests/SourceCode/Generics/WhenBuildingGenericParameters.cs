@@ -1,4 +1,4 @@
-﻿namespace AgileObjects.BuildableExpressions.UnitTests.Generics
+﻿namespace AgileObjects.BuildableExpressions.UnitTests.SourceCode.Generics
 {
     using System;
     using System.Collections.Generic;
@@ -7,14 +7,13 @@
     using BuildableExpressions.SourceCode.Generics;
     using Common;
     using NetStandardPolyfills;
-    using ReadableExpressions.Translations.Reflection;
     using Xunit;
     using static System.Linq.Expressions.Expression;
 
     public class WhenBuildingGenericParameters
     {
         [Fact]
-        public void ShouldBuildAnUnconstrainedParameter()
+        public void ShouldBuildAnUnconstrainedMethodParameter()
         {
             var param = default(GenericParameterExpression);
 
@@ -32,7 +31,6 @@
 
             param.ShouldNotBeNull();
             param.Name.ShouldBe("T");
-            param.IsClosed.ShouldBeFalse();
             param.Type.ShouldNotBeNull().Name.ShouldBe("T");
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
@@ -41,24 +39,21 @@
         [Fact]
         public void ShouldCreateAnUnconstrainedParameterExpression()
         {
-            var typeParameter = new TypedOpenGenericArgumentExpression(
+            var typeParameter = new TypedOpenGenericParameterExpression(
                 typeof(List<>)
                     .GetGenericTypeArguments()
                     .First());
 
             typeParameter.ShouldNotBeNull();
-            typeParameter.IsClosed.ShouldBeFalse();
-
-            var typeArgument = (IGenericArgument)typeParameter;
-            typeArgument.HasConstraints.ShouldBeFalse();
-            typeArgument.HasClassConstraint.ShouldBeFalse();
-            typeArgument.HasNewableConstraint.ShouldBeFalse();
-            typeArgument.HasStructConstraint.ShouldBeFalse();
-            typeArgument.TypeConstraints.ShouldBeEmpty();
+            typeParameter.HasConstraints.ShouldBeFalse();
+            typeParameter.HasClassConstraint.ShouldBeFalse();
+            typeParameter.HasNewableConstraint.ShouldBeFalse();
+            typeParameter.HasStructConstraint.ShouldBeFalse();
+            typeParameter.TypeConstraints.ShouldBeEmpty();
         }
 
         [Fact]
-        public void ShouldBuildANewableClassParameter()
+        public void ShouldBuildANewableClassMethodParameter()
         {
             var param = default(GenericParameterExpression);
 
@@ -81,7 +76,6 @@
 
             param.ShouldNotBeNull();
             param.Name.ShouldBe("TNewable");
-            param.IsClosed.ShouldBeFalse();
             param.Type.ShouldNotBeNull().Name.ShouldBe("TNewable");
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
@@ -89,26 +83,23 @@
         }
 
         [Fact]
-        public void ShouldCreateAnNewableClassParameterExpression()
+        public void ShouldCreateANewableClassParameterExpression()
         {
-            var typeParameter = new TypedOpenGenericArgumentExpression(
+            var typeParameter = new TypedOpenGenericParameterExpression(
                 typeof(NewableClassParameter<>)
                     .GetGenericTypeArguments()
                     .First());
 
             typeParameter.ShouldNotBeNull();
-            typeParameter.IsClosed.ShouldBeFalse();
-
-            var typeArgument = (IGenericArgument)typeParameter;
-            typeArgument.HasConstraints.ShouldBeTrue();
-            typeArgument.HasClassConstraint.ShouldBeTrue();
-            typeArgument.HasNewableConstraint.ShouldBeTrue();
-            typeArgument.HasStructConstraint.ShouldBeFalse();
-            typeArgument.TypeConstraints.ShouldBeEmpty();
+            typeParameter.HasConstraints.ShouldBeTrue();
+            typeParameter.HasClassConstraint.ShouldBeTrue();
+            typeParameter.HasNewableConstraint.ShouldBeTrue();
+            typeParameter.HasStructConstraint.ShouldBeFalse();
+            typeParameter.TypeConstraints.ShouldBeEmpty();
         }
 
         [Fact]
-        public void ShouldBuildAStructParameter()
+        public void ShouldBuildAStructMethodParameter()
         {
             var param = default(GenericParameterExpression);
 
@@ -130,7 +121,6 @@
 
             param.ShouldNotBeNull();
             param.Name.ShouldBe("TStruct");
-            param.IsClosed.ShouldBeFalse();
             param.Type.ShouldNotBeNull().Name.ShouldBe("TStruct");
             param.Type.IsClass().ShouldBeFalse();
             param.Type.IsValueType().ShouldBeTrue();
@@ -139,24 +129,21 @@
         [Fact]
         public void ShouldCreateAStructParameterExpression()
         {
-            var typeParameter = new TypedOpenGenericArgumentExpression(
+            var typeParameter = new TypedOpenGenericParameterExpression(
                 typeof(StructParameter<>)
                     .GetGenericTypeArguments()
                     .First());
 
             typeParameter.ShouldNotBeNull();
-            typeParameter.IsClosed.ShouldBeFalse();
-
-            var typeArgument = (IGenericArgument)typeParameter;
-            typeArgument.HasConstraints.ShouldBeTrue();
-            typeArgument.HasClassConstraint.ShouldBeFalse();
-            typeArgument.HasNewableConstraint.ShouldBeFalse();
-            typeArgument.HasStructConstraint.ShouldBeTrue();
-            typeArgument.TypeConstraints.ShouldBeEmpty();
+            typeParameter.HasConstraints.ShouldBeTrue();
+            typeParameter.HasClassConstraint.ShouldBeFalse();
+            typeParameter.HasNewableConstraint.ShouldBeFalse();
+            typeParameter.HasStructConstraint.ShouldBeTrue();
+            typeParameter.TypeConstraints.ShouldBeEmpty();
         }
 
         [Fact]
-        public void ShouldBuildATypeConstrainedParameter()
+        public void ShouldBuildATypeConstrainedMethodParameter()
         {
             var param = default(GenericParameterExpression);
 
@@ -178,7 +165,6 @@
 
             param.ShouldNotBeNull();
             param.Name.ShouldBe("TDerived");
-            param.IsClosed.ShouldBeFalse();
             param.Type.ShouldNotBeNull().Name.ShouldBe("TDerived");
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
@@ -188,24 +174,21 @@
         [Fact]
         public void ShouldCreateATypeConstrainedParameterExpression()
         {
-            var typeParameter = new TypedOpenGenericArgumentExpression(
+            var typeParameter = new TypedOpenGenericParameterExpression(
                 typeof(TypeConstrainedParameter<>)
                     .GetGenericTypeArguments()
                     .First());
 
             typeParameter.ShouldNotBeNull();
-            typeParameter.IsClosed.ShouldBeFalse();
-
-            var typeArgument = (IGenericArgument)typeParameter;
-            typeArgument.HasConstraints.ShouldBeTrue();
-            typeArgument.HasClassConstraint.ShouldBeFalse();
-            typeArgument.HasNewableConstraint.ShouldBeFalse();
-            typeArgument.HasStructConstraint.ShouldBeFalse();
-            typeArgument.TypeConstraints.ShouldHaveSingleItem().ShouldBe(typeof(BaseType));
+            typeParameter.HasConstraints.ShouldBeTrue();
+            typeParameter.HasClassConstraint.ShouldBeFalse();
+            typeParameter.HasNewableConstraint.ShouldBeFalse();
+            typeParameter.HasStructConstraint.ShouldBeFalse();
+            typeParameter.TypeConstraints.ShouldHaveSingleItem().ShouldBe(typeof(BaseType));
         }
 
         [Fact]
-        public void ShouldBuildAnInterfaceConstrainedParameter()
+        public void ShouldBuildAnInterfaceConstrainedMethodParameter()
         {
             var param = default(GenericParameterExpression);
 
@@ -227,7 +210,6 @@
 
             param.ShouldNotBeNull();
             param.Name.ShouldBe("TDisposable");
-            param.IsClosed.ShouldBeFalse();
             param.Type.ShouldNotBeNull().Name.ShouldBe("TDisposable");
             param.Type.IsAbstract().ShouldBeFalse();
             param.Type.IsClass().ShouldBeTrue();
@@ -239,24 +221,21 @@
         [Fact]
         public void ShouldCreateAnInterfaceConstrainedParameterExpression()
         {
-            var typeParameter = new TypedOpenGenericArgumentExpression(
+            var typeParameter = new TypedOpenGenericParameterExpression(
                 typeof(InterfaceConstrainedParameter<>)
                     .GetGenericTypeArguments()
                     .First());
 
             typeParameter.ShouldNotBeNull();
-            typeParameter.IsClosed.ShouldBeFalse();
-
-            var typeArgument = (IGenericArgument)typeParameter;
-            typeArgument.HasConstraints.ShouldBeTrue();
-            typeArgument.HasClassConstraint.ShouldBeFalse();
-            typeArgument.HasNewableConstraint.ShouldBeFalse();
-            typeArgument.HasStructConstraint.ShouldBeFalse();
-            typeArgument.TypeConstraints.ShouldHaveSingleItem().ShouldBe(typeof(IMessager));
+            typeParameter.HasConstraints.ShouldBeTrue();
+            typeParameter.HasClassConstraint.ShouldBeFalse();
+            typeParameter.HasNewableConstraint.ShouldBeFalse();
+            typeParameter.HasStructConstraint.ShouldBeFalse();
+            typeParameter.TypeConstraints.ShouldHaveSingleItem().ShouldBe(typeof(IMessager));
         }
 
         [Fact]
-        public void ShouldBuildAnAbstractTypeConstrainedParameter()
+        public void ShouldBuildAnAbstractTypeConstrainedMethodParameter()
         {
             var param = default(GenericParameterExpression);
 
@@ -278,7 +257,6 @@
 
             param.ShouldNotBeNull();
             param.Name.ShouldBe("TDerived");
-            param.IsClosed.ShouldBeFalse();
             param.Type.ShouldNotBeNull().Name.ShouldBe("TDerived");
             param.Type.IsAbstract().ShouldBeTrue();
             param.Type.IsClass().ShouldBeTrue();
@@ -289,26 +267,23 @@
         [Fact]
         public void ShouldCreateANewableTypeAndInterfaceConstrainedParameterExpression()
         {
-            var typeParameter = new TypedOpenGenericArgumentExpression(
+            var typeParameter = new TypedOpenGenericParameterExpression(
                 typeof(NewableTypeAndInterfaceConstrainedParameter<>)
                     .GetGenericTypeArguments()
                     .First());
 
             typeParameter.ShouldNotBeNull();
-            typeParameter.IsClosed.ShouldBeFalse();
-
-            var typeArgument = (IGenericArgument)typeParameter;
-            typeArgument.HasConstraints.ShouldBeTrue();
-            typeArgument.HasClassConstraint.ShouldBeFalse();
-            typeArgument.HasNewableConstraint.ShouldBeTrue();
-            typeArgument.HasStructConstraint.ShouldBeFalse();
-            typeArgument.TypeConstraints.Count.ShouldBe(2);
-            typeArgument.TypeConstraints.First().ShouldBe(typeof(AbstractBaseType));
-            typeArgument.TypeConstraints.Last().ShouldBe(typeof(IMessager));
+            typeParameter.HasConstraints.ShouldBeTrue();
+            typeParameter.HasClassConstraint.ShouldBeFalse();
+            typeParameter.HasNewableConstraint.ShouldBeTrue();
+            typeParameter.HasStructConstraint.ShouldBeFalse();
+            typeParameter.TypeConstraints.Count.ShouldBe(2);
+            typeParameter.TypeConstraints.First().ShouldBe(typeof(AbstractBaseType));
+            typeParameter.TypeConstraints.Last().ShouldBe(typeof(IMessager));
         }
 
         [Fact]
-        public void ShouldReuseBuiltParameterTypes()
+        public void ShouldReuseBuiltMethodParameterTypes()
         {
             var param1 = default(GenericParameterExpression);
             var param2 = default(GenericParameterExpression);
@@ -338,7 +313,7 @@
         }
 
         [Fact]
-        public void ShouldVaryBuiltParameterTypesByName()
+        public void ShouldVaryBuiltMethodParameterTypesByName()
         {
             var param1 = default(GenericParameterExpression);
             var param2 = default(GenericParameterExpression);
@@ -368,7 +343,7 @@
         }
 
         [Fact]
-        public void ShouldVaryBuiltParameterTypesByStructConstraint()
+        public void ShouldVaryBuiltMethodParameterTypesByStructConstraint()
         {
             var param1 = default(GenericParameterExpression);
             var param2 = default(GenericParameterExpression);
@@ -402,7 +377,7 @@
         }
 
         [Fact]
-        public void ShouldVaryBuiltParameterTypesByClassConstraint()
+        public void ShouldVaryBuiltMethodParameterTypesByClassConstraint()
         {
             var param1 = default(GenericParameterExpression);
             var param2 = default(GenericParameterExpression);
@@ -436,7 +411,7 @@
         }
 
         [Fact]
-        public void ShouldVaryBuiltParameterTypesByNewableConstraint()
+        public void ShouldVaryBuiltMethodParameterTypesByNewableConstraint()
         {
             var param1 = default(GenericParameterExpression);
             var param2 = default(GenericParameterExpression);
@@ -470,7 +445,7 @@
         }
 
         [Fact]
-        public void ShouldVaryBuiltParameterTypesByTypeConstraintPresence()
+        public void ShouldVaryBuiltMethodParameterTypesByTypeConstraintPresence()
         {
             var param1 = default(GenericParameterExpression);
             var param2 = default(GenericParameterExpression);
@@ -504,7 +479,7 @@
         }
 
         [Fact]
-        public void ShouldVaryBuiltParameterTypesByTypeConstraintDifference()
+        public void ShouldVaryBuiltMethodParameterTypesByTypeConstraintDifference()
         {
             var param1 = default(GenericParameterExpression);
             var param2 = default(GenericParameterExpression);
@@ -542,7 +517,7 @@
         }
 
         [Fact]
-        public void ShouldVaryBuiltParameterTypesByInterfaceTypeConstraintPresence()
+        public void ShouldVaryBuiltMethodParameterTypesByInterfaceTypeConstraintPresence()
         {
             var param1 = default(GenericParameterExpression);
             var param2 = default(GenericParameterExpression);
@@ -576,7 +551,7 @@
         }
 
         [Fact]
-        public void ShouldVaryBuiltParameterTypesByInterfaceTypeConstraintDifference()
+        public void ShouldVaryBuiltMethodParameterTypesByInterfaceTypeConstraintDifference()
         {
             var param1 = default(GenericParameterExpression);
             var param2 = default(GenericParameterExpression);

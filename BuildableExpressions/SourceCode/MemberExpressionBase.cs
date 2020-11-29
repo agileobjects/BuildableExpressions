@@ -1,6 +1,5 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
-    using System;
     using System.Linq.Expressions;
     using ReadableExpressions.Translations.Reflection;
     using static MemberVisibility;
@@ -8,10 +7,10 @@
     /// <summary>
     /// Abstract base class for types describing a member.
     /// </summary>
-    public abstract class MemberExpressionBase :
-        Expression,
-        IPotentialInterfaceMember
+    public abstract class MemberExpressionBase : Expression, IMember
     {
+        private IType _type;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberExpressionBase"/> class.
         /// </summary>
@@ -24,7 +23,7 @@
         /// <summary>
         /// Gets this <see cref="MemberExpressionBase"/>'s parent Type.
         /// </summary>
-        public abstract Type DeclaringType { get; }
+        public abstract IType DeclaringType { get; }
 
         /// <summary>
         /// Gets the <see cref="MemberVisibility"/> of this <see cref="MemberExpressionBase"/>.
@@ -54,6 +53,8 @@
 
         #region IMember Members
 
+        IType IMember.Type => _type ??= BclTypeWrapper.For(Type);
+
         bool IMember.IsPublic => Visibility == Public;
 
         bool IMember.IsProtectedInternal => Visibility == ProtectedInternal;
@@ -67,7 +68,5 @@
         bool IMember.IsPrivate => Visibility == Private;
 
         #endregion
-
-        bool IPotentialInterfaceMember.IsInterfaceMember => false;
     }
 }

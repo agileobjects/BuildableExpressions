@@ -1,26 +1,51 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
-    using Generics;
     using NetStandardPolyfills;
+    using ReadableExpressions.Translations.Reflection;
 
-    internal class TypedClassExpression : ClassExpression
+    internal class TypedClassExpression : ClassExpression, IType
     {
-        public TypedClassExpression(SourceCodeExpression sourceCode, Type type)
-            : base(sourceCode, type.GetBaseType(), type.GetTypedExpressionName())
+        private readonly Type _classType;
+
+        public TypedClassExpression(Type classType)
+            : base(classType)
         {
-            Type = type;
+            _classType = classType;
+            BaseTypeExpression = GetBaseTypeExpression(classType.GetBaseType());
 
-            var isAbstract = type.IsAbstract();
-            IsStatic = isAbstract && type.IsSealed();
-            IsAbstract = isAbstract && !IsStatic;
+            var isAbstract = classType.IsAbstract();
+            var isSealed = classType.IsSealed();
+            IsStatic = isAbstract && isSealed;
 
-            foreach (var parameterType in type.GetGenericTypeArguments())
+            if (!IsStatic)
             {
-                AddGenericParameter(new TypedOpenGenericArgumentExpression(parameterType));
+                IsAbstract = isAbstract;
+                IsSealed = isSealed;
             }
         }
 
-        public override Type Type { get; }
+        #region Setup
+
+        private static ClassExpression GetBaseTypeExpression(Type baseType)
+        {
+            return baseType != typeof(object)
+                ? new TypedClassExpression(baseType) : null;
+        }
+
+        #endregion
+
+        #region IType Members
+
+        string IType.FullName => _classType.FullName;
+
+        string IType.Name => _classType.Name;
+
+        bool IType.IsNested => _classType.IsNested;
+
+        #endregion
+
+        protected override TypeExpression CreateInstance()
+            => new TypedClassExpression(_classType);
     }
 }

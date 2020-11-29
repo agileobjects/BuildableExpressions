@@ -7,26 +7,26 @@
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
 
-    internal class TransientMethodTranslation : ITranslation
+    internal class ReturnDefaultMethodTranslation : ITranslation
     {
-        private readonly MethodExpression _methodExpression;
+        private readonly IMethod _method;
         private readonly MethodDefinitionTranslation _definitionTranslation;
         private readonly string _body;
 
-        public TransientMethodTranslation(
-            MethodExpression methodExpression,
+        public ReturnDefaultMethodTranslation(
+            IMethod method,
             ITranslationContext context)
         {
-            _methodExpression = methodExpression;
+            _method = method;
 
             _definitionTranslation = new MethodDefinitionTranslation(
-                methodExpression,
+                method,
                 includeDeclaringType: false,
                 context.Settings);
 
-            _body = methodExpression.HasBody
-                ? methodExpression.HasReturnType()
-                    ? "{return default(" + methodExpression.ReturnType.GetFriendlyName() + ");}"
+            _body = !method.IsAbstract
+                ? method.HasReturnType()
+                    ? "{return default(" + method.Type.GetFriendlyName() + ");}"
                     : "{}" : ";";
 
             TranslationSize =
@@ -34,9 +34,10 @@
                 _body.Length;
         }
 
-        public ExpressionType NodeType => _methodExpression.NodeType;
+        public ExpressionType NodeType
+            => (ExpressionType)SourceCodeExpressionType.Method;
 
-        public Type Type => _methodExpression.Type;
+        public Type Type => _method.Type.AsType();
 
         public int TranslationSize { get; }
 

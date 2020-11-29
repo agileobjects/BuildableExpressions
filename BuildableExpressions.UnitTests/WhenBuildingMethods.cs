@@ -14,7 +14,7 @@
         [Fact]
         public void ShouldBuildAMethodFromAParameterlessLambdaAction()
         {
-            var doNothing = Expression.Lambda<Action>(Expression.Default(typeof(void)));
+            var doNothing = Lambda<Action>(Default(typeof(void)));
 
             var translated = BuildableExpression
                 .SourceCode(sc => sc
@@ -39,7 +39,7 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildAMethodFromADefaultVoidExpression()
         {
-            var doNothing = Expression.Default(typeof(void));
+            var doNothing = Default(typeof(void));
 
             var translated = BuildableExpression
                 .SourceCode(sc => sc
@@ -239,7 +239,7 @@ namespace GeneratedExpressionCode
                             typeof(string),
                             typeof(string));
 
-                        var nameConcatCall = Expression.Call(
+                        var nameConcatCall = Call(
                             concatMethod,
                             param1Name,
                             param2Name,
@@ -281,7 +281,7 @@ namespace GeneratedExpressionCode
                             gp.AddStructConstraint();
                         });
 
-                        m.SetBody(Expression.Default(typeof(object)));
+                        m.SetBody(Default(typeof(object)));
                     });
                 });
             });
@@ -319,7 +319,7 @@ namespace GeneratedExpressionCode
                             gp.AddNewableConstraint();
                         });
 
-                        m.SetBody(Expression.Default(typeof(object)));
+                        m.SetBody(Default(typeof(object)));
                     });
                 });
             });
@@ -357,7 +357,7 @@ namespace GeneratedExpressionCode
                             gp.AddTypeConstraint<IMarker1>();
                         });
 
-                        m.SetBody(Expression.Default(typeof(object)));
+                        m.SetBody(Default(typeof(object)));
                     });
                 });
             });
@@ -399,7 +399,7 @@ namespace GeneratedExpressionCode
                             });
                         });
 
-                        m.SetBody(Expression.Default(typeof(object)));
+                        m.SetBody(Default(typeof(object)));
                     });
                 });
             });
@@ -428,15 +428,19 @@ namespace GeneratedExpressionCode
         public void ShouldBuildADefaultGenericParameterValueMethod()
         {
             var translated = BuildableExpression
-                .SourceCode(sc => sc
-                    .AddClass(cls => cls
-                        .AddMethod("GetT", m =>
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("GetT", m =>
                         {
                             var param = m.AddGenericParameter("T");
-                            var paramDefault = Expression.Default(param.Type);
+                            var paramDefault = Default(param.Type);
 
                             m.SetBody(paramDefault);
-                        })))
+                        });
+                    });
+                })
                 .ToCSharpString();
 
             const string EXPECTED = @"

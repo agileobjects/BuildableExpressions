@@ -1,9 +1,9 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
-    using System;
     using System.Linq.Expressions;
     using ReadableExpressions;
     using ReadableExpressions.Translations;
+    using ReadableExpressions.Translations.Reflection;
 
     /// <summary>
     /// Abstract base class for Expressions describing a type member.
@@ -43,7 +43,7 @@
         /// <summary>
         /// Gets this <see cref="MemberExpression"/>'s parent Type.
         /// </summary>
-        public override Type DeclaringType => DeclaringTypeExpression.Type;
+        public override IType DeclaringType => DeclaringTypeExpression;
 
         /// <summary>
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="MemberExpression"/>,

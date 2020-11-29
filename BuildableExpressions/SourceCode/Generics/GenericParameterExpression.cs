@@ -8,20 +8,37 @@
     using ReadableExpressions.Translations.Reflection;
 
     /// <summary>
-    /// Represents a type or method generic argument.
+    /// Represents a type or method generic parameter.
     /// </summary>
     public abstract class GenericParameterExpression :
-        Expression,
-        IGenericArgument,
+        TypeExpression,
+        IGenericParameter,
         ICustomTranslationExpression
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="GenericParameterExpression"/> class for the
+        /// given <paramref name="parameterType"/>.
+        /// </summary>
+        /// <param name="parameterType">
+        /// The Type represented by the <see cref="GenericParameterExpression"/>.
+        /// </param>
+        protected GenericParameterExpression(Type parameterType)
+            : base(parameterType)
+        {
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="GenericParameterExpression"/> class.
         /// </summary>
-        /// <param name="name"></param>
-        protected GenericParameterExpression(string name)
+        /// <param name="sourceCode">
+        /// The <see cref="GenericParameterExpression"/>'s parent <see cref="SourceCodeExpression"/>.
+        /// </param>
+        /// <param name="name">The name of the <see cref="GenericParameterExpression"/>.</param>
+        protected GenericParameterExpression(
+            SourceCodeExpression sourceCode,
+            string name)
+            : base(sourceCode, name)
         {
-            Name = name;
         }
 
         /// <summary>
@@ -31,68 +48,45 @@
         public override ExpressionType NodeType
             => (ExpressionType)SourceCodeExpressionType.GenericArgument;
 
-        /// <summary>
-        /// Visits this <see cref="GenericParameterExpression"/>.
-        /// </summary>
-        /// <param name="visitor">
-        /// The visitor with which to visit this <see cref="GenericParameterExpression"/>.
-        /// </param>
-        /// <returns>This <see cref="GenericParameterExpression"/>.</returns>
-        protected override Expression Accept(ExpressionVisitor visitor) => this;
-
-        /// <summary>
-        /// Gets the name of this <see cref="GenericParameterExpression"/>
-        /// </summary>
-        public string Name { get; }
-
-        /// <inheritdoc />
-        public abstract bool IsClosed { get; }
-
-        #region IGenericArgument Members
-
-        bool IGenericArgument.HasConstraints => HasConstraints;
+        #region IGenericParameter Members
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="GenericParameterExpression"/> is
         /// constrained.
         /// </summary>
-        protected abstract bool HasConstraints { get; }
-
-        bool IGenericArgument.HasClassConstraint => HasClassConstraint;
+        public abstract bool HasConstraints { get; }
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="GenericParameterExpression"/> is
         /// constrained to reference types.
         /// </summary>
-        protected abstract bool HasClassConstraint { get; }
-
-        bool IGenericArgument.HasStructConstraint => HasStructConstraint;
+        public abstract bool HasClassConstraint { get; }
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="GenericParameterExpression"/> is
         /// constrained to value types.
         /// </summary>
-        protected abstract bool HasStructConstraint { get; }
-
-        bool IGenericArgument.HasNewableConstraint => HasNewableConstraint;
+        public abstract bool HasStructConstraint { get; }
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="GenericParameterExpression"/> is
         /// constrained to types with a public, parameterless constructor.
         /// </summary>
-        protected abstract bool HasNewableConstraint { get; }
-
-        ReadOnlyCollection<Type> IGenericArgument.TypeConstraints => TypeConstraints;
-
-        /// <summary>
-        /// Gets this <see cref="GenericParameterExpression"/>'s collection of Type constraints, if
-        /// any.
-        /// </summary>
-        protected abstract ReadOnlyCollection<Type> TypeConstraints { get; }
+        public abstract bool HasNewableConstraint { get; }
 
         #endregion
 
+        /// <summary>
+        /// Gets the <see cref="IType"/>s describing the Types to which this
+        /// <see cref="GenericParameterExpression"/> is constrained, if any.
+        /// </summary>
+        public abstract ReadOnlyCollection<IType> TypeConstraints { get; }
+
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
-            => context.GetTranslationFor(Type);
+            => GetTranslation(context);
+
+        /// <inheritdoc />
+        protected override ITranslation GetTranslation(ITranslationContext context)
+            => context.GetTranslationFor((IType)this);
     }
 }

@@ -49,6 +49,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="SourceCode\TypeExpression.*.cs">
+      <DependentUpon>SourceCode\TypeExpression.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="BuildableExpression.*.cs">
       <DependentUpon>BuildableExpression.cs</DependentUpon>
     </Content>

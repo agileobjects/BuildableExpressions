@@ -2,6 +2,7 @@
 {
     using System;
     using Api;
+    using ReadableExpressions.Translations.Reflection;
 
     internal class ConfiguredInterfaceExpression :
         InterfaceExpression,
@@ -11,23 +12,28 @@
             SourceCodeExpression sourceCode,
             string name,
             Action<IInterfaceExpressionConfigurator> configuration)
-            : base(sourceCode, name)
+            : this(sourceCode, name)
         {
             configuration.Invoke(this);
+        }
+
+        private ConfiguredInterfaceExpression(SourceCodeExpression sourceCode, string name)
+            : base(sourceCode, name)
+        {
         }
 
         #region IInterfaceExpressionConfigurator Members
 
         void IInterfaceExpressionConfigurator.SetImplements(
-            Type @interface,
+            InterfaceExpression interfaceExpression,
             Action<IImplementationConfigurator> configuration)
         {
-            SetImplements(@interface, configuration);
+            SetImplements(interfaceExpression, configuration);
         }
 
         PropertyExpression IInterfaceExpressionConfigurator.AddProperty(
             string name,
-            Type type,
+            IType type,
             Action<IInterfacePropertyExpressionConfigurator> configuration)
         {
             return AddProperty(new InterfacePropertyExpression(
@@ -37,9 +43,8 @@
                 configuration));
         }
 
-        MethodExpression IInterfaceExpressionConfigurator.AddMethod(
-            string name,
-            Type returnType,
+        MethodExpression IInterfaceExpressionConfigurator.AddMethod(string name,
+            IType returnType,
             Action<IMethodExpressionConfigurator> configuration)
         {
             return AddMethod(new InterfaceMethodExpression(
@@ -50,5 +55,8 @@
         }
 
         #endregion
+
+        protected override TypeExpression CreateInstance()
+            => new ConfiguredInterfaceExpression(SourceCode, Name);
     }
 }

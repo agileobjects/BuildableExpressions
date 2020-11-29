@@ -1,6 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions
 {
-    using SourceCode.Generics;
+    using SourceCode;
     using SourceCode.Operators;
 
     /// <summary>
@@ -10,36 +10,30 @@
     {
         /// <summary>
         /// Create a <see cref="TypeOfOperatorExpression"/> that represents use of the typeof
-        /// operator on the given <paramref name="parameter"/>.
+        /// operator on the given <paramref name="typeExpression"/>.
         /// </summary>
-        /// <param name="parameter">
-        /// The <see cref="GenericParameterExpression"/> to which the typeof operator is being
-        /// applied.
+        /// <param name="typeExpression">
+        /// The <see cref="TypeExpression"/> to which the typeof operator is being applied.
         /// </param>
         /// <returns>
         /// A <see cref="TypeOfOperatorExpression"/> representing use of the typeof operator on
-        /// the given <paramref name="parameter"/>
+        /// the given <paramref name="typeExpression"/>
         /// </returns>
-        public static TypeOfOperatorExpression TypeOf(GenericParameterExpression parameter)
-        {
-            return parameter.IsClosed
-                ? new TypeOfOperatorExpression(parameter.Type)
-                : new TypeOfOperatorExpression(parameter.Name);
-        }
+        public static TypeOfOperatorExpression TypeOf(TypeExpression typeExpression)
+            => new TypeOfOperatorExpression(typeExpression);
 
         /// <summary>
-        /// Create a <see cref="NameOfOperatorExpression"/> that represents use of the nameof
-        /// operator on the given <paramref name="parameter"/>.
+        /// Create a <see cref="TypeOfOperatorExpression"/> that represents use of the nameof
+        /// operator on the given <paramref name="typeExpression"/>.
         /// </summary>
-        /// <param name="parameter">
-        /// The <see cref="GenericParameterExpression"/> to which the nameof operator is being
-        /// applied.
+        /// <param name="typeExpression">
+        /// The <see cref="TypeExpression"/> to which the nameof operator is being applied.
         /// </param>
         /// <returns>
         /// A <see cref="NameOfOperatorExpression"/> representing use of the nameof operator on
-        /// the given <paramref name="parameter"/>
+        /// the given <paramref name="typeExpression"/>
         /// </returns>
-        public static NameOfOperatorExpression NameOf(GenericParameterExpression parameter)
-            => new NameOfOperatorExpression(parameter);
+        public static NameOfOperatorExpression NameOf(TypeExpression typeExpression)
+            => new NameOfOperatorExpression(typeExpression);
     }
 }

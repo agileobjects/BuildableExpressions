@@ -295,12 +295,12 @@
             iProperty.IsReadable.ShouldBeTrue();
             iProperty.Getter.ShouldNotBeNull();
             iProperty.Getter.IsPublic.ShouldBeTrue();
-            iProperty.Getter.Type.ShouldBe(typeof(string));
+            iProperty.Getter.Type.AsType().ShouldBe(typeof(string));
             iProperty.Getter.Name.ShouldBe("get");
             iProperty.IsWritable.ShouldBeTrue();
             iProperty.Setter.ShouldNotBeNull();
             iProperty.Setter.IsPublic.ShouldBeTrue();
-            iProperty.Setter.Type.ShouldBe(typeof(void));
+            iProperty.Setter.Type.AsType().ShouldBe(typeof(void));
             iProperty.Setter.Name.ShouldBe("set");
 
             var propertyInfo = property

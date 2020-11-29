@@ -26,15 +26,18 @@
         IConcreteTypeMethodExpressionConfigurator,
         IMethod,
         IHasSignature,
-        IConcreteTypeExpression
+        IConcreteTypeExpression,
+        IEquatable<MethodExpression>
     {
         private List<ParameterExpression> _parameters;
+        private IList<Type> _parameterTypes;
         private List<GenericParameterExpression> _genericParameters;
         private ReadOnlyCollection<GenericParameterExpression> _readOnlyGenericParameters;
-        private ReadOnlyCollection<IGenericArgument> _readOnlyGenericArguments;
+        private ReadOnlyCollection<IGenericParameter> _readOnlyIGenericParameters;
         private ReadOnlyCollection<IParameter> _readOnlyParameters;
         private MethodInfo _methodInfo;
         private string _name;
+        private IType _returnType;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MethodExpression"/> class.
@@ -133,7 +136,7 @@
         /// Gets the MethodInfo for this <see cref="MethodExpression"/>, which is lazily, dynamically
         /// generated using this method's definition.
         /// </summary>
-        public MethodInfo MethodInfo
+        public virtual MethodInfo MethodInfo
             => _methodInfo ??= CreateMethodInfo();
 
         #region MethodInfo Creation
@@ -144,13 +147,15 @@
                 _parameters?.ProjectToArray(p => p.Type) ??
                 Type.EmptyTypes;
 
+            var declaringType = DeclaringType.AsType();
+
             var method = Visibility == Public
                 ? IsStatic
-                    ? DeclaringType.GetPublicStaticMethod(Name, parameterTypes)
-                    : DeclaringType.GetPublicInstanceMethod(Name, parameterTypes)
+                    ? declaringType.GetPublicStaticMethod(Name, parameterTypes)
+                    : declaringType.GetPublicInstanceMethod(Name, parameterTypes)
                 : IsStatic
-                    ? DeclaringType.GetNonPublicStaticMethod(Name, parameterTypes)
-                    : DeclaringType.GetNonPublicInstanceMethod(Name, parameterTypes);
+                    ? declaringType.GetNonPublicStaticMethod(Name, parameterTypes)
+                    : declaringType.GetNonPublicInstanceMethod(Name, parameterTypes);
 
             return method;
         }
@@ -158,7 +163,7 @@
         #endregion
 
         /// <summary>
-        /// Gets the return type of this <see cref="MethodExpression"/>, which is the return type
+        /// Gets the return Type of this <see cref="MethodExpression"/>, which is the return type
         /// of the LambdaExpression from which the method was created.
         /// </summary>
         public virtual Type ReturnType => Definition?.ReturnType ?? typeof(void);
@@ -178,6 +183,9 @@
 
         internal IList<ParameterExpression> ParametersAccessor => _parameters;
 
+        private IEnumerable<Type> ParameterTypes
+            => _parameterTypes ??= ParametersAccessor.ProjectToArray(p => p.Type);
+
         /// <summary>
         /// Gets the Expression describing the body of this <see cref="MethodExpression"/>.
         /// </summary>
@@ -185,20 +193,22 @@
 
         #region IGenericParameterConfigurator Members
 
-        GenericParameterExpression IGenericParameterConfigurator.AddGenericParameter(
+        OpenGenericParameterExpression IGenericParameterConfigurator.AddGenericParameter(
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
         {
             ThrowIfDuplicateGenericParameterName(name);
             ThrowIfTypeGenericParameterNameClash(name);
 
-            var parameter = new ConfiguredOpenGenericArgumentExpression(name, configuration);
+            var parameter = new ConfiguredOpenGenericParameterExpression(
+                DeclaringTypeExpression.SourceCode,
+                name,
+                configuration);
 
             _genericParameters ??= new List<GenericParameterExpression>();
-            _readOnlyGenericParameters = null;
-            _readOnlyGenericArguments = null;
-
             _genericParameters.Add(parameter);
+            _readOnlyGenericParameters = null;
+            _readOnlyIGenericParameters = null;
             return parameter;
         }
 
@@ -284,6 +294,14 @@
         }
 
         void IConcreteTypeMethodExpressionConfigurator.SetBody(Expression body, Type returnType)
+            => SetBody(body, returnType);
+
+        /// <summary>
+        /// Set the body of the <see cref="MethodExpression"/>.
+        /// </summary>
+        /// <param name="body">The Expression to use.</param>
+        /// <param name="returnType">The return type to use for the method.</param>
+        protected void SetBody(Expression body, Type returnType)
         {
             if (body.NodeType == ExpressionType.Lambda)
             {
@@ -320,9 +338,21 @@
 
         string IHasSignature.GetSignature() => this.GetSignature(includeTypeName: false);
 
-        #region IMethod Members
+        #region IMember Members
+
+        IType IMember.DeclaringType => DeclaringTypeExpression;
+
+        IType IMember.Type => GetReturnType();
+
+        #endregion
+
+        #region IComplexMember Members
 
         bool IComplexMember.IsOverride => IsOverride;
+
+        #endregion
+
+        #region IMethod Members
 
         bool IMethod.IsGenericMethod => IsGeneric;
 
@@ -330,11 +360,11 @@
 
         IMethod IMethod.GetGenericMethodDefinition() => null;
 
-        ReadOnlyCollection<IGenericArgument> IMethod.GetGenericArguments()
+        ReadOnlyCollection<IGenericParameter> IMethod.GetGenericArguments()
         {
-            return _readOnlyGenericArguments ??= IsGeneric
-                ? _genericParameters.ProjectToArray(arg => (IGenericArgument)arg).ToReadOnlyCollection()
-                : Enumerable<IGenericArgument>.EmptyReadOnlyCollection;
+            return _readOnlyIGenericParameters ??= IsGeneric
+                ? _genericParameters.ProjectToArray(arg => (IGenericParameter)arg).ToReadOnlyCollection()
+                : Enumerable<IGenericParameter>.EmptyReadOnlyCollection;
         }
 
         ReadOnlyCollection<IParameter> IMethod.GetParameters()
@@ -357,6 +387,16 @@
 
             return readonlyParameters;
         }
+
+        IType IMethod.ReturnType => GetReturnType();
+
+        bool IMethod.HasBody => HasBody;
+
+        /// <summary>
+        /// Gets this <see cref="MethodExpression"/>'s return <see cref="IType"/>.
+        /// </summary>
+        /// <returns>This <see cref="MethodExpression"/>'s return <see cref="IType"/>.</returns>
+        protected virtual IType GetReturnType() => _returnType ??= BclTypeWrapper.For(ReturnType);
 
         #endregion
 
@@ -415,7 +455,7 @@
 
         /// <inheritdoc />
         protected override ITranslation GetTransientTranslation(ITranslationContext context)
-            => new TransientMethodTranslation(this, context);
+            => new ReturnDefaultMethodTranslation(this, context);
 
         #endregion
 
@@ -423,23 +463,48 @@
         {
             if (Body != updatedBody)
             {
-                Definition = updatedBody.ToLambdaExpression(_parameters, ReturnType);
+                Definition = updatedBody.ToLambdaExpression(_parameters, Type);
             }
         }
+
+        internal bool Equals(MethodExpression method)
+        {
+            if (Name != method.Name)
+            {
+                return false;
+            }
+
+            if (IsGeneric != method.IsGeneric)
+            {
+                return false;
+            }
+
+            if (IsGeneric && !_genericParameters.SequenceEqual(method._genericParameters))
+            {
+                return false;
+            }
+
+            return ParameterTypes.SequenceEqual(method.ParameterTypes);
+        }
+
+        bool IEquatable<MethodExpression>.Equals(MethodExpression other) => Equals(other);
 
         #region Helper Class
 
         private class MethodParameter : IParameter
         {
+            private readonly ParameterExpression _parameter;
+            private IType _type;
+
             public MethodParameter(ParameterExpression parameter)
             {
-                Type = parameter.Type;
-                Name = parameter.Name;
+                _parameter = parameter;
             }
 
-            public Type Type { get; }
+            public IType Type
+                => _type ??= BclTypeWrapper.For(_parameter.Type);
 
-            public string Name { get; }
+            public string Name => _parameter.Name;
 
             public bool IsOut => false;
 

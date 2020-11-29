@@ -4,6 +4,7 @@
     using System.Linq.Expressions;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
+    using ReadableExpressions.Translations.Reflection;
 
     internal class ClassTranslation : ITranslation
     {
@@ -18,7 +19,6 @@
         {
             _class = @class;
             _typeTranslation = new TypeTranslation(@class, _classString, context);
-            var hasBaseType = @class.BaseType != typeof(object);
 
             var translationSize = _typeTranslation.TranslationSize;
             var formattingSize = _typeTranslation.FormattingSize;
@@ -41,9 +41,10 @@
                 translationSize += _modifier.Length;
             }
 
-            if (hasBaseType)
+            if (!@class.HasObjectBaseType)
             {
-                _baseTypeTranslation = context.GetTranslationFor(@class.BaseType);
+                var baseType = (IType)@class.BaseTypeExpression;
+                _baseTypeTranslation = context.GetTranslationFor(baseType);
                 translationSize += _baseTypeTranslation.TranslationSize;
                 formattingSize += _baseTypeTranslation.FormattingSize;
             }

@@ -1,23 +1,20 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Generics
 {
     using System;
-    using System.Linq;
     using Api;
     using BuildableExpressions.Extensions;
     using Compilation;
-    using NetStandardPolyfills;
-    using ReadableExpressions.Translations.Reflection;
-    using static System.Linq.Expressions.Expression;
 
     internal static class OpenGenericArgumentExpressionFactoryExtensions
     {
-        public static Type ToType(this OpenGenericArgumentExpression parameter)
+        public static Type CreateType(
+            this ConfiguredOpenGenericParameterExpression parameter)
         {
             var paramSourceCode = BuildableExpression.SourceCode(sc =>
             {
                 sc.SetNamespace(BuildConstants.GenericParameterTypeNamespace);
 
-                if (((IGenericArgument)parameter).HasStructConstraint)
+                if (parameter.HasStructConstraint)
                 {
                     sc.AddStruct(parameter.Name, parameter.ConfigureStruct);
                 }
@@ -38,33 +35,33 @@
         #region ToType Helpers
 
         private static void ConfigureStruct(
-            this OpenGenericArgumentExpression parameter,
+            this ConfiguredOpenGenericParameterExpression parameter,
             IStructExpressionConfigurator structConfig)
         {
             parameter.ConfigureType((StructExpression)structConfig, baseTypeCallback: null);
         }
 
         private static void ConfigureClass(
-            this OpenGenericArgumentExpression parameter,
+            this ConfiguredOpenGenericParameterExpression parameter,
             IClassExpressionConfigurator classConfig)
         {
             var @class = (ConfiguredClassExpression)classConfig;
 
-            parameter.ConfigureType(@class, (cfg, baseType) =>
+            parameter.ConfigureType(@class, (cls, baseType) =>
             {
-                cfg.SetBaseType(baseType);
+                cls.SetBaseType(baseType);
 
-                if (baseType.IsAbstract())
+                if (baseType.IsAbstract)
                 {
-                    cfg.SetAbstract();
+                    cls.SetAbstract();
                 }
             });
         }
 
         private static void ConfigureType<TTypeExpression>(
-            this OpenGenericArgumentExpression parameter,
+            this ConfiguredOpenGenericParameterExpression parameter,
             TTypeExpression typeExpression,
-            Action<TTypeExpression, Type> baseTypeCallback)
+            Action<TTypeExpression, ClassExpression> baseTypeCallback)
             where TTypeExpression : TypeExpression
         {
             if (parameter.TypeConstraintsAccessor == null)
@@ -72,37 +69,30 @@
                 return;
             }
 
-            foreach (var type in parameter.TypeConstraintsAccessor)
+            foreach (var typeConstraintExpression in parameter.TypeConstraintsAccessor)
             {
-                if (type.IsInterface())
+                if (typeConstraintExpression.IsClass)
                 {
-                    AddDefaultImplementations(typeExpression, type);
-                    typeExpression.SetImplements(type);
+                    baseTypeCallback.Invoke(typeExpression, (ClassExpression)typeConstraintExpression);
                     continue;
                 }
 
-                baseTypeCallback.Invoke(typeExpression, type);
+                AddDefaultImplementations(typeExpression, typeConstraintExpression);
+                typeExpression.SetImplements((InterfaceExpression)typeConstraintExpression);
             }
         }
 
         private static void AddDefaultImplementations(
             TypeExpression typeExpression,
-            Type type)
+            TypeExpression typeConstraintExpression)
         {
-            var methods = type
-                .GetPublicInstanceMethods()
-                .Concat(type.GetNonPublicInstanceMethods())
+            var methodExpressions = typeConstraintExpression
+                .MethodExpressions
                 .Filter(m => m.IsAbstract);
 
-            foreach (var method in methods)
+            foreach (var methodExpression in methodExpressions)
             {
-                var parameters = method
-                    .GetParameters()
-                    .ProjectToArray(p => Parameter(p.ParameterType, p.Name));
-
-                var methodLambda = Default(method.ReturnType).ToLambdaExpression(parameters);
-
-                typeExpression.AddMethod(method.Name, m => m.SetBody(methodLambda));
+                typeExpression.AddMethod(methodExpression);
             }
         }
 

@@ -1,4 +1,4 @@
-﻿namespace AgileObjects.BuildableExpressions.UnitTests.Generics
+﻿namespace AgileObjects.BuildableExpressions.UnitTests.SourceCode.Generics
 {
     using System;
     using System.IO;
