@@ -12,7 +12,6 @@
     using Generics;
     using NetStandardPolyfills;
     using ReadableExpressions;
-    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
 
@@ -25,7 +24,7 @@
     {
         private List<OpenGenericParameterExpression> _genericParameters;
         private ReadOnlyCollection<OpenGenericParameterExpression> _readOnlyGenericParameters;
-        private List<IType> _genericArguments;
+        private List<TypeExpression> _genericArguments;
         private ReadOnlyCollection<IType> _readOnlyGenericArguments;
         private readonly List<MemberExpression> _memberExpressions;
         private IMember[] _members;
@@ -204,17 +203,16 @@
             var genericParameterCount = _genericParameters.Count;
 
             closedInstance._genericParameters = new List<OpenGenericParameterExpression>(genericParameterCount);
-            closedInstance._genericArguments = new List<IType>(genericParameterCount);
+            closedInstance._genericArguments = new List<TypeExpression>(genericParameterCount);
 
             for (var i = 0; i < genericParameterCount; ++i)
             {
                 var parameter = _genericParameters[i];
-                var clonedParameter = parameter.Clone();
 
-                closedInstance._genericParameters.Add(clonedParameter);
+                closedInstance._genericParameters.Add(parameter);
 
                 closedInstance._genericArguments.Add(parameter == genericParameter
-                    ? closedTypeExpression : clonedParameter);
+                    ? closedTypeExpression : parameter);
             }
 
             if (_interfaceExpressions != null)
@@ -250,13 +248,28 @@
             OpenGenericParameterExpression genericParameter,
             out TypeExpression typeExpression)
         {
-            var matchingArgument = ImplementedTypeExpressions
-                .Filter(impl => impl._genericArguments != null)
-                .SelectMany(impl => impl._genericArguments)
-                .OfType<GenericArgumentExpression>()
-                .First(arg => arg.GenericParameter == genericParameter);
+            var implementedTypeExpressions = ImplementedTypeExpressions
+                .Filter(impl => impl._genericParameters != null);
 
-            typeExpression = matchingArgument.ClosedTypeExpression;
+            foreach (var implementedType in implementedTypeExpressions)
+            {
+                var index = -1;
+
+                foreach (var candidateParameter in implementedType._genericParameters)
+                {
+                    ++index;
+
+                    if (candidateParameter != genericParameter)
+                    {
+                        continue;
+                    }
+
+                    typeExpression = implementedType._genericArguments[index];
+                    return true;
+                }
+            }
+
+            typeExpression = null;
             return false;
         }
 
@@ -281,7 +294,28 @@
         /// methods.
         /// </summary>
         public ReadOnlyCollection<MethodExpression> MethodExpressions
-            => _readOnlyMethodExpressions ??= _methodExpressions.ToReadOnlyCollection();
+            => _readOnlyMethodExpressions ??= CreateMethodExpressions().ToReadOnlyCollection();
+
+        private IList<MethodExpression> CreateMethodExpressions()
+        {
+            if (_methodExpressions != null)
+            {
+                return _methodExpressions;
+            }
+
+            if (_bclType != null)
+            {
+                return _methodExpressions = _bclType
+                    .GetPublicInstanceMethods()
+                    .Concat(_bclType.GetPublicStaticMethods())
+                    .Concat(_bclType.GetNonPublicInstanceMethods().Filter(m => m.IsVirtual))
+                    .Project<MethodInfo, MethodExpression>(methodInfo =>
+                        new MethodInfoMethodExpression(this, methodInfo))
+                    .ToList();
+            }
+
+            return null;
+        }
 
         #region Validation
 
@@ -358,5 +392,11 @@
         /// An <see cref="ITranslation"/> with which to translate this <see cref="TypeExpression"/>.
         /// </returns>
         protected abstract ITranslation GetTranslation(ITranslationContext context);
+
+        /// <summary>
+        /// Gets a string representation of this <see cref="TypeExpression"/>.
+        /// </summary>
+        /// <returns>A string representation of this <see cref="TypeExpression"/>.</returns>
+        public override string ToString() => Name;
     }
 }

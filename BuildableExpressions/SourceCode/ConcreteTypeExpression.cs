@@ -53,8 +53,7 @@
             var unimplementedMethod = new[] { interfaceExpression }
                 .Concat(interfaceExpression.InterfaceTypeExpressions)
                 .SelectMany(it => it.MethodExpressions)
-                .FirstOrDefault(method =>
-                    !MethodExpressions.Any(m => m.Equals(method)));
+                .FirstOrDefault(method => !MethodExpressions.Contains(method));
 
             if (unimplementedMethod == null)
             {
@@ -73,7 +72,7 @@
         OpenGenericParameterExpression IConcreteTypeExpressionConfigurator.AddGenericParameter(
             OpenGenericParameterExpression parameter)
         {
-            return AddGenericParameter(parameter.Clone());
+            return AddGenericParameter(parameter);
         }
 
         #endregion

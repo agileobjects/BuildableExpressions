@@ -92,12 +92,12 @@
         /// <summary>
         /// Gets a value indicating whether this <see cref="MethodExpression"/> is abstract.
         /// </summary>
-        public bool IsAbstract { get; private set; }
+        public virtual bool IsAbstract { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="MethodExpression"/> is virtual.
         /// </summary>
-        public bool IsVirtual { get; private set; }
+        public virtual bool IsVirtual { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="MethodExpression"/> overrides a method
@@ -172,7 +172,7 @@
         /// Gets the LambdaExpression describing the parameters and body of this
         /// <see cref="MethodExpression"/>.
         /// </summary>
-        public LambdaExpression Definition { get; private set; }
+        public virtual LambdaExpression Definition { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ParameterExpression"/>s describing the parameters of this
@@ -184,7 +184,7 @@
         internal IList<ParameterExpression> ParametersAccessor => _parameters;
 
         private IEnumerable<Type> ParameterTypes
-            => _parameterTypes ??= ParametersAccessor.ProjectToArray(p => p.Type);
+            => _parameterTypes ??= Parameters.ProjectToArray(p => p.Type);
 
         /// <summary>
         /// Gets the Expression describing the body of this <see cref="MethodExpression"/>.
@@ -266,7 +266,11 @@
         void IMethodExpressionConfigurator.AddParameters(params ParameterExpression[] parameters)
             => AddParameters(parameters);
 
-        private void AddParameters(IList<ParameterExpression> parameters)
+        /// <summary>
+        /// Add the given <paramref name="parameters"/> to this <see cref="MethodExpression"/>.
+        /// </summary>
+        /// <param name="parameters">The ParameterExpressions to add.</param>
+        protected void AddParameters(IList<ParameterExpression> parameters)
         {
             if (!parameters.Any())
             {
@@ -276,10 +280,13 @@
             if (_parameters == null)
             {
                 _parameters = new List<ParameterExpression>(parameters);
-                return;
+            }
+            else
+            {
+                _parameters.AddRange(parameters.Except(_parameters));
             }
 
-            _parameters.AddRange(parameters.Except(_parameters));
+            _parameterTypes = null;
             _readOnlyParameters = null;
         }
 
@@ -484,12 +491,17 @@
                 return false;
             }
 
-            return ParameterTypes.SequenceEqual(method.ParameterTypes);
+            if (ParameterTypes.SequenceEqual(method.ParameterTypes))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         bool IEquatable<MethodExpression>.Equals(MethodExpression other) => Equals(other);
 
-        #region Helper Class
+        #region Helper Classes
 
         private class MethodParameter : IParameter
         {

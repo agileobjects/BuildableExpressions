@@ -146,7 +146,7 @@
                 });
             });
 
-            interfaceEx.Message.ShouldContain("'string WhenBuildingSourceCodeIncorrectly.IMessager.GetMessage()'");
+            interfaceEx.Message.ShouldContain("'string IMessager.GetMessage()'");
             interfaceEx.Message.ShouldContain("has not been implemented");
         }
 
@@ -182,16 +182,6 @@
         public interface IMessager
         {
             string GetMessage();
-        }
-
-        public interface ICodeGenerator
-        {
-            string Generate();
-        }
-
-        public interface IRandomStringFactory
-        {
-            string Generate();
         }
 
         #endregion

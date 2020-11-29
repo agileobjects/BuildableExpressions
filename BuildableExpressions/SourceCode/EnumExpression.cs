@@ -4,9 +4,7 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq.Expressions;
-    using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
-    using Translations;
 
     /// <summary>
     /// Represents an enum in a piece of source code.
@@ -67,9 +65,5 @@
         internal override bool IsEnum => true;
 
         #endregion
-
-        /// <inheritdoc />
-        protected override ITranslation GetTranslation(ITranslationContext context)
-            => new EnumTranslation(this, context);
     }
 }

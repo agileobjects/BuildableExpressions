@@ -49,7 +49,7 @@
 
         #endregion
 
-        internal override OpenGenericParameterExpression Clone()
+        internal virtual OpenGenericParameterExpression Clone()
             => new TypedOpenGenericParameterExpression(_genericParameter, _parameterType);
 
         protected override TypeExpression CreateInstance() => Clone();

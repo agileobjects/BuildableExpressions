@@ -39,7 +39,5 @@
         bool IType.IsGenericParameter => true;
 
         #endregion
-
-        internal abstract OpenGenericParameterExpression Clone();
     }
 }

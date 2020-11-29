@@ -184,7 +184,7 @@
             typeParameter.HasClassConstraint.ShouldBeFalse();
             typeParameter.HasNewableConstraint.ShouldBeFalse();
             typeParameter.HasStructConstraint.ShouldBeFalse();
-            typeParameter.TypeConstraints.ShouldHaveSingleItem().ShouldBe(typeof(BaseType));
+            typeParameter.TypeConstraints.ShouldHaveSingleItem().AsType().ShouldBe(typeof(BaseType));
         }
 
         [Fact]
@@ -231,7 +231,7 @@
             typeParameter.HasClassConstraint.ShouldBeFalse();
             typeParameter.HasNewableConstraint.ShouldBeFalse();
             typeParameter.HasStructConstraint.ShouldBeFalse();
-            typeParameter.TypeConstraints.ShouldHaveSingleItem().ShouldBe(typeof(IMessager));
+            typeParameter.TypeConstraints.ShouldHaveSingleItem().AsType().ShouldBe(typeof(IMessager));
         }
 
         [Fact]
@@ -278,8 +278,8 @@
             typeParameter.HasNewableConstraint.ShouldBeTrue();
             typeParameter.HasStructConstraint.ShouldBeFalse();
             typeParameter.TypeConstraints.Count.ShouldBe(2);
-            typeParameter.TypeConstraints.First().ShouldBe(typeof(AbstractBaseType));
-            typeParameter.TypeConstraints.Last().ShouldBe(typeof(IMessager));
+            typeParameter.TypeConstraints.First().AsType().ShouldBe(typeof(AbstractBaseType));
+            typeParameter.TypeConstraints.Last().AsType().ShouldBe(typeof(IMessager));
         }
 
         [Fact]

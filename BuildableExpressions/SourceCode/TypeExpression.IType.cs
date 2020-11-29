@@ -14,6 +14,7 @@
 
     public partial class TypeExpression : IType
     {
+        private readonly Type _bclType;
         private IType _declaringType;
         private ReadOnlyCollection<IType> _readOnlyConstraintTypes;
 
@@ -29,30 +30,25 @@
 
             if (type.IsGenericType())
             {
+                var argumentTypes = type.GetGenericTypeArguments();
 #if NETSTANDARD
                 var typeInfo = type.GetTypeInfo();
-                var constraints = typeInfo.GenericParameterAttributes;
-                var constraintTypes = typeInfo.GetGenericParameterConstraints();
-                var isTypeDefinition = typeInfo.IsGenericTypeDefinition;
 #else
-                var constraints = type.GenericParameterAttributes;
-                var constraintTypes = type.GetGenericParameterConstraints();
-                var isTypeDefinition = type.IsGenericTypeDefinition;
+                var typeInfo = type;
 #endif
-                if (constraints != GenericParameterAttributes.None)
-                {
-                    Constraints = constraints;
+                var parameterTypes = typeInfo.IsGenericTypeDefinition
+                    ? argumentTypes
+                    : typeInfo.GetGenericTypeDefinition().GetGenericTypeArguments();
 
-                    ConstraintTypes = constraintTypes
+                if (typeInfo.IsGenericParameter)
+                {
+                    Constraints = typeInfo.GenericParameterAttributes;
+
+                    ConstraintTypes = typeInfo
+                        .GetGenericParameterConstraints()
                         .ProjectToArray(TypeExpressionFactory.Create)
                         .ToReadOnlyCollection();
                 }
-
-                var typeDefinition = isTypeDefinition
-                    ? type : type.GetGenericTypeDefinition();
-
-                var parameterTypes = typeDefinition.GetGenericTypeArguments();
-                var argumentTypes = type.GetGenericTypeArguments();
 
                 for (var i = 0; i < argumentTypes.Length; ++i)
                 {
@@ -68,23 +64,11 @@
                         continue;
                     }
 
-                    var closedType = TypeExpressionFactory.Create(argumentType);
-                    var argument = new GenericArgumentExpression(parameter, closedType);
-                    _genericArguments[i] = argument;
+                    _genericArguments[i] = TypeExpressionFactory.Create(argumentType);
                 }
             }
 
-            var allMethodInfos = type
-                .GetPublicInstanceMethods()
-                .Concat(type.GetPublicStaticMethods())
-                .Concat(type.GetNonPublicInstanceMethods().Filter(m => m.IsVirtual));
-
-            foreach (var methodInfo in allMethodInfos)
-            {
-                AddMethod(new MethodInfoMethodExpression(this, methodInfo));
-            }
-
-            _type = type;
+            _type = _bclType = type;
         }
 
         #region Setup
@@ -156,7 +140,14 @@
         int IType.GenericParameterCount => _genericArguments?.Count ?? 0;
 
         ReadOnlyCollection<IType> IType.GenericTypeArguments
-            => _readOnlyGenericArguments ??= _genericArguments.ToReadOnlyCollection();
+        {
+            get
+            {
+                return _readOnlyGenericArguments ??= _genericArguments
+                    .ProjectToArray<TypeExpression, IType>(arg => arg)
+                    .ToReadOnlyCollection();
+            }
+        }
 
         GenericParameterAttributes IType.Constraints => Constraints;
 

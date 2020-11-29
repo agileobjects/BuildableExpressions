@@ -4,7 +4,9 @@
     using System.Linq.Expressions;
     using Api;
     using BuildableExpressions.Extensions;
+    using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
+    using Translations;
 
     internal class ConfiguredClassExpression :
         ClassExpression,
@@ -169,5 +171,8 @@
                 IsSealed = IsSealed
             };
         }
+
+        protected override ITranslation GetTranslation(ITranslationContext context)
+            => new ClassTranslation(this, context);
     }
 }

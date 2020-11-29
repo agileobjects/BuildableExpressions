@@ -65,7 +65,7 @@
             _genericParameters.Add(parameter);
             _readOnlyGenericParameters = null;
 
-            _genericArguments ??= new List<IType>();
+            _genericArguments ??= new List<TypeExpression>();
             _genericArguments.Add(parameter);
             _readOnlyGenericArguments = null;
 

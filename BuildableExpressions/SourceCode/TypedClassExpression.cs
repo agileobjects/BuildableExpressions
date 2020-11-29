@@ -2,6 +2,7 @@
 {
     using System;
     using NetStandardPolyfills;
+    using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
 
     internal class TypedClassExpression : ClassExpression, IType
@@ -47,5 +48,8 @@
 
         protected override TypeExpression CreateInstance()
             => new TypedClassExpression(_classType);
+
+        protected override ITranslation GetTranslation(ITranslationContext context)
+            => new TypeNameTranslation(_classType, context.Settings);
     }
 }

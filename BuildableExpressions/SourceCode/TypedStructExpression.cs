@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
+    using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
 
     internal class TypedStructExpression : StructExpression, IType
@@ -23,7 +24,10 @@
 
         #endregion
 
-        protected override TypeExpression CreateInstance() 
+        protected override TypeExpression CreateInstance()
             => new TypedStructExpression(_structType);
+
+        protected override ITranslation GetTranslation(ITranslationContext context)
+            => new TypeNameTranslation(_structType, context.Settings);
     }
 }

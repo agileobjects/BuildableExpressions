@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Linq.Expressions;
     using Api;
     using BuildableExpressions.Extensions;
     using Extensions;
@@ -16,7 +15,7 @@
         private bool? _isOverride;
         private IType _returnType;
         private List<BlockMethodExpression> _blockMethods;
-        private IType[] _parameterTypes;
+        private Type[] _parameterTypes;
 
         public StandardMethodExpression(
             TypeExpression declaringTypeExpression,
@@ -87,8 +86,8 @@
                    ParameterTypes.SequenceEqual(otherMethod.ParameterTypes);
         }
 
-        private IEnumerable<IType> ParameterTypes
-            => _parameterTypes ??= ParametersAccessor.ProjectToArray(p => ((IParameter)p).Type);
+        private IEnumerable<Type> ParameterTypes
+            => _parameterTypes ??= ParametersAccessor.ProjectToArray(p => p.Type);
 
         public override Type ReturnType
             => _returnType?.AsType() ?? base.ReturnType;
@@ -124,7 +123,8 @@
             SetAbstract();
         }
 
-        protected override IType GetReturnType() => _returnType;
+        protected override IType GetReturnType()
+            => _returnType ??= BclTypeWrapper.For(ReturnType);
 
         #endregion
     }

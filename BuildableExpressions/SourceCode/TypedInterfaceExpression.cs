@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
+    using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
 
     internal class TypedInterfaceExpression : InterfaceExpression, IType
@@ -25,5 +26,8 @@
 
         protected override TypeExpression CreateInstance()
             => new TypedInterfaceExpression(_interfaceType);
+
+        protected override ITranslation GetTranslation(ITranslationContext context)
+            => new TypeNameTranslation(_interfaceType, context.Settings);
     }
 }

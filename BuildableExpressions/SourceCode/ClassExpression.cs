@@ -3,9 +3,7 @@
     using System;
     using System.Collections.Generic;
     using BuildableExpressions.Extensions;
-    using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
-    using Translations;
 
     /// <summary>
     /// Represents a class in a piece of source code.
@@ -107,9 +105,5 @@
         bool IType.IsSealed => IsSealed;
 
         #endregion
-
-        /// <inheritdoc />
-        protected override ITranslation GetTranslation(ITranslationContext context)
-            => new ClassTranslation(this, context);
     }
 }

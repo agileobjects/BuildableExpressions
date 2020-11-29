@@ -168,7 +168,7 @@
 
         internal IEnumerable<TypeExpression> TypeConstraintsAccessor => _typeConstraints;
 
-        internal override OpenGenericParameterExpression Clone()
+        internal virtual OpenGenericParameterExpression Clone()
         {
             return new ConfiguredOpenGenericParameterExpression(SourceCode, Name)
             {

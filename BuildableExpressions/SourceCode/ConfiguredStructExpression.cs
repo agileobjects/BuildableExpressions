@@ -2,7 +2,9 @@
 {
     using System;
     using Api;
+    using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
+    using Translations;
 
     internal class ConfiguredStructExpression :
         StructExpression,
@@ -51,5 +53,8 @@
 
         protected override TypeExpression CreateInstance()
             => new ConfiguredStructExpression(SourceCode, Name);
+
+        protected override ITranslation GetTranslation(ITranslationContext context)
+            => new StructTranslation(this, context);
     }
 }

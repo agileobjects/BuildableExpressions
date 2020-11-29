@@ -2,7 +2,9 @@
 {
     using System;
     using Api;
+    using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
+    using Translations;
 
     internal class ConfiguredInterfaceExpression :
         InterfaceExpression,
@@ -58,5 +60,8 @@
 
         protected override TypeExpression CreateInstance()
             => new ConfiguredInterfaceExpression(SourceCode, Name);
+
+        protected override ITranslation GetTranslation(ITranslationContext context)
+            => new InterfaceTranslation(this, context);
     }
 }

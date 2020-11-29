@@ -1,9 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
-    using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
-    using Translations;
 
     /// <summary>
     /// Represents a struct in a piece of source code.
@@ -37,9 +35,5 @@
         IType IType.BaseType => BclTypeWrapper.ValueType;
 
         #endregion
-
-        /// <inheritdoc />
-        protected override ITranslation GetTranslation(ITranslationContext context)
-            => new StructTranslation(this, context);
     }
 }

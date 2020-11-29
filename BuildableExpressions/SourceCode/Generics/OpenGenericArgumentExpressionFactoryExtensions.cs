@@ -4,6 +4,7 @@
     using Api;
     using BuildableExpressions.Extensions;
     using Compilation;
+    using static System.Linq.Expressions.Expression;
 
     internal static class OpenGenericArgumentExpressionFactoryExtensions
     {
@@ -92,7 +93,11 @@
 
             foreach (var methodExpression in methodExpressions)
             {
-                typeExpression.AddMethod(methodExpression);
+                var methodLambda =
+                    Default(methodExpression.ReturnType)
+                        .ToLambdaExpression(methodExpression.Parameters);
+
+                typeExpression.AddMethod(methodExpression.Name, m => m.SetBody(methodLambda));
             }
         }
 

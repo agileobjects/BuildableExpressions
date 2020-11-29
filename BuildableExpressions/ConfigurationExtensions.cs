@@ -89,7 +89,9 @@
             string genericParameterName,
             Type closedType)
         {
-            implConfig.SetGenericArgument(genericParameterName, (TypeExpression)BclTypeWrapper.For(closedType));
+            implConfig.SetGenericArgument(
+                genericParameterName,
+                TypeExpressionFactory.Create(closedType));
         }
 
         /// <summary>

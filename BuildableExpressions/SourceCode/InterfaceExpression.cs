@@ -1,9 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
-    using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
-    using Translations;
 
     /// <summary>
     /// Represents an interface in a piece of source code.
@@ -39,9 +37,5 @@
         bool IType.IsAbstract => true;
 
         #endregion
-
-        /// <inheritdoc />
-        protected override ITranslation GetTranslation(ITranslationContext context)
-            => new InterfaceTranslation(this, context);
     }
 }
