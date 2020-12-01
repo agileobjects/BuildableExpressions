@@ -102,26 +102,13 @@
             return AddMethod(new StandardMethodExpression(this, name, configuration));
         }
 
-        internal virtual StandardMethodExpression AddMethod(
-            StandardMethodExpression method)
+        internal void AddMethod(BlockMethodExpression blockMethod)
         {
-            AddMethod((MethodExpression)method);
-
-            if (!method.HasBlockMethods)
-            {
-                return method;
-            }
-
-            foreach (var blockMethod in method.BlockMethods)
-            {
-                blockMethod.Finalise();
-                AddMethod(blockMethod);
-            }
-
-            return method;
+            _blockMethodExpressions ??= new List<BlockMethodExpression>();
+            _blockMethodExpressions.Add(blockMethod);
         }
 
-        internal MethodExpression AddMethod(MethodExpression method)
+        internal virtual MethodExpression AddMethod(MethodExpression method)
         {
             _methodExpressions ??= new List<MethodExpression>();
             _methodExpressions.Add(method);

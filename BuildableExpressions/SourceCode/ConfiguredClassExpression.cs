@@ -149,7 +149,7 @@
             return AddMethod(name, configuration);
         }
 
-        internal override StandardMethodExpression AddMethod(StandardMethodExpression method)
+        internal override MethodExpression AddMethod(MethodExpression method)
         {
             if (IsStatic)
             {

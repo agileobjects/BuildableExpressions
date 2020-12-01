@@ -14,7 +14,6 @@
     {
         private bool? _isOverride;
         private IType _returnType;
-        private List<BlockMethodExpression> _blockMethods;
         private Type[] _parameterTypes;
 
         public StandardMethodExpression(
@@ -91,17 +90,6 @@
 
         public override Type ReturnType
             => _returnType?.AsType() ?? base.ReturnType;
-
-        public bool HasBlockMethods => _blockMethods != null;
-
-        public IList<BlockMethodExpression> BlockMethods
-            => _blockMethods ??= new List<BlockMethodExpression>();
-
-        public BlockMethodExpression CreateBlockMethod(
-            Action<IConcreteTypeMethodExpressionConfigurator> configuration)
-        {
-            return new BlockMethodExpression(DeclaringTypeExpression, configuration);
-        }
 
         #region IClassMemberExpressionConfigurator Members
 

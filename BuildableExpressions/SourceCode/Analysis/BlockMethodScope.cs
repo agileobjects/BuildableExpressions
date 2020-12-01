@@ -21,8 +21,8 @@
 
         public BlockMethodExpression BlockMethod { get; private set; }
 
-        public override MethodExpression GetOwningMethod()
-            => Parent.GetOwningMethod();
+        public override TypeExpression OwningTypeExpression
+            => Parent.OwningTypeExpression;
 
         private void AddChildBlockScope(BlockMethodScope childBlockScope)
         {
@@ -40,9 +40,9 @@
         {
             base.Finalise(finalisedBody);
 
-            var owningMethod = (StandardMethodExpression)GetOwningMethod();
+            var owningTypeExpression = OwningTypeExpression;
 
-            BlockMethod = owningMethod.CreateBlockMethod(m =>
+            BlockMethod = new BlockMethodExpression(owningTypeExpression, m =>
             {
                 m.SetVisibility(MemberVisibility.Private);
 
@@ -59,7 +59,7 @@
                 return;
             }
 
-            Finalise(owningMethod);
+            AddBlockMethodTo(owningTypeExpression);
 
             if (_childBlockScopes == null)
             {
@@ -68,12 +68,12 @@
 
             foreach (var childBlockScope in _childBlockScopes)
             {
-                childBlockScope.Finalise(owningMethod);
+                childBlockScope.AddBlockMethodTo(owningTypeExpression);
             }
         }
 
-        private void Finalise(StandardMethodExpression owningMethod)
-            => owningMethod.BlockMethods.Add(BlockMethod);
+        private void AddBlockMethodTo(TypeExpression owningTypeExpression)
+            => owningTypeExpression.AddMethod(BlockMethod);
 
         protected override void UnscopedVariablesAccessed(
             IEnumerable<ParameterExpression> unscopedVariables)

@@ -45,11 +45,11 @@
                 case (ExpressionType)SourceCodeExpressionType.Type:
                     return VisitAndConvert((TypeExpression)expression);
 
-                case (ExpressionType)SourceCodeExpressionType.Method:
-                    return VisitAndConvert((MethodExpression)expression);
-
                 case (ExpressionType)SourceCodeExpressionType.Property:
                     return VisitAndConvert((PropertyExpression)expression);
+
+                case (ExpressionType)SourceCodeExpressionType.Method:
+                    return VisitAndConvert((MethodExpression)expression);
 
                 default:
                     return base.VisitAndConvert(expression);
@@ -80,6 +80,7 @@
                 VisitAndConvert(methodExpression);
             }
 
+            type.Finalise();
             return type;
         }
 

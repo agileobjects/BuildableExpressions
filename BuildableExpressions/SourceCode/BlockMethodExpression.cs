@@ -3,6 +3,7 @@
     using System;
     using System.Linq;
     using System.Linq.Expressions;
+    using Api;
     using BuildableExpressions.Extensions;
     using ReadableExpressions.Extensions;
 
@@ -10,7 +11,7 @@
     {
         public BlockMethodExpression(
             TypeExpression declaringTypeExpression,
-            Action<MethodExpression> configuration)
+            Action<IConcreteTypeMethodExpressionConfigurator> configuration)
             : base(declaringTypeExpression, name: null)
         {
             configuration.Invoke(this);

@@ -18,7 +18,7 @@
 
         public MethodScopeBase Parent { get; }
 
-        public abstract MethodExpression GetOwningMethod();
+        public abstract TypeExpression OwningTypeExpression { get; }
 
         public void Add(ParameterExpression inScopeVariable)
             => _inScopeVariables.Add(inScopeVariable);

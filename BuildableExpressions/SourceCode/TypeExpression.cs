@@ -32,6 +32,7 @@
         private List<PropertyExpression> _propertyExpressions;
         private ReadOnlyCollection<PropertyExpression> _readOnlyPropertyExpressions;
         private List<MethodExpression> _methodExpressions;
+        private List<BlockMethodExpression> _blockMethodExpressions;
         private ReadOnlyCollection<MethodExpression> _readOnlyMethodExpressions;
         private Type _type;
         private bool _rebuildType;
@@ -379,6 +380,18 @@
         }
 
         #endregion
+
+        internal void Finalise()
+        {
+            if (_blockMethodExpressions != null)
+            {
+                foreach (var blockMethod in _blockMethodExpressions)
+                {
+                    blockMethod.Finalise();
+                    AddMethod((MethodExpression)blockMethod);
+                }
+            }
+        }
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => GetTranslation(context);
