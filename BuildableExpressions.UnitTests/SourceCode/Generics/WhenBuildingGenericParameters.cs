@@ -39,7 +39,7 @@
         [Fact]
         public void ShouldCreateAnUnconstrainedParameterExpression()
         {
-            var typeParameter = new TypedOpenGenericParameterExpression(
+            var typeParameter = new TypedGenericParameterExpression(
                 typeof(List<>)
                     .GetGenericTypeArguments()
                     .First());
@@ -85,7 +85,7 @@
         [Fact]
         public void ShouldCreateANewableClassParameterExpression()
         {
-            var typeParameter = new TypedOpenGenericParameterExpression(
+            var typeParameter = new TypedGenericParameterExpression(
                 typeof(NewableClassParameter<>)
                     .GetGenericTypeArguments()
                     .First());
@@ -129,7 +129,7 @@
         [Fact]
         public void ShouldCreateAStructParameterExpression()
         {
-            var typeParameter = new TypedOpenGenericParameterExpression(
+            var typeParameter = new TypedGenericParameterExpression(
                 typeof(StructParameter<>)
                     .GetGenericTypeArguments()
                     .First());
@@ -174,7 +174,7 @@
         [Fact]
         public void ShouldCreateATypeConstrainedParameterExpression()
         {
-            var typeParameter = new TypedOpenGenericParameterExpression(
+            var typeParameter = new TypedGenericParameterExpression(
                 typeof(TypeConstrainedParameter<>)
                     .GetGenericTypeArguments()
                     .First());
@@ -221,7 +221,7 @@
         [Fact]
         public void ShouldCreateAnInterfaceConstrainedParameterExpression()
         {
-            var typeParameter = new TypedOpenGenericParameterExpression(
+            var typeParameter = new TypedGenericParameterExpression(
                 typeof(InterfaceConstrainedParameter<>)
                     .GetGenericTypeArguments()
                     .First());
@@ -267,7 +267,7 @@
         [Fact]
         public void ShouldCreateANewableTypeAndInterfaceConstrainedParameterExpression()
         {
-            var typeParameter = new TypedOpenGenericParameterExpression(
+            var typeParameter = new TypedGenericParameterExpression(
                 typeof(NewableTypeAndInterfaceConstrainedParameter<>)
                     .GetGenericTypeArguments()
                     .First());

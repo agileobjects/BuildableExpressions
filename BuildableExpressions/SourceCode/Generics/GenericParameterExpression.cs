@@ -8,7 +8,7 @@
     using ReadableExpressions.Translations.Reflection;
 
     /// <summary>
-    /// Represents a type or method generic parameter.
+    /// Represents a type or method open generic parameter.
     /// </summary>
     public abstract class GenericParameterExpression :
         TypeExpression,
@@ -73,6 +73,12 @@
         /// constrained to types with a public, parameterless constructor.
         /// </summary>
         public abstract bool HasNewableConstraint { get; }
+
+        #endregion
+
+        #region IType Members
+
+        bool IType.IsGenericParameter => true;
 
         #endregion
 

@@ -103,12 +103,12 @@
         /// </typeparam>
         /// <param name="implConfig">The <see cref="IImplementationConfigurator"/> to configure.</param>
         /// <param name="parameter">
-        /// The <see cref="OpenGenericParameterExpression"/> describing the open generic parameter
-        /// to close to the given <typeparamref name="TClosed"/> type.
+        /// The <see cref="GenericParameterExpression"/> describing the open generic parameter to
+        /// close to the given <typeparamref name="TClosed"/> type.
         /// </param>
         public static void SetGenericArgument<TClosed>(
             this IImplementationConfigurator implConfig,
-            OpenGenericParameterExpression parameter)
+            GenericParameterExpression parameter)
         {
             implConfig.SetGenericArgument(parameter, typeof(TClosed));
         }
@@ -119,13 +119,13 @@
         /// </summary>
         /// <param name="implConfig">The <see cref="IImplementationConfigurator"/> to configure.</param>
         /// <param name="parameter">
-        /// The <see cref="OpenGenericParameterExpression"/> describing the open generic parameter
-        /// to close to the given <paramref name="closedType"/>.
+        /// The <see cref="GenericParameterExpression"/> describing the open generic parameter to 
+        /// close to the given <paramref name="closedType"/>.
         /// </param>
         /// <param name="closedType">The Type to which to close the given <paramref name="parameter"/>.</param>
         public static void SetGenericArgument(
             this IImplementationConfigurator implConfig,
-            OpenGenericParameterExpression parameter,
+            GenericParameterExpression parameter,
             Type closedType)
         {
             implConfig.SetGenericArgument(parameter, TypeExpressionFactory.Create(closedType));
@@ -932,14 +932,14 @@
         }
 
         /// <summary>
-        /// Add an unconstrained <see cref="OpenGenericParameterExpression"/> with the given
+        /// Add an unconstrained <see cref="GenericParameterExpression"/> with the given
         /// <paramref name="name"/> to the <see cref="TypeExpression"/> or
         /// <see cref="MethodExpression"/>.
         /// </summary>
         /// <param name="methodConfig">The <see cref="IGenericParameterConfigurator"/> to configure.</param>
-        /// <param name="name">The name of the <see cref="OpenGenericParameterExpression"/>.</param>
-        /// <returns>The newly-created <see cref="OpenGenericParameterExpression"/>.</returns>
-        public static OpenGenericParameterExpression AddGenericParameter(
+        /// <param name="name">The name of the <see cref="GenericParameterExpression"/>.</param>
+        /// <returns>The newly-created <see cref="GenericParameterExpression"/>.</returns>
+        public static GenericParameterExpression AddGenericParameter(
             this IGenericParameterConfigurator methodConfig,
             string name)
         {

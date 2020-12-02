@@ -31,7 +31,7 @@
 
                 if (t.IsGenericParameter)
                 {
-                    return new TypedOpenGenericParameterExpression(t);
+                    return new TypedGenericParameterExpression(t);
                 }
 
                 return new TypedStructExpression(t);

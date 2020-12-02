@@ -5,17 +5,17 @@
     using NetStandardPolyfills;
     using ReadableExpressions.Translations.Reflection;
 
-    internal class TypedOpenGenericParameterExpression : OpenGenericParameterExpression, IType
+    internal class TypedGenericParameterExpression : GenericParameterExpression, IType
     {
         private readonly IGenericParameter _genericParameter;
         private readonly Type _parameterType;
 
-        public TypedOpenGenericParameterExpression(Type parameterType)
+        public TypedGenericParameterExpression(Type parameterType)
             : this(GenericParameterFactory.For(parameterType), parameterType)
         {
         }
 
-        private TypedOpenGenericParameterExpression(
+        private TypedGenericParameterExpression(
             IGenericParameter genericParameter,
             Type parameterType)
             : base(parameterType)
@@ -49,9 +49,7 @@
 
         #endregion
 
-        internal virtual OpenGenericParameterExpression Clone()
-            => new TypedOpenGenericParameterExpression(_genericParameter, _parameterType);
-
-        protected override TypeExpression CreateInstance() => Clone();
+        protected override TypeExpression CreateInstance()
+            => new TypedGenericParameterExpression(_genericParameter, _parameterType);
     }
 }

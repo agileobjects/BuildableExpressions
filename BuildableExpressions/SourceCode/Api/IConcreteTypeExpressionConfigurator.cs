@@ -18,9 +18,8 @@
         /// Adds a copy of the given open generic <paramref name="parameter"/> to the
         /// <see cref="ConcreteTypeExpression"/>.
         /// </summary>
-        /// <param name="parameter">The <see cref="OpenGenericParameterExpression"/> to add.</param>
+        /// <param name="parameter">The <see cref="GenericParameterExpression"/> to add.</param>
         /// <returns>The newly-created copy of the given <paramref name="parameter"/>.</returns>
-        OpenGenericParameterExpression AddGenericParameter(
-            OpenGenericParameterExpression parameter);
+        GenericParameterExpression AddGenericParameter(GenericParameterExpression parameter);
     }
 }

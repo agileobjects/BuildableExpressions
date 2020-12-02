@@ -271,19 +271,19 @@ namespace GeneratedExpressionCode
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
-                    var param1 = default(OpenGenericParameterExpression);
+                    var param = default(GenericParameterExpression);
 
                     var baseType = sc.AddClass("Basey", cls =>
                     {
                         cls.SetAbstract();
 
-                        param1 = cls.AddGenericParameter("T1");
+                        param = cls.AddGenericParameter("T1");
                         cls.AddGenericParameter("T2");
                     });
 
                     sc.AddClass("Derivey", cls =>
                     {
-                        cls.AddGenericParameter(param1);
+                        cls.AddGenericParameter(param);
 
                         cls.SetBaseType(baseType, bt =>
                         {

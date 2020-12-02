@@ -9,17 +9,17 @@
     public interface IImplementationConfigurator
     {
         /// <summary>
-        /// Closes the <see cref="OpenGenericParameterExpression"/> with the given
+        /// Closes the <see cref="GenericParameterExpression"/> with the given
         /// <paramref name="genericParameterName"/> to the given
         /// <paramref name="closedTypeExpression"/> for the implementation.
         /// </summary>
         /// <param name="genericParameterName">
-        /// The name of the <see cref="OpenGenericParameterExpression"/> describing the open generic
+        /// The name of the <see cref="GenericParameterExpression"/> describing the open generic
         /// parameter to close to the given <paramref name="closedTypeExpression"/>.
         /// </param>
         /// <param name="closedTypeExpression">
         /// The <see cref="TypeExpression"/> to which to close the
-        /// <see cref="OpenGenericParameterExpression"/> with the given
+        /// <see cref="GenericParameterExpression"/> with the given
         /// <paramref name="genericParameterName"/>.
         /// </param>
         public void SetGenericArgument(
@@ -31,15 +31,15 @@
         /// <paramref name="closedTypeExpression"/> for the implementation.
         /// </summary>
         /// <param name="genericParameter">
-        /// The <see cref="OpenGenericParameterExpression"/> describing the open generic parameter
-        /// to close to the given <paramref name="closedTypeExpression"/>.
+        /// The <see cref="GenericParameterExpression"/> describing the open generic parameter to
+        /// close to the given <paramref name="closedTypeExpression"/>.
         /// </param>
         /// <param name="closedTypeExpression">
         /// The <see cref="TypeExpression"/> to which to close the given
         /// <paramref name="genericParameter"/>.
         /// </param>
         public void SetGenericArgument(
-            OpenGenericParameterExpression genericParameter,
+            GenericParameterExpression genericParameter,
             TypeExpression closedTypeExpression);
     }
 }

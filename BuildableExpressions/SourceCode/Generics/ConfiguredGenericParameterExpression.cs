@@ -11,13 +11,13 @@
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations.Reflection;
 
-    internal class ConfiguredOpenGenericParameterExpression :
-        OpenGenericParameterExpression,
+    internal class ConfiguredGenericParameterExpression :
+        GenericParameterExpression,
         IGenericParameterExpressionConfigurator,
-        IEquatable<ConfiguredOpenGenericParameterExpression>
+        IEquatable<ConfiguredGenericParameterExpression>
     {
-        private static readonly ConcurrentDictionary<ConfiguredOpenGenericParameterExpression, Type>
-            _typeCache = new ConcurrentDictionary<ConfiguredOpenGenericParameterExpression, Type>(
+        private static readonly ConcurrentDictionary<ConfiguredGenericParameterExpression, Type>
+            _typeCache = new ConcurrentDictionary<ConfiguredGenericParameterExpression, Type>(
                 new GenericParameterExpressionComparer());
 
         private Type _bclType;
@@ -29,7 +29,7 @@
         private ReadOnlyCollection<TypeExpression> _readOnlyTypeConstraints;
         private ReadOnlyCollection<IType> _readOnlyTypeConstraintTypes;
 
-        public ConfiguredOpenGenericParameterExpression(
+        public ConfiguredGenericParameterExpression(
             SourceCodeExpression sourceCode,
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
@@ -38,7 +38,7 @@
             configuration.Invoke(this);
         }
 
-        private ConfiguredOpenGenericParameterExpression(
+        private ConfiguredGenericParameterExpression(
             SourceCodeExpression sourceCode,
             string name)
             : base(sourceCode, name)
@@ -168,9 +168,9 @@
 
         internal IEnumerable<TypeExpression> TypeConstraintsAccessor => _typeConstraints;
 
-        internal virtual OpenGenericParameterExpression Clone()
+        protected override TypeExpression CreateInstance()
         {
-            return new ConfiguredOpenGenericParameterExpression(SourceCode, Name)
+            return new ConfiguredGenericParameterExpression(SourceCode, Name)
             {
                 _bclType = _bclType,
                 _hasConstraints = _hasConstraints,
@@ -182,12 +182,10 @@
             };
         }
 
-        protected override TypeExpression CreateInstance() => Clone();
-
         #region IEquatable Members
 
-        bool IEquatable<ConfiguredOpenGenericParameterExpression>.Equals(
-            ConfiguredOpenGenericParameterExpression other)
+        bool IEquatable<ConfiguredGenericParameterExpression>.Equals(
+            ConfiguredGenericParameterExpression other)
         {
             if (ReferenceEquals(other, null))
             {
@@ -221,16 +219,16 @@
         }
 
         private class GenericParameterExpressionComparer :
-            IEqualityComparer<ConfiguredOpenGenericParameterExpression>
+            IEqualityComparer<ConfiguredGenericParameterExpression>
         {
             public bool Equals(
-                ConfiguredOpenGenericParameterExpression x,
-                ConfiguredOpenGenericParameterExpression y)
+                ConfiguredGenericParameterExpression x,
+                ConfiguredGenericParameterExpression y)
             {
-                return ((IEquatable<ConfiguredOpenGenericParameterExpression>)x)?.Equals(y) == true;
+                return ((IEquatable<ConfiguredGenericParameterExpression>)x)?.Equals(y) == true;
             }
 
-            public int GetHashCode(ConfiguredOpenGenericParameterExpression obj) => 0;
+            public int GetHashCode(ConfiguredGenericParameterExpression obj) => 0;
         }
 
         #endregion

@@ -190,14 +190,14 @@
 
         #region IGenericParameterConfigurator Members
 
-        OpenGenericParameterExpression IGenericParameterConfigurator.AddGenericParameter(
+        GenericParameterExpression IGenericParameterConfigurator.AddGenericParameter(
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
         {
             ThrowIfDuplicateGenericParameterName(name);
             ThrowIfTypeGenericParameterNameClash(name);
 
-            var parameter = new ConfiguredOpenGenericParameterExpression(
+            var parameter = new ConfiguredGenericParameterExpression(
                 DeclaringTypeExpression.SourceCode,
                 name,
                 configuration);

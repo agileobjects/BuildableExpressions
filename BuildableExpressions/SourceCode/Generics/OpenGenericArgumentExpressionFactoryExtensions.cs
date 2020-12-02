@@ -9,7 +9,7 @@
     internal static class OpenGenericArgumentExpressionFactoryExtensions
     {
         public static Type CreateType(
-            this ConfiguredOpenGenericParameterExpression parameter)
+            this ConfiguredGenericParameterExpression parameter)
         {
             var paramSourceCode = BuildableExpression.SourceCode(sc =>
             {
@@ -36,14 +36,14 @@
         #region ToType Helpers
 
         private static void ConfigureStruct(
-            this ConfiguredOpenGenericParameterExpression parameter,
+            this ConfiguredGenericParameterExpression parameter,
             IStructExpressionConfigurator structConfig)
         {
             parameter.ConfigureType((StructExpression)structConfig, baseTypeCallback: null);
         }
 
         private static void ConfigureClass(
-            this ConfiguredOpenGenericParameterExpression parameter,
+            this ConfiguredGenericParameterExpression parameter,
             IClassExpressionConfigurator classConfig)
         {
             var @class = (ConfiguredClassExpression)classConfig;
@@ -60,7 +60,7 @@
         }
 
         private static void ConfigureType<TTypeExpression>(
-            this ConfiguredOpenGenericParameterExpression parameter,
+            this ConfiguredGenericParameterExpression parameter,
             TTypeExpression typeExpression,
             Action<TTypeExpression, ClassExpression> baseTypeCallback)
             where TTypeExpression : TypeExpression

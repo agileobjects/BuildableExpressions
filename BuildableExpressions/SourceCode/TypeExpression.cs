@@ -22,8 +22,8 @@
         Expression,
         ICustomTranslationExpression
     {
-        private List<OpenGenericParameterExpression> _genericParameters;
-        private ReadOnlyCollection<OpenGenericParameterExpression> _readOnlyGenericParameters;
+        private List<GenericParameterExpression> _genericParameters;
+        private ReadOnlyCollection<GenericParameterExpression> _readOnlyGenericParameters;
         private List<TypeExpression> _genericArguments;
         private ReadOnlyCollection<IType> _readOnlyGenericArguments;
         private readonly List<MemberExpression> _memberExpressions;
@@ -182,28 +182,28 @@
         public bool IsGeneric => _genericParameters?.Any() == true;
 
         /// <summary>
-        /// Gets the <see cref="OpenGenericParameterExpression"/>s describing the open generic
-        /// arguments of this <see cref="TypeExpression"/>, if any.
+        /// Gets the <see cref="GenericParameterExpression"/>s describing the open generic arguments
+        /// of this <see cref="TypeExpression"/>, if any.
         /// </summary>
-        public ReadOnlyCollection<OpenGenericParameterExpression> GenericParameters
+        public ReadOnlyCollection<GenericParameterExpression> GenericParameters
         {
             get
             {
                 return _readOnlyGenericParameters ??= IsGeneric
                     ? _genericParameters.ToReadOnlyCollection()
-                    : Enumerable<OpenGenericParameterExpression>.EmptyReadOnlyCollection;
+                    : Enumerable<GenericParameterExpression>.EmptyReadOnlyCollection;
             }
         }
 
         internal TypeExpression Close(
-            OpenGenericParameterExpression genericParameter,
+            GenericParameterExpression genericParameter,
             TypeExpression closedTypeExpression)
         {
             var closedInstance = CreateInstance();
 
             var genericParameterCount = _genericParameters.Count;
 
-            closedInstance._genericParameters = new List<OpenGenericParameterExpression>(genericParameterCount);
+            closedInstance._genericParameters = new List<GenericParameterExpression>(genericParameterCount);
             closedInstance._genericArguments = new List<TypeExpression>(genericParameterCount);
 
             for (var i = 0; i < genericParameterCount; ++i)
@@ -246,7 +246,7 @@
         protected abstract TypeExpression CreateInstance();
 
         internal bool TryGetTypeExpressionFor(
-            OpenGenericParameterExpression genericParameter,
+            GenericParameterExpression genericParameter,
             out TypeExpression typeExpression)
         {
             var implementedTypeExpressions = ImplementedTypeExpressions

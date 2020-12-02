@@ -46,7 +46,7 @@
         }
 
         public void SetGenericArgument(
-            OpenGenericParameterExpression genericParameter,
+            GenericParameterExpression genericParameter,
             TypeExpression closedType)
         {
             ImplementedTypeExpression = ImplementedTypeExpression

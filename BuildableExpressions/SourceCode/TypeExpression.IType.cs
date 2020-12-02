@@ -53,7 +53,7 @@
                 for (var i = 0; i < argumentTypes.Length; ++i)
                 {
                     var parameterType = parameterTypes[i];
-                    var parameter = new TypedOpenGenericParameterExpression(parameterType);
+                    var parameter = new TypedGenericParameterExpression(parameterType);
 
                     AddGenericParameter(parameter);
 

@@ -52,7 +52,7 @@
             if (_isGenericType)
             {
                 var genericParameters = type.GenericParameters
-                    .ProjectToArray<OpenGenericParameterExpression, IGenericParameter>(p => p);
+                    .ProjectToArray<GenericParameterExpression, IGenericParameter>(p => p);
 
                 var settings = context.Settings;
 

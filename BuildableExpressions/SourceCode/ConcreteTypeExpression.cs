@@ -69,8 +69,8 @@
         Expression IConcreteTypeExpressionConfigurator.ThisInstanceExpression
             => ThisInstanceExpression;
 
-        OpenGenericParameterExpression IConcreteTypeExpressionConfigurator.AddGenericParameter(
-            OpenGenericParameterExpression parameter)
+        GenericParameterExpression IConcreteTypeExpressionConfigurator.AddGenericParameter(
+            GenericParameterExpression parameter)
         {
             return AddGenericParameter(parameter);
         }

@@ -101,7 +101,7 @@
                     return VisitAndConvert((MethodExpression)expression);
 
                 case (ExpressionType)SourceCodeExpressionType.GenericArgument
-                    when expression is OpenGenericParameterExpression genericParameter:
+                    when expression is GenericParameterExpression genericParameter:
                     {
                         return VisitAndConvert(genericParameter);
                     }
@@ -191,7 +191,7 @@
             return base.VisitAndConvert(constant);
         }
 
-        private TypeExpression VisitAndConvert(OpenGenericParameterExpression parameter)
+        private TypeExpression VisitAndConvert(GenericParameterExpression parameter)
         {
             var method = _currentMethodScope.RootMethodExpression;
 

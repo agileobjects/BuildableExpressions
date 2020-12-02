@@ -43,11 +43,11 @@
         void ITypeExpressionConfigurator.SetVisibility(TypeVisibility visibility)
             => Visibility = visibility;
 
-        OpenGenericParameterExpression IGenericParameterConfigurator.AddGenericParameter(
+        GenericParameterExpression IGenericParameterConfigurator.AddGenericParameter(
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
         {
-            return AddGenericParameter(new ConfiguredOpenGenericParameterExpression(
+            return AddGenericParameter(new ConfiguredGenericParameterExpression(
                 SourceCode,
                 name,
                 configuration));
@@ -56,12 +56,12 @@
         /// <summary>
         /// Adds the given <paramref name="parameter"/> to this <see cref="TypeExpression"/>.
         /// </summary>
-        /// <param name="parameter">The <see cref="OpenGenericParameterExpression"/> to add.</param>
+        /// <param name="parameter">The <see cref="GenericParameterExpression"/> to add.</param>
         /// <returns>The given <paramref name="parameter"/>.</returns>
-        protected OpenGenericParameterExpression AddGenericParameter(
-            OpenGenericParameterExpression parameter)
+        protected GenericParameterExpression AddGenericParameter(
+            GenericParameterExpression parameter)
         {
-            _genericParameters ??= new List<OpenGenericParameterExpression>();
+            _genericParameters ??= new List<GenericParameterExpression>();
             _genericParameters.Add(parameter);
             _readOnlyGenericParameters = null;
 

@@ -80,7 +80,7 @@ namespace GeneratedExpressionCode
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
-                    var param = default(OpenGenericParameterExpression);
+                    var param = default(GenericParameterExpression);
 
                     var @interface = sc.AddInterface("ITypeGetter", itf =>
                     {
@@ -130,7 +130,7 @@ namespace GeneratedExpressionCode
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
-                    var param = default(OpenGenericParameterExpression);
+                    var param = default(GenericParameterExpression);
 
                     var @interface = sc.AddInterface("ITypeGetter", itf =>
                     {
