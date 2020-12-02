@@ -21,8 +21,8 @@
 
         public BlockMethodExpression BlockMethod { get; private set; }
 
-        public override TypeExpression OwningTypeExpression
-            => Parent.OwningTypeExpression;
+        public override MethodExpression RootMethodExpression
+            => Parent.RootMethodExpression;
 
         private void AddChildBlockScope(BlockMethodScope childBlockScope)
         {
@@ -40,7 +40,7 @@
         {
             base.Finalise(finalisedBody);
 
-            var owningTypeExpression = OwningTypeExpression;
+            var owningTypeExpression = RootMethodExpression.DeclaringTypeExpression;
 
             BlockMethod = new BlockMethodExpression(owningTypeExpression, m =>
             {

@@ -6,7 +6,6 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Analysis;
     using Api;
     using BuildableExpressions.Extensions;
     using Extensions;
@@ -82,8 +81,6 @@
 
             return base.Accept(visitor);
         }
-
-        internal MethodExpressionAnalysis Analysis { get; private protected set; }
 
         internal abstract bool HasGeneratedName { get; }
 

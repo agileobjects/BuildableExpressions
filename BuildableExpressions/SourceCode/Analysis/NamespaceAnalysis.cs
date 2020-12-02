@@ -185,19 +185,6 @@
             }
         }
 
-        public void Merge(NamespaceAnalysis otherAnalysis)
-        {
-            if (otherAnalysis._requiredNamespaces == null)
-            {
-                return;
-            }
-
-            _requiredNamespaces ??= new List<string>();
-
-            _requiredNamespaces.AddRange(otherAnalysis._requiredNamespaces
-                .Except(_requiredNamespaces));
-        }
-
         public void Finalise()
         {
             if (_requiredNamespaces == null)
