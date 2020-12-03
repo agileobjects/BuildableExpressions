@@ -56,6 +56,8 @@
 
         #region IFieldExpressionConfigurator Members
 
+        void IFieldExpressionConfigurator.SetStatic() => SetStatic();
+
         void IFieldExpressionConfigurator.SetReadonly() => IsReadonly = true;
 
         #endregion
