@@ -11,7 +11,6 @@
     using Extensions;
     using Generics;
     using NetStandardPolyfills;
-    using ReadableExpressions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
     using Translations;
@@ -245,16 +244,6 @@
                     $"generic parameter in declaring type '{DeclaringTypeExpression.Name}'.");
             }
         }
-
-        #endregion
-
-        #region IMemberExpressionConfigurator Members
-
-        void IMemberExpressionConfigurator.SetSummary(CommentExpression summary)
-            => SetSummary(summary);
-
-        void IMemberExpressionConfigurator.SetVisibility(MemberVisibility visibility)
-            => SetVisibility(visibility);
 
         #endregion
 

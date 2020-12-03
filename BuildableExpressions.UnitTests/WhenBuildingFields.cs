@@ -3,17 +3,17 @@
     using Common;
     using Xunit;
 
-    public class WhenBuildingConstructors
+    public class WhenBuildingFields
     {
         [Fact]
-        public void ShouldBuildAParameterlessClassConstructor()
+        public void ShouldBuildAClassReadWriteInstanceField()
         {
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
-                    sc.AddClass("Messager", cls =>
+                    sc.AddClass(cls =>
                     {
-                       // cls.AddConstructor();
+                        cls.AddField<string>("MyField");
                     });
                 })
                 .ToCSharpString();
@@ -21,11 +21,9 @@
             const string EXPECTED = @"
 namespace GeneratedExpressionCode
 {
-    public class Messager
+    public class GeneratedExpressionClass
     {
-        public Messager()
-        {
-        }
+        public string MyField;
     }
 }";
             EXPECTED.ShouldCompile();

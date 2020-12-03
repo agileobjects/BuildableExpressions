@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System.Linq.Expressions;
+    using Api;
     using ReadableExpressions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
@@ -10,6 +11,7 @@
     /// </summary>
     public abstract class MemberExpression :
         MemberExpressionBase,
+        IMemberExpressionConfigurator,
         ICustomTranslationExpression
     {
         /// <summary>
@@ -51,15 +53,15 @@
         /// </summary>
         public CommentExpression Summary { get; private set; }
 
-        /// <summary>
-        /// Set the summary documentation of this <see cref="MemberExpression"/>.
-        /// </summary>
-        /// <param name="summary">
-        /// A <see cref="CommentExpression"/> containing summary documentation of the
-        /// <see cref="MemberExpression"/>.
-        /// </param>
-        protected void SetSummary(CommentExpression summary)
+        #region IMemberExpressionConfigurator Members
+
+        void IMemberExpressionConfigurator.SetSummary(CommentExpression summary)
             => Summary = summary;
+
+        void IMemberExpressionConfigurator.SetVisibility(MemberVisibility visibility)
+            => SetVisibility(visibility);
+
+        #endregion
 
         #region Translation
 

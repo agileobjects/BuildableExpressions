@@ -73,6 +73,28 @@
             return parameter;
         }
 
+        internal FieldExpression AddField(
+            string name,
+            IType type,
+            Action<FieldExpression> configuration)
+        {
+            return AddField(new FieldExpression(this, name, type, configuration));
+        }
+
+        /// <summary>
+        /// Adds the given <paramref name="field"/> to this <see cref="TypeExpression"/>.
+        /// </summary>
+        /// <param name="field">The <see cref="FieldExpression"/> to add.</param>
+        /// <returns>The given <paramref name="field"/>.</returns>
+        protected FieldExpression AddField(FieldExpression field)
+        {
+            _fieldExpressions ??= new List<FieldExpression>();
+            _fieldExpressions.Add(field);
+            _readOnlyFieldExpressions = null;
+            AddMember(field);
+            return field;
+        }
+
         internal PropertyExpression AddProperty(
             string name,
             IType type,

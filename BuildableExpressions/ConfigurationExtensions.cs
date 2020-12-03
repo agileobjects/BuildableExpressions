@@ -335,6 +335,45 @@
         }
 
         /// <summary>
+        /// Add a public, instance-scoped, get-set <see cref="FieldExpression"/> to the
+        /// <see cref="ConcreteTypeExpression"/>, with the given <paramref name="name"/> and
+        /// <typeparamref name="TField"/> type.
+        /// </summary>
+        /// <typeparam name="TField">The type of the <see cref="FieldExpression"/>.</typeparam>
+        /// <param name="concreteTypeConfig">
+        /// The <see cref="IConcreteTypeExpressionConfigurator"/> to configure.
+        /// </param>
+        /// <param name="name">The name of the <see cref="FieldExpression"/>.</param>
+        /// <returns>The newly-created <see cref="FieldExpression"/>.</returns>
+        public static FieldExpression AddField<TField>(
+            this IConcreteTypeExpressionConfigurator concreteTypeConfig,
+            string name)
+        {
+            return concreteTypeConfig.AddField<TField>(name, f => { });
+        }
+
+        /// <summary>
+        /// Add a public, instance-scoped, get-set <see cref="FieldExpression"/> to the
+        /// <see cref="ConcreteTypeExpression"/>, with the given <paramref name="name"/>,
+        /// <typeparamref name="TField"/> type and <paramref name="configuration"/>.
+        /// </summary>
+        /// <typeparam name="TField">The type of the <see cref="FieldExpression"/>.</typeparam>
+        /// <param name="concreteTypeConfig">
+        /// The <see cref="IConcreteTypeExpressionConfigurator"/> to configure.
+        /// </param>
+        /// <param name="name">The name of the <see cref="FieldExpression"/>.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The newly-created <see cref="FieldExpression"/>.</returns>
+        public static FieldExpression AddField<TField>(
+            this IConcreteTypeExpressionConfigurator concreteTypeConfig,
+            string name,
+            Action<IFieldExpressionConfigurator> configuration)
+        {
+            return concreteTypeConfig
+                .AddField(name, BclTypeWrapper.For(typeof(TField)), configuration);
+        }
+
+        /// <summary>
         /// Add a public, instance-scoped, get-set <see cref="PropertyExpression"/> to the
         /// <see cref="InterfaceExpression"/>, with the given <paramref name="name"/> and
         /// <typeparamref name="TProperty"/> type.

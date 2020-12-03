@@ -1,7 +1,9 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Api
 {
+    using System;
     using System.Linq.Expressions;
     using Generics;
+    using ReadableExpressions.Translations.Reflection;
 
     /// <summary>
     /// Provides options to configure a <see cref="ConcreteTypeExpression"/>.
@@ -21,5 +23,19 @@
         /// <param name="parameter">The <see cref="GenericParameterExpression"/> to add.</param>
         /// <returns>The newly-created copy of the given <paramref name="parameter"/>.</returns>
         GenericParameterExpression AddGenericParameter(GenericParameterExpression parameter);
+
+        /// <summary>
+        /// Add a <see cref="FieldExpression"/> to the <see cref="ConcreteTypeExpression"/>, with
+        /// the given <paramref name="name"/>, <paramref name="type"/> and
+        /// <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="name">The name of the <see cref="FieldExpression"/>.</param>
+        /// <param name="type">The <see cref="IType"/> of the <see cref="FieldExpression"/>.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The newly-created <see cref="FieldExpression"/>.</returns>
+        FieldExpression AddField(
+            string name,
+            IType type,
+            Action<IFieldExpressionConfigurator> configuration);
     }
 }

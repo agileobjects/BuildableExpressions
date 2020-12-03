@@ -4,7 +4,6 @@
     using System.Linq;
     using Api;
     using Extensions;
-    using ReadableExpressions;
     using ReadableExpressions.Translations.Reflection;
     using static MemberVisibility;
 
@@ -61,16 +60,6 @@
         }
 
         public override bool IsAutoProperty => this.IsAutoProperty();
-
-        #region IMemberExpressionConfigurator Members
-
-        void IMemberExpressionConfigurator.SetSummary(CommentExpression summary)
-            => SetSummary(summary);
-
-        void IMemberExpressionConfigurator.SetVisibility(MemberVisibility visibility)
-            => SetVisibility(visibility);
-
-        #endregion
 
         #region IConcreteTypePropertyExpressionConfigurator Members
 

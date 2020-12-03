@@ -29,6 +29,8 @@
         private readonly List<MemberExpression> _memberExpressions;
         private IMember[] _members;
         private ReadOnlyCollection<MemberExpression> _readOnlyMemberExpressions;
+        private List<FieldExpression> _fieldExpressions;
+        private ReadOnlyCollection<FieldExpression> _readOnlyFieldExpressions;
         private List<PropertyExpression> _propertyExpressions;
         private ReadOnlyCollection<PropertyExpression> _readOnlyPropertyExpressions;
         private List<MethodExpression> _methodExpressions;
@@ -282,6 +284,13 @@
             => _readOnlyMemberExpressions ??= _memberExpressions.ToReadOnlyCollection();
 
         internal ICollection<MemberExpression> MemberExpressionsAccessor => _memberExpressions;
+
+        /// <summary>
+        /// Gets the <see cref="FieldExpression"/>s which describe this
+        /// <see cref="TypeExpression"/>'s fields.
+        /// </summary>
+        public ReadOnlyCollection<FieldExpression> FieldExpressions
+            => _readOnlyFieldExpressions ??= _fieldExpressions.ToReadOnlyCollection();
 
         /// <summary>
         /// Gets the <see cref="PropertyExpression"/>s which describe this

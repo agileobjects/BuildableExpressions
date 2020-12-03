@@ -5,6 +5,7 @@
     using System.Linq.Expressions;
     using Api;
     using Generics;
+    using ReadableExpressions.Translations.Reflection;
 
     /// <summary>
     /// Represents a concrete (non-interface) type in a piece of source code.
@@ -73,6 +74,14 @@
             GenericParameterExpression parameter)
         {
             return AddGenericParameter(parameter);
+        }
+
+        FieldExpression IConcreteTypeExpressionConfigurator.AddField(
+            string name,
+            IType type,
+            Action<IFieldExpressionConfigurator> configuration)
+        {
+            return AddField(name, type, configuration);
         }
 
         #endregion

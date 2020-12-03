@@ -17,6 +17,8 @@
         private readonly IList<ITranslation> _interfaceTypeTranslations;
         private readonly int _interfaceTypeCount;
         private readonly int _memberCount;
+        private readonly int _fieldCount;
+        private readonly IList<ITranslation> _fieldTranslations;
         private readonly int _propertyCount;
         private readonly IList<ITranslation> _propertyTranslations;
         private readonly int _methodCount;
@@ -86,6 +88,31 @@
                     _interfaceTypeTranslations[i] = interfaceTranslation;
                     translationSize += interfaceTranslation.TranslationSize;
                     formattingSize += interfaceTranslation.FormattingSize;
+                }
+            }
+
+            _fieldCount = type.FieldExpressions.Count;
+
+            if (_fieldCount != 0)
+            {
+                _memberCount += _fieldCount;
+                _fieldTranslations = new ITranslation[_fieldCount];
+
+                for (var i = 0; ;)
+                {
+                    var fieldTranslation = context.GetTranslationFor(type.FieldExpressions[i]);
+                    var field = _fieldTranslations[i] = fieldTranslation;
+                    translationSize += field.TranslationSize;
+                    formattingSize += field.FormattingSize;
+
+                    ++i;
+
+                    if (i == _fieldCount)
+                    {
+                        break;
+                    }
+
+                    translationSize += 2; // <- for new line
                 }
             }
 
@@ -277,10 +304,19 @@
 
             writer.WriteOpeningBraceToTranslation();
 
+            WriteFieldTo(writer);
             WritePropertiesTo(writer);
             WriteMethodsTo(writer);
 
             writer.WriteClosingBraceToTranslation();
+        }
+
+        private void WriteFieldTo(TranslationWriter writer)
+        {
+            if (_fieldCount != 0)
+            {
+                WriteTo(writer, _fieldCount, _fieldTranslations);
+            }
         }
 
         private void WritePropertiesTo(TranslationWriter writer)
