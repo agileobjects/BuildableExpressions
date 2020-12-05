@@ -4,6 +4,7 @@
     using System.Linq;
     using System.Reflection;
     using AgileObjects.BuildableExpressions.SourceCode.Extensions;
+    using BuildableExpressions.SourceCode;
     using Common;
     using NetStandardPolyfills;
     using ReadableExpressions.Translations.Reflection;
@@ -235,13 +236,19 @@
         }
 
         [Fact]
-        public void ShouldCreateAParameterlessVoidClassMethodInfo()
+        public void ShouldCreateAnInternalStaticReadonlyClassFieldInfo()
         {
             var sourceCode = BuildableExpression.SourceCode(sc =>
             {
                 sc.AddClass("MyClass", cls =>
                 {
-                    cls.AddMethod("DoNothing", Default(typeof(void)));
+                    cls.AddField<DateTime>("DateCreated", f =>
+                    {
+                        f.SetVisibility(MemberVisibility.Internal);
+                        f.SetStatic();
+                        f.SetReadonly();
+                        f.SetInitialValue(DateTime.Today);
+                    });
                 });
             });
 
@@ -250,21 +257,28 @@
                 .FirstOrDefault()
                 .ShouldNotBeNull();
 
-            var method = @class
-                .MethodExpressions
+            var field = @class
+                .FieldExpressions
                 .FirstOrDefault()
-                .ShouldNotBeNull()
-                .MethodInfo
                 .ShouldNotBeNull();
 
-            method.DeclaringType.ShouldBe(@class.Type);
-            method.ReturnType.ShouldBe(typeof(void));
-            method.Name.ShouldBe("DoNothing");
-            method.GetParameters().ShouldBeEmpty();
-            method.IsGenericMethod.ShouldBeFalse();
-            method.IsPublic.ShouldBeTrue();
-            method.IsStatic.ShouldBeFalse();
-            method.IsAbstract.ShouldBeFalse();
+            var iField = (IField)field;
+            iField.IsStatic.ShouldBeTrue();
+            iField.IsReadonly.ShouldBeTrue();
+            iField.Type.AsType().ShouldBe(typeof(DateTime));
+            iField.IsInternal.ShouldBeTrue();
+            iField.Name.ShouldBe("DateCreated");
+            iField.DeclaringType.ShouldBe(@class);
+
+            var fieldInfo = field
+                .FieldInfo.ShouldNotBeNull();
+
+            fieldInfo.DeclaringType.ShouldBe(@class.Type);
+            fieldInfo.FieldType.ShouldBe(typeof(DateTime));
+            fieldInfo.Name.ShouldBe("DateCreated");
+            fieldInfo.IsAssembly.ShouldBeTrue();
+            fieldInfo.IsStatic.ShouldBeTrue();
+            fieldInfo.GetValue(obj: null).ShouldBe(DateTime.Today);
         }
 
         [Fact]
@@ -311,6 +325,39 @@
             propertyInfo.Name.ShouldBe("Name");
             propertyInfo.IsPublic().ShouldBeTrue();
             propertyInfo.IsStatic().ShouldBeFalse();
+        }
+
+        [Fact]
+        public void ShouldCreateAParameterlessVoidClassMethodInfo()
+        {
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass("MyClass", cls =>
+                {
+                    cls.AddMethod("DoNothing", Default(typeof(void)));
+                });
+            });
+
+            var @class = sourceCode
+                .TypeExpressions
+                .FirstOrDefault()
+                .ShouldNotBeNull();
+
+            var method = @class
+                .MethodExpressions
+                .FirstOrDefault()
+                .ShouldNotBeNull()
+                .MethodInfo
+                .ShouldNotBeNull();
+
+            method.DeclaringType.ShouldBe(@class.Type);
+            method.ReturnType.ShouldBe(typeof(void));
+            method.Name.ShouldBe("DoNothing");
+            method.GetParameters().ShouldBeEmpty();
+            method.IsGenericMethod.ShouldBeFalse();
+            method.IsPublic.ShouldBeTrue();
+            method.IsStatic.ShouldBeFalse();
+            method.IsAbstract.ShouldBeFalse();
         }
 
         [Fact]

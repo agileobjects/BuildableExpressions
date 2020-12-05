@@ -94,6 +94,9 @@
                 case (ExpressionType)SourceCodeExpressionType.Type:
                     return VisitAndConvert((TypeExpression)expression);
 
+                case (ExpressionType)SourceCodeExpressionType.Field:
+                    return VisitAndConvert((FieldExpression)expression);
+
                 case (ExpressionType)SourceCodeExpressionType.Property:
                     return VisitAndConvert((PropertyExpression)expression);
 
@@ -191,6 +194,12 @@
             return base.VisitAndConvert(constant);
         }
 
+        private FieldExpression VisitAndConvert(FieldExpression field)
+        {
+            _namespaceAnalysis.Visit(field);
+            return field;
+        }
+
         private TypeExpression VisitAndConvert(GenericParameterExpression parameter)
         {
             var method = _currentMethodScope.RootMethodExpression;
@@ -221,14 +230,9 @@
         {
             _namespaceAnalysis.Visit(type);
 
-            foreach (Expression propertyExpression in type.PropertyExpressions)
+            foreach (var memberExpression in type.MemberExpressionsAccessor)
             {
-                VisitAndConvert(propertyExpression);
-            }
-
-            foreach (Expression methodExpression in type.MethodExpressions)
-            {
-                VisitAndConvert(methodExpression);
+                VisitAndConvert(memberExpression);
             }
 
             type.Finalise();

@@ -374,6 +374,20 @@
         }
 
         /// <summary>
+        /// Set the <see cref="FieldExpression"/>'s initial value to the given
+        /// <paramref name="value"/>.
+        /// </summary>
+        /// <typeparam name="TValue">The type of the value to set.</typeparam>
+        /// <param name="fieldConfig">The <see cref="IFieldExpressionConfigurator"/> to configure.</param>
+        /// <param name="value">The value to which to initialise the <see cref="FieldExpression"/>.</param>
+        public static void SetInitialValue<TValue>(
+            this IFieldExpressionConfigurator fieldConfig,
+            TValue value)
+        {
+            fieldConfig.SetInitialValue(Expression.Constant(value, typeof(TValue)));
+        }
+
+        /// <summary>
         /// Add a public, instance-scoped, get-set <see cref="PropertyExpression"/> to the
         /// <see cref="InterfaceExpression"/>, with the given <paramref name="name"/> and
         /// <typeparamref name="TProperty"/> type.

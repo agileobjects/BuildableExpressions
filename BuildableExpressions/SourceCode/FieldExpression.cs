@@ -2,9 +2,13 @@
 {
     using System;
     using System.Linq.Expressions;
+    using System.Reflection;
     using Api;
+    using NetStandardPolyfills;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
+    using Translations;
+    using static MemberVisibility;
 
     /// <summary>
     /// Represents a field in a type in a piece of source code.
@@ -15,6 +19,7 @@
         IField
     {
         private readonly IType _type;
+        private FieldInfo _fieldInfo;
 
         internal FieldExpression(
             TypeExpression declaringTypeExpression,
@@ -28,7 +33,7 @@
 
             if (Visibility == default)
             {
-                SetVisibility(MemberVisibility.Public);
+                SetVisibility(Public);
             }
         }
 
@@ -51,14 +56,55 @@
         /// <returns>This <see cref="FieldExpression"/>.</returns>
         protected override Expression Accept(ExpressionVisitor visitor) => this;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsConstant { get; private set; }
+
         /// <inheritdoc />
         public bool IsReadonly { get; private set; }
+
+        /// <summary>
+        /// Gets an Expression representing this <see cref="FieldExpression"/>'s initial value.
+        /// </summary>
+        public Expression InitialValue { get; private set; }
+
+        /// <summary>
+        /// Gets the FieldInfo for this <see cref="PropertyExpression"/>, which is lazily,
+        /// dynamically generated using this field's definition.
+        /// </summary>
+        public FieldInfo FieldInfo
+            => _fieldInfo ??= CreateFieldInfo();
+
+        #region PropertyInfo Creation
+
+        private FieldInfo CreateFieldInfo()
+        {
+            var declaringType = DeclaringType.AsType();
+
+            var field = Visibility == Public
+                ? IsStatic
+                    ? declaringType.GetPublicStaticField(Name)
+                    : declaringType.GetPublicInstanceField(Name)
+                : IsStatic
+                    ? declaringType.GetNonPublicStaticField(Name)
+                    : declaringType.GetNonPublicInstanceField(Name);
+
+            return field;
+        }
+
+        #endregion
 
         #region IFieldExpressionConfigurator Members
 
         void IFieldExpressionConfigurator.SetStatic() => SetStatic();
 
+        void IFieldExpressionConfigurator.SetConstant() => IsConstant = IsReadonly = true;
+
         void IFieldExpressionConfigurator.SetReadonly() => IsReadonly = true;
+
+        void IFieldExpressionConfigurator.SetInitialValue(Expression value)
+            => InitialValue = value;
 
         #endregion
 
@@ -66,7 +112,7 @@
 
         /// <inheritdoc />
         protected override ITranslation GetFullTranslation(ITranslationContext context)
-            => new FieldDefinitionTranslation(this, includeDeclaringType: false, context.Settings);
+            => new FieldTranslation(this, context);
 
         /// <inheritdoc />
         protected override ITranslation GetTransientTranslation(ITranslationContext context)

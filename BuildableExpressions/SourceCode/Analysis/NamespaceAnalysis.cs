@@ -11,7 +11,7 @@
     using ReadableExpressions.Translations.Reflection;
     using static SourceCodeTranslationSettings;
 
-    internal class NamespaceAnalysis : ExpressionVisitor
+    internal class NamespaceAnalysis
     {
         private List<string> _requiredNamespaces;
         private string _sourceCodeNamespace;
@@ -22,12 +22,6 @@
         {
             _sourceCodeNamespace = type.SourceCode.Namespace;
             AddNamespacesIfRequired(type.ImplementedTypeExpressions);
-        }
-
-        protected override Expression VisitConstant(ConstantExpression constant)
-        {
-            Visit(constant);
-            return base.VisitConstant(constant);
         }
 
         public void Visit(ConstantExpression constant)
@@ -42,19 +36,9 @@
             }
         }
 
-        protected override Expression VisitDefault(DefaultExpression @default)
-        {
-            Visit(@default);
-            return base.VisitDefault(@default);
-        }
-
         public void Visit(DefaultExpression @default) => AddNamespaceIfRequired(@default);
 
-        protected override Expression VisitMember(MemberExpression memberAccess)
-        {
-            Visit(memberAccess);
-            return base.VisitMember(memberAccess);
-        }
+        public void Visit(FieldExpression field) => AddNamespaceIfRequired(field);
 
         public void Visit(MemberExpression memberAccess)
         {
@@ -63,12 +47,6 @@
                 // Static member access
                 AddNamespaceIfRequired(memberAccess.Member.DeclaringType);
             }
-        }
-
-        protected override Expression VisitMethodCall(MethodCallExpression methodCall)
-        {
-            Visit(methodCall);
-            return base.VisitMethodCall(methodCall);
         }
 
         public void Visit(MethodCallExpression methodCall)
@@ -106,29 +84,11 @@
         public void Visit(PropertyExpression property)
             => AddNamespaceIfRequired(property);
 
-        protected override Expression VisitNewArray(NewArrayExpression newArray)
-        {
-            Visit(newArray);
-            return base.VisitNewArray(newArray);
-        }
-
         public void Visit(NewArrayExpression newArray)
             => AddNamespaceIfRequired(newArray.Type.GetElementType());
 
-        protected override Expression VisitNew(NewExpression newing)
-        {
-            Visit(newing);
-            return base.VisitNew(newing);
-        }
-
         public void Visit(NewExpression newing)
             => AddNamespaceIfRequired(newing);
-
-        protected override CatchBlock VisitCatchBlock(CatchBlock @catch)
-        {
-            Visit(@catch);
-            return base.VisitCatchBlock(@catch);
-        }
 
         public void Visit(CatchBlock @catch)
         {

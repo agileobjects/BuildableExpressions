@@ -304,18 +304,22 @@
 
             writer.WriteOpeningBraceToTranslation();
 
-            WriteFieldTo(writer);
+            WriteFieldsTo(writer);
             WritePropertiesTo(writer);
             WriteMethodsTo(writer);
 
             writer.WriteClosingBraceToTranslation();
         }
 
-        private void WriteFieldTo(TranslationWriter writer)
+        private void WriteFieldsTo(TranslationWriter writer)
         {
             if (_fieldCount != 0)
             {
-                WriteTo(writer, _fieldCount, _fieldTranslations);
+                WriteTo(
+                    writer,
+                    _fieldCount,
+                    _fieldTranslations,
+                    separateWithBlankLine: false);
             }
         }
 
@@ -338,7 +342,8 @@
         private static void WriteTo(
             TranslationWriter writer,
             int memberCount,
-            IList<ITranslation> memberTranslations)
+            IList<ITranslation> memberTranslations,
+            bool separateWithBlankLine = true)
         {
             if (memberCount == 0)
             {
@@ -356,7 +361,11 @@
                 }
 
                 writer.WriteNewLineToTranslation();
-                writer.WriteNewLineToTranslation();
+
+                if (separateWithBlankLine)
+                {
+                    writer.WriteNewLineToTranslation();
+                }
             }
         }
     }
