@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
     using Api;
@@ -97,6 +98,17 @@
                 .OrderByDescending(suffix => suffix)
                 .FirstOrDefault();
         }
+
+        #endregion
+
+        #region Validation
+
+        /// <inheritdoc />
+        protected override IEnumerable<MethodExpression> SiblingMethodExpressions
+            => null;
+
+        /// <inheritdoc />
+        protected override string MethodTypeName => "method";
 
         #endregion
     }

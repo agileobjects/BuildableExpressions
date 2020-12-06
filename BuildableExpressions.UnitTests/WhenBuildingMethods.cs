@@ -14,7 +14,7 @@
         [Fact]
         public void ShouldBuildAMethodFromAParameterlessLambdaAction()
         {
-            var doNothing = Lambda<Action>(Default(typeof(void)));
+            var doNothing = Lambda<Action>(Empty());
 
             var translated = BuildableExpression
                 .SourceCode(sc => sc
@@ -39,7 +39,7 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildAMethodFromADefaultVoidExpression()
         {
-            var doNothing = Default(typeof(void));
+            var doNothing = Empty();
 
             var translated = BuildableExpression
                 .SourceCode(sc => sc
@@ -499,7 +499,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("VirtualMethod", m =>
                         {
                             m.SetVirtual();
-                            m.SetBody(Default(typeof(void)));
+                            m.SetBody(Empty());
                         });
                     });
                 })

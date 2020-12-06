@@ -27,7 +27,7 @@
 
                     sc.AddClass(cls =>
                     {
-                        cls.AddMethod(Default(typeof(void)));
+                        cls.AddMethod(Empty());
                     });
                 });
 
@@ -58,7 +58,7 @@
 
                 sc.AddClass(cls =>
                 {
-                    cls.AddMethod(Default(typeof(void)));
+                    cls.AddMethod(Empty());
                 });
             });
 

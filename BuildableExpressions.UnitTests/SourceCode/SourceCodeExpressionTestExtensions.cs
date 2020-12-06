@@ -26,14 +26,14 @@
             this IClassExpressionConfigurator classConfig,
             string name)
         {
-            return classConfig.AddMethod(name, Default(typeof(void)));
+            return classConfig.AddMethod(name, Empty());
         }
 
         public static MethodExpression AddMethod(
             this IStructExpressionConfigurator structConfig,
             string name)
         {
-            return structConfig.AddMethod(name, Default(typeof(void)));
+            return structConfig.AddMethod(name, Empty());
         }
 
         public static MethodExpression AddMethod(

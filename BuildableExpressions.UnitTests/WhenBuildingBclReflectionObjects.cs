@@ -57,7 +57,7 @@
                         str.SetImplements<IMessager>(impl =>
                         {
                             var sendMessageLamba = Lambda<Action<object>>(
-                                Default(typeof(void)),
+                                Empty(),
                                 Parameter(typeof(object), "message"));
 
                             impl.AddMethod(nameof(IMessager.SendMessage), sendMessageLamba);
@@ -118,7 +118,7 @@
 
                 sc.AddClass("MyClass", cls =>
                 {
-                    cls.AddMethod("DoNothing", Default(typeof(void)));
+                    cls.AddMethod("DoNothing", Empty());
                 });
             });
 
@@ -182,7 +182,7 @@
 
                 sc.AddStruct("MyStruct", cls =>
                 {
-                    cls.AddMethod("DoNothing", Default(typeof(void)));
+                    cls.AddMethod("DoNothing", Empty());
                 });
             });
 
@@ -334,7 +334,7 @@
             {
                 sc.AddClass("MyClass", cls =>
                 {
-                    cls.AddMethod("DoNothing", Default(typeof(void)));
+                    cls.AddMethod("DoNothing", Empty());
                 });
             });
 

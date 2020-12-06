@@ -14,7 +14,7 @@
             var translated = BuildableExpression
                 .SourceCode(sc => sc
                     .AddStruct("MyStruct", cls => cls
-                        .AddMethod(Default(typeof(void)))))
+                        .AddMethod(Empty())))
                 .ToCSharpString();
 
             const string EXPECTED = @"
@@ -48,7 +48,7 @@ namespace GeneratedExpressionCode
                         {
                             impl.AddMethod("DoNothing", m =>
                             {
-                                m.SetBody(Default(typeof(void)));
+                                m.SetBody(Empty());
                             });
                         });
                     });

@@ -134,6 +134,12 @@
             }
         }
 
+        ConstructorExpression IClassConstructorConfigurator.AddConstructor(
+            Action<IClassConstructorExpressionConfigurator> configuration)
+        {
+            return AddConstructor(configuration);
+        }
+
         PropertyExpression IClassMemberConfigurator.AddProperty(
             string name,
             IType type,

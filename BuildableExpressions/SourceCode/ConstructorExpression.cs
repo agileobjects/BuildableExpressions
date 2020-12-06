@@ -1,6 +1,8 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
     using Api;
     using BuildableExpressions.Extensions;
     using ReadableExpressions.Extensions;
@@ -13,7 +15,7 @@
     /// </summary>
     public class ConstructorExpression :
         MethodExpression,
-        IConstructorExpressionConfigurator,
+        IClassConstructorExpressionConfigurator,
         IConstructor
     {
         private string _name;
@@ -29,6 +31,8 @@
             {
                 SetVisibility(MemberVisibility.Public);
             }
+
+            Validate();
         }
 
         /// <inheritdoc />
@@ -49,13 +53,41 @@
 
         internal override bool HasGeneratedName => false;
 
-        internal override bool HasBody => Body != null;
+        internal override bool HasBody => !IsAbstract;
 
         /// <inheritdoc cref="IComplexMember.IsOverride" />
         public override bool IsOverride => false;
 
+        #region Validation
+
+        /// <inheritdoc />
+        protected override IEnumerable<MethodExpression> SiblingMethodExpressions
+            => DeclaringTypeExpression.ConstructorExpressions;
+
+        /// <inheritdoc />
+        protected override string MethodTypeName => "constructor";
+
+        #endregion
+
+        #region IClassConstructorExpressionConfigurator Members
+
+        void IConstructorExpressionConfigurator.AddParameters(
+            params ParameterExpression[] parameters)
+        {
+            AddParameters(new List<ParameterExpression>(parameters));
+        }
+
+        void IConstructorExpressionConfigurator.SetBody(Expression body)
+            => SetBody(body, typeof(void));
+
+        #endregion
+
+        #region Translation
+
         /// <inheritdoc />
         protected override ITranslation GetFullTranslation(ITranslationContext context)
             => new ConstructorTranslation(this, context);
+
+        #endregion
     }
 }

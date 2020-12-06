@@ -46,7 +46,7 @@
                 {
                     var blockMethod = new BlockMethodExpression((TypeExpression)cls, cfg =>
                     {
-                        cfg.SetBody(Default(typeof(void)));
+                        cfg.SetBody(Empty());
                     });
 
                     cls.AddMethod(blockMethod);

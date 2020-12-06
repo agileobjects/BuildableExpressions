@@ -395,6 +395,40 @@
 
         #region Validation
 
+        #region Validation
+
+        /// <summary>
+        /// Validates that this <see cref="MethodExpression"/> is non-empty with a unique signature.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this <see cref="MethodExpression"/> is empty.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this <see cref="MethodExpression"/> has the same signature as another method
+        /// on the <see cref="MemberExpression.DeclaringTypeExpression"/>.
+        /// </exception>
+        protected void Validate()
+        {
+            ThrowIfEmpty();
+            ThrowIfDuplicateSignature();
+        }
+
+        private void ThrowIfEmpty()
+        {
+            if (IsAbstract || Body != null)
+            {
+                return;
+            }
+
+            var methodTypeName = MethodTypeName.ToLowerInvariant();
+
+            throw new InvalidOperationException(
+                $"Method '{this.GetSignature()}': no {methodTypeName} body defined. " +
+                $"To add an empty {methodTypeName}, use SetBody(Expression.Empty())");
+        }
+
+        #endregion
+
         /// <summary>
         /// Throws an InvalidOperationException if this <see cref="MethodExpression"/> has the same
         /// signature as another method on the
@@ -404,19 +438,36 @@
         /// Thrown if this <see cref="MethodExpression"/> has the same signature as another method
         /// on the <see cref="MemberExpression.DeclaringTypeExpression"/>.
         /// </exception>
-        protected void ThrowIfDuplicateMethodSignature()
+        protected void ThrowIfDuplicateSignature()
         {
-            var hasDuplicateMethod = DeclaringTypeExpression
-                .MethodExpressions
+            if (SiblingMethodExpressions == null)
+            {
+                return;
+            }
+
+            var hasDuplicateMethod = SiblingMethodExpressions
                 .Any(m => m.Name == Name && HasSameParameterTypes(m));
 
             if (hasDuplicateMethod)
             {
                 throw new InvalidOperationException(
                     $"Type {DeclaringTypeExpression.Name} has duplicate " +
-                    $"method signature '{this.GetSignature(includeTypeName: false)}'");
+                    $"{MethodTypeName.ToLowerInvariant()} signature " +
+                    $"'{this.GetSignature(includeTypeName: false)}'");
             }
         }
+
+        /// <summary>
+        /// When overridden in a derived type, gets the set of <see cref="MethodExpression"/>s with
+        /// which to verify that this <see cref="MethodExpression"/> has a unique signature.
+        /// </summary>
+        protected abstract IEnumerable<MethodExpression> SiblingMethodExpressions { get; }
+
+        /// <summary>
+        /// When overridden in a derived type, gets the name of the type of method represented by
+        /// this <see cref="MethodExpression"/>, e.g. 'method' or 'constructor'.
+        /// </summary>
+        protected abstract string MethodTypeName { get; }
 
         private bool HasSameParameterTypes(MethodExpression otherMethod)
         {

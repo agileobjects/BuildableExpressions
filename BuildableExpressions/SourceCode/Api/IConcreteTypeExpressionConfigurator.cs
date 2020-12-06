@@ -24,15 +24,6 @@
         void AddGenericParameter(GenericParameterExpression parameter);
 
         /// <summary>
-        /// Add a <see cref="ConstructorExpression"/> to the <see cref="ConcreteTypeExpression"/>,
-        /// with the given <paramref name="configuration"/>.
-        /// </summary>
-        /// <param name="configuration">The configuration to use.</param>
-        /// <returns>The newly-created <see cref="ConstructorExpression"/>.</returns>
-        ConstructorExpression AddConstructor(
-            Action<IConstructorExpressionConfigurator> configuration);
-
-        /// <summary>
         /// Add a <see cref="FieldExpression"/> to the <see cref="ConcreteTypeExpression"/>, with
         /// the given <paramref name="name"/>, <paramref name="type"/> and
         /// <paramref name="configuration"/>.

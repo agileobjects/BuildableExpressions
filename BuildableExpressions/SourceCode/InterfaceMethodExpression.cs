@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
+    using System.Collections.Generic;
     using ReadableExpressions.Translations.Reflection;
 
     internal class InterfaceMethodExpression : MethodExpression
@@ -18,15 +19,8 @@
             configuration.Invoke(this);
 
             SetAbstract();
-            Validate();
+            ThrowIfDuplicateSignature();
         }
-
-        #region Validation
-
-        private void Validate()
-            => ThrowIfDuplicateMethodSignature();
-
-        #endregion
 
         public override Type ReturnType => _returnType.AsType();
 
@@ -37,5 +31,16 @@
         public override bool IsOverride => false;
 
         protected override IType GetReturnType() => _returnType;
+
+        #region Validation
+
+        /// <inheritdoc />
+        protected override IEnumerable<MethodExpression> SiblingMethodExpressions
+            => DeclaringTypeExpression.MethodExpressionsAccessor;
+
+        /// <inheritdoc />
+        protected override string MethodTypeName => "method";
+
+        #endregion
     }
 }

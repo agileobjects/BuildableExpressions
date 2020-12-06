@@ -149,7 +149,7 @@ namespace MyNamespace
             {
                 sc.AddClass(""MyClass"", cls => 
                 {
-                    var doNothing = Expression.Lambda<Action>(Expression.Default(typeof(void)));
+                    var doNothing = Expression.Lambda<Action>(Expression.Empty());
                     
                     cls.AddMethod(""DoNothing"", doNothing, m => { });
                 });

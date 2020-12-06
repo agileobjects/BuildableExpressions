@@ -336,6 +336,8 @@
             return null;
         }
 
+        internal ICollection<MethodExpression> MethodExpressionsAccessor => _methodExpressions;
+
         #region Validation
 
         /// <summary>

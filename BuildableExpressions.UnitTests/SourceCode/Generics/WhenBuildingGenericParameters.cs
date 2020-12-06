@@ -24,7 +24,7 @@
                     cls.AddMethod("DoStuff", m =>
                     {
                         param = m.AddGenericParameter("T");
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
                 });
             });
@@ -69,7 +69,7 @@
                             gp.AddNewableConstraint();
                         });
 
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
                 });
             });
@@ -114,7 +114,7 @@
                             gp.AddStructConstraint();
                         });
 
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
                 });
             });
@@ -158,7 +158,7 @@
                             gp.AddTypeConstraint(typeof(BaseType));
                         });
 
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
                 });
             });
@@ -203,7 +203,7 @@
                             gp.AddTypeConstraint(typeof(IDisposable));
                         });
 
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
                 });
             });
@@ -250,7 +250,7 @@
                             gp.AddTypeConstraint(typeof(AbstractBaseType));
                         });
 
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
                 });
             });
@@ -295,13 +295,13 @@
                     cls.AddMethod("DoStuff", m =>
                     {
                         param1 = m.AddGenericParameter("T");
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
 
                     cls.AddMethod("DoMoarStuff", m =>
                     {
                         param2 = m.AddGenericParameter("T");
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
                 });
             });
@@ -325,13 +325,13 @@
                     cls.AddMethod("DoStuff", m =>
                     {
                         param1 = m.AddGenericParameter("T1");
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
 
                     cls.AddMethod("DoMoarStuff", m =>
                     {
                         param2 = m.AddGenericParameter("T2");
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
                 });
             });
@@ -355,7 +355,7 @@
                     cls.AddMethod("DoStuff", m =>
                     {
                         param1 = m.AddGenericParameter("T");
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
 
                     cls.AddMethod("DoMoarStuff", m =>
@@ -365,7 +365,7 @@
                             gp.AddStructConstraint();
                         });
 
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
                 });
             });
@@ -393,13 +393,13 @@
                             gp.AddClassConstraint();
                         });
 
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
 
                     cls.AddMethod("DoMoarStuff", m =>
                     {
                         param2 = m.AddGenericParameter("T");
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
                 });
             });
@@ -423,7 +423,7 @@
                     cls.AddMethod("DoStuff", m =>
                     {
                         param1 = m.AddGenericParameter("T");
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
 
                     cls.AddMethod("DoMoarStuff", m =>
@@ -433,7 +433,7 @@
                             gp.AddNewableConstraint();
                         });
 
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
                 });
             });
@@ -461,13 +461,13 @@
                             gp.AddTypeConstraint(typeof(Stream));
                         });
 
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
 
                     cls.AddMethod("DoMoarStuff", m =>
                     {
                         param2 = m.AddGenericParameter("T");
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
                 });
             });
@@ -495,7 +495,7 @@
                             gp.AddTypeConstraint(typeof(Stream));
                         });
 
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
 
                     cls.AddMethod("DoMoarStuff", m =>
@@ -505,7 +505,7 @@
                             gp.AddTypeConstraint(typeof(StringComparer));
                         });
 
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
                 });
             });
@@ -529,7 +529,7 @@
                     cls.AddMethod("DoStuff", m =>
                     {
                         param1 = m.AddGenericParameter("T");
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
 
                     cls.AddMethod("DoMoarStuff", m =>
@@ -539,7 +539,7 @@
                             gp.AddTypeConstraint<IDisposable>();
                         });
 
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
                 });
             });
@@ -567,7 +567,7 @@
                             gp.AddTypeConstraint<IDisposable>();
                         });
 
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
 
                     cls.AddMethod("DoMoarStuff", m =>
@@ -581,7 +581,7 @@
                             });
                         });
 
-                        m.SetBody(Default(typeof(void)));
+                        m.SetBody(Empty());
                     });
                 });
             });

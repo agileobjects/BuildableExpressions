@@ -80,7 +80,7 @@
         {
             var configEx = Should.Throw<InvalidOperationException>(() =>
             {
-                var doNothing = Lambda<Action>(Default(typeof(void)));
+                var doNothing = Lambda<Action>(Empty());
 
                 BuildableExpression.SourceCode(sc =>
                 {

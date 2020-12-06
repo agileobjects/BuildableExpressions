@@ -34,26 +34,6 @@
             Validate();
         }
 
-        #region Validation
-
-        private void Validate()
-        {
-            ThrowIfEmptyMethod();
-            ThrowIfDuplicateMethodSignature();
-        }
-
-        private void ThrowIfEmptyMethod()
-        {
-            if (!IsAbstract && Body == null)
-            {
-                throw new InvalidOperationException(
-                    $"Method '{this.GetSignature()}': no method body defined. " +
-                    "To add an empty method, use SetBody(Expression.Default(typeof(void)))");
-            }
-        }
-
-        #endregion
-
         internal override bool HasGeneratedName => false;
 
         internal override bool HasBody => !IsAbstract;
@@ -113,6 +93,17 @@
 
         protected override IType GetReturnType()
             => _returnType ??= BclTypeWrapper.For(ReturnType);
+
+        #endregion
+
+        #region Validation
+
+        /// <inheritdoc />
+        protected override IEnumerable<MethodExpression> SiblingMethodExpressions
+            => DeclaringTypeExpression.MethodExpressionsAccessor;
+
+        /// <inheritdoc />
+        protected override string MethodTypeName => "method";
 
         #endregion
     }

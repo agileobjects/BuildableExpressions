@@ -330,13 +330,13 @@
                         str.AddMethod("DoNothing", m =>
                         {
                             m.AddParameter(Parameter(typeof(long), "number"));
-                            m.SetBody(Default(typeof(void)));
+                            m.SetBody(Empty());
                         });
 
                         str.AddMethod("DoNothing", m =>
                         {
                             m.AddParameter(Parameter(typeof(long), "number"));
-                            m.SetBody(Default(typeof(void)));
+                            m.SetBody(Empty());
                         });
                     });
                 });

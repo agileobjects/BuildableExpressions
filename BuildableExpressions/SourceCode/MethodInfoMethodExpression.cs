@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
     using BuildableExpressions.Extensions;
@@ -40,6 +41,10 @@
         internal override bool HasGeneratedName => false;
 
         internal override bool HasBody => true;
+
+        protected override IEnumerable<MethodExpression> SiblingMethodExpressions => null;
+
+        protected override string MethodTypeName => "method";
 
         public override bool IsAbstract => MethodInfo.IsAbstract;
 

@@ -24,7 +24,7 @@
             {
                 sc.AddClass(typeof(ExpressionBuilder).Name + "OutputClass", cls =>
                 {
-                    var doNothing = Expression.Default(typeof(void));
+                    var doNothing = Expression.Empty();
 
                     cls.AddMethod("DoNothing", doNothing);
                 });

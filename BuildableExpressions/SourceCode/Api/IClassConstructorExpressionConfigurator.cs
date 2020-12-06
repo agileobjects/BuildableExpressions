@@ -5,7 +5,7 @@
     /// <see cref="ClassExpression"/>.
     /// </summary>
     public interface IClassConstructorExpressionConfigurator :
-        IConcreteTypeConstructorExpressionConfigurator
+        IConstructorExpressionConfigurator
     {
     }
 }

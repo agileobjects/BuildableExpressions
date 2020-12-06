@@ -12,7 +12,7 @@
         [Fact]
         public void ShouldUseACustomNamespace()
         {
-            var doNothing = Lambda<Action>(Default(typeof(void)));
+            var doNothing = Lambda<Action>(Empty());
 
             var translated = BuildableExpression
                 .SourceCode(sc =>
@@ -39,7 +39,7 @@ namespace AgileObjects.GeneratedStuff
         [Fact]
         public void ShouldAllowANullNamespace()
         {
-            var doNothing = Lambda<Action>(Default(typeof(void)));
+            var doNothing = Lambda<Action>(Empty());
 
             var translated = BuildableExpression
                 .SourceCode(sc =>
@@ -63,7 +63,7 @@ public class GeneratedExpressionClass
         [Fact]
         public void ShouldAllowABlankNamespace()
         {
-            var doNothing = Lambda<Action>(Default(typeof(void)));
+            var doNothing = Lambda<Action>(Empty());
 
             var translated = BuildableExpression
                 .SourceCode(sc =>
@@ -87,7 +87,7 @@ public class GeneratedExpressionClass
         [Fact]
         public void ShouldUseACustomTypeNamespace()
         {
-            var doNothing = Lambda<Action>(Default(typeof(void)));
+            var doNothing = Lambda<Action>(Empty());
 
             var translated = BuildableExpression
                 .SourceCode(sc => sc
@@ -122,7 +122,7 @@ namespace {typeof(WhenBuildingSourceCode).Namespace}
                     {
                         cls.AddMethod("MyMethod", m =>
                         {
-                            m.SetDefinition(Lambda<Action>(Default(typeof(void))));
+                            m.SetDefinition(Lambda<Action>(Empty()));
                         });
                     });
                 })
@@ -145,7 +145,7 @@ namespace AgileObjects.BuildableExpressions.UnitTests
         [Fact]
         public void ShouldUseCustomClassAndMethodNamesAndStringSummaries()
         {
-            var doNothing = Lambda<Action>(Default(typeof(void)));
+            var doNothing = Lambda<Action>(Empty());
 
             const string CLASS_SUMMARY = @"
 This is my class!
@@ -196,7 +196,7 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldUseCustomClassAndMethodNamesAndCommentSummaries()
         {
-            var doNothing = Lambda<Action>(Default(typeof(void)));
+            var doNothing = Lambda<Action>(Empty());
 
             var classSummary = ReadableExpression.Comment(@"
 This is my class!
