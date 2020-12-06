@@ -4,6 +4,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using Api;
+    using BuildableExpressions.Extensions;
     using Generics;
     using ReadableExpressions.Translations.Reflection;
 
@@ -54,7 +55,7 @@
             var unimplementedMethod = new[] { interfaceExpression }
                 .Concat(interfaceExpression.InterfaceTypeExpressions)
                 .SelectMany(it => it.MethodExpressions)
-                .FirstOrDefault(method => !MethodExpressions.Contains(method));
+                .FirstOrDefault(method => !MethodExpressionsAccessor.Contains(method));
 
             if (unimplementedMethod == null)
             {

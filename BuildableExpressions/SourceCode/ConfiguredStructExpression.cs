@@ -27,6 +27,19 @@
 
         #region IStructExpressionConfigurator Members
 
+        void IStructExpressionConfigurator.SetImplements(
+            InterfaceExpression interfaceExpression,
+            Action<IStructImplementationConfigurator> configuration)
+        {
+            SetImplements(interfaceExpression, configuration);
+        }
+
+        ConstructorExpression IStructConstructorConfigurator.AddConstructor(
+            Action<IConstructorExpressionConfigurator> configuration)
+        {
+            return AddConstructor(configuration);
+        }
+
         PropertyExpression IStructMemberConfigurator.AddProperty(
             string name,
             IType type,
@@ -40,13 +53,6 @@
             Action<IConcreteTypeMethodExpressionConfigurator> configuration)
         {
             return AddMethod(name, configuration);
-        }
-
-        void IStructExpressionConfigurator.SetImplements(
-            InterfaceExpression interfaceExpression,
-            Action<IStructImplementationConfigurator> configuration)
-        {
-            SetImplements(interfaceExpression, configuration);
         }
 
         #endregion

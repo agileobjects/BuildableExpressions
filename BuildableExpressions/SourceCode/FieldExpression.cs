@@ -5,6 +5,7 @@
     using System.Reflection;
     using Api;
     using NetStandardPolyfills;
+    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
     using Translations;
@@ -119,5 +120,8 @@
             => GetFullTranslation(context);
 
         #endregion
+
+        /// <inheritdoc />
+        public override string ToString() => $"{_type.GetFriendlyName()} {Name}";
     }
 }

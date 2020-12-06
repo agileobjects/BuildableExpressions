@@ -237,5 +237,8 @@
             => new ReturnDefaultPropertyTranslation(this, context);
 
         #endregion
+
+        /// <inheritdoc />
+        public override string ToString() => $"{_type.GetFriendlyName()} {Name}";
     }
 }

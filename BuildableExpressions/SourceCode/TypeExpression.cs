@@ -411,6 +411,8 @@
                     AddMethod((MethodExpression)blockMethod);
                 }
             }
+
+            _memberExpressions.Sort(MemberExpressionComparer.Instance);
         }
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)

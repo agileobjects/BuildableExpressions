@@ -89,5 +89,8 @@
             => new ConstructorTranslation(this, context);
 
         #endregion
+
+        /// <inheritdoc />
+        public override string ToString() => Name;
     }
 }

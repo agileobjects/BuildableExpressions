@@ -51,6 +51,8 @@
         /// </summary>
         public CommentExpression Summary { get; private set; }
 
+        internal int MemberIndex { get; set; }
+
         #region IMemberExpressionConfigurator Members
 
         void IMemberExpressionConfigurator.SetSummary(CommentExpression summary)

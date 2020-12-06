@@ -55,12 +55,17 @@
 
         private int GetLatestMatchingMethodSuffix(string baseName)
         {
+            if (DeclaringTypeExpression.MethodExpressionsAccessor == null)
+            {
+                return default;
+            }
+
             var parameterTypes =
                 ParametersAccessor?.ProjectToArray(p => p.Type) ??
                 Type.EmptyTypes;
 
             return DeclaringTypeExpression
-                .MethodExpressions
+                .MethodExpressionsAccessor
                 .Filter(m => m.Name != null)
                 .Select(m =>
                 {

@@ -159,6 +159,8 @@
         private TMemberExpression AddMember<TMemberExpression>(TMemberExpression member)
             where TMemberExpression : MemberExpression
         {
+            member.MemberIndex = _memberExpressions.Count;
+
             _memberExpressions.Add(member);
             _readOnlyMemberExpressions = null;
             _members = null;

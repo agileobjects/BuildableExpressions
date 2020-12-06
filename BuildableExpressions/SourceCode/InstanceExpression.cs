@@ -48,7 +48,7 @@
             return _translation ??= new FixedValueTranslation(
                 NodeType,
                 _keyword,
-                Type,
+                typeof(string),
                 TokenType.Keyword,
                 context.Settings);
         }
