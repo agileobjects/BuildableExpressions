@@ -76,7 +76,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildASimpleStructConstructor()
+        public void ShouldBuildAPropertyAssignmentStructConstructor()
         {
             var translated = BuildableExpression
                 .SourceCode(sc =>
@@ -133,6 +133,71 @@ namespace GeneratedExpressionCode
         public int Count1 { get; private set; }
 
         public int Count2 { get; private set; }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAnAbstractFieldAssignmentClassConstructor()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("PersonBase", cls =>
+                    {
+                        cls.SetAbstract();
+
+                        var nameField = cls.AddField<string>("_name", f =>
+                        {
+                            f.SetVisibility(Private);
+                        });
+
+                        var nameFieldAccess =
+                            Field(cls.ThisInstanceExpression, nameField.FieldInfo);
+
+                        cls.AddProperty<string>("Name", p =>
+                        {
+                            p.SetGetter(g => g.SetBody(nameFieldAccess));
+                        });
+
+                        cls.AddConstructor(ctor =>
+                        {
+                            ctor.SetVisibility(Protected);
+
+                            var nameParam = Parameter(typeof(string), "name");
+                            ctor.AddParameter(nameParam);
+
+                            var nameAssignment = Assign(nameFieldAccess, nameParam);
+                            ctor.SetBody(nameAssignment);
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public abstract class PersonBase
+    {
+        private string _name;
+
+        protected PersonBase
+        (
+            string name
+        )
+        {
+            this._name = name;
+        }
+
+        public string Name
+        {
+            get
+            {
+                return this._name;
+            }
+        }
     }
 }";
             EXPECTED.ShouldCompile();

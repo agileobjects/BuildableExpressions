@@ -94,14 +94,15 @@
                 case (ExpressionType)SourceCodeExpressionType.Type:
                     return VisitAndConvert((TypeExpression)expression);
 
+                case (ExpressionType)SourceCodeExpressionType.Constructor:
+                case (ExpressionType)SourceCodeExpressionType.Method:
+                    return VisitAndConvert((MethodExpression)expression);
+
                 case (ExpressionType)SourceCodeExpressionType.Field:
                     return VisitAndConvert((FieldExpression)expression);
 
                 case (ExpressionType)SourceCodeExpressionType.Property:
                     return VisitAndConvert((PropertyExpression)expression);
-
-                case (ExpressionType)SourceCodeExpressionType.Method:
-                    return VisitAndConvert((MethodExpression)expression);
 
                 case (ExpressionType)SourceCodeExpressionType.GenericArgument
                     when expression is GenericParameterExpression genericParameter:
@@ -146,11 +147,12 @@
             switch (parentExpression.NodeType)
             {
                 case Block:
+                case (ExpressionType)SourceCodeExpressionType.Constructor:
                 case Lambda:
                 case Loop:
+                case (ExpressionType)SourceCodeExpressionType.Method:
                 case Quote:
                 case Try:
-                case (ExpressionType)SourceCodeExpressionType.Method:
                     return false;
 
                 case Switch:

@@ -9,7 +9,7 @@
     public interface IConstructorExpressionConfigurator : IMemberExpressionConfigurator
     {
         /// <summary>
-        /// Adds the given <paramref name="parameters"/> to the <see cref="MethodExpression"/>.
+        /// Adds the given <paramref name="parameters"/> to the <see cref="ConstructorExpression"/>.
         /// </summary>
         /// <param name="parameters">The ParameterExpression to add.</param>
         void AddParameters(params ParameterExpression[] parameters);

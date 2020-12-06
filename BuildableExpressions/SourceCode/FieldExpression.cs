@@ -77,7 +77,7 @@
         public FieldInfo FieldInfo
             => _fieldInfo ??= CreateFieldInfo();
 
-        #region PropertyInfo Creation
+        #region FieldInfo Creation
 
         private FieldInfo CreateFieldInfo()
         {
@@ -116,7 +116,7 @@
             => new FieldTranslation(this, context);
 
         /// <inheritdoc />
-        protected override ITranslation GetTransientTranslation(ITranslationContext context)
+        protected override ITranslation GetTransientTranslation(ITranslationContext context) 
             => GetFullTranslation(context);
 
         #endregion

@@ -322,6 +322,30 @@
         }
 
         /// <summary>
+        /// Adds the given <paramref name="parameter"/> to the <see cref="ConstructorExpression"/>.
+        /// </summary>
+        /// <param name="ctorConfig">The <see cref="IConstructorExpressionConfigurator"/> to configure.</param>
+        /// <param name="parameter">The ParameterExpression to add.</param>
+        public static void AddParameter(
+            this IConstructorExpressionConfigurator ctorConfig,
+            ParameterExpression parameter)
+        {
+            ctorConfig.AddParameters(parameter);
+        }
+
+        /// <summary>
+        /// Set the summary documentation of the <see cref="SourceCode.MemberExpression"/>.
+        /// </summary>
+        /// <param name="memberConfig">The <see cref="IMemberExpressionConfigurator"/> to configure.</param>
+        /// <param name="summary">The summary documentation of the <see cref="SourceCode.MemberExpression"/>.</param>
+        public static void SetSummary(
+            this IMemberExpressionConfigurator memberConfig,
+            string summary)
+        {
+            memberConfig.SetSummary(ReadableExpression.Comment(summary));
+        }
+
+        /// <summary>
         /// Add a member to the <see cref="EnumExpression"/> with the given <paramref name="name"/>
         /// and an auto-generated value.
         /// </summary>
@@ -581,18 +605,6 @@
             {
                 propertyConfig.SetSetter();
             }
-        }
-
-        /// <summary>
-        /// Set the summary documentation of the <see cref="SourceCode.MemberExpression"/>.
-        /// </summary>
-        /// <param name="memberConfig">The <see cref="IMemberExpressionConfigurator"/> to configure.</param>
-        /// <param name="summary">The summary documentation of the <see cref="SourceCode.MemberExpression"/>.</param>
-        public static void SetSummary(
-            this IMemberExpressionConfigurator memberConfig,
-            string summary)
-        {
-            memberConfig.SetSummary(ReadableExpression.Comment(summary));
         }
 
         /// <summary>

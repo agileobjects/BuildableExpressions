@@ -35,6 +35,13 @@
             Validate();
         }
 
+        /// <summary>
+        /// Gets the <see cref="SourceCodeExpressionType"/> value (1005) indicating the type of this
+        /// <see cref="ConstructorExpression"/> as an ExpressionType.
+        /// </summary>
+        public override ExpressionType NodeType
+            => (ExpressionType)SourceCodeExpressionType.Constructor;
+
         /// <inheritdoc />
         public override string Name => _name ??= GenerateName();
 

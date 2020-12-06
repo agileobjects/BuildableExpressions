@@ -15,6 +15,8 @@
             FieldExpression fieldExpression,
             ITranslationContext context)
         {
+            NodeType = fieldExpression.NodeType;
+
             _summary = SummaryTranslation.For(fieldExpression.Summary, context);
 
             _definitionTranslation = new FieldDefinitionTranslation(
@@ -42,7 +44,7 @@
         }
 
         /// <inheritdoc />
-        public ExpressionType NodeType => _definitionTranslation.NodeType;
+        public ExpressionType NodeType { get; }
 
         public Type Type => _definitionTranslation.Type;
 

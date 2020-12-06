@@ -1,11 +1,13 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Translations
 {
     using System.Collections.Generic;
+    using System.Linq.Expressions;
     using BuildableExpressions.Extensions;
     using Generics;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
+    using static SourceCodeExpressionType;
 
     internal class TypeTranslation
     {
@@ -240,7 +242,7 @@
         public void WriteBodyTo(TranslationWriter writer)
         {
             writer.WriteOpeningBraceToTranslation();
-            
+
             if (_memberCount == 0)
             {
                 writer.WriteClosingBraceToTranslation(startOnNewLine: false);
@@ -271,11 +273,21 @@
 
                 writer.WriteNewLineToTranslation();
 
-                if (!(memberTranslation is FieldTranslation))
+                if (IsField(memberTranslation))
                 {
-                    writer.WriteNewLineToTranslation();
+                    var nextMemberTranslation = _memberTranslations[i];
+
+                    if (IsField(nextMemberTranslation))
+                    {
+                        continue;
+                    }
                 }
+
+                writer.WriteNewLineToTranslation();
             }
         }
+
+        private static bool IsField(ITranslation memberTranslation)
+            => memberTranslation.NodeType == (ExpressionType)Field;
     }
 }

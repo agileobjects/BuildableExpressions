@@ -28,7 +28,7 @@
             var yTypeIndex = Array.IndexOf(_orderedTypes, (int)y.NodeType);
             // ReSharper restore PossibleNullReferenceException
 
-            return xTypeIndex > yTypeIndex ? -1 : 1;
+            return xTypeIndex > yTypeIndex ? 1 : -1;
         }
     }
 }
