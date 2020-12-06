@@ -21,9 +21,7 @@
         /// This <see cref="MemberExpression"/>'s parent <see cref="TypeExpression"/>.
         /// </param>
         /// <param name="name">The name of this <see cref="MemberExpression"/>.</param>
-        protected MemberExpression(
-            TypeExpression declaringTypeExpression,
-            string name)
+        protected MemberExpression(TypeExpression declaringTypeExpression, string name)
             : base(name)
         {
             DeclaringTypeExpression = declaringTypeExpression;

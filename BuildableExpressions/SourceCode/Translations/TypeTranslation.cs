@@ -16,15 +16,10 @@
         private readonly string _visibility;
         private readonly IList<ITranslation> _interfaceTypeTranslations;
         private readonly int _interfaceTypeCount;
-        private readonly int _memberCount;
-        private readonly int _fieldCount;
-        private readonly IList<ITranslation> _fieldTranslations;
-        private readonly int _propertyCount;
-        private readonly IList<ITranslation> _propertyTranslations;
-        private readonly int _methodCount;
-        private readonly IList<ITranslation> _methodTranslations;
         private readonly ITranslatable _genericParametersTranslation;
         private readonly ITranslatable _genericParameterConstraintsTranslation;
+        private readonly int _memberCount;
+        private readonly IList<ITranslation> _memberTranslations;
 
         public TypeTranslation(
             TypeExpression type,
@@ -91,79 +86,32 @@
                 }
             }
 
-            _fieldCount = type.FieldExpressions.Count;
+            _memberCount = type.MemberExpressionsAccessor.Count;
 
-            if (_fieldCount != 0)
+            if (_memberCount == 0)
             {
-                _memberCount += _fieldCount;
-                _fieldTranslations = new ITranslation[_fieldCount];
-
-                for (var i = 0; ;)
-                {
-                    var fieldTranslation = context.GetTranslationFor(type.FieldExpressions[i]);
-                    var field = _fieldTranslations[i] = fieldTranslation;
-                    translationSize += field.TranslationSize;
-                    formattingSize += field.FormattingSize;
-
-                    ++i;
-
-                    if (i == _fieldCount)
-                    {
-                        break;
-                    }
-
-                    translationSize += 2; // <- for new line
-                }
+                TranslationSize = translationSize;
+                FormattingSize = formattingSize;
+                return;
             }
 
-            _propertyCount = type.PropertyExpressions.Count;
+            _memberTranslations = new ITranslation[_memberCount];
 
-            if (_propertyCount != 0)
+            for (var i = 0; ;)
             {
-                _memberCount += _propertyCount;
-                _propertyTranslations = new ITranslation[_propertyCount];
+                var memberTranslation = context.GetTranslationFor(type.MemberExpressions[i]);
+                var member = _memberTranslations[i] = memberTranslation;
+                translationSize += member.TranslationSize;
+                formattingSize += member.FormattingSize;
 
-                for (var i = 0; ;)
+                ++i;
+
+                if (i == _memberCount)
                 {
-                    var propertyTranslation = context.GetTranslationFor(type.PropertyExpressions[i]);
-                    var property = _propertyTranslations[i] = propertyTranslation;
-                    translationSize += property.TranslationSize;
-                    formattingSize += property.FormattingSize;
-
-                    ++i;
-
-                    if (i == _propertyCount)
-                    {
-                        break;
-                    }
-
-                    translationSize += 2; // <- for new line
+                    break;
                 }
-            }
 
-            _methodCount = type.MethodExpressions.Count;
-
-            if (_methodCount != 0)
-            {
-                _memberCount += _methodCount;
-                _methodTranslations = new ITranslation[_methodCount];
-
-                for (var i = 0; ;)
-                {
-                    var methodTranslation = context.GetTranslationFor(type.MethodExpressions[i]);
-                    var method = _methodTranslations[i] = methodTranslation;
-                    translationSize += method.TranslationSize;
-                    formattingSize += method.FormattingSize;
-
-                    ++i;
-
-                    if (i == _methodCount)
-                    {
-                        break;
-                    }
-
-                    translationSize += 2; // <- for new line
-                }
+                translationSize += 2; // <- for new line
             }
 
             TranslationSize = translationSize;
@@ -185,18 +133,17 @@
                     _genericParameterConstraintsTranslation.GetIndentSize();
             }
 
-            if (_methodCount == 0)
+            if (_memberCount == 0)
             {
                 return indentSize;
             }
 
             for (var i = 0; ;)
             {
-                indentSize += _methodTranslations[i].GetIndentSize();
-
+                indentSize += _memberTranslations[i].GetIndentSize();
                 ++i;
 
-                if (i == _methodCount)
+                if (i == _memberCount)
                 {
                     return indentSize;
                 }
@@ -215,18 +162,17 @@
                     _genericParameterConstraintsTranslation.GetLineCount();
             }
 
-            if (_methodCount == 0)
+            if (_memberCount == 0)
             {
                 return lineCount;
             }
 
             for (var i = 0; ;)
             {
-                lineCount += _methodTranslations[i].GetLineCount();
-
+                lineCount += _memberTranslations[i].GetLineCount();
                 ++i;
 
-                if (i == _methodCount)
+                if (i == _memberCount)
                 {
                     return lineCount;
                 }
@@ -291,78 +237,41 @@
             }
         }
 
-        public void WriteMembersTo(TranslationWriter writer)
+        public void WriteBodyTo(TranslationWriter writer)
         {
+            writer.WriteOpeningBraceToTranslation();
+            
             if (_memberCount == 0)
             {
-                writer.WriteNewLineToTranslation();
-                writer.WriteToTranslation('{');
-                writer.WriteNewLineToTranslation();
-                writer.WriteToTranslation('}');
+                writer.WriteClosingBraceToTranslation(startOnNewLine: false);
                 return;
             }
 
-            writer.WriteOpeningBraceToTranslation();
-
-            WriteFieldsTo(writer);
-            WritePropertiesTo(writer);
-            WriteMethodsTo(writer);
-
+            WriteMembersTo(writer);
             writer.WriteClosingBraceToTranslation();
         }
 
-        private void WriteFieldsTo(TranslationWriter writer)
+        private void WriteMembersTo(TranslationWriter writer)
         {
-            if (_fieldCount != 0)
-            {
-                WriteTo(
-                    writer,
-                    _fieldCount,
-                    _fieldTranslations,
-                    separateWithBlankLine: false);
-            }
-        }
-
-        private void WritePropertiesTo(TranslationWriter writer)
-        {
-            if (_propertyCount != 0)
-            {
-                WriteTo(writer, _propertyCount, _propertyTranslations);
-            }
-        }
-
-        private void WriteMethodsTo(TranslationWriter writer)
-        {
-            if (_methodCount != 0)
-            {
-                WriteTo(writer, _memberCount, _methodTranslations);
-            }
-        }
-
-        private static void WriteTo(
-            TranslationWriter writer,
-            int memberCount,
-            IList<ITranslation> memberTranslations,
-            bool separateWithBlankLine = true)
-        {
-            if (memberCount == 0)
+            if (_memberCount == 0)
             {
                 return;
             }
 
             for (var i = 0; ;)
             {
-                memberTranslations[i].WriteTo(writer);
+                var memberTranslation = _memberTranslations[i];
+                memberTranslation.WriteTo(writer);
                 ++i;
 
-                if (i == memberCount)
+                if (i == _memberCount)
                 {
                     break;
                 }
 
                 writer.WriteNewLineToTranslation();
 
-                if (separateWithBlankLine)
+                if (!(memberTranslation is FieldTranslation))
                 {
                     writer.WriteNewLineToTranslation();
                 }

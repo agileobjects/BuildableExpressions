@@ -26,6 +26,8 @@
         private ReadOnlyCollection<GenericParameterExpression> _readOnlyGenericParameters;
         private List<TypeExpression> _genericArguments;
         private ReadOnlyCollection<IType> _readOnlyGenericArguments;
+        private List<ConstructorExpression> _ctorExpressions;
+        private ReadOnlyCollection<ConstructorExpression> _readOnlyCtorExpressions;
         private readonly List<MemberExpression> _memberExpressions;
         private IMember[] _members;
         private ReadOnlyCollection<MemberExpression> _readOnlyMemberExpressions;
@@ -277,8 +279,15 @@
         }
 
         /// <summary>
+        /// Gets the <see cref="ConstructorExpression"/>s which describe this
+        /// <see cref="TypeExpression"/>'s constructors.
+        /// </summary>
+        public ReadOnlyCollection<ConstructorExpression> ConstructorExpressions
+            => _readOnlyCtorExpressions ??= _ctorExpressions.ToReadOnlyCollection();
+
+        /// <summary>
         /// Gets the <see cref="MemberExpression"/>s which describe this
-        /// <see cref="TypeExpression"/>'s properties and methods.
+        /// <see cref="TypeExpression"/>'s constructors, fields, properties and methods.
         /// </summary>
         public ReadOnlyCollection<MemberExpression> MemberExpressions
             => _readOnlyMemberExpressions ??= _memberExpressions.ToReadOnlyCollection();

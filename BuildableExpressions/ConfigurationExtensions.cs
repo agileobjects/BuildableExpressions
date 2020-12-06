@@ -335,6 +335,20 @@
         }
 
         /// <summary>
+        /// Add a public, instance-scoped, empty <see cref="ConstructorExpression"/> to the
+        /// <see cref="ConcreteTypeExpression"/>.
+        /// </summary>
+        /// <param name="concreteTypeConfig">
+        /// The <see cref="IConcreteTypeExpressionConfigurator"/> to configure.
+        /// </param>
+        /// <returns>The newly-created <see cref="ConstructorExpression"/>.</returns>
+        public static ConstructorExpression AddConstructor(
+            this IConcreteTypeExpressionConfigurator concreteTypeConfig)
+        {
+            return concreteTypeConfig.AddConstructor(ctor => { });
+        }
+
+        /// <summary>
         /// Add a public, instance-scoped, get-set <see cref="FieldExpression"/> to the
         /// <see cref="ConcreteTypeExpression"/>, with the given <paramref name="name"/> and
         /// <typeparamref name="TField"/> type.

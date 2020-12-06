@@ -2,30 +2,25 @@
 {
     using System;
     using System.Linq.Expressions;
-    using BuildableExpressions.Extensions;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
 
-    internal class MethodTranslation : ITranslation
+    internal class ConstructorTranslation : ITranslation
     {
-        private readonly MethodExpression _methodExpression;
         private readonly ITranslatable _summary;
-        private readonly ITranslatable _definitionTranslation;
-        private readonly bool _methodHasBody;
-        private readonly ITranslation _bodyTranslation;
+        private readonly ITranslation _definitionTranslation;
+        private readonly bool _hasBody;
+        private readonly ITranslatable _bodyTranslation;
 
-        public MethodTranslation(
-            MethodExpression methodExpression,
+        public ConstructorTranslation(
+            ConstructorExpression ctorExpression,
             ITranslationContext context)
         {
-            _methodExpression = methodExpression;
-            _summary = SummaryTranslation.For(methodExpression.Summary, context);
+            _summary = SummaryTranslation.For(ctorExpression.Summary, context);
 
-            _definitionTranslation = new MethodDefinitionTranslation(
-                methodExpression,
-                includeDeclaringType: false,
-                context.Settings);
+            _definitionTranslation =
+                new ConstructorDefinitionTranslation(ctorExpression, context.Settings);
 
             var translationSize =
                 _summary.TranslationSize +
@@ -35,32 +30,26 @@
                 _summary.FormattingSize +
                 _definitionTranslation.FormattingSize;
 
-            _methodHasBody = _methodExpression.HasBody;
+            _hasBody = ctorExpression.HasBody;
 
-            if (_methodHasBody)
+            if (_hasBody)
             {
-                var bodyCodeBlock = context
-                    .GetCodeBlockTranslationFor(methodExpression.Body)
+                _bodyTranslation = context
+                    .GetCodeBlockTranslationFor(ctorExpression.Body)
                     .WithBraces()
                     .WithTermination();
 
-                if (methodExpression.HasReturnType())
-                {
-                    bodyCodeBlock.WithReturnKeyword();
-                }
-
-                translationSize += bodyCodeBlock.TranslationSize;
-                formattingSize += bodyCodeBlock.FormattingSize;
-                _bodyTranslation = bodyCodeBlock;
+                translationSize += _bodyTranslation.TranslationSize;
+                formattingSize += _bodyTranslation.FormattingSize;
             }
 
             TranslationSize = translationSize;
             FormattingSize = formattingSize;
         }
 
-        public ExpressionType NodeType => _methodExpression.NodeType;
+        public ExpressionType NodeType => _definitionTranslation.NodeType;
 
-        public Type Type => _methodExpression.Type;
+        public Type Type => _definitionTranslation.Type;
 
         public int TranslationSize { get; }
 
@@ -72,7 +61,7 @@
                 _summary.GetIndentSize() +
                 _definitionTranslation.GetIndentSize();
 
-            if (_methodHasBody)
+            if (_hasBody)
             {
                 indentSize += _bodyTranslation.GetIndentSize();
             }
@@ -86,7 +75,7 @@
                 _summary.GetLineCount() +
                 _definitionTranslation.GetLineCount();
 
-            if (_methodHasBody)
+            if (_hasBody)
             {
                 lineCount += _bodyTranslation.GetLineCount();
             }
@@ -99,13 +88,14 @@
             _summary.WriteTo(writer);
             _definitionTranslation.WriteTo(writer);
 
-            if (_methodHasBody)
+            if (_hasBody)
             {
                 _bodyTranslation.WriteTo(writer);
             }
             else
             {
-                writer.WriteToTranslation(';');
+                writer.WriteOpeningBraceToTranslation();
+                writer.WriteClosingBraceToTranslation(startOnNewLine: false);
             }
         }
     }

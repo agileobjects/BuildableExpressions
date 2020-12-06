@@ -70,10 +70,16 @@
         Expression IConcreteTypeExpressionConfigurator.ThisInstanceExpression
             => ThisInstanceExpression;
 
-        GenericParameterExpression IConcreteTypeExpressionConfigurator.AddGenericParameter(
+        void IConcreteTypeExpressionConfigurator.AddGenericParameter(
             GenericParameterExpression parameter)
         {
-            return AddGenericParameter(parameter);
+            AddGenericParameter(parameter);
+        }
+
+        ConstructorExpression IConcreteTypeExpressionConfigurator.AddConstructor(
+            Action<IConstructorExpressionConfigurator> configuration)
+        {
+            return AddConstructor(configuration);
         }
 
         FieldExpression IConcreteTypeExpressionConfigurator.AddField(

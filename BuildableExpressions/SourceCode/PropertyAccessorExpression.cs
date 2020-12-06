@@ -112,15 +112,15 @@
 
         bool IMethod.IsGenericMethod => false;
 
+        bool IMethodBase.IsExtensionMethod => false;
+
         IMethod IMethod.GetGenericMethodDefinition() => null;
 
         ReadOnlyCollection<IGenericParameter> IMethod.GetGenericArguments()
             => Enumerable<IGenericParameter>.EmptyReadOnlyCollection;
 
-        ReadOnlyCollection<IParameter> IMethod.GetParameters()
+        ReadOnlyCollection<IParameter> IMethodBase.GetParameters()
             => Enumerable<IParameter>.EmptyReadOnlyCollection;
-
-        bool IMethod.IsExtensionMethod => false;
 
         IType IMethod.ReturnType => _type;
 

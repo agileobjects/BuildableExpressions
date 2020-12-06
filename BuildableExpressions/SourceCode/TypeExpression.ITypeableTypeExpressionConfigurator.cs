@@ -73,6 +73,23 @@
             return parameter;
         }
 
+        internal ConstructorExpression AddConstructor(Action<ConstructorExpression> configuration)
+            => AddConstructor(new ConstructorExpression(this, configuration));
+
+        /// <summary>
+        /// Adds the given <paramref name="ctor"/> to this <see cref="TypeExpression"/>.
+        /// </summary>
+        /// <param name="ctor">The <see cref="ConstructorExpression"/> to add.</param>
+        /// <returns>The given <paramref name="ctor"/>.</returns>
+        protected ConstructorExpression AddConstructor(ConstructorExpression ctor)
+        {
+            _ctorExpressions ??= new List<ConstructorExpression>();
+            _ctorExpressions.Add(ctor);
+            _readOnlyCtorExpressions = null;
+
+            return AddMember(ctor);
+        }
+
         internal FieldExpression AddField(
             string name,
             IType type,
@@ -91,8 +108,8 @@
             _fieldExpressions ??= new List<FieldExpression>();
             _fieldExpressions.Add(field);
             _readOnlyFieldExpressions = null;
-            AddMember(field);
-            return field;
+
+            return AddMember(field);
         }
 
         internal PropertyExpression AddProperty(
@@ -113,8 +130,8 @@
             _propertyExpressions ??= new List<PropertyExpression>();
             _propertyExpressions.Add(property);
             _readOnlyPropertyExpressions = null;
-            AddMember(property);
-            return property;
+
+            return AddMember(property);
         }
 
         internal MethodExpression AddMethod(
@@ -135,16 +152,19 @@
             _methodExpressions ??= new List<MethodExpression>();
             _methodExpressions.Add(method);
             _readOnlyMethodExpressions = null;
-            AddMember(method);
-            return method;
+
+            return AddMember(method);
         }
 
-        private void AddMember(MemberExpression member)
+        private TMemberExpression AddMember<TMemberExpression>(TMemberExpression member)
+            where TMemberExpression : MemberExpression
         {
             _memberExpressions.Add(member);
             _readOnlyMemberExpressions = null;
             _members = null;
+
             ResetTypeIfRequired();
+            return member;
         }
 
         private void ResetTypeIfRequired()

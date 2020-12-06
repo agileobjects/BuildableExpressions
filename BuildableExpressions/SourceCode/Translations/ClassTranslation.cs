@@ -69,7 +69,7 @@
         {
             _typeTranslation.WriteTypeDeclarationTo(writer, _modifier);
             _typeTranslation.WriteTypeListTo(writer, _baseTypeTranslation);
-            _typeTranslation.WriteMembersTo(writer);
+            _typeTranslation.WriteBodyTo(writer);
         }
     }
 }

@@ -17,12 +17,20 @@
         Expression ThisInstanceExpression { get; }
 
         /// <summary>
-        /// Adds a copy of the given open generic <paramref name="parameter"/> to the
+        /// Adds the given open generic <paramref name="parameter"/> to the
         /// <see cref="ConcreteTypeExpression"/>.
         /// </summary>
         /// <param name="parameter">The <see cref="GenericParameterExpression"/> to add.</param>
-        /// <returns>The newly-created copy of the given <paramref name="parameter"/>.</returns>
-        GenericParameterExpression AddGenericParameter(GenericParameterExpression parameter);
+        void AddGenericParameter(GenericParameterExpression parameter);
+
+        /// <summary>
+        /// Add a <see cref="ConstructorExpression"/> to the <see cref="ConcreteTypeExpression"/>,
+        /// with the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The newly-created <see cref="ConstructorExpression"/>.</returns>
+        ConstructorExpression AddConstructor(
+            Action<IConstructorExpressionConfigurator> configuration);
 
         /// <summary>
         /// Add a <see cref="FieldExpression"/> to the <see cref="ConcreteTypeExpression"/>, with

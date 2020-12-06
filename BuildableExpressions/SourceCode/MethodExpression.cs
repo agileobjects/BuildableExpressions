@@ -349,7 +349,7 @@
 
         bool IMethod.IsGenericMethod => IsGeneric;
 
-        bool IMethod.IsExtensionMethod => false;
+        bool IMethodBase.IsExtensionMethod => false;
 
         IMethod IMethod.GetGenericMethodDefinition() => null;
 
@@ -360,7 +360,7 @@
                 : Enumerable<IGenericParameter>.EmptyReadOnlyCollection;
         }
 
-        ReadOnlyCollection<IParameter> IMethod.GetParameters()
+        ReadOnlyCollection<IParameter> IMethodBase.GetParameters()
         {
             if (_readOnlyParameters != null)
             {
