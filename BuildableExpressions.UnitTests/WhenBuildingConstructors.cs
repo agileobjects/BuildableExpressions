@@ -152,6 +152,7 @@ namespace GeneratedExpressionCode
                         var nameField = cls.AddField<string>("_name", f =>
                         {
                             f.SetVisibility(Private);
+                            f.SetReadonly();
                         });
 
                         var nameFieldAccess =
@@ -181,7 +182,7 @@ namespace GeneratedExpressionCode
 {
     public abstract class PersonBase
     {
-        private string _name;
+        private readonly string _name;
 
         protected PersonBase
         (

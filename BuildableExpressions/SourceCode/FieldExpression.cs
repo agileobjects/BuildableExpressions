@@ -20,6 +20,7 @@
         IField
     {
         private readonly IType _type;
+        private bool _isReadonly;
         private FieldInfo _fieldInfo;
 
         internal FieldExpression(
@@ -63,7 +64,8 @@
         public bool IsConstant { get; private set; }
 
         /// <inheritdoc />
-        public bool IsReadonly { get; private set; }
+        public bool IsReadonly
+            => _isReadonly && DeclaringTypeExpression.SourceCode.IsComplete;
 
         /// <summary>
         /// Gets an Expression representing this <see cref="FieldExpression"/>'s initial value.
@@ -100,9 +102,9 @@
 
         void IFieldExpressionConfigurator.SetStatic() => SetStatic();
 
-        void IFieldExpressionConfigurator.SetConstant() => IsConstant = IsReadonly = true;
+        void IFieldExpressionConfigurator.SetConstant() => IsConstant = _isReadonly = true;
 
-        void IFieldExpressionConfigurator.SetReadonly() => IsReadonly = true;
+        void IFieldExpressionConfigurator.SetReadonly() => _isReadonly = true;
 
         void IFieldExpressionConfigurator.SetInitialValue(Expression value)
             => InitialValue = value;
@@ -116,7 +118,7 @@
             => new FieldTranslation(this, context);
 
         /// <inheritdoc />
-        protected override ITranslation GetTransientTranslation(ITranslationContext context) 
+        protected override ITranslation GetTransientTranslation(ITranslationContext context)
             => GetFullTranslation(context);
 
         #endregion
