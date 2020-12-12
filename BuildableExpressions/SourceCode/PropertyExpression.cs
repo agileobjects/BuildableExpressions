@@ -59,6 +59,9 @@
         /// <returns>This <see cref="PropertyExpression"/>.</returns>
         protected override Expression Accept(ExpressionVisitor visitor)
         {
+            base.Accept(visitor);
+            visitor.Visit(GetterExpression);
+            visitor.Visit(SetterExpression);
             return this;
         }
 

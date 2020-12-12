@@ -32,15 +32,12 @@
 
         IEnumerable<Expression> ICustomAnalysableExpression.Expressions
         {
-            get
-            {
-                yield return _blockMethod;
-            }
+            get { yield return _blockMethod; }
         }
 
         #endregion
 
-        #region ICustomTranslationExpression
+        #region ICustomTranslationExpression Members
 
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => MethodCallTranslation.For(_blockMethod, _blockMethod.Parameters, context);

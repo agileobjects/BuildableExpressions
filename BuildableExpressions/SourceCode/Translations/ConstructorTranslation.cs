@@ -10,6 +10,8 @@
     {
         private readonly ITranslatable _summary;
         private readonly ITranslation _definitionTranslation;
+        private readonly bool _hasChainedCtorCall;
+        private readonly ITranslatable _chainedCtorCallTranslation;
         private readonly bool _hasBody;
         private readonly ITranslatable _bodyTranslation;
 
@@ -21,6 +23,15 @@
 
             _definitionTranslation =
                 new ConstructorDefinitionTranslation(ctorExpression, context.Settings);
+
+            _hasChainedCtorCall = ctorExpression.ChainedConstructorCall != null;
+
+            if (_hasChainedCtorCall)
+            {
+                _chainedCtorCallTranslation = new ChainedConstructorCallTranslation(
+                    ctorExpression.ChainedConstructorCall,
+                    context);
+            }
 
             var translationSize =
                 _summary.TranslationSize +
@@ -61,6 +72,11 @@
                 _summary.GetIndentSize() +
                 _definitionTranslation.GetIndentSize();
 
+            if (_hasChainedCtorCall)
+            {
+                indentSize += _chainedCtorCallTranslation.GetIndentSize();
+            }
+
             if (_hasBody)
             {
                 indentSize += _bodyTranslation.GetIndentSize();
@@ -75,6 +91,11 @@
                 _summary.GetLineCount() +
                 _definitionTranslation.GetLineCount();
 
+            if (_hasChainedCtorCall)
+            {
+                lineCount += _chainedCtorCallTranslation.GetLineCount();
+            }
+
             if (_hasBody)
             {
                 lineCount += _bodyTranslation.GetLineCount();
@@ -87,6 +108,11 @@
         {
             _summary.WriteTo(writer);
             _definitionTranslation.WriteTo(writer);
+
+            if (_hasChainedCtorCall)
+            {
+                _chainedCtorCallTranslation.WriteTo(writer);
+            }
 
             if (_hasBody)
             {

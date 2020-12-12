@@ -42,6 +42,12 @@
         public override ExpressionType NodeType
             => (ExpressionType)SourceCodeExpressionType.Constructor;
 
+        /// <summary>
+        /// Gets the <see cref="ChainedConstructorCallExpression"/> representing the chained call
+        /// to base or sibling <see cref="ConstructorExpression"/>, if one exists.
+        /// </summary>
+        public ChainedConstructorCallExpression ChainedConstructorCall { get; private set; }
+
         /// <inheritdoc />
         public override string Name => _name ??= GenerateName();
 
@@ -82,6 +88,16 @@
             params ParameterExpression[] parameters)
         {
             AddParameters(new List<ParameterExpression>(parameters));
+        }
+
+        void IConstructorExpressionConfigurator.Call(
+            ConstructorExpression constructorExpression,
+            params Expression[] arguments)
+        {
+            ChainedConstructorCall = new ChainedConstructorCallExpression(
+                this,
+                constructorExpression,
+                arguments);
         }
 
         void IConstructorExpressionConfigurator.SetBody(Expression body)

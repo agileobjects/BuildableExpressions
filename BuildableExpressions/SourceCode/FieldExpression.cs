@@ -56,7 +56,11 @@
         /// </summary>
         /// <param name="visitor">The visitor with which to visit this <see cref="FieldExpression"/>.</param>
         /// <returns>This <see cref="FieldExpression"/>.</returns>
-        protected override Expression Accept(ExpressionVisitor visitor) => this;
+        protected override Expression Accept(ExpressionVisitor visitor)
+        {
+            base.Accept(visitor);
+            return this;
+        }
 
         /// <summary>
         /// 

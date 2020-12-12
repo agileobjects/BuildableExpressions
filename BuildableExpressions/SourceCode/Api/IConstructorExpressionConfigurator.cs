@@ -15,6 +15,19 @@
         void AddParameters(params ParameterExpression[] parameters);
 
         /// <summary>
+        /// Adds a call from the <see cref="ConstructorExpression"/> to the given sibling or base
+        /// Type (if applicable) <paramref name="constructorExpression"/>.
+        /// </summary>
+        /// <param name="constructorExpression">
+        /// The sibling or base Type <see cref="ConstructorExpression"/> to call.
+        /// </param>
+        /// <param name="arguments">
+        /// Zero or more Expressions to pass to the given sibling or base Type
+        /// <paramref name="constructorExpression"/>.
+        /// </param>
+        void Call(ConstructorExpression constructorExpression, params Expression[] arguments);
+
+        /// <summary>
         /// Set the body of the <see cref="ConstructorExpression"/>.
         /// </summary>
         /// <param name="body">The Expression to use.</param>

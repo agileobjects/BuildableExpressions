@@ -63,13 +63,14 @@
         public override Type Type => ReturnType;
 
         /// <summary>
-        /// Visits this <see cref="MethodExpression"/>'s Body.
+        /// Visits this <see cref="MethodExpression"/>'s Summary, <see cref="Parameters"/> and
+        /// <see cref="Body"/>.
         /// </summary>
         /// <param name="visitor">The visitor with which to visit this <see cref="MethodExpression"/>.</param>
         /// <returns>This <see cref="MethodExpression"/>.</returns>
         protected override Expression Accept(ExpressionVisitor visitor)
         {
-            visitor.Visit(Summary);
+            base.Accept(visitor);
 
             foreach (var parameter in Parameters)
             {
@@ -77,8 +78,7 @@
             }
 
             visitor.Visit(Body);
-
-            return base.Accept(visitor);
+            return this;
         }
 
         internal abstract bool HasGeneratedName { get; }

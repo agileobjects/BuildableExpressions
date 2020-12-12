@@ -204,5 +204,70 @@ namespace GeneratedExpressionCode
             EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
+
+        [Fact]
+        public void ShouldBuildAChainedStructConstructorCall()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddStruct("LongWrapper", str =>
+                    {
+                        var valueProperty =
+                            str.AddProperty<long>("Value", p => p.SetGetter());
+
+                        var longParamCtor = str.AddConstructor(ctor =>
+                        {
+                            var longValuePropertyAccess = Property(
+                                str.ThisInstanceExpression,
+                                valueProperty.PropertyInfo);
+
+                            var longParam = Parameter(typeof(long), "value");
+                            ctor.AddParameter(longParam);
+
+                            var longValueAssignment = Assign(longValuePropertyAccess, longParam);
+                            ctor.SetBody(longValueAssignment);
+                        });
+
+                        str.AddConstructor(ctor =>
+                        {
+                            var intParam = Parameter(typeof(int), "intValue");
+                            ctor.AddParameter(intParam);
+
+                            ctor.Call(longParamCtor, Convert(intParam, typeof(long)));
+
+                            ctor.SetBody(Empty());
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public struct LongWrapper
+    {
+        public LongWrapper
+        (
+            long value
+        )
+        {
+            this.Value = value;
+        }
+
+        public LongWrapper
+        (
+            int intValue
+        )
+        : this((long)intValue)
+        {
+        }
+
+        public long Value { get; private set; }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
     }
 }

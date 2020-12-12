@@ -50,6 +50,7 @@
         /// <returns>This <see cref="PropertyAccessorExpression"/>.</returns>
         protected override Expression Accept(ExpressionVisitor visitor)
         {
+            visitor.Visit(Body);
             return this;
         }
 

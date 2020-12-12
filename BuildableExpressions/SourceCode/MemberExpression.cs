@@ -28,12 +28,15 @@
         }
 
         /// <summary>
-        /// Visits this <see cref="MemberExpression"/>'s Body.
+        /// Visits this <see cref="MemberExpression"/>'s <see cref="Summary"/>.
         /// </summary>
         /// <param name="visitor">The visitor with which to visit this <see cref="MemberExpression"/>.</param>
         /// <returns>This <see cref="MemberExpression"/>.</returns>
         protected override Expression Accept(ExpressionVisitor visitor)
-            => this;
+        {
+            visitor.Visit(Summary);
+            return this;
+        }
 
         /// <summary>
         /// Gets this <see cref="MemberExpression"/>'s parent <see cref="TypeExpression"/>.
