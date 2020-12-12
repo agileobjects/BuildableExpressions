@@ -239,7 +239,7 @@
             }
         }
 
-        public void WriteBodyTo(TranslationWriter writer)
+        public void WriteTypeBodyTo(TranslationWriter writer)
         {
             writer.WriteOpeningBraceToTranslation();
 

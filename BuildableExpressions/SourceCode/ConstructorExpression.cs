@@ -18,8 +18,6 @@
         IClassConstructorExpressionConfigurator,
         IConstructor
     {
-        private string _name;
-
         internal ConstructorExpression(
             TypeExpression declaringTypeExpression,
             Action<ConstructorExpression> configuration)
@@ -42,6 +40,8 @@
         public override ExpressionType NodeType
             => (ExpressionType)SourceCodeExpressionType.Constructor;
 
+        internal bool HasChainedConstructorCall => ChainedConstructorCall != null;
+
         /// <summary>
         /// Gets the <see cref="ChainedConstructorCallExpression"/> representing the chained call
         /// to base or sibling <see cref="ConstructorExpression"/>, if one exists.
@@ -49,20 +49,7 @@
         public ChainedConstructorCallExpression ChainedConstructorCall { get; private set; }
 
         /// <inheritdoc />
-        public override string Name => _name ??= GenerateName();
-
-        private string GenerateName()
-        {
-            if (ParametersAccessor == null)
-            {
-                return "Ctor()";
-            }
-
-            var parameterTypeNames = ParametersAccessor
-                .Project(p => p.Type.GetFriendlyName());
-
-            return $"Ctor({string.Join(", ", parameterTypeNames)})";
-        }
+        public override string Name => DeclaringTypeExpression.Name;
 
         internal override bool HasGeneratedName => false;
 
@@ -111,9 +98,24 @@
         protected override ITranslation GetFullTranslation(ITranslationContext context)
             => new ConstructorTranslation(this, context);
 
+        /// <inheritdoc />
+        protected override ITranslation GetTransientTranslation(ITranslationContext context)
+            => new TransientConstructorTranslation(this, context);
+
         #endregion
 
         /// <inheritdoc />
-        public override string ToString() => Name;
+        public override string ToString()
+        {
+            if (ParametersAccessor == null)
+            {
+                return "Ctor()";
+            }
+
+            var parameterTypeNames = ParametersAccessor
+                .Project(p => p.Type.GetFriendlyName());
+
+            return $"Ctor({string.Join(", ", parameterTypeNames)})";
+        }
     }
 }

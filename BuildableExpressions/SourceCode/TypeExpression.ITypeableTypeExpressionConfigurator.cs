@@ -73,7 +73,33 @@
             return parameter;
         }
 
-        internal ConstructorExpression AddConstructor(Action<ConstructorExpression> configuration)
+        /// <summary>
+        /// Adds a parameterles, empty <see cref="ConstructorExpression"/> to this
+        /// <see cref="TypeExpression"/>.
+        /// </summary>
+        protected void AddDefaultConstructor()
+            => _defaultCtorExpression = AddConstructor(ctor => ctor.SetBody(Empty()));
+
+        private void RemoveDefaultConstructor()
+        {
+            _ctorExpressions.Remove(_defaultCtorExpression);
+            _readOnlyCtorExpressions = null;
+
+            _memberExpressions.Remove(_defaultCtorExpression);
+            _readOnlyMemberExpressions = null;
+            _members = null;
+
+            _defaultCtorExpression = null;
+            ResetTypeIfRequired();
+        }
+
+        /// <summary>
+        /// Adds a <see cref="ConstructorExpression"/> to this <see cref="TypeExpression"/> using
+        /// the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The newly-created <see cref="ConstructorExpressions"/>.</returns>
+        protected ConstructorExpression AddConstructor(Action<ConstructorExpression> configuration)
             => AddConstructor(new ConstructorExpression(this, configuration));
 
         /// <summary>
@@ -86,6 +112,11 @@
             _ctorExpressions ??= new List<ConstructorExpression>();
             _ctorExpressions.Add(ctor);
             _readOnlyCtorExpressions = null;
+
+            if (ctor.ParametersAccessor == null && _defaultCtorExpression != null)
+            {
+                RemoveDefaultConstructor();
+            }
 
             return AddMember(ctor);
         }

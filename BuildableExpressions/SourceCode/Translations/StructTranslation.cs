@@ -33,7 +33,7 @@
         {
             _typeTranslation.WriteTypeDeclarationTo(writer);
             _typeTranslation.WriteTypeListTo(writer);
-            _typeTranslation.WriteBodyTo(writer);
+            _typeTranslation.WriteTypeBodyTo(writer);
         }
     }
 }

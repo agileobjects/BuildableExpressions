@@ -322,6 +322,23 @@
         }
 
         /// <summary>
+        /// Adds a ParameterExpression with the given <typeparamref name="TParameter"/> Type and
+        /// <paramref name="name"/> to the <see cref="ConstructorExpression"/>.
+        /// </summary>
+        /// <typeparam name="TParameter">The type of the ParameterExpression to add.</typeparam>
+        /// <param name="ctorConfig">The <see cref="IConstructorExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the ParameterExpression to add.</param>
+        /// <returns>The newly-added ParameterExpression.</returns>
+        public static ParameterExpression AddParameter<TParameter>(
+            this IConstructorExpressionConfigurator ctorConfig,
+            string name)
+        {
+            var parameterExpression = Expression.Parameter(typeof(TParameter), name);
+            ctorConfig.AddParameter(parameterExpression);
+            return parameterExpression;
+        }
+
+        /// <summary>
         /// Adds the given <paramref name="parameter"/> to the <see cref="ConstructorExpression"/>.
         /// </summary>
         /// <param name="ctorConfig">The <see cref="IConstructorExpressionConfigurator"/> to configure.</param>

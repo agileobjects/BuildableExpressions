@@ -24,14 +24,7 @@
             _definitionTranslation =
                 new ConstructorDefinitionTranslation(ctorExpression, context.Settings);
 
-            _hasChainedCtorCall = ctorExpression.ChainedConstructorCall != null;
-
-            if (_hasChainedCtorCall)
-            {
-                _chainedCtorCallTranslation = new ChainedConstructorCallTranslation(
-                    ctorExpression.ChainedConstructorCall,
-                    context);
-            }
+            _hasChainedCtorCall = ctorExpression.HasChainedConstructorCall;
 
             var translationSize =
                 _summary.TranslationSize +
@@ -40,6 +33,16 @@
             var formattingSize =
                 _summary.FormattingSize +
                 _definitionTranslation.FormattingSize;
+
+            if (_hasChainedCtorCall)
+            {
+                _chainedCtorCallTranslation = new ChainedConstructorCallTranslation(
+                    ctorExpression.ChainedConstructorCall,
+                    context);
+
+                translationSize += _chainedCtorCallTranslation.TranslationSize;
+                formattingSize += _chainedCtorCallTranslation.FormattingSize;
+            }
 
             _hasBody = ctorExpression.HasBody;
 

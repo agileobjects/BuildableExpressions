@@ -26,6 +26,7 @@
         private ReadOnlyCollection<GenericParameterExpression> _readOnlyGenericParameters;
         private List<TypeExpression> _genericArguments;
         private ReadOnlyCollection<IType> _readOnlyGenericArguments;
+        private ConstructorExpression _defaultCtorExpression;
         private List<ConstructorExpression> _ctorExpressions;
         private ReadOnlyCollection<ConstructorExpression> _readOnlyCtorExpressions;
         private readonly List<MemberExpression> _memberExpressions;
@@ -103,7 +104,20 @@
                 .CompiledAssembly
                 .GetTypes();
 
-            return _type = compiledTypes[0];
+            return _type = compiledTypes.First(t =>
+            {
+                if (t.Name == Name)
+                {
+                    return true;
+                }
+
+                if (_genericParameters == null)
+                {
+                    return false;
+                }
+
+                return t.Name == Name + "`" + _genericParameters.Count;
+            });
         }
 
         #endregion
@@ -285,6 +299,9 @@
         public ReadOnlyCollection<ConstructorExpression> ConstructorExpressions
             => _readOnlyCtorExpressions ??= _ctorExpressions.ToReadOnlyCollection();
 
+        internal ICollection<ConstructorExpression> ConstructorExpressionsAccessor
+            => _ctorExpressions;
+
         /// <summary>
         /// Gets the <see cref="MemberExpression"/>s which describe this
         /// <see cref="TypeExpression"/>'s constructors, fields, properties and methods.
@@ -292,7 +309,8 @@
         public ReadOnlyCollection<MemberExpression> MemberExpressions
             => _readOnlyMemberExpressions ??= _memberExpressions.ToReadOnlyCollection();
 
-        internal ICollection<MemberExpression> MemberExpressionsAccessor => _memberExpressions;
+        internal virtual ICollection<MemberExpression> MemberExpressionsAccessor
+            => _memberExpressions;
 
         /// <summary>
         /// Gets the <see cref="FieldExpression"/>s which describe this
@@ -403,6 +421,11 @@
 
         internal void Finalise()
         {
+            if (SourceCode.IsComplete && _defaultCtorExpression != null)
+            {
+                RemoveDefaultConstructor();
+            }
+
             if (_blockMethodExpressions != null)
             {
                 foreach (var blockMethod in _blockMethodExpressions)

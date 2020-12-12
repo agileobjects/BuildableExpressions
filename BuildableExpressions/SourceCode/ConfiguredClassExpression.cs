@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
+    using System.Linq;
     using System.Linq.Expressions;
     using Api;
     using BuildableExpressions.Extensions;
@@ -22,6 +23,14 @@
         {
             configuration.Invoke(this);
             Validate();
+
+            var parameterlessCtorExpression = ConstructorExpressionsAccessor?
+                .FirstOrDefault(ctor => ctor.ParametersAccessor == null);
+
+            if (parameterlessCtorExpression == null)
+            {
+                AddDefaultConstructor();
+            }
         }
 
         private ConfiguredClassExpression(SourceCodeExpression sourceCode, string name)

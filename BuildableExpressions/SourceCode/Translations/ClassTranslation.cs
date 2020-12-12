@@ -43,8 +43,8 @@
 
             if (!@class.HasObjectBaseType)
             {
-                var baseType = (IType)@class.BaseTypeExpression;
-                _baseTypeTranslation = context.GetTranslationFor(baseType);
+                var baseType = @class.BaseTypeExpression;
+                _baseTypeTranslation = context.GetTranslationFor((IType)baseType);
                 translationSize += _baseTypeTranslation.TranslationSize;
                 formattingSize += _baseTypeTranslation.FormattingSize;
             }
@@ -69,7 +69,7 @@
         {
             _typeTranslation.WriteTypeDeclarationTo(writer, _modifier);
             _typeTranslation.WriteTypeListTo(writer, _baseTypeTranslation);
-            _typeTranslation.WriteBodyTo(writer);
+            _typeTranslation.WriteTypeBodyTo(writer);
         }
     }
 }

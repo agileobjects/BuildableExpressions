@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using System.Linq;
     using System.Linq.Expressions;
     using Common;
     using Xunit;
@@ -264,6 +265,93 @@ namespace GeneratedExpressionCode
         }
 
         public long Value { get; private set; }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAChainedBaseClassConstructorCall()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var personClass = sc.AddClass("PersonBase", cls =>
+                    {
+                        cls.SetAbstract();
+
+                        var nameProperty =
+                            cls.AddProperty<string>("Name", p => p.SetGetter());
+
+                        cls.AddConstructor(ctor =>
+                        {
+                            ctor.SetVisibility(Protected);
+
+                            var namePropertyAccess = Property(
+                                cls.ThisInstanceExpression,
+                                nameProperty.PropertyInfo);
+
+                            var nameParam = ctor.AddParameter<string>("name");
+                            var nameAssignment = Assign(namePropertyAccess, nameParam);
+                            ctor.SetBody(nameAssignment);
+                        });
+                    });
+
+                    sc.AddClass("Customer", cls =>
+                    {
+                        cls.SetBaseType(personClass);
+
+                        var numberProperty =
+                            cls.AddProperty<string>("Number", p => p.SetGetter());
+
+                        cls.AddConstructor(ctor =>
+                        {
+                            var personCtor = personClass.ConstructorExpressions.First();
+                            var nameParam = ctor.AddParameter<string>("customerName");
+                            ctor.Call(personCtor, nameParam);
+
+                            var numberPropertyAccess = Property(
+                                cls.ThisInstanceExpression,
+                                numberProperty.PropertyInfo);
+
+                            var numberParam = ctor.AddParameter<string>("customerNumber");
+                            var numberAssignment = Assign(numberPropertyAccess, numberParam);
+                            ctor.SetBody(numberAssignment);
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+namespace GeneratedExpressionCode
+{
+    public abstract class PersonBase
+    {
+        protected PersonBase
+        (
+            string name
+        )
+        {
+            this.Name = name;
+        }
+
+        public string Name { get; private set; }
+    }
+
+    public class Customer : PersonBase
+    {
+        public Customer
+        (
+            string customerName,
+            string customerNumber
+        )
+        : base(customerName)
+        {
+            this.Number = customerNumber;
+        }
+
+        public string Number { get; private set; }
     }
 }";
             EXPECTED.ShouldCompile();

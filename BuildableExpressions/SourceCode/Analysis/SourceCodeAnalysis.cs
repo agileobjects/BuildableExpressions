@@ -225,6 +225,7 @@
                 VisitAndConvert(typeExpression);
             }
 
+            sourceCode.Finalise();
             return sourceCode;
         }
 
@@ -237,7 +238,6 @@
                 VisitAndConvert(memberExpression);
             }
 
-            type.Finalise();
             return type;
         }
 
