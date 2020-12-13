@@ -8,7 +8,6 @@
     /// </summary>
     public interface IClassExpressionConfigurator :
         IConcreteTypeExpressionConfigurator,
-        IClassConstructorConfigurator,
         IClassMemberConfigurator
     {
         /// <summary>

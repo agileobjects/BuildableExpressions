@@ -76,6 +76,12 @@
             AddGenericParameter(parameter);
         }
 
+        ConstructorExpression IConstructorConfigurator.AddConstructor(
+            Action<IConstructorExpressionConfigurator> configuration)
+        {
+            return AddConstructor(configuration);
+        }
+
         FieldExpression IConcreteTypeExpressionConfigurator.AddField(
             string name,
             IType type,

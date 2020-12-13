@@ -15,7 +15,7 @@
     /// </summary>
     public class ConstructorExpression :
         MethodExpression,
-        IClassConstructorExpressionConfigurator,
+        IConstructorExpressionConfigurator,
         IConstructor
     {
         internal ConstructorExpression(

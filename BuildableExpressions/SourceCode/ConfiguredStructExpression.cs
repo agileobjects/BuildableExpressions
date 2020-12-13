@@ -34,12 +34,6 @@
             SetImplements(interfaceExpression, configuration);
         }
 
-        ConstructorExpression IStructConstructorConfigurator.AddConstructor(
-            Action<IConstructorExpressionConfigurator> configuration)
-        {
-            return AddConstructor(configuration);
-        }
-
         PropertyExpression IStructMemberConfigurator.AddProperty(
             string name,
             IType type,
