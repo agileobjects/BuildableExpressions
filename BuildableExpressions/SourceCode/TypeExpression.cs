@@ -56,7 +56,7 @@
         protected TypeExpression(SourceCodeExpression sourceCode, string name)
             : this(sourceCode)
         {
-            Name = name.ThrowIfInvalidName<ArgumentException>("Type");
+            Name = name.ThrowIfInvalidName("Type");
         }
 
         private TypeExpression(SourceCodeExpression sourceCode)

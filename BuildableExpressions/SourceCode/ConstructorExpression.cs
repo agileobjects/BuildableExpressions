@@ -77,7 +77,7 @@
             AddParameters(new List<ParameterExpression>(parameters));
         }
 
-        void IConstructorExpressionConfigurator.Call(
+        void IConstructorExpressionConfigurator.SetConstructorCall(
             ConstructorExpression constructorExpression,
             params Expression[] arguments)
         {
@@ -105,17 +105,18 @@
         #endregion
 
         /// <inheritdoc />
-        public override string ToString()
+        public override string ToString() => $"Ctor({ParametersString})";
+
+        internal string ParametersString
         {
-            if (ParametersAccessor == null)
+            get
             {
-                return "Ctor()";
+                return string.Join(
+                    ", ",
+                    ParametersAccessor?
+                        .Project(p => p.Type.GetFriendlyName()) ??
+                         Array.Empty<string>());
             }
-
-            var parameterTypeNames = ParametersAccessor
-                .Project(p => p.Type.GetFriendlyName());
-
-            return $"Ctor({string.Join(", ", parameterTypeNames)})";
         }
     }
 }

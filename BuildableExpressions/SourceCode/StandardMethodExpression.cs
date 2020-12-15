@@ -20,9 +20,7 @@
             TypeExpression declaringTypeExpression,
             string name,
             Action<StandardMethodExpression> configuration)
-            : base(
-                declaringTypeExpression,
-                name.ThrowIfInvalidName<ArgumentException>("Method"))
+            : base(declaringTypeExpression, name.ThrowIfInvalidName("Method"))
         {
             configuration.Invoke(this);
 

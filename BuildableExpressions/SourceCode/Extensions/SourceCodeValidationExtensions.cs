@@ -6,17 +6,16 @@
 
     internal static class SourceCodeValidationExtensions
     {
-        public static string ThrowIfInvalidName<TException>(
+        public static string ThrowIfInvalidName(
             this string name,
             string symbolType,
             bool throwIfNull = true)
-            where TException : Exception
         {
             if (name == null)
             {
                 if (throwIfNull)
                 {
-                    throw Create<TException>(symbolType + " names cannot be null");
+                    throw Create<ArgumentNullException>(symbolType + " names cannot be null");
                 }
 
                 return null;
@@ -24,12 +23,12 @@
 
             if (name.Trim() == string.Empty)
             {
-                throw Create<TException>(symbolType + " names cannot be blank");
+                throw Create<ArgumentException>(symbolType + " names cannot be blank");
             }
 
             if (char.IsDigit(name[0]) || name.Any(IsInvalidTypeNameCharacter))
             {
-                throw Create<TException>($"'{name}' is an invalid {symbolType.ToLowerInvariant()} name");
+                throw Create<ArgumentException>($"'{name}' is an invalid {symbolType.ToLowerInvariant()} name");
             }
 
             return name;

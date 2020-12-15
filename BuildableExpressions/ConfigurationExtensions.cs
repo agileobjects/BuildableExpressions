@@ -11,6 +11,7 @@
     using ReadableExpressions.Translations.Reflection;
     using SourceCode;
     using SourceCode.Api;
+    using SourceCode.Extensions;
     using SourceCode.Generics;
     using static SourceCode.MemberVisibility;
 
@@ -333,6 +334,8 @@
             this IConstructorExpressionConfigurator ctorConfig,
             string name)
         {
+            name.ThrowIfInvalidName("Parameter");
+
             var parameterExpression = Expression.Parameter(typeof(TParameter), name);
             ctorConfig.AddParameter(parameterExpression);
             return parameterExpression;
@@ -347,6 +350,8 @@
             this IConstructorExpressionConfigurator ctorConfig,
             ParameterExpression parameter)
         {
+            parameter.ThrowIfNull(nameof(parameter));
+
             ctorConfig.AddParameters(parameter);
         }
 

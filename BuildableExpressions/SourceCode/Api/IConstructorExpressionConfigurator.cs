@@ -25,7 +25,9 @@
         /// Zero or more Expressions to pass to the given sibling or base Type
         /// <paramref name="constructorExpression"/>.
         /// </param>
-        void Call(ConstructorExpression constructorExpression, params Expression[] arguments);
+        void SetConstructorCall(
+            ConstructorExpression constructorExpression,
+            params Expression[] arguments);
 
         /// <summary>
         /// Set the body of the <see cref="ConstructorExpression"/>.

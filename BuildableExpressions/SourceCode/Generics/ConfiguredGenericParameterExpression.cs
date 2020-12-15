@@ -33,7 +33,7 @@
             SourceCodeExpression sourceCode,
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
-            : this(sourceCode, name.ThrowIfInvalidName<ArgumentException>("Generic Parameter"))
+            : this(sourceCode, name.ThrowIfInvalidName("Generic Parameter"))
         {
             configuration.Invoke(this);
         }

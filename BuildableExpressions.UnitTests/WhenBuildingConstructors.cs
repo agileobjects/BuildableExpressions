@@ -235,7 +235,7 @@ namespace GeneratedExpressionCode
                             var intParam = Parameter(typeof(int), "intValue");
                             ctor.AddParameter(intParam);
 
-                            ctor.Call(longParamCtor, Convert(intParam, typeof(long)));
+                            ctor.SetConstructorCall(longParamCtor, Convert(intParam, typeof(long)));
 
                             ctor.SetBody(Empty());
                         });
@@ -309,7 +309,7 @@ namespace GeneratedExpressionCode
                         {
                             var personCtor = personClass.ConstructorExpressions.First();
                             var nameParam = ctor.AddParameter<string>("customerName");
-                            ctor.Call(personCtor, nameParam);
+                            ctor.SetConstructorCall(personCtor, nameParam);
 
                             var numberPropertyAccess = Property(
                                 cls.ThisInstanceExpression,

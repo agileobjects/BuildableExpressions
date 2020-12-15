@@ -6,8 +6,10 @@
     using System.Linq.Expressions;
     using Extensions;
     using ReadableExpressions;
+    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using Translations;
+    using static MemberVisibility;
 
     /// <summary>
     /// Represents a chained call from a class or struct constructor to base or sibling constructor
@@ -23,10 +25,54 @@
             ConstructorExpression targetConstructor,
             IList<Expression> arguments)
         {
+            ThrowIfInvalidTarget(callingConstructor, targetConstructor);
+
             CallingConstructor = callingConstructor;
             TargetConstructor = targetConstructor;
             Arguments = arguments.ToReadOnlyCollection();
         }
+
+        #region Setup
+
+        private static void ThrowIfInvalidTarget(
+            ConstructorExpression callingConstructor,
+            ConstructorExpression targetConstructor)
+        {
+            var callingCtorDeclaringType = callingConstructor.DeclaringTypeExpression;
+            var targetCtorDeclaringType = targetConstructor.DeclaringTypeExpression;
+
+            if (callingCtorDeclaringType == targetCtorDeclaringType)
+            {
+                return;
+            }
+
+            var isInaccessibleCtor = false;
+
+            if ((callingCtorDeclaringType is ClassExpression declaringClassExpression) &&
+                (declaringClassExpression.BaseTypeExpression == targetCtorDeclaringType))
+            {
+                if (targetConstructor.Visibility != Private)
+                {
+                    return;
+                }
+
+                isInaccessibleCtor = true;
+            }
+
+            var callingCtorName = callingCtorDeclaringType.GetFriendlyName();
+            var callingCtor = $"{callingCtorName}({callingConstructor.ParametersString})";
+
+            var targetCtorName = targetCtorDeclaringType.GetFriendlyName();
+            var targetCtor = $"{targetCtorName}({targetConstructor.ParametersString})";
+
+            var visibility = isInaccessibleCtor ? "private " : null;
+
+            throw new InvalidOperationException(
+                $"Constructor {callingCtor} cannot call " +
+                $"{visibility}constructor {targetCtor}.");
+        }
+
+        #endregion
 
         /// <summary>
         /// Gets the ExpressionType value (6 - Call) indicating the type of this
@@ -76,7 +122,7 @@
 
         #region ICustomTranslationExpression Members
 
-        ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context) 
+        ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => new ChainedConstructorCallTranslation(this, context);
 
         #endregion
