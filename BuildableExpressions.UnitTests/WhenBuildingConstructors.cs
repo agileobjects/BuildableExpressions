@@ -1,9 +1,11 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
     using Common;
+    using NetStandardPolyfills;
     using Xunit;
     using static System.Linq.Expressions.Expression;
     using static BuildableExpressions.SourceCode.MemberVisibility;
@@ -352,6 +354,82 @@ namespace GeneratedExpressionCode
         }
 
         public string Number { get; private set; }
+    }
+}";
+            EXPECTED.ShouldCompile();
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAChainedParameterlessSiblingConstructorCall()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("Person", cls =>
+                    {
+                        var nameProperty =
+                            cls.AddProperty<string>("Name", p => p.SetGetter());
+
+                        var friendsProperty = cls
+                            .AddProperty(
+                            "Friends",
+                            typeof(List<>).MakeGenericType(cls.Type),
+                            p => p.SetGetter());
+
+                        var defaultCtor = cls.AddConstructor(ctor =>
+                        {
+                            var friendsPropertyAccess = Property(
+                                cls.ThisInstanceExpression,
+                                friendsProperty.PropertyInfo);
+
+                            var emptyList = New(
+                                friendsPropertyAccess.Type.GetPublicInstanceConstructor());
+
+                            var friendsAssignment = Assign(friendsPropertyAccess, emptyList);
+                            ctor.SetBody(friendsAssignment);
+                        });
+
+                        cls.AddConstructor(ctor =>
+                        {
+                            ctor.SetConstructorCall(defaultCtor);
+
+                            var namePropertyAccess = Property(
+                                cls.ThisInstanceExpression,
+                                nameProperty.PropertyInfo);
+
+                            var nameParam = ctor.AddParameter<string>("name");
+                            var nameAssignment = Assign(namePropertyAccess, nameParam);
+                            ctor.SetBody(nameAssignment);
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+using System.Collections.Generic;
+
+namespace GeneratedExpressionCode
+{
+    public class Person
+    {
+        public Person()
+        {
+            this.Friends = new List<Person>();
+        }
+
+        public Person
+        (
+            string name
+        )
+        : this()
+        {
+            this.Name = name;
+        }
+
+        public string Name { get; private set; }
+
+        public List<Person> Friends { get; private set; }
     }
 }";
             EXPECTED.ShouldCompile();

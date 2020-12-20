@@ -16,17 +16,17 @@
 
         /// <summary>
         /// Adds a call from the <see cref="ConstructorExpression"/> to the given sibling or base
-        /// Type (if applicable) <paramref name="constructorExpression"/>.
+        /// Type (if applicable) <paramref name="targetConstructorExpression"/>.
         /// </summary>
-        /// <param name="constructorExpression">
+        /// <param name="targetConstructorExpression">
         /// The sibling or base Type <see cref="ConstructorExpression"/> to call.
         /// </param>
         /// <param name="arguments">
         /// Zero or more Expressions to pass to the given sibling or base Type
-        /// <paramref name="constructorExpression"/>.
+        /// <paramref name="targetConstructorExpression"/>.
         /// </param>
         void SetConstructorCall(
-            ConstructorExpression constructorExpression,
+            ConstructorExpression targetConstructorExpression,
             params Expression[] arguments);
 
         /// <summary>

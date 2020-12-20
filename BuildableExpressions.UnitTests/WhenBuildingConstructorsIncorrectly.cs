@@ -159,5 +159,65 @@
             ctorCallEx.Message.ShouldContain("cannot call");
             ctorCallEx.Message.ShouldContain("private constructor BaseClass(string)");
         }
+
+        [Fact]
+        public void ShouldErrorIfIncorrectChainedConstructorArgumentCount()
+        {
+            var ctorArgsEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("Class1", cls =>
+                    {
+                        var nameCtor = cls.AddConstructor(ctor =>
+                        {
+                            ctor.AddParameter<string>("name");
+                            ctor.SetBody(Expression.Empty());
+                        });
+
+                        cls.AddConstructor(ctor =>
+                        {
+                            ctor.SetConstructorCall(nameCtor);
+                        });
+                    });
+                });
+            });
+
+            ctorArgsEx.Message.ShouldContain("Constructor Class1(string)");
+            ctorArgsEx.Message.ShouldContain("1 parameter(s)");
+            ctorArgsEx.Message.ShouldContain("0 were supplied");
+        }
+
+        [Fact]
+        public void ShouldErrorIfIncorrectChainedConstructorArgumentType()
+        {
+            var ctorArgsEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass("Entity", cls =>
+                    {
+                        var nameCtor = cls.AddConstructor(ctor =>
+                        {
+                            ctor.AddParameter<int>("id");
+                            ctor.AddParameter<string>("name");
+                            ctor.SetBody(Expression.Empty());
+                        });
+
+                        cls.AddConstructor(ctor =>
+                        {
+                            ctor.SetConstructorCall(
+                                nameCtor,
+                                Expression.Constant(123),
+                                Expression.Constant(DateTime.Now));
+                        });
+                    });
+                });
+            });
+
+            ctorArgsEx.Message.ShouldContain("Constructor Entity(int, string)");
+            ctorArgsEx.Message.ShouldContain("cannot be called");
+            ctorArgsEx.Message.ShouldContain("argument(s) of Type int, DateTime");
+        }
     }
 }

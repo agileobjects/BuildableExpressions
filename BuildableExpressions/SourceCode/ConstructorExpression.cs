@@ -5,10 +5,12 @@
     using System.Linq.Expressions;
     using Api;
     using BuildableExpressions.Extensions;
+    using NetStandardPolyfills;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
     using Translations;
+    using static MemberVisibility;
 
     /// <summary>
     /// Represents a class or struct constructor in a piece of source code.
@@ -78,14 +80,88 @@
         }
 
         void IConstructorExpressionConfigurator.SetConstructorCall(
-            ConstructorExpression constructorExpression,
+            ConstructorExpression targetConstructorExpression,
             params Expression[] arguments)
         {
+            ThrowIfInvalidTarget(targetConstructorExpression);
+            ThrowIfInvalidArguments(targetConstructorExpression, arguments);
+
             ChainedConstructorCall = new ChainedConstructorCallExpression(
                 this,
-                constructorExpression,
+                targetConstructorExpression,
                 arguments);
         }
+
+        #region Validation
+
+        private void ThrowIfInvalidTarget(ConstructorExpression targetConstructor)
+        {
+            var targetCtorDeclaringType = targetConstructor.DeclaringTypeExpression;
+
+            if (targetCtorDeclaringType == DeclaringTypeExpression)
+            {
+                return;
+            }
+
+            var isInaccessibleCtor = false;
+
+            if ((DeclaringTypeExpression is ClassExpression declaringClassExpression) &&
+                (declaringClassExpression.BaseTypeExpression == targetCtorDeclaringType))
+            {
+                if (targetConstructor.Visibility != Private)
+                {
+                    return;
+                }
+
+                isInaccessibleCtor = true;
+            }
+
+            var visibility = isInaccessibleCtor ? "private " : null;
+
+            throw new InvalidOperationException(
+                $"Constructor {this} cannot call " +
+                $"{visibility}constructor {targetConstructor}.");
+        }
+
+        private static void ThrowIfInvalidArguments(
+            ConstructorExpression targetConstructor,
+            IList<Expression> arguments)
+        {
+            var parameterCount = targetConstructor.ParametersAccessor?.Count ?? 0;
+
+            if (parameterCount != arguments.Count)
+            {
+                throw new InvalidOperationException(
+                    $"Constructor {targetConstructor} requires {parameterCount} " +
+                    $"parameter(s). {arguments.Count} were supplied.");
+            }
+
+            if (parameterCount == 0)
+            {
+                return;
+            }
+
+            for (var i = 0; i < parameterCount; ++i)
+            {
+                // ReSharper disable once PossibleNullReferenceException
+                var parameterType = targetConstructor.ParametersAccessor[i].Type;
+                var argumentType = arguments[i].Type;
+
+                if (argumentType.IsAssignableTo(parameterType))
+                {
+                    continue;
+                }
+
+                var argumentTypes = string.Join(", ", arguments
+                    .ProjectToArray(arg => arg.Type.GetFriendlyName()));
+
+                throw new InvalidOperationException(
+                    $"Constructor {targetConstructor} cannot be called with " +
+                    $"argument(s) of Type {argumentTypes}.");
+            }
+        }
+
+        #endregion
 
         void IConstructorExpressionConfigurator.SetBody(Expression body)
             => SetBody(body, typeof(void));
@@ -105,18 +181,15 @@
         #endregion
 
         /// <inheritdoc />
-        public override string ToString() => $"Ctor({ParametersString})";
-
-        internal string ParametersString
+        public override string ToString()
         {
-            get
-            {
-                return string.Join(
-                    ", ",
-                    ParametersAccessor?
-                        .Project(p => p.Type.GetFriendlyName()) ??
-                         Array.Empty<string>());
-            }
+            var parameters = string.Join(
+                ", ",
+                ParametersAccessor?
+                    .Project(p => p.Type.GetFriendlyName()) ??
+                     Array.Empty<string>());
+
+            return $"{DeclaringTypeExpression.GetFriendlyName()}({parameters})";
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Api
 {
+    using System;
     using ReadableExpressions;
 
     /// <summary>
@@ -7,6 +8,13 @@
     /// </summary>
     public interface ITypeExpressionConfigurator
     {
+        /// <summary>
+        /// Gets a Type object for the <see cref="TypeExpression"/>. The returned Type is lazily
+        /// and dynamically generated when this property is accessed, and is built from the state
+        /// of the <see cref="TypeExpression"/> at the time the property is accessed.
+        /// </summary>
+        Type Type { get; }
+
         /// <summary>
         /// Set the summary documentation of the <see cref="TypeExpression"/>.
         /// </summary>
