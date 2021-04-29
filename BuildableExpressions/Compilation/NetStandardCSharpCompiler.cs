@@ -1,4 +1,4 @@
-﻿#if NET_STANDARD
+﻿#if NETSTANDARD
 namespace AgileObjects.BuildableExpressions.Compilation
 {
     using System.Collections.Concurrent;

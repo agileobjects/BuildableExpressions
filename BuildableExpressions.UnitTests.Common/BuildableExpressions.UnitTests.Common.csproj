@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>net461;netstandard1.5</TargetFrameworks>
-    <LangVersion>8.0</LangVersion>
     <AssemblyName>AgileObjects.BuildableExpressions.UnitTests.Common</AssemblyName>
     <RootNamespace>AgileObjects.BuildableExpressions.UnitTests.Common</RootNamespace>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

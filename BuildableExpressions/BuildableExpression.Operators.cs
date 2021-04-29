@@ -23,7 +23,7 @@
             => new TypeOfOperatorExpression(typeExpression);
 
         /// <summary>
-        /// Create a <see cref="TypeOfOperatorExpression"/> that represents use of the nameof
+        /// Create a <see cref="NameOfOperatorExpression"/> that represents use of the nameof
         /// operator on the given <paramref name="typeExpression"/>.
         /// </summary>
         /// <param name="typeExpression">

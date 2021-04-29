@@ -1,11 +1,11 @@
 ﻿<Project>
 
   <PropertyGroup>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Company>AgileObjects Ltd</Company>
     <Product>AgileObjects.BuildableExpressions</Product>
     <Authors>Steve Wilkes</Authors>
-    <Copyright>Copyright © AgileObjects Ltd 2020</Copyright>
+    <Copyright>Copyright © AgileObjects Ltd 2021</Copyright>
     <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
     <AssemblyOriginatorKeyFile>..\BuildableExpressions.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>

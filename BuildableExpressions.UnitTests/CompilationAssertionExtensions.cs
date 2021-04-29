@@ -2,24 +2,30 @@
 {
     using System;
 #if FEATURE_COMPILATION
-    using System.IO;
+    using System.Collections.Generic;
+    using System.CodeDom.Compiler;
     using System.Linq;
     using System.Text.RegularExpressions;
     using Common;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
+    using Microsoft.CSharp;
     using NetStandardPolyfills;
 #endif
 
     public static class CompilationAssertionExtensions
     {
-        public static void ShouldCompile(this string sourceCode, params Type[] dependedOnAssemblyTypes)
+        public static void ShouldCompile(this string cSharpSourceCode, params Type[] dependedOnAssemblyTypes)
         {
 #if FEATURE_COMPILATION
 
-            var syntaxTree = CSharpSyntaxTree.ParseText(sourceCode);
+            var codeProvider = new CSharpCodeProvider();
 
-            var references = new[]
+            var parameters = new CompilerParameters
+            {
+                GenerateInMemory = true,
+                TreatWarningsAsErrors = false
+            };
+
+            var referenceAssemblyPaths = new[]
                 {
                     typeof(object),
                     typeof(Enumerable),
@@ -29,30 +35,27 @@
                 }
                 .Concat(dependedOnAssemblyTypes)
                 .Distinct()
-                .Select(t => MetadataReference.CreateFromFile(t.GetAssembly().Location));
+                .Select(t => t.GetAssembly().Location)
+                .ToArray();
 
-            var compilation = CSharpCompilation.Create(
-                "BuildableExpressionsTestAssembly" + Guid.NewGuid(),
-                new[] { syntaxTree },
-                references,
-                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+            parameters.ReferencedAssemblies.AddRange(referenceAssemblyPaths);
 
-            using (var dllStream = new MemoryStream())
-            using (var pdbStream = new MemoryStream())
+            var compilationResult = codeProvider
+                .CompileAssemblyFromSource(parameters, cSharpSourceCode);
+
+            if (!compilationResult.Errors.HasErrors)
             {
-                var emitResult = compilation.Emit(dllStream, pdbStream);
-
-                if (emitResult.Success)
-                {
-                    return;
-                }
-
-                var errors = string.Join(
-                    Environment.NewLine,
-                    emitResult.Diagnostics.Select(d => d.ToString()));
-
-                throw new NotSupportedException(errors);
+                return;
             }
+
+            var errors = string.Join(
+                Environment.NewLine,
+                compilationResult
+                    .Errors
+                    .Cast<CompilerError>()
+                    .Select(ce => $"Error ({ce.ErrorNumber}): {ce.ErrorText}"));
+
+            throw new NotSupportedException(errors);
 #endif
         }
     }

@@ -20,7 +20,7 @@
         public static readonly List<Assembly> CompilationAssemblies = new List<Assembly>
         {
             typeof(object).GetAssembly(),
-#if NET_STANDARD
+#if NETSTANDARD
             typeof(List<>).GetAssembly(),
 #endif
             typeof(Enumerable).GetAssembly(),
