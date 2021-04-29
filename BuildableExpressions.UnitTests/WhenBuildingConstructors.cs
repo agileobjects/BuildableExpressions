@@ -38,7 +38,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -74,7 +73,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -138,7 +136,6 @@ namespace GeneratedExpressionCode
         public int Count2 { get; private set; }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -204,7 +201,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -269,7 +265,6 @@ namespace GeneratedExpressionCode
         public long Value { get; private set; }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -356,7 +351,6 @@ namespace GeneratedExpressionCode
         public string Number { get; private set; }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -432,7 +426,6 @@ namespace GeneratedExpressionCode
         public List<Person> Friends { get; private set; }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
     }

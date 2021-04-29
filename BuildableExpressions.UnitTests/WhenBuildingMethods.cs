@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq.Expressions;
     using BuildableExpressions.SourceCode;
     using Common;
     using NetStandardPolyfills;
@@ -32,7 +31,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -57,7 +55,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -83,7 +80,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -112,7 +108,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -142,7 +137,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -175,7 +169,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -211,7 +204,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -263,7 +255,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -300,7 +291,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -338,7 +328,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -378,7 +367,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -420,7 +408,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -454,7 +441,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -484,7 +470,6 @@ namespace GeneratedExpressionCode
         public abstract void AbstractMethod();
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -515,7 +500,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -575,7 +559,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -626,7 +609,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 

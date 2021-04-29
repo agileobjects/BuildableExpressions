@@ -32,7 +32,6 @@ namespace AgileObjects.GeneratedStuff
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -56,7 +55,6 @@ public class GeneratedExpressionClass
     {
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -80,7 +78,6 @@ public class GeneratedExpressionClass
     {
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -106,7 +103,6 @@ namespace {typeof(WhenBuildingSourceCode).Namespace}
         }}
     }}
 }}";
-            expected.ShouldCompile();
             translated.ShouldBe(expected.TrimStart());
         }
 
@@ -138,7 +134,6 @@ namespace AgileObjects.BuildableExpressions.UnitTests
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -189,7 +184,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -240,7 +234,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -311,7 +304,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -353,7 +345,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
     }

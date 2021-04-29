@@ -31,7 +31,6 @@ namespace GeneratedExpressionCode
         public string MyProperty { get; set; }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -59,7 +58,6 @@ namespace GeneratedExpressionCode
         public int MyProperty { get; private set; }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -117,7 +115,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -158,7 +155,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -201,7 +197,6 @@ namespace GeneratedExpressionCode
         public string Name { get; private set; }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -282,7 +277,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -314,7 +308,6 @@ namespace GeneratedExpressionCode
         protected abstract string AbstractProperty { get; }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -344,7 +337,6 @@ namespace GeneratedExpressionCode
         protected internal virtual int VirtualProperty { get; private set; }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -387,7 +379,6 @@ namespace GeneratedExpressionCode
         public override string OverrideMe { get; set; }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -428,7 +419,6 @@ namespace GeneratedExpressionCode
         public override string OverrideMe { get; set; }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
     }

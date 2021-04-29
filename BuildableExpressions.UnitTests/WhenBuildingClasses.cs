@@ -40,7 +40,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -85,7 +84,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -114,7 +112,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -149,7 +146,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -198,7 +194,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -261,7 +256,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -304,7 +298,6 @@ namespace GeneratedExpressionCode
     {
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -348,7 +341,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -388,7 +380,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -442,7 +433,6 @@ namespace AgileObjects.Tests.Yo
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -500,7 +490,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -529,7 +518,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -558,7 +546,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -598,7 +585,6 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -619,7 +605,6 @@ namespace GeneratedExpressionCode
     {
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 

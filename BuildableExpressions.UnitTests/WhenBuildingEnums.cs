@@ -27,7 +27,6 @@ namespace GeneratedExpressionCode
         Three = 3
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -58,7 +57,6 @@ namespace GeneratedExpressionCode
         Six = 6
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
     }

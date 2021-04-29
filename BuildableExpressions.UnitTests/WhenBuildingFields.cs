@@ -27,7 +27,6 @@ namespace GeneratedExpressionCode
         public string MyField;
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -56,7 +55,6 @@ namespace GeneratedExpressionCode
         private static int MyField;
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
@@ -94,7 +92,6 @@ namespace GeneratedExpressionCode
         protected const int _myConstantIntField = 123;
     }
 }";
-            EXPECTED.ShouldCompile();
             translated.ShouldBe(EXPECTED.TrimStart());
         }
     }
