@@ -84,6 +84,10 @@
 
         #endregion
 
+        Assembly IType.Assembly => Type.GetAssembly();
+
+        internal Assembly BclTypeAssembly => _bclType?.GetAssembly();
+
         string IType.Namespace => SourceCode.Namespace;
 
         IType IType.BaseType => null;

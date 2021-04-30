@@ -19,11 +19,10 @@
             var sourceCode = BuildableExpression
                 .SourceCode(sc =>
                 {
-                    sc.AddClass("MyClass", cls => { });
+                    sc.AddClass("MyClass", _ => { });
                 });
 
             sourceCode.ToCSharpString();
-
             sourceCode.ReferencedAssemblies.ShouldBeEmpty();
         }
 
@@ -61,6 +60,28 @@
                                 Parameter(typeof(object), "message"));
 
                             impl.AddMethod(nameof(IMessager.SendMessage), sendMessageLamba);
+                        });
+                    });
+                });
+
+            sourceCode.ToCSharpString();
+
+            sourceCode.ReferencedAssemblies
+                .ShouldHaveSingleItem()
+                .ShouldBe(typeof(IMessager).GetAssembly());
+        }
+
+        [Fact]
+        public void ShouldAddMethodReturnTypeReferenceAssembliesToSourceCode()
+        {
+            var sourceCode = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("DerivedClass", cls =>
+                    {
+                        cls.AddMethod("GetMessager", m =>
+                        {
+                            m.SetBody(Default(typeof(IMessager)));
                         });
                     });
                 });

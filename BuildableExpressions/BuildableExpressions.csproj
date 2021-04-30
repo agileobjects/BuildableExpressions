@@ -55,9 +55,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="BuildableExpression.*.cs">
+    <Compile Update="BuildableExpression.*.cs">
       <DependentUpon>BuildableExpression.cs</DependentUpon>
-    </Content>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>

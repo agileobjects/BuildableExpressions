@@ -9,7 +9,6 @@
     using Analysis;
     using Api;
     using Extensions;
-    using NetStandardPolyfills;
     using ReadableExpressions.Translations;
     using Translations;
 
@@ -103,62 +102,7 @@
         public string Namespace { get; private set; }
 
         internal ReadOnlyCollection<Assembly> ReferencedAssemblies
-            => _referencedAssemblies ??= GetReferenceAssemblies().ToReadOnlyCollection();
-
-        #region ReferencedAssemblies Helpers
-
-        private IList<Assembly> GetReferenceAssemblies()
-        {
-            var referenceAssemblies = new List<Assembly>();
-
-            foreach (var type in TypeExpressions.SelectMany(t => t.ImplementedTypes).Distinct())
-            {
-#if NETFRAMEWORK
-                AddAssembliesFor(type, referenceAssemblies);
-#else
-                AddAssemblyFor(type, referenceAssemblies);
-#endif
-            }
-
-            return referenceAssemblies;
-        }
-
-#if NETFRAMEWORK
-        private static void AddAssembliesFor(Type type, ICollection<Assembly> assemblies)
-        {
-            while (true)
-            {
-                AddAssemblyFor(type, assemblies);
-
-                // ReSharper disable once PossibleNullReferenceException
-                var baseType = type.BaseType;
-
-                while (baseType != null && baseType != typeof(object))
-                {
-                    AddAssemblyFor(baseType, assemblies);
-                    baseType = baseType.BaseType;
-                }
-
-                if (!type.IsNested)
-                {
-                    return;
-                }
-
-                type = type.DeclaringType;
-            }
-        }
-#endif
-        private static void AddAssemblyFor(Type type, ICollection<Assembly> assemblies)
-        {
-            var assembly = type.GetAssembly();
-
-            if (!assemblies.Contains(assembly))
-            {
-                assemblies.Add(assembly);
-            }
-        }
-
-        #endregion
+            => _referencedAssemblies ??= Analysis.RequiredAssemblies.ToReadOnlyCollection();
 
         /// <summary>
         /// Gets the <see cref="TypeExpression"/>s which describe the types defined by this
@@ -233,6 +177,7 @@
 
         internal void Analyse()
         {
+            _referencedAssemblies = null;
             Analysis = SourceCodeAnalysis.For(this);
         }
 

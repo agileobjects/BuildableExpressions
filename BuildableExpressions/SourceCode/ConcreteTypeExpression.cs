@@ -38,9 +38,6 @@
         {
         }
 
-        internal Expression ThisInstanceExpression
-            => _thisInstanceExpression ??= InstanceExpression.This(this);
-
         internal override void SetImplements(
             InterfaceExpression interfaceExpression,
             Action<ImplementationConfigurator> configuration)
@@ -68,7 +65,7 @@
         #region IConcreteTypeExpressionConfigurator Members
 
         Expression IConcreteTypeExpressionConfigurator.ThisInstanceExpression
-            => ThisInstanceExpression;
+            => _thisInstanceExpression ??= InstanceExpression.This(this);
 
         void IConcreteTypeExpressionConfigurator.AddGenericParameter(
             GenericParameterExpression parameter)

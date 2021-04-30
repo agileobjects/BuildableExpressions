@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using Generics;
     using Operators;
     using ReadableExpressions;
@@ -11,14 +12,14 @@
 
     internal class SourceCodeAnalysis : ExpressionAnalysis
     {
-        private readonly NamespaceAnalysis _namespaceAnalysis;
+        private readonly ReferenceAnalysis _referenceAnalysis;
         private readonly Stack<Expression> _expressions;
         private MethodScopeBase _currentMethodScope;
 
         private SourceCodeAnalysis()
             : base(Settings)
         {
-            _namespaceAnalysis = new NamespaceAnalysis();
+            _referenceAnalysis = new ReferenceAnalysis();
             _expressions = new Stack<Expression>();
         }
 
@@ -34,8 +35,11 @@
 
         #endregion
 
+        public IList<Assembly> RequiredAssemblies
+            => _referenceAnalysis.RequiredAssemblies;
+
         public IList<string> RequiredNamespaces
-            => _namespaceAnalysis.RequiredNamespaces;
+            => _referenceAnalysis.RequiredNamespaces;
 
         protected override Expression VisitAndConvert(Expression expression)
         {
@@ -85,7 +89,7 @@
                     return extractedMethod.CallExpression;
 
                 case Default:
-                    _namespaceAnalysis.Visit((DefaultExpression)expression);
+                    _referenceAnalysis.Visit((DefaultExpression)expression);
                     goto default;
 
                 case (ExpressionType)SourceCodeExpressionType.SourceCode:
@@ -192,13 +196,13 @@
 
         protected override Expression VisitAndConvert(ConstantExpression constant)
         {
-            _namespaceAnalysis.Visit(constant);
+            _referenceAnalysis.Visit(constant);
             return base.VisitAndConvert(constant);
         }
 
         private FieldExpression VisitAndConvert(FieldExpression field)
         {
-            _namespaceAnalysis.Visit(field);
+            _referenceAnalysis.Visit(field);
             return field;
         }
 
@@ -231,7 +235,7 @@
 
         private TypeExpression VisitAndConvert(TypeExpression type)
         {
-            _namespaceAnalysis.Visit(type);
+            _referenceAnalysis.Visit(type);
 
             foreach (var memberExpression in type.MemberExpressionsAccessor)
             {
@@ -243,13 +247,13 @@
 
         protected override Expression VisitAndConvert(MemberExpression memberAccess)
         {
-            _namespaceAnalysis.Visit(memberAccess);
+            _referenceAnalysis.Visit(memberAccess);
             return base.VisitAndConvert(memberAccess);
         }
 
         protected override Expression VisitAndConvert(MethodCallExpression methodCall)
         {
-            _namespaceAnalysis.Visit(methodCall);
+            _referenceAnalysis.Visit(methodCall);
             return base.VisitAndConvert(methodCall);
         }
 
@@ -261,7 +265,7 @@
             var updatedBody = VisitAndConvert(method.Body);
 
             _currentMethodScope.Finalise(updatedBody);
-            _namespaceAnalysis.Visit(method);
+            _referenceAnalysis.Visit(method);
 
             ExitMethodScope();
             return method;
@@ -278,13 +282,13 @@
 
         protected override Expression VisitAndConvert(NewArrayExpression newArray)
         {
-            _namespaceAnalysis.Visit(newArray);
+            _referenceAnalysis.Visit(newArray);
             return base.VisitAndConvert(newArray);
         }
 
         protected override Expression VisitAndConvert(NewExpression newing)
         {
-            _namespaceAnalysis.Visit(newing);
+            _referenceAnalysis.Visit(newing);
             return base.VisitAndConvert(newing);
         }
 
@@ -296,13 +300,13 @@
 
         private PropertyExpression VisitAndConvert(PropertyExpression property)
         {
-            _namespaceAnalysis.Visit(property);
+            _referenceAnalysis.Visit(property);
             return property;
         }
 
         protected override CatchBlock VisitAndConvert(CatchBlock @catch)
         {
-            _namespaceAnalysis.Visit(@catch);
+            _referenceAnalysis.Visit(@catch);
 
             var catchVariable = @catch.Variable;
 
@@ -316,7 +320,7 @@
 
         protected override ExpressionAnalysis Finalise()
         {
-            _namespaceAnalysis.Finalise();
+            _referenceAnalysis.Finalise();
             return base.Finalise();
         }
     }
