@@ -336,6 +336,69 @@ namespace GeneratedExpressionCode
             translated.ShouldBe(EXPECTED.TrimStart());
         }
 
+        [Fact]
+        public void ShouldNotDuplicateMethodExtracts()
+        {
+            var intVariable = Parameter(typeof(int), "input");
+
+            var yepOrNopeBlock = Block(
+                IfThen(
+                    Block(
+                        new[] { intVariable },
+                        Assign(
+                            intVariable,
+                            Call(typeof(Console), "Read", Type.EmptyTypes)),
+                        Condition(
+                            GreaterThan(intVariable, Constant(100)),
+                            Constant(false),
+                            Constant(true))),
+                    Constant("Yep")),
+                Constant("Nope"));
+
+            var transientClassType = default(Type);
+
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var testClass = sc.AddClass("TestClass", cls =>
+                    {
+                        cls.AddMethod("GetYepOrNope", yepOrNopeBlock);
+                    });
+
+                    transientClassType = testClass.Type;
+                })
+                .ToCSharpString();
+
+            transientClassType.ShouldNotBeNull();
+
+            const string EXPECTED = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    public class TestClass
+    {
+        public string GetYepOrNope()
+        {
+            if (this.GetBool())
+            {
+                return ""Yep"";
+            }
+
+            return ""Nope"";
+        }
+
+        private bool GetBool()
+        {
+            var input = Console.Read();
+
+            return (input > 100) ? false : true;
+        }
+    }
+}";
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
         #region Helper Members
 
         public class PublicProperty<T>

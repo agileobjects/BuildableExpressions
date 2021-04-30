@@ -12,13 +12,15 @@
 
     internal class SourceCodeAnalysis : ExpressionAnalysis
     {
+        private readonly bool _sourceCodeComplete;
         private readonly ReferenceAnalysis _referenceAnalysis;
         private readonly Stack<Expression> _expressions;
         private MethodScopeBase _currentMethodScope;
 
-        private SourceCodeAnalysis()
+        private SourceCodeAnalysis(SourceCodeExpression expression)
             : base(Settings)
         {
+            _sourceCodeComplete = expression.IsComplete;
             _referenceAnalysis = new ReferenceAnalysis();
             _expressions = new Stack<Expression>();
         }
@@ -27,7 +29,7 @@
 
         public static SourceCodeAnalysis For(SourceCodeExpression expression)
         {
-            var analysis = new SourceCodeAnalysis();
+            var analysis = new SourceCodeAnalysis(expression);
             analysis.Analyse(expression);
 
             return analysis;
@@ -146,6 +148,11 @@
 
         private bool Extract(Expression blockExpression)
         {
+            if (!_sourceCodeComplete)
+            {
+                return false;
+            }
+
             var parentExpression = _expressions.ElementAt(1);
 
             switch (parentExpression.NodeType)
