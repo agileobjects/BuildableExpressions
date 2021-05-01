@@ -1,9 +1,12 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using System.Linq.Expressions;
     using BuildableExpressions;
+    using BuildableExpressions.SourceCode;
     using Common;
     using NetStandardPolyfills;
+    using ReadableExpressions.Extensions;
     using Xunit;
     using static System.Linq.Expressions.Expression;
 
@@ -337,7 +340,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldNotDuplicateMethodExtracts()
+        public void ShouldNotDuplicateMethodExtractsWhenTransientClassCreated()
         {
             var intVariable = Parameter(typeof(int), "input");
 
@@ -394,6 +397,82 @@ namespace GeneratedExpressionCode
 
             return (input > 100) ? false : true;
         }
+    }
+}";
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldNotDuplicateMethodExtractsWhenTransientClassFieldCreated()
+        {
+            var intVariable = Parameter(typeof(int), "input");
+
+            var yepOrNopeBlock = Block(
+                IfThen(
+                    Block(
+                        new[] { intVariable },
+                        Assign(
+                            intVariable,
+                            Call(typeof(Console), "Read", Type.EmptyTypes)),
+                        Condition(
+                            GreaterThan(intVariable, Constant(100)),
+                            Constant(false),
+                            Constant(true))),
+                    Constant("Yep")),
+                Constant("Nope"));
+
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var testClass = sc.AddClass("TestClass", cls =>
+                    {
+                        cls.AddMethod("GetYepOrNope", yepOrNopeBlock);
+                    });
+
+                    sc.AddClass("WrapperClass", cls =>
+                    {
+                        cls.AddField(
+                            "_" + testClass.GetVariableNameInCamelCase(),
+                            testClass,
+                            field =>
+                            {
+                                field.SetVisibility(MemberVisibility.Private);
+                                field.SetStatic();
+                                field.SetReadonly();
+                                field.SetInitialValue(New(testClass.Type));
+                            });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    public class TestClass
+    {
+        public string GetYepOrNope()
+        {
+            if (this.GetBool())
+            {
+                return ""Yep"";
+            }
+
+            return ""Nope"";
+        }
+
+        private bool GetBool()
+        {
+            var input = Console.Read();
+
+            return (input > 100) ? false : true;
+        }
+    }
+
+    public class WrapperClass
+    {
+        private static readonly TestClass _testClass = new TestClass();
     }
 }";
             translated.ShouldBe(EXPECTED.TrimStart());

@@ -433,6 +433,8 @@
                     blockMethod.Finalise();
                     AddMethod((MethodExpression)blockMethod);
                 }
+
+                _blockMethodExpressions = null;
             }
 
             _memberExpressions.Sort(MemberExpressionComparer.Instance);
