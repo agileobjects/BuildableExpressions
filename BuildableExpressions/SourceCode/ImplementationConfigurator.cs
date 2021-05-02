@@ -15,7 +15,7 @@
 
         internal ImplementationConfigurator(
             TypeExpression implementingTypeExpression,
-            TypeExpression implementedTypeExpression,
+            IClosableTypeExpression implementedTypeExpression,
             Action<ImplementationConfigurator> configuration)
         {
             _implementingTypeExpression = implementingTypeExpression;
@@ -24,7 +24,7 @@
             configuration.Invoke(this);
         }
 
-        internal TypeExpression ImplementedTypeExpression { get; private set; }
+        internal IClosableTypeExpression ImplementedTypeExpression { get; private set; }
 
         public void SetGenericArgument(
             string genericParameterName,

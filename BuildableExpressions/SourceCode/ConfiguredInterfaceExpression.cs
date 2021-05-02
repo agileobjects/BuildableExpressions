@@ -24,6 +24,13 @@
         {
         }
 
+        #region IClosableTypeExpression Members
+
+        protected override InterfaceExpression CreateInstance()
+            => new ConfiguredInterfaceExpression(SourceCode, Name);
+
+        #endregion
+
         #region IInterfaceExpressionConfigurator Members
 
         void IInterfaceExpressionConfigurator.SetImplements(
@@ -57,9 +64,6 @@
         }
 
         #endregion
-
-        protected override TypeExpression CreateInstance()
-            => new ConfiguredInterfaceExpression(SourceCode, Name);
 
         protected override ITranslation GetTranslation(ITranslationContext context)
             => new InterfaceTranslation(this, context);

@@ -17,8 +17,7 @@
         IEquatable<ConfiguredGenericParameterExpression>
     {
         private static readonly ConcurrentDictionary<ConfiguredGenericParameterExpression, Type>
-            _typeCache = new ConcurrentDictionary<ConfiguredGenericParameterExpression, Type>(
-                new GenericParameterExpressionComparer());
+            _typeCache = new(new GenericParameterExpressionComparer());
 
         private Type _bclType;
         private bool _hasConstraints;
@@ -167,20 +166,6 @@
         }
 
         internal IEnumerable<TypeExpression> TypeConstraintsAccessor => _typeConstraints;
-
-        protected override TypeExpression CreateInstance()
-        {
-            return new ConfiguredGenericParameterExpression(SourceCode, Name)
-            {
-                _bclType = _bclType,
-                _hasConstraints = _hasConstraints,
-                _hasClassConstraint = _hasClassConstraint,
-                _hasStructConstraint = _hasStructConstraint,
-                _hasNewableConstraint = _hasNewableConstraint,
-                _typeConstraints = _typeConstraints,
-                _readOnlyTypeConstraints = _readOnlyTypeConstraints
-            };
-        }
 
         #region IEquatable Members
 

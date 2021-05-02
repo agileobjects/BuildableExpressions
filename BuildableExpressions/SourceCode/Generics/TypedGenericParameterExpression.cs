@@ -48,8 +48,5 @@
         bool IType.IsEnum => _parameterType.IsEnum();
 
         #endregion
-
-        protected override TypeExpression CreateInstance()
-            => new TypedGenericParameterExpression(_genericParameter, _parameterType);
     }
 }

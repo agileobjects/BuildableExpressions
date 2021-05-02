@@ -54,9 +54,6 @@
 
         #endregion
 
-        protected override TypeExpression CreateInstance()
-            => new ConfiguredEnumExpression(SourceCode, Name);
-
         protected override ITranslation GetTranslation(ITranslationContext context)
             => new EnumTranslation(this, context);
     }

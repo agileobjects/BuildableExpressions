@@ -3,12 +3,13 @@
     using System;
     using System.Collections.Generic;
     using BuildableExpressions.Extensions;
+    using Generics;
     using ReadableExpressions.Translations.Reflection;
 
     /// <summary>
     /// Represents a class in a piece of source code.
     /// </summary>
-    public abstract class ClassExpression : ConcreteTypeExpression, IType
+    public abstract class ClassExpression : ConcreteTypeExpression, IClosableTypeExpression
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassExpression"/> class for the given
@@ -103,6 +104,25 @@
         bool IType.IsAbstract => IsAbstract;
 
         bool IType.IsSealed => IsSealed;
+
+        #endregion
+
+        #region IClosableTypeExpression Members
+        
+        IClosableTypeExpression IClosableTypeExpression.Close(
+            GenericParameterExpression genericParameter, 
+            TypeExpression closedTypeExpression)
+        {
+            var closedClass = CreateInstance();
+            Close(closedClass, genericParameter, closedTypeExpression);
+            return closedClass;
+        }
+
+        /// <summary>
+        /// Creates a new instance of this <see cref="ClassExpression"/>.
+        /// </summary>
+        /// <returns>A newly-created instance of this <see cref="ClassExpression"/>.</returns>
+        protected abstract ClassExpression CreateInstance();
 
         #endregion
     }

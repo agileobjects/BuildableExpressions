@@ -245,7 +245,7 @@
         {
             ThrowIfNonInterfaceType(@interface);
 
-            var interfaceExpression = new TypedInterfaceExpression(@interface);
+            var interfaceExpression = TypeExpressionFactory.CreateInterface(@interface);
             interfaceConfig.SetImplements(interfaceExpression, configuration);
         }
 
@@ -303,7 +303,7 @@
         {
             ThrowIfNonInterfaceType(@interface);
 
-            var interfaceExpression = new TypedInterfaceExpression(@interface);
+            var interfaceExpression = TypeExpressionFactory.CreateInterface(@interface);
             classConfig.SetImplements(interfaceExpression, configuration);
         }
 
@@ -319,7 +319,7 @@
             Type @interface,
             Action<IStructImplementationConfigurator> configuration)
         {
-            var interfaceExpression = new TypedInterfaceExpression(@interface);
+            var interfaceExpression = TypeExpressionFactory.CreateInterface(@interface);
             structConfig.SetImplements(interfaceExpression, configuration);
         }
 

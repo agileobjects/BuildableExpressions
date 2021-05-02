@@ -38,6 +38,21 @@
         {
         }
 
+        #region IClosableTypeExpression Members
+
+        protected override ClassExpression CreateInstance()
+        {
+            return new ConfiguredClassExpression(SourceCode, Name)
+            {
+                BaseTypeExpression = BaseTypeExpression,
+                IsStatic = IsStatic,
+                IsAbstract = IsAbstract,
+                IsSealed = IsSealed
+            };
+        }
+
+        #endregion
+
         #region IClassExpressionConfigurator Members
 
         void IClassExpressionConfigurator.SetImplements(
@@ -169,17 +184,6 @@
         }
 
         #endregion
-
-        protected override TypeExpression CreateInstance()
-        {
-            return new ConfiguredClassExpression(SourceCode, Name)
-            {
-                BaseTypeExpression = BaseTypeExpression,
-                IsStatic = IsStatic,
-                IsAbstract = IsAbstract,
-                IsSealed = IsSealed
-            };
-        }
 
         protected override ITranslation GetTranslation(ITranslationContext context)
             => new ClassTranslation(this, context);

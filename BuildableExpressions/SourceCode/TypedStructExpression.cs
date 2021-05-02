@@ -24,9 +24,6 @@
 
         #endregion
 
-        protected override TypeExpression CreateInstance()
-            => new TypedStructExpression(_structType);
-
         protected override ITranslation GetTranslation(ITranslationContext context)
             => new TypeNameTranslation(_structType, context.Settings);
     }

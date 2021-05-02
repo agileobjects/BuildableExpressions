@@ -213,12 +213,24 @@
             }
         }
 
-        internal TypeExpression Close(
+        /// <summary>
+        /// Closes the given <paramref name="genericParameter"/> to the given
+        /// <paramref name="closedTypeExpression"/> on the given <paramref name="closedInstance"/>.
+        /// </summary>
+        /// <param name="closedInstance">
+        /// The <see cref="TypeExpression"/> on which the given <paramref name="genericParameter"/>
+        /// is being closed.
+        /// </param>
+        /// <param name="genericParameter">The <see cref="GenericParameterExpression"/> being closed.</param>
+        /// <param name="closedTypeExpression">
+        /// The <see cref="TypeExpression"/> to which the given <paramref name="genericParameter"/>
+        /// is being closed.
+        /// </param>
+        protected void Close(
+            TypeExpression closedInstance,
             GenericParameterExpression genericParameter,
             TypeExpression closedTypeExpression)
         {
-            var closedInstance = CreateInstance();
-
             var genericParameterCount = _genericParameters.Count;
 
             closedInstance._genericParameters = new List<GenericParameterExpression>(genericParameterCount);
@@ -253,15 +265,7 @@
                 closedInstance._methodExpressions =
                     new List<MethodExpression>(_methodExpressions);
             }
-
-            return closedInstance;
         }
-
-        /// <summary>
-        /// Creates a new instance of this <see cref="TypeExpression"/>.
-        /// </summary>
-        /// <returns>A newly-created instance of this <see cref="TypeExpression"/>.</returns>
-        protected abstract TypeExpression CreateInstance();
 
         internal bool TryGetTypeExpressionFor(
             GenericParameterExpression genericParameter,

@@ -24,8 +24,12 @@
 
         #endregion
 
-        protected override TypeExpression CreateInstance()
-            => TypeExpressionFactory.Create(_interfaceType);
+        #region IClosableTypeExpression Members
+
+        protected override InterfaceExpression CreateInstance()
+            => new TypedInterfaceExpression(_interfaceType);
+
+        #endregion
 
         protected override ITranslation GetTranslation(ITranslationContext context)
             => new TypeNameTranslation(_interfaceType, context.Settings);

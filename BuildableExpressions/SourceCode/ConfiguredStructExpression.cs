@@ -51,9 +51,6 @@
 
         #endregion
 
-        protected override TypeExpression CreateInstance()
-            => new ConfiguredStructExpression(SourceCode, Name);
-
         protected override ITranslation GetTranslation(ITranslationContext context)
             => new StructTranslation(this, context);
     }

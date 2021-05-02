@@ -20,9 +20,6 @@
 
         #endregion
 
-        protected override TypeExpression CreateInstance()
-            => new TypedEnumExpression(Type);
-
         protected override ITranslation GetTranslation(ITranslationContext context)
             => new TypeNameTranslation(_enumType, context.Settings);
     }
