@@ -18,6 +18,17 @@
             : base(declaringType, methodInfo.Name)
         {
             MethodInfo = methodInfo;
+
+            if (methodInfo.IsAbstract)
+            {
+                SetAbstract();
+            }
+            else if (methodInfo.IsVirtual)
+            {
+                SetVirtual();
+            }
+
+            AddParameters(methodInfo.GetParameters());
         }
 
         public override MethodInfo MethodInfo { get; }
@@ -28,28 +39,18 @@
             => _definition ??= CreateDefinition();
 
         private LambdaExpression CreateDefinition()
-        {
-            var parameters = MethodInfo
-                .GetParameters()
-                .ProjectToArray(p => Parameter(p.ParameterType, p.Name));
-
-            AddParameters(parameters);
-
-            return Default(ReturnType).ToLambdaExpression(parameters);
-        }
+            => Default(ReturnType).ToLambdaExpression(ParametersAccessor);
 
         internal override bool HasGeneratedName => false;
 
         internal override bool HasBody => true;
 
-        protected override IEnumerable<MethodExpression> SiblingMethodExpressions => null;
-
-        protected override string MethodTypeName => "method";
-
-        public override bool IsAbstract => MethodInfo.IsAbstract;
-
-        public override bool IsVirtual => MethodInfo.IsVirtual;
-
         public override bool IsOverride => _isOverride ??= this.IsOverride();
+
+        #region Validation
+
+        protected override IEnumerable<MethodExpressionBase> SiblingMethodExpressions => null;
+
+        #endregion
     }
 }

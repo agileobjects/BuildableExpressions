@@ -109,11 +109,8 @@
         #region Validation
 
         /// <inheritdoc />
-        protected override IEnumerable<MethodExpression> SiblingMethodExpressions
+        protected override IEnumerable<MethodExpressionBase> SiblingMethodExpressions
             => null;
-
-        /// <inheritdoc />
-        protected override string MethodTypeName => "method";
 
         #endregion
     }

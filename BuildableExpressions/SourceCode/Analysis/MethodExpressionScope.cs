@@ -8,16 +8,16 @@
 
     internal class MethodExpressionScope : MethodScopeBase
     {
-        private readonly MethodExpression _methodExpression;
+        private readonly MethodExpressionBase _methodExpression;
 
-        public MethodExpressionScope(MethodExpression methodExpression, MethodScopeBase parent)
+        public MethodExpressionScope(MethodExpressionBase methodExpression, MethodScopeBase parent)
             : base(parent)
         {
             _methodExpression = methodExpression;
             Add(methodExpression.Parameters);
         }
 
-        public override MethodExpression RootMethodExpression => _methodExpression;
+        public override MethodExpressionBase RootMethodExpression => _methodExpression;
 
         public override void Finalise(Expression finalisedBody)
         {

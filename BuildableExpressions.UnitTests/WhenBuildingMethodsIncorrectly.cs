@@ -356,7 +356,7 @@
                 {
                     sc.AddStruct("EmptyMethodStruct", str =>
                     {
-                        str.AddMethod("EmptyMethod", m => { });
+                        str.AddMethod("EmptyMethod", _ => { });
                     });
                 });
             });

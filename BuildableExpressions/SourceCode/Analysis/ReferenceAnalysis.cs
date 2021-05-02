@@ -67,7 +67,7 @@
             }
         }
 
-        public void Visit(MethodExpression method)
+        public void Visit(MethodExpressionBase method)
         {
             if (method.IsGeneric)
             {

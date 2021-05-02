@@ -16,7 +16,7 @@
 
         /// <summary>
         /// Adds a call from the <see cref="ConstructorExpression"/> to the given sibling or base
-        /// Type (if applicable) <paramref name="targetConstructorExpression"/>.
+        /// Type <paramref name="targetConstructorExpression"/>.
         /// </summary>
         /// <param name="targetConstructorExpression">
         /// The sibling or base Type <see cref="ConstructorExpression"/> to call.

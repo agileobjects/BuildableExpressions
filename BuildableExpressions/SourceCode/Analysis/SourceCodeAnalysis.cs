@@ -102,7 +102,7 @@
 
                 case (ExpressionType)SourceCodeExpressionType.Constructor:
                 case (ExpressionType)SourceCodeExpressionType.Method:
-                    return VisitAndConvert((MethodExpression)expression);
+                    return VisitAndConvert((MethodExpressionBase)expression);
 
                 case (ExpressionType)SourceCodeExpressionType.Field:
                     return VisitAndConvert((FieldExpression)expression);
@@ -264,7 +264,7 @@
             return base.VisitAndConvert(methodCall);
         }
 
-        private MethodExpression VisitAndConvert(MethodExpression method)
+        private MethodExpressionBase VisitAndConvert(MethodExpressionBase method)
         {
             EnterMethodScope(method);
 
@@ -278,7 +278,7 @@
             return method;
         }
 
-        private void EnterMethodScope(MethodExpression method)
+        private void EnterMethodScope(MethodExpressionBase method)
             => EnterMethodScope(new MethodExpressionScope(method, _currentMethodScope));
 
         private void EnterMethodScope(MethodScopeBase methodScope)

@@ -9,7 +9,7 @@
 
     internal static class MemberExpressionExtensions
     {
-        public static string GetSignature(this IMethod method, bool includeTypeName = true)
+        public static string GetMethodSignature(this IMethod method, bool includeTypeName = true)
         {
             var typeName = includeTypeName
                 ? GetDeclaringTypeName(method) + "."

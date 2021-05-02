@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using Extensions;
     using NetStandardPolyfills;
     using ReadableExpressions;
@@ -193,7 +194,7 @@
         {
             ThrowIfInvalidBaseType(baseType);
 
-            classConfig.SetBaseType(new TypedClassExpression(baseType), configuration);
+            classConfig.SetBaseType(TypeExpressionFactory.CreateClass(baseType), configuration);
         }
 
         private static void ThrowIfInvalidBaseType(Type baseType)
@@ -334,9 +335,25 @@
             this IConstructorExpressionConfigurator ctorConfig,
             string name)
         {
+            return ctorConfig.AddParameter(name, typeof(TParameter));
+        }
+
+        /// <summary>
+        /// Adds a ParameterExpression with the given <paramref name="name"/> and
+        /// <paramref name="type"/> to the <see cref="ConstructorExpression"/>.
+        /// </summary>
+        /// <param name="ctorConfig">The <see cref="IConstructorExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the ParameterExpression to add.</param>
+        /// <param name="type">The type of the ParameterExpression to add.</param>
+        /// <returns>The newly-added ParameterExpression.</returns>
+        public static ParameterExpression AddParameter(
+            this IConstructorExpressionConfigurator ctorConfig,
+            string name,
+            Type type)
+        {
             name.ThrowIfInvalidName("Parameter");
 
-            var parameterExpression = Expression.Parameter(typeof(TParameter), name);
+            var parameterExpression = Expression.Parameter(type, name);
             ctorConfig.AddParameter(parameterExpression);
             return parameterExpression;
         }
@@ -351,8 +368,29 @@
             ParameterExpression parameter)
         {
             parameter.ThrowIfNull(nameof(parameter));
-
             ctorConfig.AddParameters(parameter);
+        }
+
+        /// <summary>
+        /// Adds a call from the <see cref="ConstructorExpression"/> to the given sibling or base
+        /// Type <paramref name="targetConstructor"/>.
+        /// </summary>
+        /// <param name="ctorConfig">The <see cref="IConstructorExpressionConfigurator"/> to configure.</param>
+        /// <param name="targetConstructor">The sibling or base Type ConstructorInfo to call.</param>
+        /// <param name="arguments">
+        /// Zero or more Expressions to pass to the given sibling or base Type
+        /// <paramref name="targetConstructor"/>.
+        /// </param>
+        public static void SetConstructorCall(
+            this IConstructorExpressionConfigurator ctorConfig,
+            ConstructorInfo targetConstructor,
+            params Expression[] arguments)
+        {
+            var ctorExpression = new ConstructorInfoConstructorExpression(
+                TypeExpressionFactory.Create(targetConstructor.DeclaringType),
+                targetConstructor);
+
+            ctorConfig.SetConstructorCall(ctorExpression, arguments);
         }
 
         /// <summary>
@@ -395,7 +433,7 @@
             this IConcreteTypeExpressionConfigurator concreteTypeConfig,
             string name)
         {
-            return concreteTypeConfig.AddField<TField>(name, f => { });
+            return concreteTypeConfig.AddField<TField>(name, _ => { });
         }
 
         /// <summary>
@@ -875,7 +913,7 @@
             string name,
             Type returnType)
         {
-            return interfaceConfig.AddMethod(name, returnType, cfg => { });
+            return interfaceConfig.AddMethod(name, returnType, _ => { });
         }
 
         /// <summary>
@@ -1030,7 +1068,7 @@
             this IGenericParameterConfigurator methodConfig,
             string name)
         {
-            return methodConfig.AddGenericParameter(name, gp => { });
+            return methodConfig.AddGenericParameter(name, _ => { });
         }
 
         /// <summary>

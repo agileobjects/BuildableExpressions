@@ -355,6 +355,47 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldBuildAChainedBaseDesignTimeClassConstructorCall()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("DerivedType", cls =>
+                    {
+                        var baseType = typeof(BaseType<>).MakeGenericType(typeof(string));
+                        cls.SetBaseType(baseType);
+
+                        cls.AddConstructor(ctor =>
+                        {
+                            var baseTypeCtor = baseType.GetNonPublicInstanceConstructor(typeof(string));
+                            var valueParam = ctor.AddParameter<string>("value");
+                            ctor.SetConstructorCall(baseTypeCtor, valueParam);
+                            ctor.SetBody(Empty());
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+using AgileObjects.BuildableExpressions.UnitTests;
+
+namespace GeneratedExpressionCode
+{
+    public class DerivedType : WhenBuildingConstructors.BaseType<string>
+    {
+        public DerivedType
+        (
+            string value
+        )
+        : base(value)
+        {
+        }
+    }
+}";
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAChainedParameterlessSiblingConstructorCall()
         {
             var translated = BuildableExpression
@@ -428,5 +469,19 @@ namespace GeneratedExpressionCode
 }";
             translated.ShouldBe(EXPECTED.TrimStart());
         }
+
+        #region Helper Classes
+
+        public class BaseType<T>
+        {
+            protected BaseType(T value)
+            {
+                Value = value;
+            }
+
+            public T Value { get; }
+        }
+
+        #endregion
     }
 }

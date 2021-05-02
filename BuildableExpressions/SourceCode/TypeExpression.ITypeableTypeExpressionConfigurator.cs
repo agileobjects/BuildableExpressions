@@ -74,7 +74,7 @@
         }
 
         /// <summary>
-        /// Adds a parameterles, empty <see cref="ConstructorExpression"/> to this
+        /// Adds a parameterless, empty <see cref="ConstructorExpression"/> to this
         /// <see cref="TypeExpression"/>.
         /// </summary>
         protected void AddDefaultConstructor()
@@ -93,14 +93,8 @@
             ResetTypeIfRequired();
         }
 
-        /// <summary>
-        /// Adds a <see cref="ConstructorExpression"/> to this <see cref="TypeExpression"/> using
-        /// the given <paramref name="configuration"/>.
-        /// </summary>
-        /// <param name="configuration">The configuration to use.</param>
-        /// <returns>The newly-created <see cref="ConstructorExpressions"/>.</returns>
-        protected ConstructorExpression AddConstructor(Action<ConstructorExpression> configuration)
-            => AddConstructor(new ConstructorExpression(this, configuration));
+        internal ConstructorExpression AddConstructor(Action<StandardConstructorExpression> configuration)
+            => AddConstructor(new StandardConstructorExpression(this, configuration));
 
         /// <summary>
         /// Adds the given <paramref name="ctor"/> to this <see cref="TypeExpression"/>.

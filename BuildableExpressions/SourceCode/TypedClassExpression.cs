@@ -13,7 +13,13 @@
             : base(classType)
         {
             _classType = classType;
-            BaseTypeExpression = GetBaseTypeExpression(classType.GetBaseType());
+
+            var baseType = classType.GetBaseType();
+
+            if (baseType != typeof(object))
+            {
+                BaseTypeExpression = TypeExpressionFactory.CreateClass(baseType);
+            }
 
             var isAbstract = classType.IsAbstract();
             var isSealed = classType.IsSealed();
@@ -26,16 +32,6 @@
             }
         }
 
-        #region Setup
-
-        private static ClassExpression GetBaseTypeExpression(Type baseType)
-        {
-            return baseType != typeof(object)
-                ? new TypedClassExpression(baseType) : null;
-        }
-
-        #endregion
-
         #region IType Members
 
         string IType.FullName => _classType.FullName;
@@ -47,7 +43,7 @@
         #endregion
 
         protected override TypeExpression CreateInstance()
-            => new TypedClassExpression(_classType);
+            => TypeExpressionFactory.Create(_classType);
 
         protected override ITranslation GetTranslation(ITranslationContext context)
             => new TypeNameTranslation(_classType, context.Settings);

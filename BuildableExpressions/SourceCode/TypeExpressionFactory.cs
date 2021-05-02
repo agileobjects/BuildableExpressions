@@ -10,32 +10,35 @@
         private static readonly ConcurrentDictionary<Type, TypeExpression> _cache =
             new ConcurrentDictionary<Type, TypeExpression>();
 
-        public static TypeExpression Create(Type type)
+        public static ClassExpression CreateClass(Type type) 
+            => (ClassExpression)_cache.GetOrAdd(type, t => new TypedClassExpression(t));
+
+        public static TypeExpression Create(Type type) 
+            => _cache.GetOrAdd(type, CreateTypeExpression);
+
+        private static TypeExpression CreateTypeExpression(Type type)
         {
-            return _cache.GetOrAdd(type, t =>
+            if (type.IsClass())
             {
-                if (t.IsInterface())
-                {
-                    return new TypedInterfaceExpression(t);
-                }
+                return new TypedClassExpression(type);
+            }
 
-                if (t.IsClass())
-                {
-                    return new TypedClassExpression(t);
-                }
+            if (type.IsInterface())
+            {
+                return new TypedInterfaceExpression(type);
+            }
 
-                if (t.IsEnum())
-                {
-                    return new TypedEnumExpression(t);
-                }
+            if (type.IsEnum())
+            {
+                return new TypedEnumExpression(type);
+            }
 
-                if (t.IsGenericParameter)
-                {
-                    return new TypedGenericParameterExpression(t);
-                }
+            if (type.IsGenericParameter)
+            {
+                return new TypedGenericParameterExpression(type);
+            }
 
-                return new TypedStructExpression(t);
-            });
+            return new TypedStructExpression(type);
         }
     }
 }

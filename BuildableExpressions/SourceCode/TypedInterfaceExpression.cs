@@ -25,7 +25,7 @@
         #endregion
 
         protected override TypeExpression CreateInstance()
-            => new TypedInterfaceExpression(_interfaceType);
+            => TypeExpressionFactory.Create(_interfaceType);
 
         protected override ITranslation GetTranslation(ITranslationContext context)
             => new TypeNameTranslation(_interfaceType, context.Settings);

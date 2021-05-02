@@ -21,7 +21,7 @@
 
         public BlockMethodExpression BlockMethod { get; private set; }
 
-        public override MethodExpression RootMethodExpression
+        public override MethodExpressionBase RootMethodExpression
             => Parent.RootMethodExpression;
 
         private void AddChildBlockScope(BlockMethodScope childBlockScope)

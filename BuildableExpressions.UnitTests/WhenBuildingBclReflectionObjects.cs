@@ -257,6 +257,44 @@
         }
 
         [Fact]
+        public void ShouldCreateASingleParameterClassConstructor()
+        {
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass("MyClass", cls =>
+                {
+                    cls.AddConstructor(ctor =>
+                    {
+                        ctor.AddParameter<string>("value");
+                        ctor.SetBody(Empty());
+                    });
+                });
+            });
+
+            var @class = sourceCode
+                .TypeExpressions
+                .FirstOrDefault()
+                .ShouldNotBeNull();
+
+            var ctorInfo = @class
+                .ConstructorExpressions
+                .FirstOrDefault()
+                .ShouldNotBeNull()
+                .ConstructorInfo
+                .ShouldNotBeNull();
+
+            ctorInfo.DeclaringType.ShouldBe(@class.Type);
+            ctorInfo.IsGenericMethod.ShouldBeFalse();
+            ctorInfo.IsPublic.ShouldBeTrue();
+            ctorInfo.IsStatic.ShouldBeFalse();
+            ctorInfo.IsAbstract.ShouldBeFalse();
+            
+            var ctorParameter = ctorInfo.GetParameters().ShouldHaveSingleItem();
+            ctorParameter.ParameterType.ShouldBe(typeof(string));
+            ctorParameter.Name.ShouldBe("value");
+        }
+
+        [Fact]
         public void ShouldCreateAnInternalStaticReadonlyClassFieldInfo()
         {
             var sourceCode = BuildableExpression.SourceCode(sc =>

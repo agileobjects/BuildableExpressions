@@ -2,45 +2,41 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq.Expressions;
-    using Api;
+    using System.Reflection;
     using BuildableExpressions.Extensions;
-    using NetStandardPolyfills;
+    using Extensions;
+    using Generics;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
     using Translations;
-    using static MemberVisibility;
 
     /// <summary>
     /// Represents a class or struct constructor in a piece of source code.
     /// </summary>
-    public class ConstructorExpression :
-        MethodExpression,
-        IConstructorExpressionConfigurator,
+    public abstract class ConstructorExpression :
+        MethodExpressionBase,
         IConstructor
     {
-        internal ConstructorExpression(
-            TypeExpression declaringTypeExpression,
-            Action<ConstructorExpression> configuration)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConstructorExpression"/> class.
+        /// </summary>
+        /// <param name="declaringTypeExpression">
+        /// This <see cref="ConstructorExpression"/>'s parent <see cref="TypeExpression"/>.
+        /// </param>
+        protected ConstructorExpression(TypeExpression declaringTypeExpression)
             : base(declaringTypeExpression, string.Empty)
         {
-            configuration.Invoke(this);
-
-            if (!Visibility.HasValue)
-            {
-                SetVisibility(MemberVisibility.Public);
-            }
-
-            Validate();
         }
 
         /// <summary>
         /// Gets the <see cref="SourceCodeExpressionType"/> value (1005) indicating the type of this
         /// <see cref="ConstructorExpression"/> as an ExpressionType.
         /// </summary>
-        public override ExpressionType NodeType
-            => (ExpressionType)SourceCodeExpressionType.Constructor;
+        protected override SourceCodeExpressionType SourceCodeNodeType
+            => SourceCodeExpressionType.Constructor;
 
         internal bool HasChainedConstructorCall => ChainedConstructorCall != null;
 
@@ -50,121 +46,76 @@
         /// </summary>
         public ChainedConstructorCallExpression ChainedConstructorCall { get; private set; }
 
+        /// <summary>
+        /// Set this <see cref="ConstructorExpression"/>'s ChainedConstructorCall.
+        /// </summary>
+        /// <param name="call">The <see cref="ChainedConstructorCallExpression"/> to use.</param>
+        protected void SetChainedConstructorCall(ChainedConstructorCallExpression call)
+            => ChainedConstructorCall = call;
+
         /// <inheritdoc />
         public override string Name => DeclaringTypeExpression.Name;
 
-        internal override bool HasGeneratedName => false;
+        internal void SetBody(Expression body) => SetBody(body, typeof(void));
 
-        internal override bool HasBody => !IsAbstract;
+        /// <summary>
+        /// Gets the ConstructorInfo for this <see cref="ConstructorExpression"/>, which is lazily,
+        /// dynamically generated using this constructor's definition.
+        /// </summary>
+        public abstract ConstructorInfo ConstructorInfo { get; }
 
-        /// <inheritdoc cref="IComplexMember.IsOverride" />
-        public override bool IsOverride => false;
+        #region IMember Members
 
-        #region Validation
+        IType IMember.DeclaringType => DeclaringTypeExpression;
+
+        IType IMember.Type => DeclaringTypeExpression;
+
+        #endregion
+
+        #region IComplexMember
 
         /// <inheritdoc />
-        protected override IEnumerable<MethodExpression> SiblingMethodExpressions
-            => DeclaringTypeExpression.ConstructorExpressions;
+        public override bool IsOverride => false;
+
+        #endregion
+
+        #region IMethod Members
+
+        /// <inheritdoc />
+        public override bool IsGeneric => false;
+
+        /// <inheritdoc />
+        public override ReadOnlyCollection<GenericParameterExpression> GenericParameters
+            => Enumerable<GenericParameterExpression>.EmptyReadOnlyCollection;
+
+        internal override IList<GenericParameterExpression> GenericParametersAccessor
+            => Enumerable<GenericParameterExpression>.EmptyArray;
+
+        /// <inheritdoc />
+        protected override ReadOnlyCollection<IGenericParameter> GetGenericArguments()
+            => Enumerable<IGenericParameter>.EmptyReadOnlyCollection;
+
+        /// <inheritdoc />
+        protected override IType GetReturnType() => DeclaringTypeExpression;
+
+        #endregion
+
+        /// <inheritdoc />
+        protected override string GetSignature(bool includeTypeName)
+        {
+            var parameters = string.Join(
+                ", ",
+                ParametersAccessor?
+                    .Project(p => p.Type.GetFriendlyName()) ??
+                Array.Empty<string>());
+
+            return $"{DeclaringTypeExpression.GetFriendlyName()}({parameters})";
+        }
+
+        #region Validation
 
         /// <inheritdoc />
         protected override string MethodTypeName => "constructor";
-
-        #endregion
-
-        #region IClassConstructorExpressionConfigurator Members
-
-        void IConstructorExpressionConfigurator.AddParameters(
-            params ParameterExpression[] parameters)
-        {
-            AddParameters(new List<ParameterExpression>(parameters));
-        }
-
-        void IConstructorExpressionConfigurator.SetConstructorCall(
-            ConstructorExpression targetConstructorExpression,
-            params Expression[] arguments)
-        {
-            ThrowIfInvalidTarget(targetConstructorExpression);
-            ThrowIfInvalidArguments(targetConstructorExpression, arguments);
-
-            ChainedConstructorCall = new ChainedConstructorCallExpression(
-                this,
-                targetConstructorExpression,
-                arguments);
-        }
-
-        #region Validation
-
-        private void ThrowIfInvalidTarget(ConstructorExpression targetConstructor)
-        {
-            var targetCtorDeclaringType = targetConstructor.DeclaringTypeExpression;
-
-            if (targetCtorDeclaringType == DeclaringTypeExpression)
-            {
-                return;
-            }
-
-            var isInaccessibleCtor = false;
-
-            if ((DeclaringTypeExpression is ClassExpression declaringClassExpression) &&
-                (declaringClassExpression.BaseTypeExpression == targetCtorDeclaringType))
-            {
-                if (targetConstructor.Visibility != Private)
-                {
-                    return;
-                }
-
-                isInaccessibleCtor = true;
-            }
-
-            var visibility = isInaccessibleCtor ? "private " : null;
-
-            throw new InvalidOperationException(
-                $"Constructor {this} cannot call " +
-                $"{visibility}constructor {targetConstructor}.");
-        }
-
-        private static void ThrowIfInvalidArguments(
-            ConstructorExpression targetConstructor,
-            IList<Expression> arguments)
-        {
-            var parameterCount = targetConstructor.ParametersAccessor?.Count ?? 0;
-
-            if (parameterCount != arguments.Count)
-            {
-                throw new InvalidOperationException(
-                    $"Constructor {targetConstructor} requires {parameterCount} " +
-                    $"parameter(s). {arguments.Count} were supplied.");
-            }
-
-            if (parameterCount == 0)
-            {
-                return;
-            }
-
-            for (var i = 0; i < parameterCount; ++i)
-            {
-                // ReSharper disable once PossibleNullReferenceException
-                var parameterType = targetConstructor.ParametersAccessor[i].Type;
-                var argumentType = arguments[i].Type;
-
-                if (argumentType.IsAssignableTo(parameterType))
-                {
-                    continue;
-                }
-
-                var argumentTypes = string.Join(", ", arguments
-                    .ProjectToArray(arg => arg.Type.GetFriendlyName()));
-
-                throw new InvalidOperationException(
-                    $"Constructor {targetConstructor} cannot be called with " +
-                    $"argument(s) of Type {argumentTypes}.");
-            }
-        }
-
-        #endregion
-
-        void IConstructorExpressionConfigurator.SetBody(Expression body)
-            => SetBody(body, typeof(void));
 
         #endregion
 
@@ -181,15 +132,6 @@
         #endregion
 
         /// <inheritdoc />
-        public override string ToString()
-        {
-            var parameters = string.Join(
-                ", ",
-                ParametersAccessor?
-                    .Project(p => p.Type.GetFriendlyName()) ??
-                     Array.Empty<string>());
-
-            return $"{DeclaringTypeExpression.GetFriendlyName()}({parameters})";
-        }
+        public override string ToString() => GetSignature(includeTypeName: true);
     }
 }
