@@ -4,6 +4,7 @@
     using BuildableExpressions.SourceCode;
     using BuildableExpressions.SourceCode.Generics;
     using Common;
+    using NetStandardPolyfills;
     using Xunit;
     using static System.Linq.Expressions.Expression;
 
@@ -109,6 +110,42 @@ namespace GeneratedExpressionCode
         public string SayHello()
         {
             return ""Hello!"";
+        }
+    }
+}";
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAClassWithABaseTypeConstructorCall()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass("DerivedType", cls =>
+                    {
+                        cls.SetBaseType<BaseType>();
+                        
+                        cls.AddConstructor(ctor =>
+                        {
+                            ctor.SetConstructorCall(
+                                typeof(BaseType).GetNonPublicInstanceConstructor(typeof(string)),
+                                Constant("Hello!"));
+
+                            ctor.SetBody(Empty());
+                        });
+                    }))
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+using AgileObjects.BuildableExpressions.UnitTests;
+
+namespace GeneratedExpressionCode
+{
+    public class DerivedType : WhenBuildingClasses.BaseType
+    {
+        public DerivedType()
+        : base(""Hello!"")
+        {
         }
     }
 }";
@@ -610,7 +647,19 @@ namespace GeneratedExpressionCode
 
         #region Helper Members
 
-        public abstract class BaseType { }
+        public abstract class BaseType
+        {
+            protected BaseType()
+            {
+            }
+
+            protected BaseType(string value)
+            {
+                Value = value;
+            }
+
+            public string Value { get; }
+        }
 
         // ReSharper disable once UnusedTypeParameter
         public class GenericBaseType<T> { }

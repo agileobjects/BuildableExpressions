@@ -4,7 +4,7 @@
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
 
-    internal class TypedEnumExpression : EnumExpression, IType
+    internal class TypedEnumExpression : EnumExpression, ITypedTypeExpression
     {
         private readonly Type _enumType;
 

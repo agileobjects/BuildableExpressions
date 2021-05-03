@@ -164,6 +164,41 @@
         }
 
         [Fact]
+        public void ShouldCreateAClassTypeDerivedFromADesignTimeBaseType()
+        {
+            var sourceCode = BuildableExpression.SourceCode(sc =>
+            {
+                sc.AddClass("DerivedClass", cls =>
+                {
+                    cls.SetBaseType(typeof(BaseType));
+
+                    cls.AddConstructor(ctor =>
+                    {
+                        ctor.SetConstructorCall(
+                            typeof(BaseType).GetNonPublicInstanceConstructor(typeof(string)),
+                            Constant("Hello!"));
+
+                        ctor.SetBody(Empty());
+                    });
+                });
+            });
+
+            var @class = sourceCode.TypeExpressions.ShouldHaveSingleItem().ShouldNotBeNull();
+
+            @class.Type.ShouldNotBeNull();
+            @class.Type.Name.ShouldBe("DerivedClass");
+            @class.Type.IsClass().ShouldBeTrue();
+            @class.Type.IsGenericType().ShouldBeFalse();
+
+            var classCtor = @class.Type.GetPublicInstanceConstructor().ShouldNotBeNull();
+
+            classCtor.GetParameters().ShouldBeEmpty();
+
+            var typeInstance = Activator.CreateInstance(@class.Type).ShouldNotBeNull();
+            typeInstance.ShouldBeOfType<BaseType>().Value.ShouldBe("Hello!");
+        }
+
+        [Fact]
         public void ShouldNotCreateAnIncompleteClassType()
         {
             var sourceCode = BuildableExpression.SourceCode(sc =>
@@ -288,7 +323,7 @@
             ctorInfo.IsPublic.ShouldBeTrue();
             ctorInfo.IsStatic.ShouldBeFalse();
             ctorInfo.IsAbstract.ShouldBeFalse();
-            
+
             var ctorParameter = ctorInfo.GetParameters().ShouldHaveSingleItem();
             ctorParameter.ParameterType.ShouldBe(typeof(string));
             ctorParameter.Name.ShouldBe("value");
@@ -475,7 +510,19 @@
 
         #region Helper Members
 
-        public abstract class BaseType { }
+        public abstract class BaseType
+        {
+            protected BaseType()
+            {
+            }
+
+            protected BaseType(string value)
+            {
+                Value = value;
+            }
+
+            public string Value { get; }
+        }
 
         public interface IMessager
         {

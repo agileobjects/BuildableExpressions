@@ -5,7 +5,7 @@
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
 
-    internal class TypedClassExpression : ClassExpression, IType
+    internal class TypedClassExpression : ClassExpression, ITypedTypeExpression
     {
         private readonly Type _classType;
 

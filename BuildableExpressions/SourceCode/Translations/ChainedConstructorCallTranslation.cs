@@ -30,7 +30,7 @@
 
             _parameterTranslations = ParameterSetTranslation
                 .For(
-                    chainedCtorCallExpression.CallingConstructor,
+                    chainedCtorCallExpression.TargetConstructor,
                     chainedCtorCallExpression.Arguments,
                     context)
                 .WithParentheses();

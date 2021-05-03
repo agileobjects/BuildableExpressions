@@ -4,7 +4,7 @@
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
 
-    internal class TypedStructExpression : StructExpression, IType
+    internal class TypedStructExpression : StructExpression, ITypedTypeExpression
     {
         private readonly Type _structType;
 

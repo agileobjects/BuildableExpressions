@@ -4,7 +4,7 @@
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
 
-    internal class TypedInterfaceExpression : InterfaceExpression, IType
+    internal class TypedInterfaceExpression : InterfaceExpression, ITypedTypeExpression
     {
         private readonly Type _interfaceType;
 

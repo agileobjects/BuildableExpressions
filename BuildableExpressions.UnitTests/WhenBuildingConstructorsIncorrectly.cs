@@ -2,10 +2,10 @@
 {
     using System;
     using System.Linq;
-    using System.Linq.Expressions;
     using BuildableExpressions.SourceCode;
     using Common;
     using Xunit;
+    using static System.Linq.Expressions.Expression;
 
     public class WhenBuildingConstructorsIncorrectly : TestClassBase
     {
@@ -101,7 +101,7 @@
                         cls.AddConstructor(ctor =>
                         {
                             ctor.AddParameter<string>("name");
-                            ctor.SetBody(Expression.Empty());
+                            ctor.SetBody(Empty());
                         });
                     });
 
@@ -111,7 +111,7 @@
                         {
                             ctor.SetConstructorCall(
                                 class1.ConstructorExpressions.First(),
-                                Expression.Constant("Nope"));
+                                Constant("Nope"));
                         });
                     });
                 });
@@ -135,7 +135,7 @@
                         {
                             ctor.SetVisibility(MemberVisibility.Private);
                             ctor.AddParameter<string>("name");
-                            ctor.SetBody(Expression.Empty());
+                            ctor.SetBody(Empty());
                         });
                     });
 
@@ -149,7 +149,7 @@
 
                             ctor.SetConstructorCall(
                                 baseClass.ConstructorExpressions.First(),
-                                Expression.Constant("Nope"));
+                                Constant("Nope"));
                         });
                     });
                 });
@@ -172,7 +172,7 @@
                         var nameCtor = cls.AddConstructor(ctor =>
                         {
                             ctor.AddParameter<string>("name");
-                            ctor.SetBody(Expression.Empty());
+                            ctor.SetBody(Empty());
                         });
 
                         cls.AddConstructor(ctor =>
@@ -201,15 +201,15 @@
                         {
                             ctor.AddParameter<int>("id");
                             ctor.AddParameter<string>("name");
-                            ctor.SetBody(Expression.Empty());
+                            ctor.SetBody(Empty());
                         });
 
                         cls.AddConstructor(ctor =>
                         {
                             ctor.SetConstructorCall(
                                 nameCtor,
-                                Expression.Constant(123),
-                                Expression.Constant(DateTime.Now));
+                                Constant(123),
+                                Constant(DateTime.Now));
                         });
                     });
                 });

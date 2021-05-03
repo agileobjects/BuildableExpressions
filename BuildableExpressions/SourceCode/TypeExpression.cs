@@ -91,7 +91,10 @@
 
             var sourceCode = new SourceCodeExpression(SourceCode.Namespace);
 
-            foreach (var typeExpression in ImplementedTypeExpressions)
+            var configuredDependencies = ImplementedTypeExpressions
+                .Filter(t => t is not ITypedTypeExpression);
+
+            foreach (var typeExpression in configuredDependencies)
             {
                 sourceCode.Add(typeExpression);
             }
