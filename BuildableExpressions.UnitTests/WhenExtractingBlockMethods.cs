@@ -340,6 +340,67 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldExtractAMultilineIfTestBlockToAStaticPrivateMethod()
+        {
+            var intVariable = Parameter(typeof(int), "input");
+
+            var yepOrNopeBlock = Block(
+                IfThen(
+                    Block(
+                        new[] { intVariable },
+                        Assign(
+                            intVariable,
+                            Call(typeof(Console), "Read", Type.EmptyTypes)),
+                        Condition(
+                            GreaterThan(intVariable, Constant(100)),
+                            Constant(false),
+                            Constant(true))),
+                    Constant("Yep")),
+                Constant("Nope"));
+
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("GetYepOrNope", m =>
+                        {
+                            m.SetStatic();
+                            m.SetBody(yepOrNopeBlock);
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public static string GetYepOrNope()
+        {
+            if (GeneratedExpressionClass.GetBool())
+            {
+                return ""Yep"";
+            }
+
+            return ""Nope"";
+        }
+
+        private static bool GetBool()
+        {
+            var input = Console.Read();
+
+            return (input > 100) ? false : true;
+        }
+    }
+}";
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldNotDuplicateMethodExtractsWhenTransientClassCreated()
         {
             var intVariable = Parameter(typeof(int), "input");

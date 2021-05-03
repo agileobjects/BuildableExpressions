@@ -46,6 +46,11 @@
             {
                 m.SetVisibility(MemberVisibility.Private);
 
+                if (RootMethodExpression.IsStatic)
+                {
+                    m.SetStatic();
+                }
+
                 if (_parameters != null)
                 {
                     m.AddParameters(_parameters);
