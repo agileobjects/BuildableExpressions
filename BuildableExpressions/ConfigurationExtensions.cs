@@ -378,7 +378,7 @@
         /// <param name="ctorConfig">The <see cref="IConstructorExpressionConfigurator"/> to configure.</param>
         /// <param name="targetConstructor">The sibling or base Type ConstructorInfo to call.</param>
         /// <param name="arguments">
-        /// One or more Expressions to pass to the given sibling or base Type
+        /// Zero or more Expressions to pass to the given sibling or base Type
         /// <paramref name="targetConstructor"/>.
         /// </param>
         public static void SetConstructorCall(

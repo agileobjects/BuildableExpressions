@@ -32,7 +32,7 @@
         /// The sibling or base Type <see cref="ConstructorExpression"/> to call.
         /// </param>
         /// <param name="arguments">
-        /// One or more Expressions to pass to the given sibling or base Type
+        /// Zero or more Expressions to pass to the given sibling or base Type
         /// <paramref name="targetConstructorExpression"/>.
         /// </param>
         void SetConstructorCall(
