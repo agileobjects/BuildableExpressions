@@ -1,5 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Api
 {
+    using System;
     using System.Linq.Expressions;
 
     /// <summary>
@@ -8,6 +9,15 @@
     /// </summary>
     public interface IConstructorExpressionConfigurator : IMemberExpressionConfigurator
     {
+        /// <summary>
+        /// Mark the <see cref="ConstructorExpression"/> as static.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the <see cref="ConstructorExpression"/> has already had parameters added, or
+        /// had a non-private visibility set.
+        /// </exception>
+        void SetStatic();
+
         /// <summary>
         /// Adds the given <paramref name="parameters"/> to the <see cref="ConstructorExpression"/>.
         /// </summary>

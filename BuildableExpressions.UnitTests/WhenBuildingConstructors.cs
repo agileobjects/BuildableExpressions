@@ -77,6 +77,41 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldBuildASimpleStaticClassConstructor()
+        {
+            var writeLineLambda = CreateLambda(() => Console.WriteLine("Static Constructing!"));
+
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddConstructor(ctor =>
+                        {
+                            ctor.SetStatic();
+                            ctor.SetBody(writeLineLambda);
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string EXPECTED = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        static GeneratedExpressionClass()
+        {
+            Console.WriteLine(""Static Constructing!"");
+        }
+    }
+}";
+            translated.ShouldBe(EXPECTED.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAPropertyAssignmentStructConstructor()
         {
             var translated = BuildableExpression
@@ -357,6 +392,8 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildAChainedBaseDesignTimeClassConstructorCall()
         {
+            var allMembers = typeof(BaseType<>).GetNonPublicStaticMembers();
+
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
@@ -477,6 +514,11 @@ namespace GeneratedExpressionCode
             protected BaseType(T value)
             {
                 Value = value;
+            }
+
+            static BaseType()
+            {
+                Console.WriteLine("Static!");
             }
 
             public T Value { get; }

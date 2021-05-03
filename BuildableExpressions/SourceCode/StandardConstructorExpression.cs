@@ -59,6 +59,11 @@
 
         #region IClassConstructorExpressionConfigurator Members
 
+        void IConstructorExpressionConfigurator.SetStatic()
+        {
+            SetStatic();
+        }
+
         void IConstructorExpressionConfigurator.AddParameters(
             params ParameterExpression[] parameters)
         {
