@@ -428,9 +428,9 @@
 
         internal void Finalise()
         {
-            if (SourceCode.IsComplete && _defaultCtorExpression != null)
+            if (SourceCode.IsComplete)
             {
-                RemoveDefaultConstructor();
+                RemoveDefaultConstructorIfPresent();
             }
 
             if (_blockMethodExpressions != null)

@@ -24,6 +24,11 @@
             configuration.Invoke(this);
             Validate();
 
+            if (!IsAbstract)
+            {
+                return;
+            }
+
             var parameterlessCtorExpression = ConstructorExpressionsAccessor?
                 .FirstOrDefault(ctor => ctor.ParametersAccessor == null);
 

@@ -1,5 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions
 {
+    using System;
     using SourceCode;
     using SourceCode.Operators;
 
@@ -8,6 +9,18 @@
     /// </summary>
     public static partial class BuildableExpression
     {
+        /// <summary>
+        /// Create a <see cref="TypeOfOperatorExpression"/> that represents use of the typeof
+        /// operator on the given <paramref name="type"/>.
+        /// </summary>
+        /// <param name="type">The Type to which the typeof operator is being applied.</param>
+        /// <returns>
+        /// A <see cref="TypeOfOperatorExpression"/> representing use of the typeof operator on
+        /// the given <paramref name="type"/>
+        /// </returns>
+        public static TypeOfOperatorExpression TypeOf(Type type)
+            => TypeOf(TypeExpressionFactory.Create(type));
+
         /// <summary>
         /// Create a <see cref="TypeOfOperatorExpression"/> that represents use of the typeof
         /// operator on the given <paramref name="typeExpression"/>.

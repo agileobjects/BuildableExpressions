@@ -1129,11 +1129,12 @@
         /// <typeparam name="TParameter">The type of the ParameterExpression to add.</typeparam>
         /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
         /// <param name="name">The name of the ParameterExpression to add.</param>
-        public static void AddParameter<TParameter>(
+        /// <returns>The added ParameterExpression.</returns>
+        public static ParameterExpression AddParameter<TParameter>(
             this IMethodExpressionConfigurator methodConfig,
             string name)
         {
-            methodConfig.AddParameter(typeof(TParameter), name);
+            return methodConfig.AddParameter(typeof(TParameter), name);
         }
 
         /// <summary>
@@ -1143,12 +1144,15 @@
         /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
         /// <param name="type">The type of the ParameterExpression to add.</param>
         /// <param name="name">The name of the ParameterExpression to add.</param>
-        public static void AddParameter(
+        /// <returns>The added ParameterExpression.</returns>
+        public static ParameterExpression AddParameter(
             this IMethodExpressionConfigurator methodConfig,
             Type type,
             string name)
         {
-            methodConfig.AddParameter(Expression.Parameter(type, name));
+            var parameter = Expression.Parameter(type, name);
+            methodConfig.AddParameter(parameter);
+            return parameter;
         }
 
         /// <summary>

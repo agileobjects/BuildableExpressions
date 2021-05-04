@@ -80,8 +80,13 @@
         protected void AddDefaultConstructor()
             => _defaultCtorExpression = AddConstructor(ctor => ctor.SetBody(Empty()));
 
-        private void RemoveDefaultConstructor()
+        private void RemoveDefaultConstructorIfPresent()
         {
+            if (_defaultCtorExpression == null)
+            {
+                return;
+            }
+
             _ctorExpressions.Remove(_defaultCtorExpression);
             _readOnlyCtorExpressions = null;
 
@@ -107,9 +112,9 @@
             _ctorExpressions.Add(ctor);
             _readOnlyCtorExpressions = null;
 
-            if (ctor.ParametersAccessor == null && _defaultCtorExpression != null)
+            if (ctor.ParametersAccessor == null)
             {
-                RemoveDefaultConstructor();
+                RemoveDefaultConstructorIfPresent();
             }
 
             return AddMember(ctor);
