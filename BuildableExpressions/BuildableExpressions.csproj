@@ -12,7 +12,7 @@
 
     <PackageId>AgileObjects.BuildableExpressions</PackageId>
     <Title>AgileObjects.BuildableExpressions</Title>
-    <Description>Targets .NET 4.6.1+ and .NET Standard 1.5+</Description>
+    <Description>A .NET 4.6.1+ and .NET Standard 1.5+ library which generates .NET Types from Expression Trees at runtime, and MSBuild Task which generates C# class files from Expression Trees at build time.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>Expression Trees</PackageTags>
     <PackageProjectUrl>https://github.com/AgileObjects/BuildableExpressions</PackageProjectUrl>
@@ -34,15 +34,6 @@
     <Content Include="MsBuild\*.targets" PackagePath="build\" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <PackageReference Include="System.CodeDom" Version="5.0.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
-    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-  </ItemGroup>
-
   <ItemGroup>
     <Content Remove="ExpressionBuilder.cs" />
     <EmbeddedResource Include="ExpressionBuilder.cs" />
@@ -58,6 +49,16 @@
     <Compile Update="BuildableExpression.*.cs">
       <DependentUpon>BuildableExpression.cs</DependentUpon>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <PackageReference Include="EnvDTE" Version="16.9.31023.347" />
+    <PackageReference Include="System.CodeDom" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>

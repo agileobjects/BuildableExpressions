@@ -22,7 +22,7 @@
             // to be compiled to one or more source code files:
             var sourceCode = BuildableExpression.SourceCode(sc =>
             {
-                sc.AddClass(nameof(ExpressionBuilder) + "OutputClass", cls =>
+                sc.AddClass(typeof(ExpressionBuilder).Name + "OutputClass", cls =>
                 {
                     var doNothing = Expression.Empty();
 

@@ -21,7 +21,7 @@ namespace BuildXpr
         private readonly InputFilesFinder _inputFilesFinder;
         private readonly ICSharpCompiler _compiler;
         private readonly OutputWriter _outputWriter;
-        private readonly IProjectManager _projectManager;
+        private readonly IProjectFactory _projectFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BuildExpressionsTask"/> class.
@@ -34,7 +34,7 @@ namespace BuildXpr
                     MsBuildTaskLogger.Instance),
                 CSharpCompiler.Instance,
                 new OutputWriter(BclFileManager.Instance),
-                new ProjectManager(BclFileManager.Instance))
+                new ProjectFactory(BclFileManager.Instance))
         {
         }
 
@@ -43,24 +43,24 @@ namespace BuildXpr
             InputFilesFinder inputFilesFinder,
             ICSharpCompiler compiler,
             OutputWriter outputWriter,
-            IProjectManager projectManager)
+            IProjectFactory projectFactory)
         {
             _logger = logger.WithTask(this);
             _inputFilesFinder = inputFilesFinder;
             _compiler = compiler;
             _outputWriter = outputWriter;
-            _projectManager = projectManager;
+            _projectFactory = projectFactory;
         }
 
         /// <summary>
-        /// Gets or sets the full path of the project providing the <see cref="SourceCodeExpression"/>
-        /// to build.
+        /// Gets or sets the full path of the project providing the 
+        /// <see cref="SourceCodeExpression"/>(s) to build.
         /// </summary>
         public string ProjectPath { get; set; }
 
         /// <summary>
-        /// Gets or sets the root path of the project providing the <see cref="SourceCodeExpression"/>
-        /// to build.
+        /// Gets or sets the root namespace of the project providing the 
+        /// <see cref="SourceCodeExpression"/>(s) to build.
         /// </summary>
         public string RootNamespace { get; set; }
 
@@ -79,13 +79,14 @@ namespace BuildXpr
         {
             try
             {
-                _inputFilesFinder.Config = _outputWriter.Config = new Config
+                var config = _inputFilesFinder.Config = _outputWriter.Config = new Config
                 {
+                    ProjectPath = ProjectPath,
                     ContentRoot = Path.GetDirectoryName(ProjectPath),
                     RootNamespace = RootNamespace
                 };
 
-                _projectManager.Init(ProjectPath);
+                var project = _projectFactory.GetProject(config);
 
                 var inputFiles = _inputFilesFinder.GetInputFiles();
 
@@ -108,7 +109,7 @@ namespace BuildXpr
 
                 writtenFiles.Insert(0, Path.GetFileName(inputFiles.First().FilePath));
 
-                _projectManager.AddIfMissing(writtenFiles);
+                project.Add(writtenFiles);
 
                 _logger.Info("Expression compilation output updated");
                 return true;

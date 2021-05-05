@@ -10,7 +10,7 @@
         public IEnumerable<string> FindFiles(string path, string pattern)
             => Directory.EnumerateFiles(path, pattern);
 
-        public bool Exists(string filePath) => new FileInfo(filePath).Exists;
+        public Stream OpenRead(string filePath) => File.OpenRead(filePath);
 
         public string Read(string filePath) => File.ReadAllText(filePath);
 

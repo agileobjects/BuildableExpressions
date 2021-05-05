@@ -1,12 +1,13 @@
 ﻿namespace AgileObjects.BuildableExpressions.InputOutput
 {
     using System.Collections.Generic;
+    using System.IO;
 
     internal interface IFileManager
     {
         IEnumerable<string> FindFiles(string path, string pattern);
 
-        bool Exists(string filePath);
+        Stream OpenRead(string filePath);
 
         string Read(string filePath);
 
