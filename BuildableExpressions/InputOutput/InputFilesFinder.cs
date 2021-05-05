@@ -30,10 +30,12 @@
             _logger = logger;
         }
 
-        public ICollection<InputFile> GetInputFiles(Config config)
+        public Config Config { get; set; }
+
+        public ICollection<InputFile> GetInputFiles()
         {
             var inputFiles = _fileManager
-                .FindFiles(config.ContentRoot, "*.cs")
+                .FindFiles(Config.ContentRoot, "*.cs")
                 .Where(cSharpFilePath => !_binOrObjPathMatcher.IsMatch(cSharpFilePath))
                 .Select(cSharpFilePath => new InputFile
                 {
@@ -54,13 +56,13 @@
 
             var inputFileContent = GetDefaultInputFile();
 
-            if (!string.IsNullOrEmpty(config.RootNamespace))
+            if (!string.IsNullOrEmpty(Config.RootNamespace))
             {
                 inputFileContent = inputFileContent
-                    .Replace(DefaultInputFileNamespace, config.RootNamespace);
+                    .Replace(DefaultInputFileNamespace, Config.RootNamespace);
             }
 
-            var inputFilePath = Combine(config.ContentRoot, DefaultInputFileName);
+            var inputFilePath = Combine(Config.ContentRoot, DefaultInputFileName);
 
             _fileManager.Write(inputFilePath, inputFileContent);
 

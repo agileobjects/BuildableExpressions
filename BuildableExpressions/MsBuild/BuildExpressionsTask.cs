@@ -79,7 +79,7 @@ namespace BuildXpr
         {
             try
             {
-                var config = new Config
+                _inputFilesFinder.Config = _outputWriter.Config = new Config
                 {
                     ContentRoot = Path.GetDirectoryName(ProjectPath),
                     RootNamespace = RootNamespace
@@ -87,7 +87,7 @@ namespace BuildXpr
 
                 _projectManager.Init(ProjectPath);
 
-                var inputFiles = _inputFilesFinder.GetInputFiles(config);
+                var inputFiles = _inputFilesFinder.GetInputFiles();
 
                 _logger.Info("Compiling Expression files...");
 
@@ -104,7 +104,7 @@ namespace BuildXpr
                 _logger.Info("Expression compilation succeeded");
 
                 var sourceCodeExpressions = compilationResult.ToSourceCodeExpressions();
-                var writtenFiles = _outputWriter.Write(sourceCodeExpressions, config);
+                var writtenFiles = _outputWriter.Write(sourceCodeExpressions);
 
                 writtenFiles.Insert(0, Path.GetFileName(inputFiles.First().FilePath));
 

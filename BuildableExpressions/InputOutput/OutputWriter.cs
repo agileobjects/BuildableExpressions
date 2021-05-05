@@ -16,18 +16,18 @@
             _fileManager = fileManager;
         }
 
-        public List<string> Write(
-            IEnumerable<SourceCodeExpression> sourceCodeExpressions,
-            Config config)
+        public Config Config { get; set; }
+
+        public List<string> Write(IEnumerable<SourceCodeExpression> sourceCodeExpressions)
         {
-            var rootNamespace = config.RootNamespace;
+            var rootNamespace = Config.RootNamespace;
             var newFilePaths = new List<string>();
 
             foreach (var sourceCodeExpression in sourceCodeExpressions)
             {
                 var @namespace = sourceCodeExpression.Namespace;
 
-                var outputDirectory = config.ContentRoot;
+                var outputDirectory = Config.ContentRoot;
                 string relativeFilePath;
 
                 if (@namespace != rootNamespace &&
