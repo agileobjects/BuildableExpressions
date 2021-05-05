@@ -1,8 +1,10 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests.InputOutput
 {
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using BuildableExpressions.InputOutput;
+    using BuildableExpressions.SourceCode;
     using Configuration;
     using Moq;
     using Xunit;
@@ -18,7 +20,15 @@
         public void ShouldWriteToRootDirectory()
         {
             var fileManagerMock = new Mock<IFileManager>();
-            var outputWriter = new OutputWriter(fileManagerMock.Object);
+
+            var outputWriter = new OutputWriter(fileManagerMock.Object)
+            {
+                Config = new Config
+                {
+                    ContentRoot = _projectDirectory,
+                    RootNamespace = _rootNamespace
+                }
+            };
 
             var sourceCode = BuildableExpression
                 .SourceCode(sc =>
@@ -33,11 +43,7 @@
 
             var fileName = sourceCode.TypeExpressions.First().Name + ".cs";
 
-            outputWriter.Write(new[] { sourceCode }, new Config
-            {
-                ContentRoot = _projectDirectory,
-                RootNamespace = _rootNamespace
-            });
+            outputWriter.Write(sourceCode);
 
             fileManagerMock.Verify(fm => fm.EnsureDirectory(_projectDirectory), Never);
 
@@ -50,7 +56,15 @@
         public void ShouldWriteToNamespaceDirectories()
         {
             var fileManagerMock = new Mock<IFileManager>();
-            var outputWriter = new OutputWriter(fileManagerMock.Object);
+
+            var outputWriter = new OutputWriter(fileManagerMock.Object)
+            {
+                Config = new Config
+                {
+                    ContentRoot = _projectDirectory,
+                    RootNamespace = _rootNamespace
+                }
+            };
 
             var sourceCode = BuildableExpression.SourceCode(sc =>
             {
@@ -64,11 +78,7 @@
 
             var fileName = sourceCode.TypeExpressions.First().Name + ".cs";
 
-            outputWriter.Write(new[] { sourceCode }, new Config
-            {
-                ContentRoot = _projectDirectory,
-                RootNamespace = _rootNamespace
-            });
+            outputWriter.Write(new List<SourceCodeExpression> { sourceCode });
 
             var expectedOutputDirectory =
                 Path.Combine(_projectDirectory, "GeneratedCode");

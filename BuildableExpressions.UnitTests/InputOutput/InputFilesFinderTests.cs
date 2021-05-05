@@ -25,15 +25,16 @@
                 .Setup(fm => fm.FindFiles(_contentRoot, "*.cs"))
                 .Returns(Array.Empty<string>());
 
-            var finder = new InputFilesFinder(
-                fileManagerMock.Object,
-                Mock.Of<ILogger>());
-
-            var inputFiles = finder.GetInputFiles(new Config
+            var finder = new InputFilesFinder(fileManagerMock.Object, Mock.Of<ILogger>())
             {
-                ContentRoot = _contentRoot,
-                RootNamespace = _rootNamespace
-            });
+                Config = new Config
+                {
+                    ContentRoot = _contentRoot,
+                    RootNamespace = _rootNamespace
+                }
+            };
+
+            var inputFiles = finder.GetInputFiles();
 
             var inputFile = inputFiles.ShouldHaveSingleItem();
             inputFile.FilePath.ShouldBe(Path.Combine(_contentRoot, DefaultInputFileName));
@@ -74,15 +75,16 @@ namespace {DefaultInputFileNamespace}
     {{
     }}
 }}");
-            var finder = new InputFilesFinder(
-                fileManagerMock.Object,
-                Mock.Of<ILogger>());
-
-            var inputFiles = finder.GetInputFiles(new Config
+            var finder = new InputFilesFinder(fileManagerMock.Object, Mock.Of<ILogger>())
             {
-                ContentRoot = _contentRoot,
-                RootNamespace = _rootNamespace
-            });
+                Config = new Config
+                {
+                    ContentRoot = _contentRoot,
+                    RootNamespace = _rootNamespace
+                }
+            };
+
+            var inputFiles = finder.GetInputFiles();
 
             inputFiles.Count.ShouldBe(2);
 
@@ -111,15 +113,16 @@ namespace {DefaultInputFileNamespace}
     {{
     }}
 }}");
-            var finder = new InputFilesFinder(
-                fileManagerMock.Object,
-                Mock.Of<ILogger>());
-
-            var inputFiles = finder.GetInputFiles(new Config
+            var finder = new InputFilesFinder(fileManagerMock.Object, Mock.Of<ILogger>())
             {
-                ContentRoot = _contentRoot,
-                RootNamespace = _rootNamespace
-            });
+                Config = new Config
+                {
+                    ContentRoot = _contentRoot,
+                    RootNamespace = _rootNamespace
+                }
+            };
+
+            var inputFiles = finder.GetInputFiles();
 
             inputFiles.ShouldHaveSingleItem().FilePath.ShouldBe(filePath3);
 
@@ -155,15 +158,16 @@ namespace MyOtherClassNamespace
     {
     }
 }");
-            var finder = new InputFilesFinder(
-                fileManagerMock.Object,
-                Mock.Of<ILogger>());
-
-            var inputFiles = finder.GetInputFiles(new Config
+            var finder = new InputFilesFinder(fileManagerMock.Object, Mock.Of<ILogger>())
             {
-                ContentRoot = _contentRoot,
-                RootNamespace = _rootNamespace
-            });
+                Config = new Config
+                {
+                    ContentRoot = _contentRoot,
+                    RootNamespace = _rootNamespace
+                }
+            };
+
+            var inputFiles = finder.GetInputFiles();
 
             inputFiles.ShouldHaveSingleItem().FilePath.ShouldBe(filePath1);
 

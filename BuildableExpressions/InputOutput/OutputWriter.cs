@@ -18,6 +18,9 @@
 
         public Config Config { get; set; }
 
+        public List<string> Write(params SourceCodeExpression[] sourceCodeExpressions)
+            => Write(sourceCodeExpressions.AsEnumerable());
+
         public List<string> Write(IEnumerable<SourceCodeExpression> sourceCodeExpressions)
         {
             var rootNamespace = Config.RootNamespace;
