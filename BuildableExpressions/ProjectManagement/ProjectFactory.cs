@@ -36,6 +36,11 @@
                     continue;
                 }
 
+                if (string.IsNullOrWhiteSpace(config.RootNamespace))
+                {
+                    TryPopulateRootNamespace(config, fileReader);
+                }
+
 #if NETFRAMEWORK
                 if (fileLine.IndexOf(" Sdk=\"", OrdinalIgnoreCase) != -1)
                 {
@@ -46,6 +51,26 @@
 #else
                 return new SdkProject();
 #endif
+            }
+        }
+
+        private static void TryPopulateRootNamespace(Config config, TextReader fileReader)
+        {
+            string fileLine;
+
+            while ((fileLine = fileReader.ReadLine()?.TrimStart()) != null)
+            {
+                if (!fileLine.StartsWith("<RootNamespace>", OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                var @namespace = fileLine
+                    .Substring("<RootNamespace>".Length)
+                    .Split('<')[0];
+
+                config.RootNamespace = @namespace;
+                return;
             }
         }
     }

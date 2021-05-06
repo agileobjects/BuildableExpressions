@@ -14,6 +14,7 @@
     public class InputFilesFinderTests
     {
         private const string _contentRoot = @"C:\Data\VisualStudio\BuildableExpressions";
+        private const string _projectFilePath = _contentRoot + @"\MyProject.csproj";
         private const string _rootNamespace = "AgileObjects.BuildableExpressions";
 
         [Fact]
@@ -27,9 +28,8 @@
 
             var finder = new InputFilesFinder(fileManagerMock.Object, Mock.Of<ILogger>())
             {
-                Config = new Config
+                Config = new Config(_projectFilePath)
                 {
-                    ContentRoot = _contentRoot,
                     RootNamespace = _rootNamespace
                 }
             };
@@ -77,9 +77,8 @@ namespace {DefaultInputFileNamespace}
 }}");
             var finder = new InputFilesFinder(fileManagerMock.Object, Mock.Of<ILogger>())
             {
-                Config = new Config
+                Config = new Config(_projectFilePath)
                 {
-                    ContentRoot = _contentRoot,
                     RootNamespace = _rootNamespace
                 }
             };
@@ -115,9 +114,8 @@ namespace {DefaultInputFileNamespace}
 }}");
             var finder = new InputFilesFinder(fileManagerMock.Object, Mock.Of<ILogger>())
             {
-                Config = new Config
+                Config = new Config(_projectFilePath)
                 {
-                    ContentRoot = _contentRoot,
                     RootNamespace = _rootNamespace
                 }
             };
@@ -160,9 +158,8 @@ namespace MyOtherClassNamespace
 }");
             var finder = new InputFilesFinder(fileManagerMock.Object, Mock.Of<ILogger>())
             {
-                Config = new Config
+                Config = new Config(_projectFilePath)
                 {
-                    ContentRoot = _contentRoot,
                     RootNamespace = _rootNamespace
                 }
             };

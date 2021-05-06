@@ -1,10 +1,18 @@
 ﻿namespace AgileObjects.BuildableExpressions.Configuration
 {
+    using System.IO;
+
     internal class Config
     {
-        public string ProjectPath { get; set; }
-        
-        public string ContentRoot { get; set; }
+        public Config(string projectPath)
+        {
+            ProjectPath = projectPath;
+            ContentRoot = Path.GetDirectoryName(projectPath);
+        }
+
+        public string ProjectPath { get; }
+
+        public string ContentRoot { get; }
 
         public string RootNamespace { get; set; }
     }

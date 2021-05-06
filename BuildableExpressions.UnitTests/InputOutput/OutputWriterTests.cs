@@ -14,6 +14,7 @@
     public class OutputWriterTests
     {
         private const string _projectDirectory = @"C:\Data\VisualStudio\BuildableExpressions";
+        private const string _projectFilePath = _projectDirectory + @"\MyProject.csproj";
         private const string _rootNamespace = "AgileObjects.BuildableExpressions";
 
         [Fact]
@@ -23,9 +24,8 @@
 
             var outputWriter = new OutputWriter(fileManagerMock.Object)
             {
-                Config = new Config
+                Config = new Config(_projectFilePath)
                 {
-                    ContentRoot = _projectDirectory,
                     RootNamespace = _rootNamespace
                 }
             };
@@ -59,9 +59,8 @@
 
             var outputWriter = new OutputWriter(fileManagerMock.Object)
             {
-                Config = new Config
+                Config = new Config(_projectFilePath)
                 {
-                    ContentRoot = _projectDirectory,
                     RootNamespace = _rootNamespace
                 }
             };
