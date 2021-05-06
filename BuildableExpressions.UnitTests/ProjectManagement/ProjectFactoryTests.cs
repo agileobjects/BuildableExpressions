@@ -1,15 +1,13 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests.ProjectManagement
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
-    using System.Xml.Linq;
     using BuildableExpressions.InputOutput;
     using BuildableExpressions.ProjectManagement;
     using Common;
     using Configuration;
     using Moq;
+    using System;
+    using System.IO;
+    using System.Text;
     using Xunit;
 
     public class ProjectFactoryTests
@@ -80,6 +78,32 @@
             project.ShouldBeOfType<SdkProject>();
         }
 
+        [Fact]
+        public void ShouldRetrieveAnSdkProjectRootNamespace()
+        {
+            #region File Contents
+            const string fileContents = @"
+<Project Sdk=""Microsoft.NET.Sdk"">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <RootNamespace>AgileObjects.BuildableExpressions.UnitTests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include=""AgileObjects.ReadableExpressions"" Version=""3.0.0-preview1"" />
+  </ItemGroup>
+</Project>";
+            #endregion
+
+            var fileManager = CreateFileManager(fileContents);
+            var factory = new ProjectFactory(fileManager);
+            var config = new Config(_projectFilePath);
+
+            factory.GetProject(config);
+
+            config.RootNamespace.ShouldBe("AgileObjects.BuildableExpressions.UnitTests");
+        }
+
 #if NETFRAMEWORK
         [Fact]
         public void ShouldHandleANetFrameworkProject()
@@ -113,35 +137,7 @@
 
             project.ShouldBeOfType<NetFrameworkProject>();
         }
-#endif
 
-        [Fact]
-        public void ShouldRetrieveAnSdkProjectRootNamespace()
-        {
-            #region File Contents
-            const string fileContents = @"
-<Project Sdk=""Microsoft.NET.Sdk"">
-  <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
-    <RootNamespace>AgileObjects.BuildableExpressions.UnitTests</RootNamespace>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include=""AgileObjects.ReadableExpressions"" Version=""3.0.0-preview1"" />
-  </ItemGroup>
-</Project>";
-            #endregion
-
-            var fileManager = CreateFileManager(fileContents);
-            var factory = new ProjectFactory(fileManager);
-            var config = new Config(_projectFilePath);
-
-            factory.GetProject(config);
-
-            config.RootNamespace.ShouldBe("AgileObjects.BuildableExpressions.UnitTests");
-        }
-
-#if NETFRAMEWORK
         [Fact]
         public void ShouldRetrieveANetFrameworkProjectRootNamespace()
         {
