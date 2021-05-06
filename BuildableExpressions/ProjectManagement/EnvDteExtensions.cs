@@ -8,12 +8,7 @@ namespace AgileObjects.BuildableExpressions.ProjectManagement
     internal static class EnvDteExtensions
     {
         public static IEnumerable<Project> EnumerateProjects(this Solution solution)
-        {
-            foreach (var project in Enumerate(solution.Projects))
-            {
-                yield return project;
-            }
-        }
+            => Enumerate(solution.Projects);
 
         private static IEnumerable<Project> Enumerate(IEnumerable items)
         {
