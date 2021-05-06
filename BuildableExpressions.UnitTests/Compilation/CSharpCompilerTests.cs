@@ -25,7 +25,7 @@ namespace MyNamespace
         }
     }
 }";
-            var result = CSharpCompiler.Instance.Compile(SOURCE);
+            var result = CSharpCompiler.Compile(SOURCE);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -76,7 +76,7 @@ namespace MyNamespace
         }
     }
 }";
-            var result = CSharpCompiler.Instance
+            var result = CSharpCompiler
                 .Compile(new[] { SOURCE1, SOURCE2, SOURCE3 }.AsEnumerable());
 
             var compiledAssembly = result
@@ -106,7 +106,7 @@ namespace MyNamespace
         }
     }
 }";
-            var result = CSharpCompiler.Instance.Compile(SOURCE);
+            var result = CSharpCompiler.Compile(SOURCE);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -151,14 +151,14 @@ namespace MyNamespace
                 {
                     var doNothing = Expression.Lambda<Action>(Expression.Empty());
                     
-                    cls.AddMethod(""DoNothing"", doNothing, m => { });
+                    cls.AddMethod(nameof(Build), doNothing, m => { });
                 });
             });
         }
     }
 }
     ";
-            var result = CSharpCompiler.Instance.Compile(SOURCE);
+            var result = CSharpCompiler.Compile(SOURCE);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -178,7 +178,7 @@ namespace MyNamespace
 
             var methodExpression = classExpression.MethodExpressions.ShouldHaveSingleItem();
             methodExpression.ReturnType.ShouldBe(typeof(void));
-            methodExpression.Name.ShouldBe("DoNothing");
+            methodExpression.Name.ShouldBe("Build");
             methodExpression.Parameters.ShouldBeEmpty();
         }
     }

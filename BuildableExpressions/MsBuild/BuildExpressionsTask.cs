@@ -8,6 +8,7 @@ namespace BuildXpr
     using AgileObjects.BuildableExpressions.ProjectManagement;
     using AgileObjects.BuildableExpressions.SourceCode;
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using MsBuildTask = Microsoft.Build.Utilities.Task;
@@ -19,7 +20,6 @@ namespace BuildXpr
     {
         private readonly ILogger _logger;
         private readonly InputFilesFinder _inputFilesFinder;
-        private readonly ICSharpCompiler _compiler;
         private readonly OutputWriter _outputWriter;
         private readonly IProjectFactory _projectFactory;
 
@@ -32,7 +32,6 @@ namespace BuildXpr
                 new InputFilesFinder(
                     BclFileManager.Instance,
                     MsBuildTaskLogger.Instance),
-                CSharpCompiler.Instance,
                 new OutputWriter(BclFileManager.Instance),
                 new ProjectFactory(BclFileManager.Instance))
         {
@@ -41,13 +40,11 @@ namespace BuildXpr
         internal BuildExpressionsTask(
             ILogger logger,
             InputFilesFinder inputFilesFinder,
-            ICSharpCompiler compiler,
             OutputWriter outputWriter,
             IProjectFactory projectFactory)
         {
             _logger = logger.WithTask(this);
             _inputFilesFinder = inputFilesFinder;
-            _compiler = compiler;
             _outputWriter = outputWriter;
             _projectFactory = projectFactory;
         }
@@ -90,17 +87,14 @@ namespace BuildXpr
 
                 _logger.Info("Compiling Expression files...");
 
-                var compilationFailed = _compiler.CompilationFailed(
+                var compilationFailed = CompilationFailed(
                     inputFiles.Select(f => f.Contents),
-                    _logger,
                     out var compilationResult);
 
                 if (compilationFailed)
                 {
                     return false;
                 }
-
-                _logger.Info("Expression compilation succeeded");
 
                 var sourceCodeExpressions = compilationResult.ToSourceCodeExpressions();
                 var writtenFiles = _outputWriter.Write(sourceCodeExpressions);
@@ -117,6 +111,28 @@ namespace BuildXpr
                 _logger.Error(ex);
                 return false;
             }
+        }
+
+        internal bool CompilationFailed(
+            IEnumerable<string> expressionBuilderSources,
+            out CompilationResult compilationResult)
+        {
+            compilationResult = CSharpCompiler.Compile(expressionBuilderSources);
+
+            if (!compilationResult.Failed)
+            {
+                _logger.Info("Expression compilation succeeded");
+                return false;
+            }
+
+            _logger.Error("Expression compilation failed:");
+
+            foreach (var error in compilationResult.Errors)
+            {
+                _logger.Error(error);
+            }
+
+            return true;
         }
     }
 }
