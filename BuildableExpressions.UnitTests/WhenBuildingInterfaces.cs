@@ -18,14 +18,14 @@
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public interface IMarker
     {
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -44,7 +44,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 
 namespace GeneratedExpressionCode
@@ -57,7 +57,7 @@ namespace GeneratedExpressionCode
         );
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -73,7 +73,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 
 namespace GeneratedExpressionCode
@@ -82,7 +82,7 @@ namespace GeneratedExpressionCode
     {
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -98,7 +98,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 
 namespace GeneratedExpressionCode
@@ -107,7 +107,7 @@ namespace GeneratedExpressionCode
     {
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -128,7 +128,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System.Collections.Generic;
 
 namespace GeneratedExpressionCode
@@ -137,7 +137,7 @@ namespace GeneratedExpressionCode
     {
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
     }
 }

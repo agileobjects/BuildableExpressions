@@ -24,7 +24,7 @@
                         .AddMethod("AddInts", addIntsLambda)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
@@ -40,7 +40,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace GeneratedExpressionCode
 
             var translated = sourceCode.ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;
 
 namespace GeneratedExpressionCode
@@ -78,7 +78,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         #region Helper Members

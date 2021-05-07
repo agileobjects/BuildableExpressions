@@ -37,7 +37,7 @@
                         .AddMethod("GetYepOrNope", yepOrNopeBlock)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 
 namespace GeneratedExpressionCode
@@ -62,7 +62,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -91,7 +91,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("GetInts", conditionalLambda)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
@@ -128,7 +128,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -164,7 +164,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("GetYepOrNope", yepOrNopeLambda)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
@@ -199,7 +199,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -232,7 +232,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("GetInt", assignmentLambda)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
@@ -268,7 +268,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -310,7 +310,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;
 
 namespace GeneratedExpressionCode
@@ -336,7 +336,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -372,7 +372,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 
 namespace GeneratedExpressionCode
@@ -397,7 +397,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -435,7 +435,7 @@ namespace GeneratedExpressionCode
 
             transientClassType.ShouldNotBeNull();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 
 namespace GeneratedExpressionCode
@@ -460,7 +460,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -506,7 +506,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 
 namespace GeneratedExpressionCode
@@ -536,7 +536,7 @@ namespace GeneratedExpressionCode
         private static readonly TestClass _testClass = new TestClass();
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         #region Helper Members

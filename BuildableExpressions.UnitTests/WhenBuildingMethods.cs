@@ -21,7 +21,7 @@
                         .AddMethod(doNothing)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
@@ -31,7 +31,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -45,7 +45,7 @@ namespace GeneratedExpressionCode
                         .AddMethod(doNothing)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
@@ -55,7 +55,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("Get1000", returnOneThousand)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
@@ -80,7 +80,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -94,7 +94,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("GetLong", returnGivenLong)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
@@ -108,7 +108,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -122,7 +122,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("Subtract", subtractShortFromInt)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public struct GeneratedExpressionStruct
@@ -137,7 +137,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -158,7 +158,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
@@ -169,7 +169,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -191,7 +191,7 @@ namespace GeneratedExpressionCode
 
             var translated = sourceCode.ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 
 namespace GeneratedExpressionCode
@@ -204,7 +204,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -244,7 +244,7 @@ namespace GeneratedExpressionCode
 
             var translated = sourceCode.ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
@@ -255,7 +255,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -279,7 +279,7 @@ namespace GeneratedExpressionCode
 
             var translated = sourceCode.ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public struct GeneratedExpressionStruct
@@ -291,7 +291,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -316,7 +316,7 @@ namespace GeneratedExpressionCode
 
             var translated = sourceCode.ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
@@ -328,7 +328,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -353,7 +353,7 @@ namespace GeneratedExpressionCode
 
             var translated = sourceCode.ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;
 
 namespace GeneratedExpressionCode
@@ -367,7 +367,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -394,7 +394,7 @@ namespace GeneratedExpressionCode
 
             var translated = sourceCode.ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;
 
 namespace GeneratedExpressionCode
@@ -408,7 +408,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -430,7 +430,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
@@ -441,7 +441,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -462,7 +462,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public abstract class BaseClass
@@ -470,7 +470,7 @@ namespace GeneratedExpressionCode
         public abstract void AbstractMethod();
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -490,7 +490,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class MyClass
@@ -500,7 +500,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -535,7 +535,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 
 namespace GeneratedExpressionCode
@@ -559,7 +559,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -590,7 +590,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class BaseVirtual
@@ -609,7 +609,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         #region Helper Members

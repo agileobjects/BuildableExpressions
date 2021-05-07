@@ -25,7 +25,7 @@
                         .AddMethod("GetDateTime", getDefaultDate)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 
 namespace GeneratedExpressionCode
@@ -38,7 +38,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -52,7 +52,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("GetStreamType", getDefaultDate)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 using System.IO;
 
@@ -66,7 +66,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -80,7 +80,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("MakeStringBuilder", createStringBuilder)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System.Text;
 
 namespace GeneratedExpressionCode
@@ -93,7 +93,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("GetStreamObject", createStreamArray)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System.IO;
 
 namespace GeneratedExpressionCode
@@ -121,7 +121,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -165,7 +165,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("GetNotNull", comparerCheckLambda)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System.Collections.Generic;
 using System.Text;
 
@@ -179,7 +179,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -203,7 +203,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("GetTypeName", lambda)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System.Text.RegularExpressions;
 using AgileObjects.BuildableExpressions.UnitTests;
 
@@ -219,7 +219,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -244,7 +244,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("GetHash", lambda)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;
 
 namespace GeneratedExpressionCode
@@ -259,7 +259,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -275,7 +275,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("GetNowTicks", getDefaultDate)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 
 namespace GeneratedExpressionCode
@@ -288,7 +288,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -303,7 +303,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("IsMatch", stringBuilderMatchesRegex)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -321,7 +321,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -336,7 +336,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("InvokeFactory", joinListItems)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -354,7 +354,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -369,7 +369,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("GetInts", joinListItems)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -387,7 +387,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -403,7 +403,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("ReadFromConsole", tryCatch)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 using System.IO;
 
@@ -424,7 +424,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -439,7 +439,7 @@ namespace GeneratedExpressionCode
                         .AddMethod("GetContains", stringBuilderContainsOther)))
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System.Text;
 
 namespace GeneratedExpressionCode
@@ -456,7 +456,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         #region Helper Members

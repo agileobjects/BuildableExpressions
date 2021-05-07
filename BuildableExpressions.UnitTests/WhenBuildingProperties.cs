@@ -23,7 +23,7 @@
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
@@ -31,7 +31,7 @@ namespace GeneratedExpressionCode
         public string MyProperty { get; set; }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -50,7 +50,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
@@ -58,7 +58,7 @@ namespace GeneratedExpressionCode
         public int MyProperty { get; private set; }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public struct IntPair
@@ -115,7 +115,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -139,7 +139,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 
 namespace GeneratedExpressionCode
@@ -155,7 +155,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -184,7 +184,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public interface IHasName
@@ -197,7 +197,7 @@ namespace GeneratedExpressionCode
         public string Name { get; private set; }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -254,7 +254,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public interface IHasName
@@ -277,7 +277,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -300,7 +300,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public abstract class BaseClass
@@ -308,7 +308,7 @@ namespace GeneratedExpressionCode
         protected abstract string AbstractProperty { get; }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -329,7 +329,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class MyClass
@@ -337,7 +337,7 @@ namespace GeneratedExpressionCode
         protected internal virtual int VirtualProperty { get; private set; }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -366,7 +366,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public abstract class BaseAbstract
@@ -379,7 +379,7 @@ namespace GeneratedExpressionCode
         public override string OverrideMe { get; set; }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -406,7 +406,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class BaseVirtual
@@ -419,7 +419,7 @@ namespace GeneratedExpressionCode
         public override string OverrideMe { get; set; }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
     }
 }

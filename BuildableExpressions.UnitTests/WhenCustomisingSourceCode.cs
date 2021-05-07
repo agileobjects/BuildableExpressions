@@ -22,7 +22,7 @@
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace AgileObjects.GeneratedStuff
 {
     public class GeneratedExpressionClass
@@ -32,7 +32,7 @@ namespace AgileObjects.GeneratedStuff
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -48,14 +48,14 @@ namespace AgileObjects.GeneratedStuff
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 public class GeneratedExpressionClass
 {
     public void DoAction()
     {
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -71,14 +71,14 @@ public class GeneratedExpressionClass
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 public class GeneratedExpressionClass
 {
     public void DoAction()
     {
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -124,7 +124,7 @@ namespace {typeof(WhenBuildingSourceCode).Namespace}
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace AgileObjects.BuildableExpressions.UnitTests
 {
     public class MyClass
@@ -134,7 +134,7 @@ namespace AgileObjects.BuildableExpressions.UnitTests
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -142,11 +142,11 @@ namespace AgileObjects.BuildableExpressions.UnitTests
         {
             var doNothing = Lambda<Action>(Empty());
 
-            const string CLASS_SUMMARY = @"
+            const string classSummary = @"
 This is my class!
 Isn't it great?";
 
-            const string METHOD_SUMMARY = @"
+            const string methodSummary = @"
 This is my method!
 It's even better.";
 
@@ -155,18 +155,18 @@ It's even better.";
                 {
                     sc.AddClass("MyClass", cls =>
                     {
-                        cls.SetSummary(CLASS_SUMMARY);
+                        cls.SetSummary(classSummary);
 
                         cls.AddMethod("MyMethod", m =>
                         {
-                            m.SetSummary(METHOD_SUMMARY);
+                            m.SetSummary(methodSummary);
                             m.SetDefinition(doNothing);
                         });
                     });
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     /// <summary>
@@ -184,7 +184,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -216,7 +216,7 @@ It's even better.".TrimStart());
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     /// <summary>
@@ -234,7 +234,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -272,7 +272,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 using System;
 
 namespace GeneratedExpressionCode
@@ -304,7 +304,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
 
         [Fact]
@@ -329,7 +329,7 @@ namespace GeneratedExpressionCode
                 })
                 .ToCSharpString();
 
-            const string EXPECTED = @"
+            const string expected = @"
 namespace GeneratedExpressionCode
 {
     public class GeneratedExpressionClass
@@ -345,7 +345,7 @@ namespace GeneratedExpressionCode
         }
     }
 }";
-            translated.ShouldBe(EXPECTED.TrimStart());
+            translated.ShouldBe(expected.TrimStart());
         }
     }
 }

@@ -14,7 +14,7 @@
         [Fact]
         public void ShouldCompileSimpleSourceCode()
         {
-            const string SOURCE = @"
+            const string source = @"
 namespace MyNamespace
 {
     public class MyClass
@@ -25,7 +25,7 @@ namespace MyNamespace
         }
     }
 }";
-            var result = CSharpCompiler.Compile(SOURCE);
+            var result = CSharpCompiler.Compile(source);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -41,7 +41,7 @@ namespace MyNamespace
         [Fact]
         public void ShouldCompileMultipleSimpleSourceCodeFiles()
         {
-            const string SOURCE1 = @"
+            const string source1 = @"
 namespace MyNamespace
 {
     public class MyClass1
@@ -53,7 +53,7 @@ namespace MyNamespace
     }
 }";
 
-            const string SOURCE2 = @"
+            const string source2 = @"
 namespace MyNamespace
 {
     public class MyClass2
@@ -65,7 +65,7 @@ namespace MyNamespace
     }
 }";
 
-            const string SOURCE3 = @"
+            const string source3 = @"
 namespace MyNamespace
 {
     public class MyClass3
@@ -77,7 +77,7 @@ namespace MyNamespace
     }
 }";
             var result = CSharpCompiler
-                .Compile(new[] { SOURCE1, SOURCE2, SOURCE3 }.AsEnumerable());
+                .Compile(new[] { source1, source2, source3 }.AsEnumerable());
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -92,7 +92,7 @@ namespace MyNamespace
         [Fact]
         public void ShouldCompileSourceCodeWithPassedInDependencies()
         {
-            const string SOURCE = @"
+            const string source = @"
 namespace MyNamespace
 {
     using System.Collections.Generic;
@@ -106,7 +106,7 @@ namespace MyNamespace
         }
     }
 }";
-            var result = CSharpCompiler.Compile(SOURCE);
+            var result = CSharpCompiler.Compile(source);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -130,7 +130,7 @@ namespace MyNamespace
         [Fact]
         public void ShouldCompileSourceCodeExpressionSourceCode()
         {
-            const string SOURCE = @"
+            const string source = @"
 namespace MyNamespace
 {
     using System;
@@ -158,7 +158,7 @@ namespace MyNamespace
     }
 }
     ";
-            var result = CSharpCompiler.Compile(SOURCE);
+            var result = CSharpCompiler.Compile(source);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
