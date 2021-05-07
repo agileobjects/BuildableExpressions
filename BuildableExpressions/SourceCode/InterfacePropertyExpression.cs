@@ -28,10 +28,10 @@
         #region IInterfacePropertyExpressionConfigurator Members
 
         void IInterfacePropertyExpressionConfigurator.SetGetter()
-            => SetGetter(g => { });
+            => SetGetter(_ => { });
 
         void IInterfacePropertyExpressionConfigurator.SetSetter()
-            => SetSetter(s => { });
+            => SetSetter(_ => { });
 
         #endregion
     }

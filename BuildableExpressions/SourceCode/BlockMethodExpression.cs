@@ -10,6 +10,8 @@
 
     internal class BlockMethodExpression : MethodExpression
     {
+        private string _name;
+
         public BlockMethodExpression(
             TypeExpression declaringTypeExpression,
             Action<IConcreteTypeMethodExpressionConfigurator> configuration)
@@ -19,7 +21,7 @@
             CallExpression = new BlockMethodCallExpression(this);
         }
 
-        internal override bool HasGeneratedName => true;
+        public override string Name => _name;
 
         internal override bool HasBody => true;
 
@@ -27,7 +29,7 @@
 
         public Expression CallExpression { get; }
 
-        public void Finalise() => SetName(GenerateName());
+        public void Finalise() => _name = GenerateName();
 
         #region Name Generation
 
@@ -71,9 +73,9 @@
                 {
                     if (m.Name == baseName)
                     {
-                        if (m.HasGeneratedName)
+                        if (m is BlockMethodExpression blockMethod)
                         {
-                            m.SetName(m.Name + "1");
+                            blockMethod._name += "1";
                         }
 
                         return new { Suffix = 1 };
@@ -113,5 +115,8 @@
             => null;
 
         #endregion
+
+        internal override void ResetMemberInfo() 
+            => SetMethodInfo(null);
     }
 }

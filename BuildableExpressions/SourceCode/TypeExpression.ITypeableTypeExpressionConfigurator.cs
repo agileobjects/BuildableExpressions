@@ -98,8 +98,8 @@
             ResetTypeIfRequired();
         }
 
-        internal ConstructorExpression AddConstructor(Action<StandardConstructorExpression> configuration)
-            => AddConstructor(new StandardConstructorExpression(this, configuration));
+        internal ConstructorExpression AddConstructor(Action<ConfiguredConstructorExpression> configuration)
+            => AddConstructor(new ConfiguredConstructorExpression(this, configuration));
 
         /// <summary>
         /// Adds the given <paramref name="ctor"/> to this <see cref="TypeExpression"/>.
@@ -166,9 +166,9 @@
 
         internal MethodExpression AddMethod(
             string name,
-            Action<StandardMethodExpression> configuration)
+            Action<ConfiguredMethodExpression> configuration)
         {
-            return AddMethod(new StandardMethodExpression(this, name, configuration));
+            return AddMethod(new ConfiguredMethodExpression(this, name, configuration));
         }
 
         internal void AddMethod(BlockMethodExpression blockMethod)
@@ -203,7 +203,21 @@
         {
             if (_type != null)
             {
-                _rebuildType = true;
+                ResetType();
+            }
+        }
+
+        /// <summary>
+        /// Resets the generated CLR Type and any associated members, as changes have been made to
+        /// this <see cref="TypeExpression"/> which mean a new Type must be generated.
+        /// </summary>
+        protected virtual void ResetType()
+        {
+            _rebuildType = true;
+            
+            foreach (var memberExpression in MemberExpressionsAccessor)
+            {
+                memberExpression.ResetMemberInfo();
             }
         }
     }

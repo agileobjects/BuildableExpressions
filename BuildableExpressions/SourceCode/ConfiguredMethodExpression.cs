@@ -7,17 +7,17 @@
     using Extensions;
     using ReadableExpressions.Translations.Reflection;
 
-    internal class StandardMethodExpression :
+    internal class ConfiguredMethodExpression :
         MethodExpression,
         IClassMethodExpressionConfigurator
     {
         private bool? _isOverride;
         private IType _returnType;
 
-        public StandardMethodExpression(
+        public ConfiguredMethodExpression(
             TypeExpression declaringTypeExpression,
             string name,
-            Action<StandardMethodExpression> configuration)
+            Action<ConfiguredMethodExpression> configuration)
             : base(declaringTypeExpression, name.ThrowIfInvalidName("Method"))
         {
             configuration.Invoke(this);
@@ -30,15 +30,13 @@
             Validate();
         }
 
-        internal override bool HasGeneratedName => false;
-
         public override bool IsOverride
             => _isOverride ??= DetermineIfOverride();
 
         private bool DetermineIfOverride()
         {
             return DeclaringTypeExpression
-                .GetAllVirtualMembersOfType<StandardMethodExpression>()
+                .GetAllVirtualMembersOfType<ConfiguredMethodExpression>()
                 .Any(m => m.IsOverriddenBy(this));
         }
 
@@ -93,5 +91,8 @@
             => DeclaringTypeExpression.MethodExpressionsAccessor;
 
         #endregion
+
+        internal override void ResetMemberInfo() 
+            => SetMethodInfo(null);
     }
 }

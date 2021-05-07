@@ -56,7 +56,7 @@
             IType returnType,
             Action<IMethodExpressionConfigurator> configuration)
         {
-            return AddMethod(new InterfaceMethodExpression(
+            return AddMethod(new ConfiguredInterfaceMethodExpression(
                 this,
                 name,
                 returnType,

@@ -10,15 +10,15 @@
     using ReadableExpressions.Extensions;
     using static MemberVisibility;
 
-    internal class StandardConstructorExpression :
+    internal class ConfiguredConstructorExpression :
         ConstructorExpression,
         IConstructorExpressionConfigurator
     {
         private ConstructorInfo _ctorInfo;
 
-        public StandardConstructorExpression(
+        public ConfiguredConstructorExpression(
             TypeExpression declaringTypeExpression,
-            Action<StandardConstructorExpression> configuration)
+            Action<ConfiguredConstructorExpression> configuration)
             : base(declaringTypeExpression)
         {
             configuration.Invoke(this);
@@ -165,5 +165,7 @@
             => DeclaringTypeExpression.ConstructorExpressionsAccessor;
 
         #endregion
+
+        internal override void ResetMemberInfo() => _ctorInfo = null;
     }
 }

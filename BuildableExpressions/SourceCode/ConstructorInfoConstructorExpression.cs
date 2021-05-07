@@ -21,5 +21,9 @@
         protected override IEnumerable<MethodExpressionBase> SiblingMethodExpressions => null;
 
         #endregion
+
+        internal override void ResetMemberInfo()
+        {
+        }
     }
 }

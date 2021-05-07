@@ -4,11 +4,11 @@
     using System.Collections.Generic;
     using ReadableExpressions.Translations.Reflection;
 
-    internal class InterfaceMethodExpression : MethodExpression
+    internal class ConfiguredInterfaceMethodExpression : MethodExpression
     {
         private readonly IType _returnType;
 
-        public InterfaceMethodExpression(
+        public ConfiguredInterfaceMethodExpression(
             InterfaceExpression declaringInterfaceExpression,
             string name,
             IType returnType,
@@ -24,8 +24,6 @@
 
         public override Type ReturnType => _returnType.AsType();
 
-        internal override bool HasGeneratedName => false;
-
         internal override bool HasBody => false;
 
         public override bool IsOverride => false;
@@ -39,5 +37,8 @@
             => DeclaringTypeExpression.MethodExpressionsAccessor;
 
         #endregion
+
+        internal override void ResetMemberInfo() 
+            => SetMethodInfo(null);
     }
 }

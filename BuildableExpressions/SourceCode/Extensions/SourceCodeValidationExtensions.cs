@@ -144,9 +144,9 @@
             var memberName = typeof(TMember).Name;
             var memberType = memberName.Substring(0, memberName.Length - "Expression".Length);
 
-            if (memberType.StartsWith("Standard", Ordinal))
+            if (memberType.StartsWith("Configured", Ordinal))
             {
-                memberType = memberType.Substring("Standard".Length);
+                memberType = memberType.Substring("Configured".Length);
             }
 
             return memberType;

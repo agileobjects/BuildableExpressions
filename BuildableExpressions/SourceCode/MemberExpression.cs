@@ -100,5 +100,7 @@
         protected abstract ITranslation GetTransientTranslation(ITranslationContext context);
 
         #endregion
+
+        internal abstract void ResetMemberInfo();
     }
 }

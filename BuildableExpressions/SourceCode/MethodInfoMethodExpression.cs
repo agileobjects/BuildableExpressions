@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
-    using BuildableExpressions.Extensions;
     using ReadableExpressions.Extensions;
 
     internal class MethodInfoMethodExpression : MethodExpression
@@ -17,8 +16,6 @@
             MethodInfo methodInfo)
             : base(declaringType, methodInfo.Name)
         {
-            MethodInfo = methodInfo;
-
             if (methodInfo.IsAbstract)
             {
                 SetAbstract();
@@ -29,9 +26,8 @@
             }
 
             AddParameters(methodInfo.GetParameters());
+            SetMethodInfo(methodInfo);
         }
-
-        public override MethodInfo MethodInfo { get; }
 
         public override Type ReturnType => MethodInfo.ReturnType;
 
@@ -40,8 +36,6 @@
 
         private LambdaExpression CreateDefinition()
             => Default(ReturnType).ToLambdaExpression(ParametersAccessor);
-
-        internal override bool HasGeneratedName => false;
 
         internal override bool HasBody => true;
 
@@ -52,5 +46,9 @@
         protected override IEnumerable<MethodExpressionBase> SiblingMethodExpressions => null;
 
         #endregion
+
+        internal override void ResetMemberInfo()
+        {
+        }
     }
 }

@@ -88,5 +88,12 @@
         }
 
         #endregion
+
+        /// <inheritdoc />
+        protected override void ResetType()
+        {
+            _thisInstanceExpression = null;
+            base.ResetType();
+        }
     }
 }

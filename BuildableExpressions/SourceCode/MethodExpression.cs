@@ -29,7 +29,6 @@
         private ReadOnlyCollection<GenericParameterExpression> _readOnlyGenericParameters;
         private ReadOnlyCollection<IGenericParameter> _readOnlyIGenericParameters;
         private MethodInfo _methodInfo;
-        private string _name;
         private IType _returnType;
 
         /// <summary>
@@ -42,7 +41,7 @@
         protected MethodExpression(TypeExpression declaringTypeExpression, string name)
             : base(declaringTypeExpression, name)
         {
-            _name = name;
+            Name = name;
         }
 
         /// <summary>
@@ -52,12 +51,8 @@
         protected override SourceCodeExpressionType SourceCodeNodeType
             => SourceCodeExpressionType.Method;
 
-        internal abstract bool HasGeneratedName { get; }
-
         /// <inheritdoc cref="MemberExpression" />
-        public override string Name => _name;
-
-        internal void SetName(string name) => _name = name;
+        public override string Name { get; }
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="MethodExpression"/> is generic.
@@ -82,7 +77,7 @@
         /// Gets the MethodInfo for this <see cref="MethodExpression"/>, which is lazily, dynamically
         /// generated using this method's definition.
         /// </summary>
-        public virtual MethodInfo MethodInfo => _methodInfo ??= CreateMethodInfo();
+        public MethodInfo MethodInfo => _methodInfo ??= CreateMethodInfo();
 
         #region MethodInfo Creation
 
@@ -106,6 +101,14 @@
         }
 
         #endregion
+
+        /// <summary>
+        /// Sets this <see cref="MethodExpression"/>'s MethodInfo to the given
+        /// <paramref name="methodInfo"/>.
+        /// </summary>
+        /// <param name="methodInfo">The MethodInfo to use.</param>
+        protected void SetMethodInfo(MethodInfo methodInfo)
+            => _methodInfo = methodInfo;
 
         #region IGenericParameterConfigurator Members
 

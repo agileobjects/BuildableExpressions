@@ -127,6 +127,8 @@
 
         #endregion
 
+        internal override void ResetMemberInfo() => _fieldInfo = null;
+
         /// <inheritdoc />
         public override string ToString() => $"{_type.GetFriendlyName()} {Name}";
     }
