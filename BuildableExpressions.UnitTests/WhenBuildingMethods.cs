@@ -7,6 +7,7 @@
     using NetStandardPolyfills;
     using Xunit;
     using static System.Linq.Expressions.Expression;
+    using static BuildableExpressions.SourceCode.MemberVisibility;
 
     public class WhenBuildingMethods : TestClassBase
     {
@@ -606,6 +607,102 @@ namespace GeneratedExpressionCode
         public override string OverrideMe()
         {
             return ""Hello!"";
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldOrderMethodsByVisibility()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("MethodOrdering", cls =>
+                    {
+                        var emptyPrivateMethod = cls.AddMethod("EmptyPrivateMethod", m =>
+                        {
+                            m.SetVisibility(Private);
+                            m.SetBody(Empty());
+                        });
+
+                        cls.AddMethod("EmptyPublicMethod", m =>
+                        {
+                            m.SetVisibility(Public);
+                            m.SetBody(Empty());
+                        });
+
+                        var chainedPrivateMethod1 = cls.AddMethod("ChainedPrivateMethod1", m =>
+                        {
+                            m.SetVisibility(Private);
+
+                            m.SetBody(Call(
+                                cls.ThisInstanceExpression,
+                                emptyPrivateMethod.MethodInfo));
+                        });
+
+                        cls.AddMethod("ChainedPublicMethod1", m =>
+                        {
+                            m.SetVisibility(Public);
+
+                            m.SetBody(Call(
+                                cls.ThisInstanceExpression,
+                                chainedPrivateMethod1.MethodInfo));
+                        });
+
+                        var chainedPrivateMethod2 = cls.AddMethod("ChainedPrivateMethod2", m =>
+                        {
+                            m.SetVisibility(Private);
+
+                            m.SetBody(Call(
+                                cls.ThisInstanceExpression,
+                                chainedPrivateMethod1.MethodInfo));
+                        });
+
+                        cls.AddMethod("ChainedPublicMethod2", m =>
+                        {
+                            m.SetVisibility(Public);
+
+                            m.SetBody(Call(
+                                cls.ThisInstanceExpression,
+                                chainedPrivateMethod2.MethodInfo));
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+namespace GeneratedExpressionCode
+{
+    public class MethodOrdering
+    {
+        public void EmptyPublicMethod()
+        {
+        }
+
+        public void ChainedPublicMethod1()
+        {
+            this.ChainedPrivateMethod1();
+        }
+
+        public void ChainedPublicMethod2()
+        {
+            this.ChainedPrivateMethod2();
+        }
+
+        private void EmptyPrivateMethod()
+        {
+        }
+
+        private void ChainedPrivateMethod1()
+        {
+            this.EmptyPrivateMethod();
+        }
+
+        private void ChainedPrivateMethod2()
+        {
+            this.ChainedPrivateMethod1();
         }
     }
 }";

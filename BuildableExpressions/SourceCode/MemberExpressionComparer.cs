@@ -21,7 +21,7 @@
             // ReSharper disable PossibleNullReferenceException
             if (x.NodeType == y.NodeType)
             {
-                return x.MemberIndex > y.MemberIndex ? 1 : -1;
+                return x.CompareTo(y);
             }
 
             var xTypeIndex = Array.IndexOf(_orderedTypes, (int)x.NodeType);

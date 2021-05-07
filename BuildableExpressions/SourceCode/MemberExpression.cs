@@ -1,5 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
+    using System;
     using System.Linq.Expressions;
     using Api;
     using ReadableExpressions;
@@ -102,5 +103,15 @@
         #endregion
 
         internal abstract void ResetMemberInfo();
+
+        internal int CompareTo(MemberExpression other)
+        {
+            if (Visibility == other.Visibility)
+            {
+                return MemberIndex > other.MemberIndex ? 1 : -1;
+            }
+
+            return Visibility > other.Visibility ? 1 : -1;
+        }
     }
 }

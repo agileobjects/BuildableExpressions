@@ -7,18 +7,18 @@
     using ReadableExpressions.Translations.Reflection;
     using static MemberVisibility;
 
-    internal class StandardPropertyExpression :
+    internal class ConfiguredPropertyExpression :
         PropertyExpression,
         IClassPropertyExpressionConfigurator,
         IConcreteTypeExpression
     {
         private bool? _isOverride;
 
-        public StandardPropertyExpression(
+        public ConfiguredPropertyExpression(
             TypeExpression declaringTypeExpression,
             string name,
             IType type,
-            Action<StandardPropertyExpression> configuration)
+            Action<ConfiguredPropertyExpression> configuration)
             : base(declaringTypeExpression, name, type)
         {
             configuration.Invoke(this);
@@ -55,7 +55,7 @@
         private bool DetermineIfOverride()
         {
             return DeclaringTypeExpression
-                .GetAllVirtualMembersOfType<StandardPropertyExpression>()
+                .GetAllVirtualMembersOfType<ConfiguredPropertyExpression>()
                 .Any(p => p != this && p.Type == Type && p.Name == Name);
         }
 

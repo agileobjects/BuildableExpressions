@@ -145,9 +145,9 @@
         internal PropertyExpression AddProperty(
             string name,
             IType type,
-            Action<StandardPropertyExpression> configuration)
+            Action<ConfiguredPropertyExpression> configuration)
         {
-            return AddProperty(new StandardPropertyExpression(this, name, type, configuration));
+            return AddProperty(new ConfiguredPropertyExpression(this, name, type, configuration));
         }
 
         /// <summary>
