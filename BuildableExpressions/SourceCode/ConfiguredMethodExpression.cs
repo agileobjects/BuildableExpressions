@@ -80,7 +80,7 @@
         }
 
         protected override IType GetReturnType()
-            => _returnType ??= BclTypeWrapper.For(ReturnType);
+            => _returnType ??= ClrTypeWrapper.For(ReturnType);
 
         #endregion
 

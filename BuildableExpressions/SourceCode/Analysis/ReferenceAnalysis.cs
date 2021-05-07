@@ -57,7 +57,7 @@
         {
             if (methodCall.Method.IsGenericMethod)
             {
-                HandleReferences(new BclMethodWrapper(methodCall.Method, Settings)
+                HandleReferences(new ClrMethodWrapper(methodCall.Method, Settings)
                     .GetRequiredExplicitGenericArguments(Settings));
             }
 
@@ -116,14 +116,14 @@
             => HandleReference(expression.Type);
 
         private void HandleReference(Type type)
-            => HandleReference(BclTypeWrapper.For(type));
+            => HandleReference(ClrTypeWrapper.For(type));
 
         private void HandleReference(IType referencedType)
         {
             if (referencedType.IsPrimitive ||
-                referencedType.Equals(BclTypeWrapper.Void) ||
-                referencedType.Equals(BclTypeWrapper.String) ||
-                referencedType.Equals(BclTypeWrapper.Object) ||
+                referencedType.Equals(ClrTypeWrapper.Void) ||
+                referencedType.Equals(ClrTypeWrapper.String) ||
+                referencedType.Equals(ClrTypeWrapper.Object) ||
                (referencedType.Namespace == BuildConstants.GenericParameterTypeNamespace))
             {
                 return;
@@ -164,7 +164,7 @@
                 // ReSharper disable once PossibleNullReferenceException
                 var baseType = referencedType.BaseType;
 
-                while (baseType != null && !baseType.Equals(BclTypeWrapper.Object))
+                while (baseType != null && !baseType.Equals(ClrTypeWrapper.Object))
                 {
                     AddAssemblyFor(baseType);
                     baseType = baseType.BaseType;

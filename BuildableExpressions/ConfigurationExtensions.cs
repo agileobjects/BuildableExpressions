@@ -454,7 +454,7 @@
             Action<IFieldExpressionConfigurator> configuration)
         {
             return concreteTypeConfig
-                .AddField(name, BclTypeWrapper.For(typeof(TField)), configuration);
+                .AddField(name, ClrTypeWrapper.For(typeof(TField)), configuration);
         }
 
         /// <summary>
@@ -487,7 +487,7 @@
             Action<IInterfacePropertyExpressionConfigurator> configuration)
         {
             return interfaceConfig
-                .AddProperty(name, BclTypeWrapper.For(typeof(TProperty)), configuration);
+                .AddProperty(name, ClrTypeWrapper.For(typeof(TProperty)), configuration);
         }
 
         /// <summary>
@@ -594,7 +594,7 @@
             Type type,
             Action<IClassPropertyExpressionConfigurator> configuration)
         {
-            return classConfig.AddProperty(name, BclTypeWrapper.For(type), configuration);
+            return classConfig.AddProperty(name, ClrTypeWrapper.For(type), configuration);
         }
 
         /// <summary>
@@ -718,7 +718,7 @@
             Action<IConcreteTypePropertyExpressionConfigurator> configuration)
         {
             return structConfig
-                .AddProperty(name, BclTypeWrapper.For(typeof(TProperty)), configuration);
+                .AddProperty(name, ClrTypeWrapper.For(typeof(TProperty)), configuration);
         }
 
         /// <summary>
@@ -754,7 +754,7 @@
             Type type,
             Action<IConcreteTypePropertyExpressionConfigurator> configuration)
         {
-            return structConfig.AddProperty(name, BclTypeWrapper.For(type), configuration);
+            return structConfig.AddProperty(name, ClrTypeWrapper.For(type), configuration);
         }
 
         internal static void PublicGetSet(
@@ -933,7 +933,7 @@
             Action<IMethodExpressionConfigurator> configuration)
         {
             return interfaceConfig
-                .AddMethod(name, BclTypeWrapper.For(returnType), configuration);
+                .AddMethod(name, ClrTypeWrapper.For(returnType), configuration);
         }
 
         /// <summary>
@@ -1221,7 +1221,7 @@
             this IClassMethodExpressionConfigurator methodConfig,
             Type returnType)
         {
-            methodConfig.SetAbstract(BclTypeWrapper.For(returnType));
+            methodConfig.SetAbstract(ClrTypeWrapper.For(returnType));
         }
 
         /// <summary>

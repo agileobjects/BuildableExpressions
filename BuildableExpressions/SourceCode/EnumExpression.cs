@@ -60,7 +60,7 @@
 
         #region IType Members
 
-        IType IType.BaseType => BclTypeWrapper.Enum;
+        IType IType.BaseType => ClrTypeWrapper.Enum;
 
         internal override bool IsEnum => true;
 

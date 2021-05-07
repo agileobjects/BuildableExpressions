@@ -13,6 +13,6 @@
             => ((Expression)member).HasReturnType();
 
         public static bool HasReturnType(this IMember member)
-            => !member.Type.Equals(BclTypeWrapper.Void);
+            => !member.Type.Equals(ClrTypeWrapper.Void);
     }
 }

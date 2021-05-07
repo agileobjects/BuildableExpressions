@@ -32,7 +32,7 @@
 
         #region IType Members
 
-        IType IType.BaseType => BclTypeWrapper.ValueType;
+        IType IType.BaseType => ClrTypeWrapper.ValueType;
 
         #endregion
     }

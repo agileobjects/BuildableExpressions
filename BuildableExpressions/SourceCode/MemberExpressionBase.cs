@@ -53,7 +53,7 @@
 
         #region IMember Members
 
-        IType IMember.Type => _type ??= BclTypeWrapper.For(Type);
+        IType IMember.Type => _type ??= ClrTypeWrapper.For(Type);
 
         bool IMember.IsPublic => Visibility == Public;
 

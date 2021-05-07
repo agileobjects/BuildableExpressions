@@ -26,7 +26,7 @@
             : base(isGetter ? "get" : "set")
         {
             _property = property;
-            _type = isGetter ? property.Type : BclTypeWrapper.Void;
+            _type = isGetter ? property.Type : ClrTypeWrapper.Void;
         }
 
         /// <summary>

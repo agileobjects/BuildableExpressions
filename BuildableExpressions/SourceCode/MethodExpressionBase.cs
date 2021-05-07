@@ -390,7 +390,7 @@
             }
 
             public IType Type
-                => _type ??= BclTypeWrapper.For(_parameter.Type);
+                => _type ??= ClrTypeWrapper.For(_parameter.Type);
 
             public string Name => _parameter.Name;
 

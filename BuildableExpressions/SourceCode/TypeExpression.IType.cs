@@ -183,7 +183,7 @@
         bool IType.IsNested => false;
 
         IType IType.DeclaringType
-            => _declaringType ??= BclTypeWrapper.For(_type?.DeclaringType);
+            => _declaringType ??= ClrTypeWrapper.For(_type?.DeclaringType);
 
         bool IType.IsArray => false;
 
@@ -207,7 +207,7 @@
             => ((IType)this).GetMembers(selectionConfiguator).OfType<TMember>();
 
         bool IType.Equals(IType otherType)
-            => BclTypeWrapper.AreEqual(this, otherType);
+            => ClrTypeWrapper.AreEqual(this, otherType);
 
         Type IType.AsType() => Type;
     }

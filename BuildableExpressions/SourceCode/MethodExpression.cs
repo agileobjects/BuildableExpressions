@@ -227,7 +227,7 @@
         }
 
         /// <inheritdoc />
-        protected override IType GetReturnType() => _returnType ??= BclTypeWrapper.For(ReturnType);
+        protected override IType GetReturnType() => _returnType ??= ClrTypeWrapper.For(ReturnType);
 
         #endregion
 

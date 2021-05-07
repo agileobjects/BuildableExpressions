@@ -207,7 +207,7 @@
 
         IType IMember.DeclaringType => DeclaringTypeExpression;
 
-        IType IMember.Type => _type ??= BclTypeWrapper.For(Type);
+        IType IMember.Type => _type ??= ClrTypeWrapper.For(Type);
 
         #endregion
 
