@@ -102,8 +102,16 @@
             sourceCode.Add(this);
             sourceCode.Analyse();
 
-            var compiledTypes = sourceCode
-                .Compile()
+            var compilationResult = sourceCode.Compile();
+
+            if (compilationResult.Failed)
+            {
+                throw new InvalidOperationException(
+                    $"Compilation of type '{Name}' failed:{Environment.NewLine}" +
+                    string.Join(Environment.NewLine, compilationResult.Errors));
+            }
+
+            var compiledTypes = compilationResult
                 .CompiledAssembly
                 .GetTypes();
 

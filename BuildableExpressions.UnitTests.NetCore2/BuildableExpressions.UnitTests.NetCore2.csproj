@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RuntimeFrameworkVersion>3.1.3</RuntimeFrameworkVersion>
-    <AssemblyName>AgileObjects.BuildableExpressions.UnitTests.NetCore3</AssemblyName>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <RuntimeFrameworkVersion>2.2.7</RuntimeFrameworkVersion>
+    <AssemblyName>AgileObjects.BuildableExpressions.UnitTests.NetCore</AssemblyName>
     <RootNamespace>AgileObjects.BuildableExpressions.UnitTests</RootNamespace>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors></WarningsAsErrors>
@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
@@ -40,7 +40,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BuildableExpressions\BuildableExpressions.csproj" />
+    <ProjectReference Include="..\BuildableExpressions\BuildableExpressions.csproj">
+      <SetTargetFramework>TargetFramework=netstandard1.5</SetTargetFramework>
+    </ProjectReference>
     <ProjectReference Include="..\BuildableExpressions.UnitTests.Common\BuildableExpressions.UnitTests.Common.csproj" />
   </ItemGroup>
 

@@ -168,7 +168,7 @@
             param.Type.ShouldNotBeNull().Name.ShouldBe("TDerived");
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
-            param.Type.BaseType.ShouldBe(typeof(BaseType));
+            param.Type.GetBaseType().ShouldBe(typeof(BaseType));
         }
 
         [Fact]
@@ -214,7 +214,7 @@
             param.Type.IsAbstract().ShouldBeFalse();
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
-            param.Type.BaseType.ShouldBe(typeof(object));
+            param.Type.GetBaseType().ShouldBe(typeof(object));
             param.Type.GetAllInterfaces().ShouldHaveSingleItem().ShouldBe(typeof(IDisposable));
         }
 
@@ -261,7 +261,7 @@
             param.Type.IsAbstract().ShouldBeTrue();
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
-            param.Type.BaseType.ShouldBe(typeof(AbstractBaseType));
+            param.Type.GetBaseType().ShouldBe(typeof(AbstractBaseType));
         }
 
         [Fact]
