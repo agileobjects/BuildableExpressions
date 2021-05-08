@@ -3,9 +3,9 @@
     using System.Collections.Generic;
     using System.IO;
 
-    internal class BclFileManager : IFileManager
+    internal class SystemIoFileManager : IFileManager
     {
-        public static readonly IFileManager Instance = new BclFileManager();
+        public static readonly IFileManager Instance = new SystemIoFileManager();
 
         public IEnumerable<string> FindFiles(string path, string pattern)
             => Directory.EnumerateFiles(path, pattern);

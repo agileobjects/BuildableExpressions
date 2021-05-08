@@ -14,7 +14,7 @@
 
     public partial class TypeExpression : IType
     {
-        private readonly Type _bclType;
+        private readonly Type _clrType;
         private IType _declaringType;
         private ReadOnlyCollection<IType> _readOnlyConstraintTypes;
 
@@ -68,7 +68,7 @@
                 }
             }
 
-            _type = _bclType = type;
+            _type = _clrType = type;
         }
 
         #region Setup
@@ -86,7 +86,7 @@
 
         Assembly IType.Assembly => Type.GetAssembly();
 
-        internal Assembly BclTypeAssembly => _bclType?.GetAssembly();
+        internal Assembly ClrTypeAssembly => _clrType?.GetAssembly();
 
         string IType.Namespace => SourceCode.Namespace;
 

@@ -1,12 +1,13 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Generics
 {
     using System;
+    using System.Linq;
     using Api;
     using BuildableExpressions.Extensions;
     using Compilation;
     using static System.Linq.Expressions.Expression;
 
-    internal static class OpenGenericArgumentExpressionFactoryExtensions
+    internal static class GenericArgumentExpressionExtensions
     {
         public static Type CreateType(
             this ConfiguredGenericParameterExpression parameter)
@@ -15,13 +16,13 @@
             {
                 sc.SetNamespace(BuildConstants.GenericParameterTypeNamespace);
 
-                if (parameter.HasStructConstraint)
+                if (CreateClass(parameter))
                 {
-                    sc.AddStruct(parameter.Name, parameter.ConfigureStruct);
+                    sc.AddClass(parameter.Name, parameter.ConfigureClass);
                 }
                 else
                 {
-                    sc.AddClass(parameter.Name, parameter.ConfigureClass);
+                    sc.AddStruct(parameter.Name, parameter.ConfigureStruct);
                 }
             });
 
@@ -33,13 +34,19 @@
             return compiledTypes[0];
         }
 
-        #region ToType Helpers
-
-        private static void ConfigureStruct(
-            this ConfiguredGenericParameterExpression parameter,
-            IStructExpressionConfigurator structConfig)
+        private static bool CreateClass(ConfiguredGenericParameterExpression parameter)
         {
-            parameter.ConfigureType((StructExpression)structConfig, baseTypeCallback: null);
+            if (parameter.HasClassConstraint)
+            {
+                return true;
+            }
+
+            if (parameter.HasStructConstraint)
+            {
+                return false;
+            }
+
+            return parameter.TypeConstraintsAccessor?.Any(t => t.IsClass) == true;
         }
 
         private static void ConfigureClass(
@@ -57,6 +64,13 @@
                     cls.SetAbstract();
                 }
             });
+        }
+
+        private static void ConfigureStruct(
+            this ConfiguredGenericParameterExpression parameter,
+            IStructExpressionConfigurator structConfig)
+        {
+            parameter.ConfigureType((StructExpression)structConfig, baseTypeCallback: null);
         }
 
         private static void ConfigureType<TTypeExpression>(
@@ -100,7 +114,5 @@
                 typeExpression.AddMethod(methodExpression.Name, m => m.SetBody(methodLambda));
             }
         }
-
-        #endregion
     }
 }

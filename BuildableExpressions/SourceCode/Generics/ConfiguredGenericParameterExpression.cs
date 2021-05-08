@@ -19,7 +19,7 @@
         private static readonly ConcurrentDictionary<ConfiguredGenericParameterExpression, Type>
             _typeCache = new(new GenericParameterExpressionComparer());
 
-        private Type _bclType;
+        private Type _clrType;
         private bool _hasConstraints;
         private bool _hasStructConstraint;
         private bool _hasClassConstraint;
@@ -45,7 +45,7 @@
         }
 
         public override Type Type
-            => _bclType ??= _typeCache.GetOrAdd(this, p => p.CreateType());
+            => _clrType ??= _typeCache.GetOrAdd(this, p => p.CreateType());
 
         #region IGenericParameterExpressionConfigurator Members
 

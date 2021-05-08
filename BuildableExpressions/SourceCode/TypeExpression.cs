@@ -355,12 +355,12 @@
                 return _methodExpressions;
             }
 
-            if (_bclType != null)
+            if (_clrType != null)
             {
-                return _methodExpressions = _bclType
+                return _methodExpressions = _clrType
                     .GetPublicInstanceMethods()
-                    .Concat(_bclType.GetPublicStaticMethods())
-                    .Concat(_bclType.GetNonPublicInstanceMethods().Filter(m => m.IsVirtual))
+                    .Concat(_clrType.GetPublicStaticMethods())
+                    .Concat(_clrType.GetNonPublicInstanceMethods().Filter(m => m.IsVirtual))
                     .Project<MethodInfo, MethodExpression>(methodInfo =>
                         new MethodInfoMethodExpression(this, methodInfo))
                     .ToList();

@@ -20,7 +20,7 @@
     {
         private readonly IProperty _property;
         private readonly IType _type;
-        private Type _bclType;
+        private Type _clrType;
 
         internal PropertyAccessorExpression(IProperty property, bool isGetter)
             : base(isGetter ? "get" : "set")
@@ -39,7 +39,7 @@
         /// <summary>
         /// Gets the type of this <see cref="PropertyAccessorExpression"/>.
         /// </summary>
-        public override Type Type => _bclType ??= _type.AsType();
+        public override Type Type => _clrType ??= _type.AsType();
 
         /// <summary>
         /// Visits this <see cref="PropertyAccessorExpression"/>.

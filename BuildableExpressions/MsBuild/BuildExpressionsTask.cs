@@ -30,10 +30,10 @@ namespace BuildXpr
             : this(
                 MsBuildTaskLogger.Instance,
                 new InputFilesFinder(
-                    BclFileManager.Instance,
+                    SystemIoFileManager.Instance,
                     MsBuildTaskLogger.Instance),
-                new OutputWriter(BclFileManager.Instance),
-                new ProjectFactory(BclFileManager.Instance))
+                new OutputWriter(SystemIoFileManager.Instance),
+                new ProjectFactory(SystemIoFileManager.Instance))
         {
         }
 

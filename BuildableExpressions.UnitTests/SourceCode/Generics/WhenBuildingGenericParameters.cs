@@ -32,8 +32,8 @@
             param.ShouldNotBeNull();
             param.Name.ShouldBe("T");
             param.Type.ShouldNotBeNull().Name.ShouldBe("T");
-            param.Type.IsClass().ShouldBeTrue();
-            param.Type.IsValueType().ShouldBeFalse();
+            param.Type.IsClass().ShouldBeFalse();
+            param.Type.IsValueType().ShouldBeTrue();
         }
 
         [Fact]
@@ -212,9 +212,8 @@
             param.Name.ShouldBe("TDisposable");
             param.Type.ShouldNotBeNull().Name.ShouldBe("TDisposable");
             param.Type.IsAbstract().ShouldBeFalse();
-            param.Type.IsClass().ShouldBeTrue();
-            param.Type.IsValueType().ShouldBeFalse();
-            param.Type.GetBaseType().ShouldBe(typeof(object));
+            param.Type.IsClass().ShouldBeFalse();
+            param.Type.IsValueType().ShouldBeTrue();
             param.Type.GetAllInterfaces().ShouldHaveSingleItem().ShouldBe(typeof(IDisposable));
         }
 

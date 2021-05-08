@@ -7,6 +7,7 @@
     using System.Reflection;
     using BuildableExpressions.Extensions;
     using Extensions;
+    using Generics;
     using NetStandardPolyfills;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations.Reflection;
@@ -25,6 +26,12 @@
         public void Visit(TypeExpression type)
         {
             _sourceCodeNamespace = type.SourceCode.Namespace;
+
+            if (type.IsGeneric)
+            {
+                HandleReferences(type.GenericParameters);
+            }
+
             HandleReferences(type.ImplementedTypeExpressions);
         }
 
@@ -71,10 +78,7 @@
         {
             if (method.IsGeneric)
             {
-                HandleReferences(method
-                    .GenericParameters
-                    .Filter(gp => gp.HasConstraints)
-                    .SelectMany(gp => gp.TypeConstraints));
+                HandleReferences(method.GenericParameters);
             }
 
             foreach (var parameter in method.Parameters)
@@ -102,6 +106,13 @@
             {
                 HandleReference(catchVariable);
             }
+        }
+
+        private void HandleReferences(IEnumerable<GenericParameterExpression> genericParameters)
+        {
+            HandleReferences(genericParameters
+                .Filter(gp => gp.HasConstraints)
+                .SelectMany(gp => gp.TypeConstraints));
         }
 
         private void HandleReferences(IEnumerable<IType> accessedTypes)
@@ -182,7 +193,7 @@
         private void AddAssemblyFor(IType referencedType)
         {
             var assembly = referencedType is TypeExpression typeExpression
-                ? typeExpression.BclTypeAssembly
+                ? typeExpression.ClrTypeAssembly
                 : referencedType.Assembly;
 
             if (assembly == null)

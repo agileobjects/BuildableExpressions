@@ -48,6 +48,17 @@
         public override ExpressionType NodeType
             => (ExpressionType)SourceCodeExpressionType.GenericArgument;
 
+        // ReSharper disable once RedundantOverriddenMember
+        /// <summary>
+        /// Gets the Type of this <see cref="GenericParameterExpression"/>, which is lazily,
+        /// dynamically created from the parameter definition and constraints, if any. The created
+        /// Type returns false from Type.IsGenericParameter, as generic parameter Types cannot be
+        /// used in Expression trees. Instead, a Type is generated which satisfies the generic
+        /// parameter constraints, if any. The generated type will be a struct unless a 'class'
+        /// constraint or class-Type constraint has been applied.
+        /// </summary>
+        public override Type Type => base.Type;
+
         #region IGenericParameter Members
 
         /// <summary>
