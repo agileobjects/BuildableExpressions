@@ -106,6 +106,10 @@
             {
                 HandleReference(catchVariable);
             }
+            else if (@catch.Test != typeof(Exception))
+            {
+                HandleReference(@catch.Test);
+            }
         }
 
         private void HandleReferences(IEnumerable<GenericParameterExpression> genericParameters)

@@ -1,5 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Analysis
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
@@ -94,6 +95,9 @@
                     _referenceAnalysis.Visit((DefaultExpression)expression);
                     goto default;
 
+                case Try when ExtractToMethod((TryExpression)expression, out var extractedMethod):
+                    return extractedMethod.CallExpression;
+
                 case (ExpressionType)SourceCodeExpressionType.SourceCode:
                     return VisitAndConvert((SourceCodeExpression)expression);
 
@@ -126,27 +130,51 @@
 
         private bool ExtractToMethod(BlockExpression block, out BlockMethodExpression extractedMethod)
         {
-            if (!Extract(block))
+            if (Extract(block, b => b.Expressions.Any() || b.Variables.Any()))
             {
-                extractedMethod = null;
-                return false;
+                ExtractToMethod(block, out extractedMethod, VisitAndConvert);
+                return true;
             }
 
+            extractedMethod = null;
+            return false;
+        }
+
+        private bool ExtractToMethod(TryExpression @try, out BlockMethodExpression extractedMethod)
+        {
+            if (Extract(@try, _ => true))
+            {
+                ExtractToMethod(@try, out extractedMethod, VisitAndConvert);
+                return true;
+            }
+
+            extractedMethod = null;
+            return false;
+        }
+
+        private void ExtractToMethod<TExpression>(
+            TExpression expression,
+            out BlockMethodExpression extractedMethod,
+            Func<TExpression, Expression> visitAndConvert)
+            where TExpression : Expression
+        {
             var blockMethodScope = new BlockMethodScope(_currentMethodScope);
 
             EnterMethodScope(blockMethodScope);
 
-            var updatedBlock = VisitAndConvert(block);
+            var updatedExpression = visitAndConvert.Invoke(expression);
 
-            blockMethodScope.Finalise(updatedBlock);
+            blockMethodScope.Finalise(updatedExpression);
 
             extractedMethod = blockMethodScope.BlockMethod;
 
             ExitMethodScope();
-            return true;
         }
 
-        private bool Extract(Expression blockExpression)
+        private bool Extract<TExpression>(
+            TExpression expression,
+            Func<TExpression, bool> extractPredicate)
+            where TExpression : Expression
         {
             if (!_sourceCodeComplete)
             {
@@ -169,8 +197,8 @@
                 case Switch:
                     var @switch = (SwitchExpression)parentExpression;
 
-                    if (blockExpression == @switch.DefaultBody ||
-                        @switch.Cases.Any(@case => blockExpression == @case.Body))
+                    if (expression == @switch.DefaultBody ||
+                        @switch.Cases.Any(@case => expression == @case.Body))
                     {
                         return false;
                     }
@@ -178,8 +206,7 @@
                     goto default;
 
                 default:
-                    var block = (BlockExpression)blockExpression;
-                    return block.Expressions.Any() || block.Variables.Any();
+                    return extractPredicate.Invoke(expression);
             }
         }
 

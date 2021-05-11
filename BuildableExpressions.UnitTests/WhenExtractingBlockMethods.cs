@@ -1,7 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
-    using System.Linq.Expressions;
     using BuildableExpressions;
     using BuildableExpressions.SourceCode;
     using Common;
@@ -13,7 +12,7 @@
     public class WhenExtractingBlockMethods
     {
         [Fact]
-        public void ShouldExtractAMultilineIfTestBlockToAPrivateMethod()
+        public void ShouldExtractAMultilineIfTestBlock()
         {
             var intVariable = Parameter(typeof(int), "input");
 
@@ -66,7 +65,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldExtractMultilineConditionalBranchesToPrivateMethods()
+        public void ShouldExtractMultilineConditionalBranchBlocks()
         {
             var intParameter1 = Parameter(typeof(int), "i");
             var intParameter2 = Parameter(typeof(int), "j");
@@ -132,7 +131,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldExtractMultilineConditionTestOperandBlocksToPrivateMethods()
+        public void ShouldExtractMultilineConditionTestOperandBlocks()
         {
             var intParameter1 = Parameter(typeof(int), "i");
             var intParameter2 = Parameter(typeof(int), "j");
@@ -203,7 +202,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldExtractNestedMultilineBlocksToPrivateMethods()
+        public void ShouldExtractNestedMultilineBlocks()
         {
             var parameterI = Parameter(typeof(int), "i");
             var variableJ = Variable(typeof(int), "j");
@@ -272,7 +271,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldExtractSingleLineVariableAssignmentValueBlockToPrivateMethod()
+        public void ShouldExtractSingleLineVariableAssignmentValueBlock()
         {
             var objectParam = Parameter(typeof(PublicProperty<int>), "obj");
             var stringParam = Parameter(typeof(string), "str");
@@ -340,7 +339,78 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldExtractAMultilineIfTestBlockToAStaticPrivateMethod()
+        public void ShouldExtractSingleLineVariableAssignmentValueTryCatch()
+        {
+            var inputParam = Parameter(typeof(string), "str");
+            var resultVariable = Parameter(typeof(int), "value");
+
+            var tryParseResultAssignment = Block(
+                new[] { resultVariable },
+                Assign(
+                    resultVariable,
+                    TryCatch(
+                        Call(
+                            typeof(int).GetPublicStaticMethod("Parse", typeof(string)),
+                            inputParam),
+                        Catch(typeof(FormatException), Default(typeof(int))))),
+                resultVariable);
+
+            var tryParseResultLambda = Lambda<Func<string, int>>(
+                tryParseResultAssignment,
+                inputParam);
+
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("ParseInt", m =>
+                        {
+                            m.SetStatic();
+                            m.SetDefinition(tryParseResultLambda);
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public static int ParseInt
+        (
+            string str
+        )
+        {
+            var value = GeneratedExpressionClass.GetInt(str);
+
+            return value;
+        }
+
+        private static int GetInt
+        (
+            string str
+        )
+        {
+            try
+            {
+                return int.Parse(str);
+            }
+            catch (FormatException)
+            {
+                return default(int);
+            }
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldExtractAMultilineStaticMethodIfTestBlock()
         {
             var intVariable = Parameter(typeof(int), "input");
 
@@ -401,7 +471,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldNotDuplicateMethodExtractsWhenTransientClassCreated()
+        public void ShouldNotDuplicateBlockExtractsWhenTransientClassCreated()
         {
             var intVariable = Parameter(typeof(int), "input");
 
@@ -464,7 +534,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldNotDuplicateMethodExtractsWhenTransientClassFieldCreated()
+        public void ShouldNotDuplicateBlockExtractsWhenTransientClassFieldCreated()
         {
             var intVariable = Parameter(typeof(int), "input");
 

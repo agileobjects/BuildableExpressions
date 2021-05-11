@@ -199,7 +199,7 @@
         /// Add the given <paramref name="parameters"/> to this <see cref="MethodExpressionBase"/>.
         /// </summary>
         /// <param name="parameters">The ParameterInfos to add.</param>
-        protected void AddParameters(IList<ParameterInfo> parameters) 
+        protected void AddParameters(IList<ParameterInfo> parameters)
             => AddParameters(parameters.ProjectToArray(p => Parameter(p.ParameterType, p.Name)));
 
         /// <summary>
@@ -226,7 +226,8 @@
         }
 
         /// <summary>
-        /// Sets the body of the <see cref="MethodExpressionBase"/>.
+        /// Sets the body of this <see cref="MethodExpressionBase"/>, using the given
+        /// <paramref name="returnType"/>.
         /// </summary>
         /// <param name="body">The Expression to use.</param>
         /// <param name="returnType">The return type to use for the method.</param>
@@ -249,11 +250,18 @@
             Definition = body.ToLambdaExpression(_parameters, returnType);
         }
 
-        internal void Update(Expression updatedBody)
+        /// <summary>
+        /// Updates the body of this <see cref="MethodExpressionBase"/>, creating a new Definition
+        /// LambdaExpression from the given <paramref name="body"/> using the current method
+        /// Parameters. This method updates this <see cref="MethodExpressionBase"/>, it does not
+        /// create a new instance.
+        /// </summary>
+        /// <param name="body">The Expression to use.</param>
+        public void Update(Expression body)
         {
-            if (Body != updatedBody)
+            if (Body != body)
             {
-                Definition = updatedBody.ToLambdaExpression(_parameters, Type);
+                Definition = body.ToLambdaExpression(_parameters, Type);
             }
         }
 
