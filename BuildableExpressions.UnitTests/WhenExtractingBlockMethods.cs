@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using System.Collections.Generic;
     using BuildableExpressions;
     using BuildableExpressions.SourceCode;
     using Common;
@@ -14,7 +15,7 @@
         [Fact]
         public void ShouldExtractAMultilineIfTestBlock()
         {
-            var intVariable = Parameter(typeof(int), "input");
+            var intVariable = Variable(typeof(int), "input");
 
             var yepOrNopeBlock = Block(
                 IfThen(
@@ -31,9 +32,13 @@
                 Constant("Nope"));
 
             var translated = BuildableExpression
-                .SourceCode(sc => sc
-                    .AddClass(cls => cls
-                        .AddMethod("GetYepOrNope", yepOrNopeBlock)))
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("GetYepOrNope", yepOrNopeBlock);
+                    });
+                })
                 .ToCSharpString();
 
             const string expected = @"
@@ -51,6 +56,62 @@ namespace GeneratedExpressionCode
             }
 
             return ""Nope"";
+        }
+
+        private bool GetBool()
+        {
+            var input = Console.Read();
+
+            return (input > 100) ? false : true;
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldExtractAMultilineMethodArgumentBlock()
+        {
+            var boolListParam = Parameter(typeof(List<bool>), "bools");
+            var intVariable = Variable(typeof(int), "input");
+
+            var addBoolCall = Call(
+                boolListParam,
+                boolListParam.Type.GetPublicInstanceMethod("Add", typeof(bool)),
+                Block(
+                    new[] { intVariable },
+                    Assign(
+                        intVariable,
+                        Call(typeof(Console), "Read", Type.EmptyTypes)),
+                    Condition(
+                        GreaterThan(intVariable, Constant(100)),
+                        Constant(false),
+                        Constant(true))));
+
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("AddBool", Lambda<Action<List<bool>>>(addBoolCall, boolListParam));
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System;
+using System.Collections.Generic;
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public void AddBool
+        (
+            List<bool> bools
+        )
+        {
+            bools.Add(this.GetBool());
         }
 
         private bool GetBool()
@@ -342,7 +403,7 @@ namespace GeneratedExpressionCode
         public void ShouldExtractSingleLineVariableAssignmentValueTryCatch()
         {
             var inputParam = Parameter(typeof(string), "str");
-            var resultVariable = Parameter(typeof(int), "value");
+            var resultVariable = Variable(typeof(int), "value");
 
             var tryParseResultAssignment = Block(
                 new[] { resultVariable },
@@ -412,7 +473,7 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldExtractAMultilineStaticMethodIfTestBlock()
         {
-            var intVariable = Parameter(typeof(int), "input");
+            var intVariable = Variable(typeof(int), "input");
 
             var yepOrNopeBlock = Block(
                 IfThen(
