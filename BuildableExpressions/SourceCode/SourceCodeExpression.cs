@@ -183,14 +183,6 @@
 
         #endregion
 
-        internal void Finalise()
-        {
-            foreach (var typeExpression in TypeExpressions)
-            {
-                typeExpression.Finalise();
-            }
-        }
-
         ITranslation ICustomTranslationExpression.GetTranslation(ITranslationContext context)
             => new SourceCodeTranslation(this, context);
     }

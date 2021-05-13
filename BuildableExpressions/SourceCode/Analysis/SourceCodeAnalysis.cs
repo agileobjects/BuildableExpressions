@@ -258,12 +258,11 @@
 
         private SourceCodeExpression VisitAndConvert(SourceCodeExpression sourceCode)
         {
-            foreach (Expression typeExpression in sourceCode.TypeExpressions)
+            foreach (var typeExpression in sourceCode.TypeExpressions)
             {
-                VisitAndConvert(typeExpression);
+                VisitAndConvert((Expression)typeExpression);
             }
 
-            sourceCode.Finalise();
             return sourceCode;
         }
 
@@ -276,6 +275,7 @@
                 VisitAndConvert(memberExpression);
             }
 
+            type.Finalise();
             return type;
         }
 

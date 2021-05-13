@@ -15,9 +15,10 @@ namespace AgileObjects.BuildableExpressions.UnitTests.ProjectManagement
         {
             var dte = (DTE)Marshal.GetActiveObject("VisualStudio.DTE");
 
-            var projects = dte
+            var projectNames = dte
                 .Solution
                 .EnumerateProjects()
+                .Select(p => p.Name)
                 .ToList();
 
             var expectedProjects = new[]
@@ -32,8 +33,8 @@ namespace AgileObjects.BuildableExpressions.UnitTests.ProjectManagement
 
             foreach (var projectName in expectedProjects)
             {
-                projects
-                    .Any(p => p.Name == projectName)
+                projectNames
+                    .Any(name => name == projectName)
                     .ShouldBeTrue($"Project '{projectName}' not found");
             }
         }
