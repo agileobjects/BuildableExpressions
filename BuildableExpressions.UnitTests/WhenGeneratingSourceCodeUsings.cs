@@ -406,9 +406,13 @@ namespace GeneratedExpressionCode
                 (string[] strings) => strings.Select(int.Parse).ToList());
 
             var translated = BuildableExpression
-                .SourceCode(sc => sc
-                    .AddClass(cls => cls
-                        .AddMethod("GetInts", joinListItems)))
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("GetInts", joinListItems);
+                    });
+                })
                 .ToCSharpString();
 
             const string expected = @"

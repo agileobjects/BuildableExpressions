@@ -39,7 +39,7 @@
         {
             if (constant.Type.IsEnum())
             {
-                Visit((Expression) constant);
+                HandleReference(constant);
             }
             else if (constant.Type.IsAssignableTo(typeof(Type)))
             {
@@ -47,9 +47,9 @@
             }
         }
 
-        public void Visit(DefaultExpression @default) => Visit((Expression) @default);
+        public void Visit(DefaultExpression @default) => HandleReference(@default);
 
-        public void Visit(FieldExpression field) => Visit((Expression) field);
+        public void Visit(FieldExpression field) => HandleReference(field);
 
         public void Visit(MemberExpression memberAccess)
         {
@@ -86,17 +86,15 @@
                 Visit(parameter);
             }
 
-            Visit((Expression) method);
+            HandleReference(method);
         }
 
-        public void Visit(PropertyExpression property)
-            => Visit((Expression) property);
+        public void Visit(PropertyExpression property) => HandleReference(property);
 
         public void Visit(NewArrayExpression newArray)
             => HandleReference(newArray.Type.GetElementType());
 
-        public void Visit(NewExpression newing)
-            => Visit((Expression) newing);
+        public void Visit(NewExpression newing) => HandleReference(newing);
 
         public void Visit(CatchBlock @catch)
         {
@@ -127,7 +125,9 @@
             }
         }
 
-        public void Visit(Expression expression) => HandleReference(expression.Type);
+        public void Visit(Expression expression) => HandleReference(expression);
+
+        private void HandleReference(Expression expression) => HandleReference(expression.Type);
 
         private void HandleReference(Type type) => HandleReference(ClrTypeWrapper.For(type));
 
