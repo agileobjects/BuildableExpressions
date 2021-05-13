@@ -20,9 +20,13 @@
             var getDefaultDate = Lambda<Func<DateTime>>(Default(typeof(DateTime)));
 
             var translated = BuildableExpression
-                .SourceCode(sc => sc
-                    .AddClass(cls => cls
-                        .AddMethod("GetDateTime", getDefaultDate)))
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("GetDateTime", getDefaultDate);
+                    });
+                })
                 .ToCSharpString();
 
             const string expected = @"
@@ -35,6 +39,44 @@ namespace GeneratedExpressionCode
         public DateTime GetDateTime()
         {
             return default(DateTime);
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldIncludeAUsingFromAnExplicitCastExpression()
+        {
+            var objectParam = Parameter(typeof(object), "obj");
+
+            var castObjectToStream = Lambda<Func<object, object>>(
+                Convert(objectParam, typeof(Stream)),
+                objectParam);
+
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("CastObjectToStream", castObjectToStream);
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System.IO;
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public object CastObjectToStream
+        (
+            object obj
+        )
+        {
+            return (Stream)obj;
         }
     }
 }";

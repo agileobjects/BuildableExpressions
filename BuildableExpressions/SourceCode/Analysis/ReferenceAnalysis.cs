@@ -39,7 +39,7 @@
         {
             if (constant.Type.IsEnum())
             {
-                HandleReference(constant);
+                Visit((Expression) constant);
             }
             else if (constant.Type.IsAssignableTo(typeof(Type)))
             {
@@ -47,9 +47,9 @@
             }
         }
 
-        public void Visit(DefaultExpression @default) => HandleReference(@default);
+        public void Visit(DefaultExpression @default) => Visit((Expression) @default);
 
-        public void Visit(FieldExpression field) => HandleReference(field);
+        public void Visit(FieldExpression field) => Visit((Expression) field);
 
         public void Visit(MemberExpression memberAccess)
         {
@@ -83,20 +83,20 @@
 
             foreach (var parameter in method.Parameters)
             {
-                HandleReference(parameter);
+                Visit(parameter);
             }
 
-            HandleReference(method);
+            Visit((Expression) method);
         }
 
         public void Visit(PropertyExpression property)
-            => HandleReference(property);
+            => Visit((Expression) property);
 
         public void Visit(NewArrayExpression newArray)
             => HandleReference(newArray.Type.GetElementType());
 
         public void Visit(NewExpression newing)
-            => HandleReference(newing);
+            => Visit((Expression) newing);
 
         public void Visit(CatchBlock @catch)
         {
@@ -104,7 +104,7 @@
 
             if (catchVariable != null)
             {
-                HandleReference(catchVariable);
+                Visit(catchVariable);
             }
             else if (@catch.Test != typeof(Exception))
             {
@@ -127,15 +127,14 @@
             }
         }
 
-        private void HandleReference(Expression expression)
-            => HandleReference(expression.Type);
+        public void Visit(Expression expression) => HandleReference(expression.Type);
 
-        private void HandleReference(Type type)
-            => HandleReference(ClrTypeWrapper.For(type));
+        private void HandleReference(Type type) => HandleReference(ClrTypeWrapper.For(type));
 
         private void HandleReference(IType referencedType)
         {
             if (referencedType.IsPrimitive ||
+                referencedType.IsNullable ||
                 referencedType.Equals(ClrTypeWrapper.Void) ||
                 referencedType.Equals(ClrTypeWrapper.String) ||
                 referencedType.Equals(ClrTypeWrapper.Object) ||

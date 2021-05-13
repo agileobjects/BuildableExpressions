@@ -6,6 +6,7 @@
     using System.Linq.Expressions;
     using System.Reflection;
     using Generics;
+    using NetStandardPolyfills;
     using Operators;
     using ReadableExpressions;
     using static System.Linq.Expressions.ExpressionType;
@@ -90,6 +91,10 @@
             {
                 case Block when ExtractToMethod((BlockExpression)expression, out var extractedMethod):
                     return extractedMethod.CallExpression;
+
+                case ExpressionType.Convert when ((UnaryExpression)expression).Method?.IsImplicitOperator() != true:
+                    _referenceAnalysis.Visit(expression);
+                    goto default;
 
                 case Default:
                     _referenceAnalysis.Visit((DefaultExpression)expression);
