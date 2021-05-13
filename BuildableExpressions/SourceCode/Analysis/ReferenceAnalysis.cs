@@ -37,13 +37,13 @@
 
         public void Visit(ConstantExpression constant)
         {
-            if (constant.Type.IsEnum())
-            {
-                HandleReference(constant);
-            }
-            else if (constant.Type.IsAssignableTo(typeof(Type)))
+            if (constant.Type.IsAssignableTo(typeof(Type)))
             {
                 HandleReference((Type)constant.Value);
+            }
+            else if (constant.Type != typeof(MethodInfo))
+            {
+                HandleReference(constant);
             }
         }
 

@@ -89,9 +89,13 @@ namespace GeneratedExpressionCode
             var getDefaultDate = Lambda<Func<Type>>(Constant(typeof(Stream)));
 
             var translated = BuildableExpression
-                .SourceCode(sc => sc
-                    .AddClass(cls => cls
-                        .AddMethod("GetStreamType", getDefaultDate)))
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("GetStreamType", getDefaultDate);
+                    });
+                })
                 .ToCSharpString();
 
             const string expected = @"
@@ -105,6 +109,38 @@ namespace GeneratedExpressionCode
         public Type GetStreamType()
         {
             return typeof(Stream);
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldIncludeAUsingFromATypedConstant()
+        {
+            var getStringCollection = Lambda<Func<object>>(
+                Constant(new string[0], typeof(ICollection<string>)));
+
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("GetStrings", getStringCollection);
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System.Collections.Generic;
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public object GetStrings()
+        {
+            return (ICollection<string>)new string[0];
         }
     }
 }";
@@ -145,9 +181,13 @@ namespace GeneratedExpressionCode
                 NewArrayBounds(typeof(Stream), Constant(5)));
 
             var translated = BuildableExpression
-                .SourceCode(sc => sc
-                    .AddClass(cls => cls
-                        .AddMethod("GetStreamObject", createStreamArray)))
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("GetStreamObject", createStreamArray);
+                    });
+                })
                 .ToCSharpString();
 
             const string expected = @"
@@ -172,9 +212,13 @@ namespace GeneratedExpressionCode
             var getEnumIntValue = CreateLambda<object>(() => (OddNumber?)OddNumber.One);
 
             var translated = BuildableExpression
-                .SourceCode(sc => sc
-                    .AddClass(cls => cls
-                        .AddMethod("GetOddOne", getEnumIntValue)))
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("GetOddOne", getEnumIntValue);
+                    });
+                })
                 .ToCSharpString();
 
             var expected = @$"
