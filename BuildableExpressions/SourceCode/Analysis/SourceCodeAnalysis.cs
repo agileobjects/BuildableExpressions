@@ -194,6 +194,22 @@
                 case Try:
                     return false;
 
+                case Conditional:
+                    var conditional = (ConditionalExpression)parentExpression;
+
+                    if (conditional.Type != typeof(void))
+                    {
+                        // Ternary
+                        goto default;
+                    }
+
+                    if (expression == conditional.IfTrue || expression == conditional.IfFalse)
+                    {
+                        return false;
+                    }
+
+                    goto default;
+
                 case Switch:
                     var @switch = (SwitchExpression)parentExpression;
 

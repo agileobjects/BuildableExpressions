@@ -670,6 +670,61 @@ namespace GeneratedExpressionCode
             translated.ShouldBe(expected.TrimStart());
         }
 
+        [Fact]
+        public void ShouldNotExtractAnIfStatementBodyBlock()
+        {
+            var intParam = Parameter(typeof(int), "intValue");
+            var stringVariable1 = Variable(typeof(string), "str1");
+            var stringVariable2 = Variable(typeof(string), "str2");
+
+            var intParamToString = Call(
+                intParam,
+                intParam.Type.GetPublicInstanceMethod("ToString", Type.EmptyTypes));
+
+            var ifStatementLambda = Lambda<Func<int, int>>(
+                Block(
+                    IfThen(
+                        GreaterThan(intParam, Constant(100, typeof(int))),
+                        Block(
+                            new[] { stringVariable1, stringVariable2 },
+                            Assign(stringVariable1, intParamToString),
+                            Assign(stringVariable2, intParamToString))),
+                    intParam),
+                intParam);
+
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("TestClass", cls =>
+                    {
+                        cls.AddMethod("GetIntValue", ifStatementLambda);
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+namespace GeneratedExpressionCode
+{
+    public class TestClass
+    {
+        public int GetIntValue
+        (
+            int intValue
+        )
+        {
+            if (intValue > 100)
+            {
+                var str1 = intValue.ToString();
+                var str2 = intValue.ToString();
+            }
+
+            return intValue;
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
         #region Helper Members
 
         public class PublicProperty<T>
