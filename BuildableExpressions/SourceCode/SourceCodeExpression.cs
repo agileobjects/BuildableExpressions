@@ -24,22 +24,26 @@
         private ReadOnlyCollection<TypeExpression> _readOnlyTypeExpressions;
         private ReadOnlyCollection<Assembly> _referencedAssemblies;
 
-        internal SourceCodeExpression(string @namespace)
-        {
-            _typeExpressions = new List<TypeExpression>();
-            Namespace = @namespace;
-        }
-
         internal SourceCodeExpression(Action<ISourceCodeExpressionConfigurator> configuration)
+            : this("GeneratedExpressionCode")
         {
-            _typeExpressions = new List<TypeExpression>();
-            Namespace = "GeneratedExpressionCode";
-
             configuration.Invoke(this);
             Validate();
 
             IsComplete = true;
             Analyse();
+        }
+
+        internal SourceCodeExpression(SourceCodeExpression parent)
+            : this(parent.Namespace)
+        {
+            Analysis = parent.Analysis;
+        }
+
+        internal SourceCodeExpression(string @namespace)
+        {
+            _typeExpressions = new List<TypeExpression>();
+            Namespace = @namespace;
         }
 
         #region Validation

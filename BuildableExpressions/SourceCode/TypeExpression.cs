@@ -89,7 +89,7 @@
 
             _rebuildType = false;
 
-            var sourceCode = new SourceCodeExpression(SourceCode.Namespace);
+            var sourceCode = new SourceCodeExpression(SourceCode);
 
             var configuredDependencies = ImplementedTypeExpressions
                 .Filter(t => t is not ITypedTypeExpression);
@@ -100,7 +100,11 @@
             }
 
             sourceCode.Add(this);
-            sourceCode.Analyse();
+
+            if (sourceCode.Analysis == null)
+            {
+                sourceCode.Analyse();
+            }
 
             var compilationResult = sourceCode.Compile();
 

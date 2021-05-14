@@ -18,6 +18,7 @@
         private readonly ReferenceAnalysis _referenceAnalysis;
         private readonly Stack<Expression> _expressions;
         private MethodScopeBase _currentMethodScope;
+        private List<ParameterExpression> _methodParameters;
 
         private SourceCodeAnalysis(SourceCodeExpression expression)
             : base(Settings)
@@ -44,6 +45,12 @@
 
         public IList<string> RequiredNamespaces
             => _referenceAnalysis.RequiredNamespaces;
+
+        protected override void Analyse(Expression expression)
+        {
+            base.Analyse(expression);
+            _referenceAnalysis.Finalise();
+        }
 
         protected override Expression VisitAndConvert(Expression expression)
         {
@@ -174,6 +181,12 @@
             blockMethodScope.Finalise(updatedExpression);
 
             extractedMethod = blockMethodScope.BlockMethod;
+
+            if (extractedMethod.ParametersAccessor != null)
+            {
+                (_methodParameters ??= new List<ParameterExpression>())
+                    .AddRange(extractedMethod.ParametersAccessor);
+            }
 
             ExitMethodScope();
         }
@@ -369,6 +382,12 @@
             return type;
         }
 
+        public override bool ShouldBeDeclaredInVariableList(ParameterExpression variable)
+        {
+            return base.ShouldBeDeclaredInVariableList(variable) &&
+                  _methodParameters?.Contains(variable) != true;
+        }
+
         protected override bool IsAssignmentJoinable(ParameterExpression variable)
         {
             _currentMethodScope.VariableAccessed(variable);
@@ -379,12 +398,6 @@
             }
 
             return base.IsAssignmentJoinable(variable);
-        }
-
-        protected override ExpressionAnalysis Finalise()
-        {
-            _referenceAnalysis.Finalise();
-            return base.Finalise();
         }
     }
 }

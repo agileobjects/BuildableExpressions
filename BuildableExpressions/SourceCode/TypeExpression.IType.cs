@@ -20,7 +20,8 @@
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeExpression"/> class for the given
-        /// <paramref name="type"/>.
+        /// CLR <paramref name="type"/>. This constructor enables creation of
+        /// <see cref="TypeExpression"/>s which wrap CLR type objects.
         /// </summary>
         /// <param name="type">The Type represented by the <see cref="TypeExpression"/>.</param>
         protected TypeExpression(Type type)
