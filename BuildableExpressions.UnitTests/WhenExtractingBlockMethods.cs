@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using BuildableExpressions;
     using BuildableExpressions.SourceCode;
     using Common;
@@ -256,6 +257,80 @@ namespace GeneratedExpressionCode
             var l = 3;
 
             return j * l;
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldExtractAMethodArgumentLambdaBodyBlock()
+        {
+            var stringListParam = Parameter(typeof(IEnumerable<string>), "strings");
+            var stringParam = Parameter(typeof(string), "str");
+            var intVariable = Variable(typeof(int), "intValue");
+
+            var linqSelectMethod = typeof(Enumerable)
+                .GetPublicStaticMethods("Select")
+                .First(m => m.GetParameters()[1]
+                    .ParameterType
+                    .GetGenericTypeArguments().Length == 2)
+                .MakeGenericMethod(typeof(string), typeof(int));
+
+            var parseStringsLambda =
+                Lambda<Func<IEnumerable<string>, IEnumerable<int>>>(
+                    Call(
+                        linqSelectMethod,
+                        stringListParam,
+                        Lambda<Func<string, int>>(
+                            Block(
+                                new[] { intVariable },
+                                Condition(
+                                    Call(
+                                        typeof(int).GetPublicStaticMethod(
+                                            "TryParse",
+                                            typeof(string),
+                                            typeof(int).MakeByRefType()),
+                                        stringParam,
+                                        intVariable),
+                                    intVariable,
+                                    Default(typeof(int)))),
+                            stringParam)),
+                    stringListParam);
+
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("ParseStrings", parseStringsLambda);
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System.Collections.Generic;
+using System.Linq;
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public IEnumerable<int> ParseStrings
+        (
+            IEnumerable<string> strings
+        )
+        {
+            return strings.Select(str => this.GetInt(str));
+        }
+
+        private int GetInt
+        (
+            string str
+        )
+        {
+            int intValue;
+            return int.TryParse(str, out intValue) ? intValue : default(int);
         }
     }
 }";

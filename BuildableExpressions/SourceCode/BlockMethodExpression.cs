@@ -116,7 +116,7 @@
 
         #endregion
 
-        internal override void ResetMemberInfo() 
+        internal override void ResetMemberInfo()
             => SetMethodInfo(null);
     }
 }

@@ -49,7 +49,7 @@
 
         public void Visit(DefaultExpression @default) => HandleReference(@default);
 
-        public void Visit(FieldExpression field) => HandleReference(field);
+        public FieldExpression Visit(FieldExpression field) => HandleReference(field);
 
         public void Visit(MemberExpression memberAccess)
         {
@@ -89,7 +89,8 @@
             HandleReference(method);
         }
 
-        public void Visit(PropertyExpression property) => HandleReference(property);
+        public PropertyExpression Visit(PropertyExpression property)
+            => HandleReference(property);
 
         public void Visit(NewArrayExpression newArray)
             => HandleReference(newArray.Type.GetElementType());
@@ -127,7 +128,12 @@
 
         public void Visit(Expression expression) => HandleReference(expression);
 
-        private void HandleReference(Expression expression) => HandleReference(expression.Type);
+        private TExpression HandleReference<TExpression>(TExpression expression)
+            where TExpression : Expression
+        {
+            HandleReference(expression.Type);
+            return expression;
+        }
 
         private void HandleReference(Type type) => HandleReference(ClrTypeWrapper.For(type));
 

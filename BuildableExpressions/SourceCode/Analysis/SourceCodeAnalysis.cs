@@ -114,10 +114,10 @@
                     return VisitAndConvert((MethodExpressionBase)expression);
 
                 case (ExpressionType)SourceCodeExpressionType.Field:
-                    return VisitAndConvert((FieldExpression)expression);
+                    return _referenceAnalysis.Visit((FieldExpression)expression);
 
                 case (ExpressionType)SourceCodeExpressionType.Property:
-                    return VisitAndConvert((PropertyExpression)expression);
+                    return _referenceAnalysis.Visit((PropertyExpression)expression);
 
                 case (ExpressionType)SourceCodeExpressionType.GenericArgument
                     when expression is GenericParameterExpression genericParameter:
@@ -132,6 +132,8 @@
                     return base.VisitAndConvert(expression);
             }
         }
+
+        #region Method Extraction
 
         private bool ExtractToMethod(BlockExpression block, out BlockMethodExpression extractedMethod)
         {
@@ -192,10 +194,8 @@
             {
                 case Block:
                 case (ExpressionType)SourceCodeExpressionType.Constructor:
-                case Lambda:
                 case Loop:
                 case (ExpressionType)SourceCodeExpressionType.Method:
-                case Quote:
                 case Try:
                     return false;
 
@@ -215,6 +215,9 @@
 
                     goto default;
 
+                case Lambda:
+                    return _expressions.ElementAtOrDefault(2)?.NodeType == Call;
+
                 case Switch:
                     var @switch = (SwitchExpression)parentExpression;
 
@@ -231,34 +234,18 @@
             }
         }
 
+        #endregion
+
         protected override Expression VisitAndConvert(BlockExpression block)
         {
             _currentMethodScope.Add(block.Variables);
             return base.VisitAndConvert(block);
         }
 
-        protected override bool IsAssignmentJoinable(ParameterExpression variable)
-        {
-            _currentMethodScope.VariableAccessed(variable);
-
-            if (_currentMethodScope.IsMethodParameter(variable))
-            {
-                return false;
-            }
-
-            return base.IsAssignmentJoinable(variable);
-        }
-
         protected override Expression VisitAndConvert(ConstantExpression constant)
         {
             _referenceAnalysis.Visit(constant);
             return base.VisitAndConvert(constant);
-        }
-
-        private FieldExpression VisitAndConvert(FieldExpression field)
-        {
-            _referenceAnalysis.Visit(field);
-            return field;
         }
 
         private TypeExpression VisitAndConvert(GenericParameterExpression parameter)
@@ -277,27 +264,15 @@
             return closedType ? typeExpression : parameter;
         }
 
-        private SourceCodeExpression VisitAndConvert(SourceCodeExpression sourceCode)
+        protected override LambdaExpression VisitAndConvert(LambdaExpression lambda)
         {
-            foreach (var typeExpression in sourceCode.TypeExpressions)
+            if (lambda == null)
             {
-                VisitAndConvert((Expression)typeExpression);
+                return null;
             }
 
-            return sourceCode;
-        }
-
-        private TypeExpression VisitAndConvert(TypeExpression type)
-        {
-            _referenceAnalysis.Visit(type);
-
-            foreach (var memberExpression in type.MemberExpressionsAccessor)
-            {
-                VisitAndConvert(memberExpression);
-            }
-
-            type.Finalise();
-            return type;
+            _currentMethodScope.Add(lambda.Parameters);
+            return base.VisitAndConvert(lambda);
         }
 
         protected override Expression VisitAndConvert(MemberExpression memberAccess)
@@ -326,6 +301,8 @@
             return method;
         }
 
+        #region Method Scoping
+
         private void EnterMethodScope(MethodExpressionBase method)
             => EnterMethodScope(new MethodExpressionScope(method, _currentMethodScope));
 
@@ -334,6 +311,8 @@
 
         private void ExitMethodScope()
             => _currentMethodScope = _currentMethodScope.Parent;
+
+        #endregion
 
         protected override Expression VisitAndConvert(NewArrayExpression newArray)
         {
@@ -353,10 +332,14 @@
             return base.VisitAndConvert(variable);
         }
 
-        private PropertyExpression VisitAndConvert(PropertyExpression property)
+        private SourceCodeExpression VisitAndConvert(SourceCodeExpression sourceCode)
         {
-            _referenceAnalysis.Visit(property);
-            return property;
+            foreach (var typeExpression in sourceCode.TypeExpressions)
+            {
+                VisitAndConvert((Expression)typeExpression);
+            }
+
+            return sourceCode;
         }
 
         protected override CatchBlock VisitAndConvert(CatchBlock @catch)
@@ -371,6 +354,31 @@
             }
 
             return base.VisitAndConvert(@catch);
+        }
+
+        private TypeExpression VisitAndConvert(TypeExpression type)
+        {
+            _referenceAnalysis.Visit(type);
+
+            foreach (var memberExpression in type.MemberExpressionsAccessor)
+            {
+                VisitAndConvert(memberExpression);
+            }
+
+            type.Finalise();
+            return type;
+        }
+
+        protected override bool IsAssignmentJoinable(ParameterExpression variable)
+        {
+            _currentMethodScope.VariableAccessed(variable);
+
+            if (_currentMethodScope.IsMethodParameter(variable))
+            {
+                return false;
+            }
+
+            return base.IsAssignmentJoinable(variable);
         }
 
         protected override ExpressionAnalysis Finalise()

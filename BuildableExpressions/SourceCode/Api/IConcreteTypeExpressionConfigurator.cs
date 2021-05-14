@@ -13,8 +13,8 @@
         IConstructorConfigurator
     {
         /// <summary>
-        /// Gets an Expression to use to refer to the instance of the type being created in the
-        /// current scope. Use this property to access the 'this' keyword in a class or struct method.
+        /// Gets an Expression which refers to the instance of the type being created in the current
+        /// scope. This property can be used to access the 'this' keyword in a method.
         /// </summary>
         Expression ThisInstanceExpression { get; }
 
