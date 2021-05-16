@@ -18,7 +18,7 @@
         private readonly ReferenceAnalysis _referenceAnalysis;
         private readonly Stack<Expression> _expressions;
         private MethodScopeBase _currentMethodScope;
-        private List<ParameterExpression> _methodParameters;
+        private Dictionary<Expression, IList<ParameterExpression>> _methodParametersByBlock;
 
         private SourceCodeAnalysis(SourceCodeExpression expression)
             : base(Settings)
@@ -182,10 +182,10 @@
 
             extractedMethod = blockMethodScope.BlockMethod;
 
-            if (extractedMethod.ParametersAccessor != null)
+            if (extractedMethod.ParametersAccessor != null && expression.NodeType == Block)
             {
-                (_methodParameters ??= new List<ParameterExpression>())
-                    .AddRange(extractedMethod.ParametersAccessor);
+                (_methodParametersByBlock ??= new Dictionary<Expression, IList<ParameterExpression>>())
+                    .Add(expression, extractedMethod.ParametersAccessor);
             }
 
             ExitMethodScope();
@@ -382,10 +382,12 @@
             return type;
         }
 
-        public override bool ShouldBeDeclaredInVariableList(ParameterExpression variable)
+        public override bool ShouldBeDeclaredInVariableList(
+            ParameterExpression variable,
+            BlockExpression block)
         {
-            return base.ShouldBeDeclaredInVariableList(variable) &&
-                  _methodParameters?.Contains(variable) != true;
+            return base.ShouldBeDeclaredInVariableList(variable, block) &&
+                   _methodParametersByBlock?[block].Contains(variable) != true;
         }
 
         protected override bool IsAssignmentJoinable(ParameterExpression variable)
