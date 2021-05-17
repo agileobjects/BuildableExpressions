@@ -158,7 +158,7 @@ namespace GeneratedExpressionCode
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
-                    var baseType = sc.AddClass("BaseType", cls => { });
+                    var baseType = sc.AddClass("BaseType", _ => { });
 
                     sc.AddClass("DerivedType", cls =>
                     {
@@ -187,7 +187,55 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildAGenericClassWithAGenericBaseType()
+        public void ShouldBuildAGenericClassWithAClosedGenericBaseType()
+        {
+            var sourceCode = BuildableExpression
+                .SourceCode(sc => sc
+                    .AddClass("GenericDerivedType", cls =>
+                    {
+                        cls.AddGenericParameter("T");
+                        cls.SetBaseType(typeof(GenericBaseType<double[]>));
+                        cls.AddMethod("SayHello", Constant("Hello!"));
+                    }));
+
+            var genericDerivedClass = sourceCode
+                .TypeExpressions
+                .ShouldHaveSingleItem()
+                .ShouldBeOfType<ClassExpression>();
+
+            genericDerivedClass.Name.ShouldBe("GenericDerivedType");
+            genericDerivedClass.IsGeneric.ShouldBeTrue();
+            genericDerivedClass.GenericParameters.ShouldHaveSingleItem();
+            genericDerivedClass.BaseType.ShouldBe(typeof(GenericBaseType<double[]>));
+
+            var genericBaseType = genericDerivedClass
+                .BaseTypeExpression.ShouldNotBeNull();
+
+            genericBaseType.Name.ShouldBe("GenericBaseType<double[]>");
+            genericBaseType.IsGeneric.ShouldBeTrue();
+            genericBaseType.GenericParameters.ShouldHaveSingleItem();
+            genericBaseType.BaseType.ShouldBe(typeof(object));
+
+            var translated = sourceCode.ToCSharpString();
+
+            const string expected = @"
+using AgileObjects.BuildableExpressions.UnitTests;
+
+namespace GeneratedExpressionCode
+{
+    public class GenericDerivedType<T> : WhenBuildingClasses.GenericBaseType<double[]>
+    {
+        public string SayHello()
+        {
+            return ""Hello!"";
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAGenericClassWithAnOpenGenericBaseType()
         {
             var sourceCode = BuildableExpression
                 .SourceCode(sc => sc
@@ -631,7 +679,7 @@ namespace GeneratedExpressionCode
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
-                    sc.AddClass("EmptyClass", cls => { });
+                    sc.AddClass("EmptyClass", _ => { });
                 })
                 .ToCSharpString();
 

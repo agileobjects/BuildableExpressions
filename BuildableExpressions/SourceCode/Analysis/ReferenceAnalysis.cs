@@ -141,6 +141,7 @@
         {
             if (referencedType.IsPrimitive ||
                 referencedType.IsNullable ||
+                referencedType.IsArray ||
                 referencedType.Equals(ClrTypeWrapper.Void) ||
                 referencedType.Equals(ClrTypeWrapper.String) ||
                 referencedType.Equals(ClrTypeWrapper.Object) ||

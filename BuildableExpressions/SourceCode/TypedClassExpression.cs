@@ -2,12 +2,14 @@
 {
     using System;
     using NetStandardPolyfills;
+    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
 
     internal class TypedClassExpression : ClassExpression, ITypedTypeExpression
     {
         private readonly Type _classType;
+        private IType _elementType;
 
         public TypedClassExpression(Type classType)
             : base(classType)
@@ -37,6 +39,17 @@
         string IType.FullName => _classType.FullName;
 
         string IType.Name => _classType.Name;
+
+        bool IType.IsArray => _classType.IsArray;
+
+        IType IType.ElementType
+            => _elementType ??= ClrTypeWrapper.For(_classType.GetEnumerableElementType());
+
+        bool IType.IsAnonymous => _classType.IsAnonymous();
+
+        bool IType.IsEnumerable => _classType.IsEnumerable();
+
+        bool IType.IsDictionary => _classType.IsDictionary();
 
         bool IType.IsNested => _classType.IsNested;
 
