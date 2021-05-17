@@ -90,6 +90,40 @@ namespace MyNamespace
         }
 
         [Fact]
+        public void ShouldCompileSourceCodeWithExternalDependencies()
+        {
+            const string source = @"
+using System.Collections.Generic;
+
+namespace Factories
+{
+    public static class HashSetFactory
+    {
+        public static HashSet<int> CreateHashSet()
+        {
+            return new HashSet<int> { 1, 2, 3 };
+        }
+    }
+}";
+            var result = CSharpCompiler.Compile(source);
+
+            var compiledAssembly = result
+                .ShouldNotBeNull()
+                .CompiledAssembly
+                .ShouldNotBeNull();
+
+            var testType = compiledAssembly.GetType("Factories.HashSetFactory").ShouldNotBeNull();
+            var testMethod = testType.GetPublicStaticMethod("CreateHashSet").ShouldNotBeNull();
+            
+            var hashSet = testMethod
+                .Invoke(null, Array.Empty<object>())
+                .ShouldNotBeNull()
+                .ShouldBeOfType<HashSet<int>>();
+
+            hashSet.ShouldBe(1, 2, 3);
+        }
+
+        [Fact]
         public void ShouldCompileSourceCodeWithPassedInDependencies()
         {
             const string source = @"

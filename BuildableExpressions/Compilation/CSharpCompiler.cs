@@ -164,12 +164,10 @@
 
             assemblies.Add(assembly);
 
-#if NETSTANDARD
             foreach (var referencedAssembly in assembly.GetReferencedAssemblies())
             {
                 CollectReferencedAssemblies(Assembly.Load(referencedAssembly), assemblies);
             }
-#endif
         }
 
         private static MetadataReference CreateReference(Assembly assembly)
