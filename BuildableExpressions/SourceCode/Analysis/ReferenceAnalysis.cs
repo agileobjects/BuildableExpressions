@@ -155,11 +155,8 @@
                 HandleReferences(referencedType.GenericTypeArguments);
             }
 
-#if NETFRAMEWORK
-            AddAssembliesFor(referencedType);
-#else
             AddAssemblyFor(referencedType);
-#endif
+
             var @namespace = referencedType.Namespace;
 
             if (@namespace == null)
@@ -175,31 +172,6 @@
             }
         }
 
-#if NETFRAMEWORK
-        private void AddAssembliesFor(IType referencedType)
-        {
-            while (true)
-            {
-                AddAssemblyFor(referencedType);
-
-                // ReSharper disable once PossibleNullReferenceException
-                var baseType = referencedType.BaseType;
-
-                while (baseType != null && !baseType.Equals(ClrTypeWrapper.Object))
-                {
-                    AddAssemblyFor(baseType);
-                    baseType = baseType.BaseType;
-                }
-
-                if (!referencedType.IsNested)
-                {
-                    return;
-                }
-
-                referencedType = referencedType.DeclaringType;
-            }
-        }
-#endif
         private void AddAssemblyFor(IType referencedType)
         {
             var assembly = referencedType is TypeExpression typeExpression

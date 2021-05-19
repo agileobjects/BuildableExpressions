@@ -6,9 +6,6 @@
     using System.IO;
     using System.Linq;
     using System.Reflection;
-#if !FEATURE_ASSEMBLY_LOAD_FROM_BYTES
-    using System.Runtime.Loader;
-#endif
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using NetStandardPolyfills;
@@ -26,20 +23,19 @@
         /// includes the Assemblies defining System.Object, System.Collections.Generic.List{T} and
         /// System.Linq.Enumerable.
         /// </summary>
-        public static readonly List<Assembly> CompilationAssemblies = CollectReferencedAssemblies(new[]
+        public static readonly IList<Assembly> CompilationAssemblies = CollectReferencedAssemblies(new[]
         {
             typeof(object).GetAssembly(),
+            typeof(Enumerable).GetAssembly(),
 #if NETSTANDARD
             typeof(List<>).GetAssembly(),
 #endif
-            typeof(Enumerable).GetAssembly(),
             typeof(AssemblyExtensionsPolyfill).GetAssembly(),
             typeof(ReadableExpression).GetAssembly(),
             typeof(BuildableExpression).GetAssembly()
         });
 
-        private static readonly ConcurrentDictionary<string, MetadataReference> _references =
-            new ConcurrentDictionary<string, MetadataReference>();
+        private static readonly ConcurrentDictionary<string, MetadataReference> _references = new();
 
         /// <summary>
         /// Compiles the given <paramref name="cSharpSourceCodes"/>, returning a
@@ -68,7 +64,7 @@
         /// Zero or more Assemblies required for the compilation. The Assemblies in the
         /// <see cref="CompilationAssemblies"/> collection are automatically included in compilation
         /// and do not need to be passed. By default, this includes the Assemblies defining
-        /// System.Object, System.Collections.Generic.List{T} and System.Linq.Enumerable.
+        /// System.Object, System.Collections.Generic.List&lt;T&gt; and System.Linq.Enumerable.
         /// </param>
         /// <param name="cSharpSourceCodes">One or more complete C# source codes to compile.</param>
         /// <returns>A <see cref="CompilationResult"/> describing the result of the compilation.</returns>
@@ -121,12 +117,8 @@
 
             outputStream.Position = 0;
 
-            var compiledAssembly =
-#if FEATURE_ASSEMBLY_LOAD_FROM_BYTES
-                Assembly.Load(outputStream.ToArray());
-#else
-                AssemblyLoadContext.Default.LoadFromStream(outputStream);
-#endif
+            var compiledAssembly = Assembly.Load(outputStream.ToArray());
+
             return new CompilationResult { CompiledAssembly = compiledAssembly };
         }
 
@@ -136,10 +128,10 @@
             return CompilationAssemblies
                 .Concat(CollectReferencedAssemblies(passedInAssemblies))
                 .Distinct()
-                .Select(CreateReference);
+                .Select(CreateOrAddReference);
         }
 
-        private static List<Assembly> CollectReferencedAssemblies(
+        private static IList<Assembly> CollectReferencedAssemblies(
             IEnumerable<Assembly> referencedAssemblies)
         {
             var requiredAssemblies = new List<Assembly>();
@@ -156,21 +148,20 @@
             Assembly assembly,
             ICollection<Assembly> assemblies)
         {
-            if (string.IsNullOrEmpty(assembly.Location) ||
-                assemblies.Contains(assembly))
+            if (assemblies.Contains(assembly) || string.IsNullOrEmpty(assembly.Location))
             {
                 return;
             }
 
             assemblies.Add(assembly);
 
-            foreach (var referencedAssembly in assembly.GetReferencedAssemblies())
+            foreach (var referencedAssemblyName in assembly.GetReferencedAssemblies())
             {
-                CollectReferencedAssemblies(Assembly.Load(referencedAssembly), assemblies);
+                CollectReferencedAssemblies(Assembly.Load(referencedAssemblyName), assemblies);
             }
         }
 
-        private static MetadataReference CreateReference(Assembly assembly)
+        private static MetadataReference CreateOrAddReference(Assembly assembly)
         {
             return _references.GetOrAdd(
                 assembly.Location,

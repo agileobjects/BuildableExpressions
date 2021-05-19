@@ -8,6 +8,7 @@
     using System;
     using System.IO;
     using System.Text;
+    using Logging;
     using Xunit;
 
     public class ProjectFactoryTests
@@ -19,7 +20,7 @@
         public void ShouldErrorIfNonProjectFile()
         {
             var fileManager = CreateFileManager("Hi! I am a file");
-            var factory = new ProjectFactory(fileManager);
+            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
             var projectEx = Should.Throw<NotSupportedException>(() =>
             {
@@ -43,7 +44,7 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
-            var factory = new ProjectFactory(fileManager);
+            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
             var projectEx = Should.Throw<NotSupportedException>(() =>
             {
@@ -71,7 +72,7 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
-            var factory = new ProjectFactory(fileManager);
+            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
             var project = factory.GetProject(new Config(_projectFilePath));
 
@@ -96,7 +97,7 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
-            var factory = new ProjectFactory(fileManager);
+            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
             var config = new Config(_projectFilePath);
 
             factory.GetProject(config);
@@ -131,7 +132,7 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
-            var factory = new ProjectFactory(fileManager);
+            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
             var project = factory.GetProject(new Config(_projectFilePath));
 
@@ -165,7 +166,7 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
-            var factory = new ProjectFactory(fileManager);
+            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
             var config = new Config(_projectFilePath);
 
             factory.GetProject(config);

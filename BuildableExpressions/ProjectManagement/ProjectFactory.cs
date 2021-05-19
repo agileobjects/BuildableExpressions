@@ -3,16 +3,20 @@
     using System;
     using System.IO;
     using System.Linq;
+    using Compilation;
     using Configuration;
     using InputOutput;
+    using Logging;
     using static System.StringComparison;
 
     internal class ProjectFactory : IProjectFactory
     {
+        private readonly ILogger _logger;
         private readonly IFileManager _fileManager;
 
-        public ProjectFactory(IFileManager fileManager)
+        public ProjectFactory(ILogger logger, IFileManager fileManager)
         {
+            _logger = logger;
             _fileManager = fileManager;
         }
 
@@ -44,12 +48,12 @@
 #if NETFRAMEWORK
                 if (fileLine.IndexOf(" Sdk=\"", OrdinalIgnoreCase) != -1)
                 {
-                    return new SdkProject();
+                    return SdkProject(config);
                 }
 
                 return new NetFrameworkProject(config);
 #else
-                return new SdkProject();
+                return SdkProject(config);
 #endif
             }
         }
@@ -73,5 +77,8 @@
                 return;
             }
         }
+
+        private IProject SdkProject(Config config)
+            => new SdkProject(new AssemblyResolver(_logger, _fileManager), config);
     }
 }

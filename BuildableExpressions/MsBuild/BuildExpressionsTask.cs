@@ -1,16 +1,16 @@
 ﻿// ReSharper disable once CheckNamespace
 namespace BuildXpr
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
     using AgileObjects.BuildableExpressions.Compilation;
     using AgileObjects.BuildableExpressions.Configuration;
     using AgileObjects.BuildableExpressions.InputOutput;
     using AgileObjects.BuildableExpressions.Logging;
     using AgileObjects.BuildableExpressions.ProjectManagement;
     using AgileObjects.BuildableExpressions.SourceCode;
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
     using MsBuildTask = Microsoft.Build.Utilities.Task;
 
     /// <summary>
@@ -33,7 +33,7 @@ namespace BuildXpr
                     SystemIoFileManager.Instance,
                     MsBuildTaskLogger.Instance),
                 new OutputWriter(SystemIoFileManager.Instance),
-                new ProjectFactory(SystemIoFileManager.Instance))
+                new ProjectFactory(MsBuildTaskLogger.Instance, SystemIoFileManager.Instance))
         {
         }
 
@@ -69,11 +69,6 @@ namespace BuildXpr
 #if DEBUG
             System.Diagnostics.Debugger.Launch();
 #endif
-            return CompileExpressions();
-        }
-
-        internal bool CompileExpressions()
-        {
             try
             {
                 var config = _inputFilesFinder.Config = _outputWriter.Config = new Config(ProjectPath)
@@ -113,7 +108,7 @@ namespace BuildXpr
             }
         }
 
-        internal bool CompilationFailed(
+        private bool CompilationFailed(
             IEnumerable<string> expressionBuilderSources,
             out CompilationResult compilationResult)
         {

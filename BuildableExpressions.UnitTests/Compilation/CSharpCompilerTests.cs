@@ -114,7 +114,7 @@ namespace Factories
 
             var testType = compiledAssembly.GetType("Factories.HashSetFactory").ShouldNotBeNull();
             var testMethod = testType.GetPublicStaticMethod("CreateHashSet").ShouldNotBeNull();
-            
+
             var hashSet = testMethod
                 .Invoke(null, Array.Empty<object>())
                 .ShouldNotBeNull()

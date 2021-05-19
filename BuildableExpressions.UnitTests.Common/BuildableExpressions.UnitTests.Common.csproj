@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net461;netstandard1.5</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <AssemblyName>AgileObjects.BuildableExpressions.UnitTests.Common</AssemblyName>
     <RootNamespace>AgileObjects.BuildableExpressions.UnitTests.Common</RootNamespace>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

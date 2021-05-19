@@ -7,7 +7,7 @@
     <ProjectGuid>{EACB4487-216A-4545-B9AB-8037C0B26177}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>AgileObjects.BuildableExpressions.Console</RootNamespace>
-    <AssemblyName>AgileObjects.BuildableExpressions.Console</AssemblyName>
+    <AssemblyName>AgileObjects.BuildableExpressions.Console.Net461</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

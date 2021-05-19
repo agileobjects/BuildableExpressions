@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net461;netstandard1.5;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -12,7 +12,7 @@
 
     <PackageId>AgileObjects.BuildableExpressions</PackageId>
     <Title>AgileObjects.BuildableExpressions</Title>
-    <Description>A .NET 4.6.1+ and .NET Standard 1.5+ library which generates .NET Types from Expression Trees at runtime, and MSBuild Task which generates C# class files from Expression Trees at build time.</Description>
+    <Description>A .NET 4.6.1+ and .NET Standard 2.0+ library which generates .NET Types from Expression Trees at runtime, and MSBuild Task which generates C# class files from Expression Trees at build time.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>Expression Trees</PackageTags>
     <PackageProjectUrl>https://github.com/AgileObjects/BuildableExpressions</PackageProjectUrl>
@@ -20,16 +20,8 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <DefineConstants>$(DefineConstants);FEATURE_ASSEMBLY_LOAD_FROM_BYTES</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD1_5,FEATURE_READONLYDICTIONARY</DefineConstants>
-  </PropertyGroup>
-
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD2_0;FEATURE_ASSEMBLY_LOAD_FROM_BYTES;FEATURE_READONLYDICTIONARY</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_READONLYDICTIONARY</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -61,13 +53,6 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <PackageReference Include="EnvDTE" Version="16.9.31023.347" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.6.85" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
   </ItemGroup>
