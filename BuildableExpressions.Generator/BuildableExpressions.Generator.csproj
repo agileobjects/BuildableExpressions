@@ -55,14 +55,26 @@
 
   <PropertyGroup>
     <_BinPath>bin\$(Configuration)\*</_BinPath>
+    <_NetFrameworkPath>bin\$(Configuration)\net461</_NetFrameworkPath>
+    <_SharedAssemblies>bin\$(Configuration)\**\Microsoft.CodeAnalysis.*;$(_BinPath)\System.Collections.Immutable.*;$(_BinPath)\System.Reflection.Metadata.*</_SharedAssemblies>
   </PropertyGroup>
 
-  <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
+  <Target Name="PackDependencies" BeforeTargets="GenerateNuspec">
     <ItemGroup>
       <_PackageFiles
         Include="$(_BinPath)\*.dll;$(_BinPath)\*.deps.json;$(_BinPath)\*.Generator.pdb"
-        Exclude="$(_BinPath)\*.Generator.dll;$(_BinPath)\Microsoft.Build.*">
+        Exclude="$(_BinPath)\*.Generator.dll;$(_BinPath)\Microsoft.Build.*;$(_SharedAssemblies)">
         <PackagePath>tools\%(RecursiveDir)</PackagePath>
+        <Visible>false</Visible>
+        <BuildAction>Content</BuildAction>
+      </_PackageFiles>
+      <_PackageFiles Include="$(_NetFrameworkPath)\Microsoft.CodeAnalysis.*;$(_NetFrameworkPath)\System.Collections.Immutable.*;$(_NetFrameworkPath)\System.Reflection.Metadata.*">
+        <PackagePath>tools\shared</PackagePath>
+        <Visible>false</Visible>
+        <BuildAction>Content</BuildAction>
+      </_PackageFiles>
+      <_PackageFiles Include="bin\$(Configuration)\net461\**\Microsoft.*.resources.dll">
+        <PackagePath>tools\shared\$([System.IO.Path]::GetFileName('$(Directory)'))</PackagePath>
         <Visible>false</Visible>
         <BuildAction>Content</BuildAction>
       </_PackageFiles>

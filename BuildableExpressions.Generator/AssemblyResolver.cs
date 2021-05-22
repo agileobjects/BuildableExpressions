@@ -13,6 +13,9 @@
         private static readonly string _installPath =
             Path.GetDirectoryName(typeof(AssemblyResolver).GetAssembly().GetLocation());
 
+        private static readonly string _sharedPath = 
+            Path.Combine(Path.GetDirectoryName(_installPath)!, "shared");
+
         private readonly ILogger _logger;
         private readonly IFileManager _fileManager;
 
@@ -31,18 +34,37 @@
             var assemblyName = assemblyInfo.Name + ".dll";
 
             _logger.Info($"Attempting to resolve assembly '{assemblyInfo}'...");
-            _logger.Info($"Looking for assembly '{assemblyName}' in {_installPath}...");
 
-            var packagedFilePath = _fileManager
-                .FindFiles(_installPath, assemblyName)
-                .FirstOrDefault();
-
-            if (packagedFilePath != null)
+            if (TryFindAssembly(_installPath, assemblyName, out var assembly))
             {
-                return Assembly.LoadFrom(packagedFilePath);
+                return assembly;
+            }
+
+            if (TryFindAssembly(_sharedPath, assemblyName, out assembly))
+            {
+                return assembly;
             }
 
             return null;
+        }
+
+        private bool TryFindAssembly(string searchPath, string assemblyName, out Assembly assembly)
+        {
+            _logger.Info($"Looking for assembly '{assemblyName}' in {_installPath}...");
+
+            var assemblyPath = _fileManager
+                .FindFiles(searchPath, assemblyName)
+                .FirstOrDefault();
+
+            if (assemblyPath == null)
+            {
+                assembly = null;
+                return false;
+            }
+
+            _logger.Info($"Loading assembly '{assemblyName}' from {_installPath}");
+            assembly = Assembly.LoadFrom(assemblyPath);
+            return true;
         }
     }
 }
