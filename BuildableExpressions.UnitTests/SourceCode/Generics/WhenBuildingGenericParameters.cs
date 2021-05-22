@@ -79,7 +79,7 @@
             param.Type.ShouldNotBeNull().Name.ShouldBe("TNewable");
             param.Type.IsClass().ShouldBeTrue();
             param.Type.IsValueType().ShouldBeFalse();
-            Activator.CreateInstance(param.Type).ShouldNotBeNull().GetType().ShouldBe(param.Type);
+            Activator.CreateInstance(param.Type).ShouldNotBeNull()!.GetType().ShouldBe(param.Type);
         }
 
         [Fact]

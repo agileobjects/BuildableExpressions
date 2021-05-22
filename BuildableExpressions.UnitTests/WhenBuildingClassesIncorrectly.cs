@@ -16,7 +16,7 @@
                 {
                     sc.AddClass(str =>
                     {
-                        str.SetBaseType(default, bt => { });
+                        str.SetBaseType(default, _ => { });
                     });
                 });
             });

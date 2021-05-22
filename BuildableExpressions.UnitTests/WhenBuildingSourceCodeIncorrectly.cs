@@ -30,7 +30,7 @@
             {
                 BuildableExpression
                     .SourceCode(sc => sc
-                        .AddClass(null, cls => { }));
+                        .AddClass(null, _ => { }));
             });
 
             classNameEx.Message.ShouldContain("cannot be null");
@@ -43,7 +43,7 @@
             {
                 BuildableExpression
                     .SourceCode(sc => sc
-                        .AddClass(string.Empty, cls => { }));
+                        .AddClass(string.Empty, _ => { }));
             });
 
             classNameEx.Message.ShouldContain("cannot be blank");
@@ -56,7 +56,7 @@
              {
                  BuildableExpression
                      .SourceCode(sc => sc
-                        .AddClass("   ", cls => { }));
+                        .AddClass("   ", _ => { }));
              });
 
             classNameEx.Message.ShouldContain("cannot be blank");
@@ -69,7 +69,7 @@
             {
                 BuildableExpression
                     .SourceCode(sc => sc
-                        .AddClass("X-Y-Z", cls => { }));
+                        .AddClass("X-Y-Z", _ => { }));
             });
 
             classNameEx.Message.ShouldContain("invalid type name");
@@ -85,7 +85,7 @@
                 BuildableExpression.SourceCode(sc =>
                 {
                     sc.AddStruct("Doer", cls => cls.AddMethod(doNothing));
-                    sc.AddClass("Doer", cls => { });
+                    sc.AddClass("Doer", _ => { });
                 });
             });
 
@@ -102,7 +102,7 @@
                 {
                     sc.AddStruct(str =>
                     {
-                        str.SetImplements(default, impl => { });
+                        str.SetImplements(default, _ => { });
                     });
                 });
             });
@@ -119,7 +119,7 @@
                 {
                     sc.AddClass(cls =>
                     {
-                        cls.SetImplements(typeof(StringBuilder), impl => { });
+                        cls.SetImplements(typeof(StringBuilder), _ => { });
                     });
                 });
             });

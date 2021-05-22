@@ -1,0 +1,65 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>NU5128</NoWarn>
+    <AssemblyName>AgileObjects.BuildableExpressions.Generator</AssemblyName>
+    <RootNamespace>AgileObjects.BuildableExpressions.Generator</RootNamespace>
+
+    <PackageId>AgileObjects.BuildableExpressions.Generator</PackageId>
+    <Title>AgileObjects.BuildableExpressions.Generator</Title>
+    <Description>A .NET 4.6.1 and .NET Standard 2.0 MSBuild Task which generates C# class files from Expression Trees at build time.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>Expression Trees</PackageTags>
+    <PackageProjectUrl>https://github.com/AgileObjects/BuildableExpressions</PackageProjectUrl>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+
+    <!-- forces SDK to copy dependencies into build output to make packing easier -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\ClsCompliant.cs">
+      <Link>Properties\ClsCompliant.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="ExpressionBuilder.cs" />
+    <EmbeddedResource Include="ExpressionBuilder.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="MSBuild\AgileObjects.BuildableExpressions.Generator.targets" />
+    <Content Include="MSBuild\AgileObjects.BuildableExpressions.Generator.targets">
+      <PackagePath>build</PackagePath>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <PackageReference Include="EnvDTE" Version="16.9.31023.347" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AgileObjects.BuildableExpressions" Version="0.1.0-preview1" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.6.85" PrivateAssets="All"  />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BuildableExpressions\BuildableExpressions.csproj" />
+  </ItemGroup>
+
+  <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
+    <ItemGroup>
+      <_PackageFiles Include="bin\$(Configuration)\*\*.BuildableExpressions.Generator.*">
+        <PackagePath>tools\%(RecursiveDir)</PackagePath>
+        <Visible>false</Visible>
+        <BuildAction>Content</BuildAction>
+      </_PackageFiles>
+    </ItemGroup>
+  </Target>
+
+</Project>

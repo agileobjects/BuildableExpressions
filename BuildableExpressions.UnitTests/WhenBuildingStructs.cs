@@ -178,7 +178,7 @@ namespace GeneratedExpressionCode
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
-                    sc.AddStruct("EmptyStruct", str => { });
+                    sc.AddStruct("EmptyStruct", _ => { });
                 })
                 .ToCSharpString();
 

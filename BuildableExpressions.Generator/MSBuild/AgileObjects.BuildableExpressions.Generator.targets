@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_BuildXprFramework Condition="'$(MSBuildRuntimeType)' != 'Core'">net461</_BuildXprFramework>
+    <_BuildXprFramework Condition="'$(MSBuildRuntimeType)' == 'Core'">netstandard2.0</_BuildXprFramework>
+    <_BuildXprTaskAssembly>..\tools\$(_BuildXprFramework)\AgileObjects.BuildableExpressions.Generator.dll</_BuildXprTaskAssembly>
+    <ProjectPath>"$(MSBuildProjectFullPath)"</ProjectPath>
+  </PropertyGroup>
+
+  <UsingTask AssemblyFile="$(_BuildXprTaskAssembly)" TaskName="BuildXpr.BuildExpressionsTask" />
+
+  <Target Name="BuildExpressions" BeforeTargets="BeforeCompile" Condition="'$(BuildExpressions)' != 'False'">
+    <BuildXpr.BuildExpressionsTask ProjectPath="$(MSBuildProjectFullPath)" RootNamespace="$(RootNamespace)" />
+  </Target>
+</Project>

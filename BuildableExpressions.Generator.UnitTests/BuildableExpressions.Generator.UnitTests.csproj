@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>AgileObjects.BuildableExpressions.UnitTests.NetCore2</AssemblyName>
-    <RootNamespace>AgileObjects.BuildableExpressions.UnitTests</RootNamespace>
+    <TargetFramework>net461</TargetFramework>
+    <AssemblyName>AgileObjects.BuildableExpressions.Generator.UnitTests</AssemblyName>
+    <RootNamespace>AgileObjects.BuildableExpressions.Generator.UnitTests</RootNamespace>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors></WarningsAsErrors>
     <NoWarn>0649;1701;1702</NoWarn>
@@ -15,21 +15,9 @@
     <SignAssembly>true</SignAssembly>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <Compile Include="..\ClsCompliant.cs">
-      <Link>Properties\ClsCompliant.cs</Link>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\BuildableExpressions.UnitTests\**\*.cs" Exclude="..\BuildableExpressions.UnitTests\obj\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="EnvDTE" Version="16.9.31023.347" PrivateAssets="All" />
     <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
@@ -39,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BuildableExpressions\BuildableExpressions.csproj" />
+    <ProjectReference Include="..\BuildableExpressions.Generator\BuildableExpressions.Generator.csproj" />
     <ProjectReference Include="..\BuildableExpressions.UnitTests.Common\BuildableExpressions.UnitTests.Common.csproj" />
   </ItemGroup>
 

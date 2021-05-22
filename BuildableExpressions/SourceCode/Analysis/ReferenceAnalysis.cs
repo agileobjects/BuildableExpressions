@@ -11,6 +11,7 @@
     using NetStandardPolyfills;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations.Reflection;
+    using static SourceCodeConstants;
     using static SourceCodeTranslationSettings;
 
     internal class ReferenceAnalysis
@@ -145,7 +146,7 @@
                 referencedType.Equals(ClrTypeWrapper.Void) ||
                 referencedType.Equals(ClrTypeWrapper.String) ||
                 referencedType.Equals(ClrTypeWrapper.Object) ||
-               (referencedType.Namespace == BuildConstants.GenericParameterTypeNamespace))
+               (referencedType.Namespace == GenericParameterTypeNamespace))
             {
                 return;
             }

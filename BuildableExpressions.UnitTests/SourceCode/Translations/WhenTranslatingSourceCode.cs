@@ -13,11 +13,15 @@
         public void ShouldUseANonSourceCodeExpressionAnalysis()
         {
             var sourceCode = BuildableExpression
-                .SourceCode(sc => sc
-                    .AddClass(cls => cls
-                        .AddMethod(
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod(
                             "GetNow",
-                            Property(null, typeof(DateTime), "Now"))));
+                            Property(null, typeof(DateTime), "Now"));
+                    });
+                });
 
             var sourceCodeTranslation = new ExpressionTranslation(
                 sourceCode,

@@ -12,12 +12,11 @@
 
     <PackageId>AgileObjects.BuildableExpressions</PackageId>
     <Title>AgileObjects.BuildableExpressions</Title>
-    <Description>A .NET 4.6.1+ and .NET Standard 2.0+ library which generates .NET Types from Expression Trees at runtime, and MSBuild Task which generates C# class files from Expression Trees at build time.</Description>
+    <Description>A .NET 4.6.1 and .NET Standard 2.0 library which generates .NET Types from Expression Trees at runtime.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>Expression Trees</PackageTags>
     <PackageProjectUrl>https://github.com/AgileObjects/BuildableExpressions</PackageProjectUrl>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
@@ -31,15 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="MsBuild\*.targets" PackagePath="build\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="ExpressionBuilder.cs" />
-    <EmbeddedResource Include="ExpressionBuilder.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Update="SourceCode\TypeExpression.*.cs">
       <DependentUpon>SourceCode\TypeExpression.cs</DependentUpon>
     </Compile>
@@ -50,30 +40,10 @@
       <DependentUpon>BuildableExpression.cs</DependentUpon>
     </Compile>
   </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <PackageReference Include="EnvDTE" Version="16.9.31023.347" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.6.85" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.9.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="AgileObjects.ReadableExpressions" Version="3.0.0-preview1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
   </ItemGroup>
-
-  <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
-    <ItemGroup>
-      <_PackageFiles Include="bin\$(Configuration)\*\AgileObjects.*.dll">
-        <PackagePath>tools\%(RecursiveDir)</PackagePath>
-        <Visible>false</Visible>
-        <BuildAction>Content</BuildAction>
-      </_PackageFiles>
-    </ItemGroup>
-  </Target>
 
 </Project>
