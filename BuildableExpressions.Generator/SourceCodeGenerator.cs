@@ -19,6 +19,7 @@
 
         public SourceCodeGenerator(
             ILogger logger,
+            AssemblyResolver assemblyResolver,
             InputFilesFinder inputFilesFinder,
             OutputWriter outputWriter,
             IProjectFactory projectFactory)
@@ -27,6 +28,8 @@
             _inputFilesFinder = inputFilesFinder;
             _outputWriter = outputWriter;
             _projectFactory = projectFactory;
+
+            assemblyResolver.Init();
         }
 
         public bool Execute()

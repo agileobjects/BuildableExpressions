@@ -10,15 +10,17 @@
 
     <PackageId>AgileObjects.BuildableExpressions.Generator</PackageId>
     <Title>AgileObjects.BuildableExpressions.Generator</Title>
-    <Description>A .NET 4.6.1 and .NET Standard 2.0 MSBuild Task which generates C# class files from Expression Trees at build time.</Description>
+    <Description>An MSBuild Task which generates C# class files from Expression Trees at build time. Targets .NET 4.6.1 and .NET Standard 2.0, dotnet build and MSBuild, and SDK and non-SDK projects.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>Expression Trees</PackageTags>
     <PackageProjectUrl>https://github.com/AgileObjects/BuildableExpressions</PackageProjectUrl>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <NoPackageAnalysis>true</NoPackageAnalysis>
 
     <!-- forces SDK to copy dependencies into build output to make packing easier -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
+    <PackageOutputPath>../NuGet</PackageOutputPath>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
 
   <ItemGroup>
@@ -44,7 +46,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AgileObjects.BuildableExpressions" Version="0.1.0-preview1" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.6.85" PrivateAssets="All"  />
   </ItemGroup>
 
@@ -52,9 +53,15 @@
     <ProjectReference Include="..\BuildableExpressions\BuildableExpressions.csproj" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <_BinPath>bin\$(Configuration)\*</_BinPath>
+  </PropertyGroup>
+
   <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
     <ItemGroup>
-      <_PackageFiles Include="bin\$(Configuration)\*\*.BuildableExpressions.Generator.*">
+      <_PackageFiles
+        Include="$(_BinPath)\*.dll;$(_BinPath)\*.deps.json;$(_BinPath)\*.Generator.pdb"
+        Exclude="$(_BinPath)\*.Generator.dll;$(_BinPath)\Microsoft.Build.*">
         <PackagePath>tools\%(RecursiveDir)</PackagePath>
         <Visible>false</Visible>
         <BuildAction>Content</BuildAction>

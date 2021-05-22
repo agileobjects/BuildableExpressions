@@ -40,6 +40,7 @@ namespace BuildXpr
 
             var generator = new SourceCodeGenerator(
                 logger,
+                new AssemblyResolver(logger, fileManager),
                 new InputFilesFinder(logger, fileManager, config),
                 new OutputWriter(fileManager, config),
                 new ProjectFactory(logger, fileManager, config));
