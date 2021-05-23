@@ -12,21 +12,18 @@
     {
         private readonly ILogger _logger;
         private readonly IFileManager _fileManager;
-        private readonly Config _config;
 
         public ProjectFactory(
             ILogger logger,
-            IFileManager fileManager,
-            Config config)
+            IFileManager fileManager)
         {
             _logger = logger;
             _fileManager = fileManager;
-            _config = config;
         }
 
-        public IProject GetProject()
+        public IProject GetProject(Config config)
         {
-            using var fileReadStream = _fileManager.OpenRead(_config.ProjectPath);
+            using var fileReadStream = _fileManager.OpenRead(config.ProjectPath);
             using var fileReader = new StreamReader(fileReadStream);
 
             while (true)
@@ -36,7 +33,7 @@
                 if (fileLine == null || char.IsWhiteSpace(fileLine.First()))
                 {
                     var ex = new NotSupportedException(
-                        $"Unable to find <Project /> element in file '{_config.ProjectPath}'");
+                        $"Unable to find <Project /> element in file '{config.ProjectPath}'");
                     
                     _logger.Error(ex);
                     throw ex;
@@ -47,9 +44,9 @@
                     continue;
                 }
 
-                if (string.IsNullOrWhiteSpace(_config.RootNamespace))
+                if (string.IsNullOrWhiteSpace(config.RootNamespace))
                 {
-                    TryPopulateRootNamespace(_config, fileReader);
+                    TryPopulateRootNamespace(config, fileReader);
                 }
 
 #if NETFRAMEWORK
@@ -58,7 +55,7 @@
                     return new SdkProject();
                 }
 
-                return new NetFrameworkProject(_config);
+                return new NetFrameworkProject(config);
 #else
                 return new SdkProject();
 #endif

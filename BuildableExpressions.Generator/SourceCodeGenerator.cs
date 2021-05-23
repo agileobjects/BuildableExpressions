@@ -5,6 +5,7 @@
     using System.IO;
     using System.Linq;
     using Compilation;
+    using Configuration;
     using InputOutput;
     using Logging;
     using ProjectManagement;
@@ -32,12 +33,12 @@
             assemblyResolver.Init();
         }
 
-        public bool Execute()
+        public bool Execute(Config config)
         {
             try
             {
-                var project = _projectFactory.GetProject();
-                var inputFiles = _inputFilesFinder.GetInputFiles();
+                var project = _projectFactory.GetProject(config);
+                var inputFiles = _inputFilesFinder.GetInputFiles(config);
 
                 _logger.Info("Compiling Expression files...");
 
@@ -51,7 +52,7 @@
                 }
 
                 var sourceCodeExpressions = compilationResult.ToSourceCodeExpressions();
-                var writtenFiles = _outputWriter.Write(sourceCodeExpressions);
+                var writtenFiles = _outputWriter.Write(config, sourceCodeExpressions);
 
                 writtenFiles.Insert(0, Path.GetFileName(inputFiles.First().FilePath));
 

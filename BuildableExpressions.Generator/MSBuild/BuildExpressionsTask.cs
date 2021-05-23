@@ -36,16 +36,15 @@ namespace BuildXpr
 #endif
             var logger = new MsBuildTaskLogger(Log);
             var fileManager = SystemIoFileManager.Instance;
-            var config = new Config(ProjectPath, RootNamespace);
 
             var generator = new SourceCodeGenerator(
                 logger,
                 new AssemblyResolver(logger, fileManager),
-                new InputFilesFinder(logger, fileManager, config),
-                new OutputWriter(fileManager, config),
-                new ProjectFactory(logger, fileManager, config));
-
-            return generator.Execute();
+                new InputFilesFinder(logger, fileManager),
+                new OutputWriter(fileManager),
+                new ProjectFactory(logger, fileManager));
+            
+            return generator.Execute(new Config(ProjectPath, RootNamespace));
         }
     }
 }

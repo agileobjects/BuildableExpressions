@@ -20,15 +20,11 @@
         public void ShouldErrorIfNonProjectFile()
         {
             var fileManager = CreateFileManager("Hi! I am a file");
-
-            var factory = new ProjectFactory(
-                Mock.Of<ILogger>(),
-                fileManager,
-                new Config(_projectFilePath, rootNamespace: null));
+            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
             var projectEx = Should.Throw<NotSupportedException>(() =>
             {
-                factory.GetProject();
+                factory.GetProject(new Config(_projectFilePath, rootNamespace: null));
             });
 
             projectEx.Message.ShouldContain("Unable to find <Project />");
@@ -48,15 +44,11 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
-
-            var factory = new ProjectFactory(
-                Mock.Of<ILogger>(),
-                fileManager,
-                new Config(_projectFilePath, rootNamespace: null));
+            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
             var projectEx = Should.Throw<NotSupportedException>(() =>
             {
-                factory.GetProject();
+                factory.GetProject(new Config(_projectFilePath, rootNamespace: null));
             });
 
             projectEx.Message.ShouldContain("Unable to find <Project />");
@@ -80,13 +72,10 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
+            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
-            var factory = new ProjectFactory(
-                Mock.Of<ILogger>(),
-                fileManager,
+            var project = factory.GetProject(
                 new Config(_projectFilePath, rootNamespace: null));
-
-            var project = factory.GetProject();
 
             project.ShouldBeOfType<SdkProject>();
         }
@@ -110,9 +99,9 @@
 
             var fileManager = CreateFileManager(fileContents);
             var config = new Config(_projectFilePath, rootNamespace: null);
-            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager, config);
+            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
-            factory.GetProject();
+            factory.GetProject(config);
 
             config.RootNamespace.ShouldBe("AgileObjects.BuildableExpressions.Generator.UnitTests");
         }
@@ -144,13 +133,10 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
+            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
-            var factory = new ProjectFactory(
-                Mock.Of<ILogger>(),
-                fileManager,
+            var project = factory.GetProject(
                 new Config(_projectFilePath, rootNamespace: string.Empty));
-
-            var project = factory.GetProject();
 
             project.ShouldBeOfType<NetFrameworkProject>();
         }
@@ -183,9 +169,9 @@
 
             var fileManager = CreateFileManager(fileContents);
             var config = new Config(_projectFilePath, rootNamespace: string.Empty);
-            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager, config);
+            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
-            factory.GetProject();
+            factory.GetProject(config);
 
             config.RootNamespace.ShouldBe("AgileObjects.BuildableExpressions.Generator.UnitTests");
         }

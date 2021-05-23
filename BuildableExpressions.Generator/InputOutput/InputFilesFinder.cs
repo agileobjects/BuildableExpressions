@@ -23,22 +23,17 @@
 
         private readonly ILogger _logger;
         private readonly IFileManager _fileManager;
-        private readonly Config _config;
 
-        public InputFilesFinder(
-            ILogger logger,
-            IFileManager fileManager,
-            Config config)
+        public InputFilesFinder(ILogger logger, IFileManager fileManager)
         {
             _logger = logger;
             _fileManager = fileManager;
-            _config = config;
         }
 
-        public ICollection<InputFile> GetInputFiles()
+        public ICollection<InputFile> GetInputFiles(Config config)
         {
             var inputFiles = _fileManager
-                .FindFiles(_config.ContentRoot, "*.cs")
+                .FindFiles(config.ContentRoot, "*.cs")
                 .Where(cSharpFilePath => !_binOrObjPathMatcher.IsMatch(cSharpFilePath))
                 .Select(cSharpFilePath => new InputFile
                 {
@@ -59,13 +54,13 @@
 
             var inputFileContent = GetDefaultInputFile();
 
-            if (_config.RootNamespace != null)
+            if (config.RootNamespace != null)
             {
                 inputFileContent = inputFileContent
-                    .Replace(DefaultInputFileNamespace, _config.RootNamespace);
+                    .Replace(DefaultInputFileNamespace, config.RootNamespace);
             }
 
-            var inputFilePath = Combine(_config.ContentRoot, DefaultInputFileName);
+            var inputFilePath = Combine(config.ContentRoot, DefaultInputFileName);
 
             _fileManager.Write(inputFilePath, inputFileContent);
 

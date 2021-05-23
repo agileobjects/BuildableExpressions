@@ -23,9 +23,7 @@
         {
             var fileManagerMock = new Mock<IFileManager>();
 
-            var outputWriter = new OutputWriter(
-                fileManagerMock.Object,
-                new Config(_projectFilePath, _rootNamespace));
+            var outputWriter = new OutputWriter(fileManagerMock.Object);
 
             var sourceCode = BuildableExpression
                 .SourceCode(sc =>
@@ -40,7 +38,7 @@
 
             var fileName = sourceCode.TypeExpressions.First().Name + ".cs";
 
-            outputWriter.Write(sourceCode);
+            outputWriter.Write(new Config(_projectFilePath, _rootNamespace), sourceCode);
 
             fileManagerMock.Verify(fm => fm.EnsureDirectory(_projectDirectory), Never);
 
@@ -54,9 +52,7 @@
         {
             var fileManagerMock = new Mock<IFileManager>();
 
-            var outputWriter = new OutputWriter(
-                fileManagerMock.Object,
-                new Config(_projectFilePath, _rootNamespace));
+            var outputWriter = new OutputWriter(fileManagerMock.Object);
 
             var sourceCode = BuildableExpression.SourceCode(sc =>
             {
@@ -70,7 +66,9 @@
 
             var fileName = sourceCode.TypeExpressions.First().Name + ".cs";
 
-            outputWriter.Write(new List<SourceCodeExpression> { sourceCode });
+            outputWriter.Write(
+                new Config(_projectFilePath, _rootNamespace),
+                new List<SourceCodeExpression> { sourceCode });
 
             var expectedOutputDirectory =
                 Path.Combine(_projectDirectory, "GeneratedCode");

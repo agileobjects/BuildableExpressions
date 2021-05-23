@@ -10,27 +10,31 @@
     internal class OutputWriter
     {
         private readonly IFileManager _fileManager;
-        private readonly Config _config;
 
-        public OutputWriter(IFileManager fileManager, Config config)
+        public OutputWriter(IFileManager fileManager)
         {
             _fileManager = fileManager;
-            _config = config;
         }
 
-        public List<string> Write(params SourceCodeExpression[] sourceCodeExpressions)
-            => Write(sourceCodeExpressions.AsEnumerable());
-
-        public List<string> Write(IEnumerable<SourceCodeExpression> sourceCodeExpressions)
+        public List<string> Write(
+            Config config,
+            params SourceCodeExpression[] sourceCodeExpressions)
         {
-            var rootNamespace = _config.RootNamespace;
+            return Write(config, sourceCodeExpressions.AsEnumerable());
+        }
+
+        public List<string> Write(
+            Config config,
+            IEnumerable<SourceCodeExpression> sourceCodeExpressions)
+        {
+            var rootNamespace = config.RootNamespace;
             var newFilePaths = new List<string>();
 
             foreach (var sourceCodeExpression in sourceCodeExpressions)
             {
                 var @namespace = sourceCodeExpression.Namespace;
 
-                var outputDirectory = _config.ContentRoot;
+                var outputDirectory = config.ContentRoot;
                 string relativeFilePath;
 
                 if (@namespace != rootNamespace &&

@@ -28,10 +28,10 @@
 
             var finder = new InputFilesFinder(
                 Mock.Of<ILogger>(),
-                fileManagerMock.Object,
-                new Config(_projectFilePath, _rootNamespace));
+                fileManagerMock.Object);
 
-            var inputFiles = finder.GetInputFiles();
+            var inputFiles = finder.GetInputFiles(
+                new Config(_projectFilePath, _rootNamespace));
 
             var inputFile = inputFiles.ShouldHaveSingleItem();
             inputFile.FilePath.ShouldBe(Path.Combine(_contentRoot, DefaultInputFileName));
@@ -74,10 +74,10 @@ namespace {DefaultInputFileNamespace}
 }}");
             var finder = new InputFilesFinder(
                 Mock.Of<ILogger>(),
-                fileManagerMock.Object,
-                new Config(_projectFilePath, _rootNamespace));
+                fileManagerMock.Object);
 
-            var inputFiles = finder.GetInputFiles();
+            var inputFiles = finder.GetInputFiles(
+                new Config(_projectFilePath, _rootNamespace));
 
             inputFiles.Count.ShouldBe(2);
 
@@ -108,10 +108,10 @@ namespace {DefaultInputFileNamespace}
 }}");
             var finder = new InputFilesFinder(
                 Mock.Of<ILogger>(),
-                fileManagerMock.Object,
-                new Config(_projectFilePath, _rootNamespace));
+                fileManagerMock.Object);
 
-            var inputFiles = finder.GetInputFiles();
+            var inputFiles = finder.GetInputFiles(
+                new Config(_projectFilePath, _rootNamespace));
 
             inputFiles.ShouldHaveSingleItem().FilePath.ShouldBe(filePath3);
         }
@@ -148,10 +148,10 @@ namespace MyOtherClassNamespace
 }");
             var finder = new InputFilesFinder(
                 Mock.Of<ILogger>(),
-                fileManagerMock.Object,
-                new Config(_projectFilePath, _rootNamespace));
+                fileManagerMock.Object);
 
-            var inputFiles = finder.GetInputFiles();
+            var inputFiles = finder.GetInputFiles(
+                new Config(_projectFilePath, _rootNamespace));
 
             inputFiles.ShouldHaveSingleItem().FilePath.ShouldBe(filePath1);
 
