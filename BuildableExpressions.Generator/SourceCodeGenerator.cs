@@ -10,6 +10,7 @@
     using Logging;
     using ProjectManagement;
     using SourceCode;
+    using static GeneratorConstants;
 
     internal class SourceCodeGenerator
     {
@@ -69,7 +70,7 @@
             out CompilationResult compilationResult)
         {
             compilationResult = CSharpCompiler.Compile(
-                new[] { typeof(SourceCodeGenerator).Assembly },
+                new[] { ThisAssembly },
                 inputFiles.Select(file => file.Contents));
 
             if (!compilationResult.Failed)

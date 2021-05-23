@@ -6,9 +6,9 @@
     using System.Text.RegularExpressions;
     using Configuration;
     using Logging;
-    using NetStandardPolyfills;
     using static System.IO.Path;
     using static System.Text.RegularExpressions.RegexOptions;
+    using static GeneratorConstants;
 
     internal class InputFilesFinder
     {
@@ -66,13 +66,11 @@
 
         private static InputFile GetDefaultInputFile(Config config)
         {
-            var thisAssembly = typeof(InputFilesFinder).GetAssembly();
-
-            var defaultInputFileResourceName = thisAssembly
+            var defaultInputFileResourceName = ThisAssembly
                 .GetManifestResourceNames()
                 .First(name => name.EndsWith(DefaultInputFileName));
 
-            var defaultInputFileResourceStream = thisAssembly
+            var defaultInputFileResourceStream = ThisAssembly
                 .GetManifestResourceStream(defaultInputFileResourceName);
 
             using (defaultInputFileResourceStream)
