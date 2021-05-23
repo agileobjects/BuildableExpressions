@@ -6,7 +6,7 @@
 
     internal class MsBuildTaskLogger : ILogger
     {
-        private TaskLoggingHelper _taskLog;
+        private readonly TaskLoggingHelper _taskLog;
 
         public MsBuildTaskLogger(TaskLoggingHelper taskLog)
         {

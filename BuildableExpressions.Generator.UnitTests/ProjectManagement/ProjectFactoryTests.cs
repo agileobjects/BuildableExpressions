@@ -24,7 +24,7 @@
 
             var projectEx = Should.Throw<NotSupportedException>(() =>
             {
-                factory.GetProject(new Config(_projectFilePath, rootNamespace: null));
+                factory.GetProjectOrThrow(new Config(_projectFilePath, rootNamespace: null));
             });
 
             projectEx.Message.ShouldContain("Unable to find <Project />");
@@ -48,7 +48,7 @@
 
             var projectEx = Should.Throw<NotSupportedException>(() =>
             {
-                factory.GetProject(new Config(_projectFilePath, rootNamespace: null));
+                factory.GetProjectOrThrow(new Config(_projectFilePath, rootNamespace: null));
             });
 
             projectEx.Message.ShouldContain("Unable to find <Project />");
@@ -74,7 +74,7 @@
             var fileManager = CreateFileManager(fileContents);
             var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
-            var project = factory.GetProject(
+            var project = factory.GetProjectOrThrow(
                 new Config(_projectFilePath, rootNamespace: null));
 
             project.ShouldBeOfType<SdkProject>();
@@ -101,7 +101,7 @@
             var config = new Config(_projectFilePath, rootNamespace: null);
             var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
-            factory.GetProject(config);
+            factory.GetProjectOrThrow(config);
 
             config.RootNamespace.ShouldBe("AgileObjects.BuildableExpressions.Generator.UnitTests");
         }
@@ -135,7 +135,7 @@
             var fileManager = CreateFileManager(fileContents);
             var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
-            var project = factory.GetProject(
+            var project = factory.GetProjectOrThrow(
                 new Config(_projectFilePath, rootNamespace: string.Empty));
 
             project.ShouldBeOfType<NetFrameworkProject>();
@@ -171,7 +171,7 @@
             var config = new Config(_projectFilePath, rootNamespace: string.Empty);
             var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
-            factory.GetProject(config);
+            factory.GetProjectOrThrow(config);
 
             config.RootNamespace.ShouldBe("AgileObjects.BuildableExpressions.Generator.UnitTests");
         }

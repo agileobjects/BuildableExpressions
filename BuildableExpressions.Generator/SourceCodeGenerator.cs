@@ -37,16 +37,12 @@
         {
             try
             {
-                var project = _projectFactory.GetProject(config);
+                var project = _projectFactory.GetProjectOrThrow(config);
                 var inputFiles = _inputFilesFinder.GetInputFiles(config);
 
                 _logger.Info("Compiling Expression files...");
 
-                var compilationFailed = CompilationFailed(
-                    inputFiles.Select(f => f.Contents),
-                    out var compilationResult);
-
-                if (compilationFailed)
+                if (CompilationFailed(inputFiles, out var compilationResult))
                 {
                     return false;
                 }
@@ -69,12 +65,12 @@
         }
 
         private bool CompilationFailed(
-            IEnumerable<string> expressionBuilderSources,
+            IEnumerable<InputFile> inputFiles,
             out CompilationResult compilationResult)
         {
             compilationResult = CSharpCompiler.Compile(
                 new[] { typeof(SourceCodeGenerator).Assembly },
-                expressionBuilderSources);
+                inputFiles.Select(file => file.Contents));
 
             if (!compilationResult.Failed)
             {

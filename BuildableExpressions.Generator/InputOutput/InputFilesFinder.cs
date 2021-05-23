@@ -43,6 +43,11 @@
                 .Where(_ =>
                     _.Contents.Contains(nameof(BuildableExpressions)) &&
                     _.Contents.Contains(nameof(ISourceCodeExpressionBuilder)))
+                .Select(filePath =>
+                {
+                    _logger.Info($"Found Expression input file '{filePath}'");
+                    return filePath;
+                })
                 .ToList();
 
             if (inputFiles.Any())
@@ -52,29 +57,14 @@
 
             _logger.Info("Creating default input file...");
 
-            var inputFileContent = GetDefaultInputFile();
+            var defaultInputFile = GetDefaultInputFile(config);
 
-            if (config.RootNamespace != null)
-            {
-                inputFileContent = inputFileContent
-                    .Replace(DefaultInputFileNamespace, config.RootNamespace);
-            }
+            _fileManager.Write(defaultInputFile.FilePath, defaultInputFile.Contents);
 
-            var inputFilePath = Combine(config.ContentRoot, DefaultInputFileName);
-
-            _fileManager.Write(inputFilePath, inputFileContent);
-
-            return new[]
-            {
-                new InputFile
-                {
-                    FilePath = inputFilePath,
-                    Contents = inputFileContent
-                }
-            };
+            return new[] { defaultInputFile };
         }
 
-        private static string GetDefaultInputFile()
+        private static InputFile GetDefaultInputFile(Config config)
         {
             var thisAssembly = typeof(InputFilesFinder).GetAssembly();
 
@@ -88,15 +78,20 @@
             using (defaultInputFileResourceStream)
             using (var fileStreamReader = new StreamReader(defaultInputFileResourceStream!))
             {
-                return fileStreamReader.ReadToEnd();
+                var contents = fileStreamReader.ReadToEnd();
+
+                if (config.RootNamespace != null)
+                {
+                    contents = contents
+                        .Replace(DefaultInputFileNamespace, config.RootNamespace);
+                }
+
+                return new InputFile
+                {
+                    FilePath = Combine(config.ContentRoot, DefaultInputFileName),
+                    Contents = contents
+                };
             }
-        }
-
-        public class InputFile
-        {
-            public string FilePath { get; set; }
-
-            public string Contents { get; set; }
         }
     }
 }

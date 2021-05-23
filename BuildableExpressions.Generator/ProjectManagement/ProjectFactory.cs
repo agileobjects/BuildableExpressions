@@ -21,7 +21,7 @@
             _fileManager = fileManager;
         }
 
-        public IProject GetProject(Config config)
+        public IProject GetProjectOrThrow(Config config)
         {
             using var fileReadStream = _fileManager.OpenRead(config.ProjectPath);
             using var fileReader = new StreamReader(fileReadStream);
