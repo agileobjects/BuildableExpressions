@@ -9,6 +9,7 @@
     using Analysis;
     using Api;
     using Extensions;
+    using ReadableExpressions;
     using ReadableExpressions.Translations;
     using Translations;
 
@@ -100,6 +101,12 @@
         }
 
         /// <summary>
+        /// Gets a <see cref="CommentExpression"/> containing the file header to use in the source
+        /// code generated from this <see cref="SourceCodeExpression"/>, if a header has been set.
+        /// </summary>
+        public CommentExpression Header { get; private set; }
+
+        /// <summary>
         /// Gets the namespace to which the source code represented by this
         /// <see cref="SourceCodeExpression"/> belongs.
         /// </summary>
@@ -128,17 +135,8 @@
 
         #region ISourceCodeExpressionConfigurator Members
 
-        ISourceCodeExpressionConfigurator ISourceCodeExpressionConfigurator.WithNamespaceOf<T>()
-        {
-            Namespace = typeof(T).Namespace;
-            return this;
-        }
-
-        ISourceCodeExpressionConfigurator ISourceCodeExpressionConfigurator.WithNamespaceOf(Type type)
-        {
-            Namespace = type.Namespace;
-            return this;
-        }
+        void ISourceCodeExpressionConfigurator.SetHeader(CommentExpression header)
+            => Header = header;
 
         void ISourceCodeExpressionConfigurator.SetNamespace(string @namespace)
             => Namespace = @namespace;

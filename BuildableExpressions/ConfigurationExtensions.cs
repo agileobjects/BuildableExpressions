@@ -22,6 +22,46 @@
     public static class ConfigurationExtensions
     {
         /// <summary>
+        /// Sets the header documentation of the <see cref="SourceCodeExpression"/> to the given
+        /// <paramref name="header"/>.
+        /// </summary>
+        /// <param name="sourceCodeConfig">The <see cref="ISourceCodeExpressionConfigurator"/> to configure.</param>
+        /// <param name="header">
+        /// Text to use for the file header of the source code generated from the
+        /// <see cref="SourceCodeExpression"/>.
+        /// </param>
+        public static void SetHeader(
+            this ISourceCodeExpressionConfigurator sourceCodeConfig,
+            string header)
+        {
+            sourceCodeConfig.SetHeader(ReadableExpression.Comment(header));
+        }
+
+        /// <summary>
+        /// Add <see cref="TypeExpression"/>s belonging to the <see cref="SourceCodeExpression"/>
+        /// to the namespace of the given <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type the namespace to which generated code should belong.</typeparam>
+        /// <param name="sourceCodeConfig">The <see cref="ISourceCodeExpressionConfigurator"/> to configure.</param>
+        public static void SetNamespaceToThatOf<T>(
+            this ISourceCodeExpressionConfigurator sourceCodeConfig)
+        {
+            sourceCodeConfig.SetNamespaceToThatOf(typeof(T));
+        }
+
+        /// <summary>
+        /// Add <see cref="TypeExpression"/>s belonging to the <see cref="SourceCodeExpression"/>
+        /// to the namespace of the given <paramref name="type"/>.
+        /// </summary>
+        /// <param name="sourceCodeConfig">The <see cref="ISourceCodeExpressionConfigurator"/> to configure.</param>
+        /// <param name="type">The type the namespace of which the generated code should use.</param>
+        public static void SetNamespaceToThatOf(
+            this ISourceCodeExpressionConfigurator sourceCodeConfig, Type type)
+        {
+            sourceCodeConfig.SetNamespace(type.Namespace);
+        }
+
+        /// <summary>
         /// Adds a public <see cref="EnumExpression"/> to this <see cref="SourceCodeExpression"/>.
         /// </summary>
         /// <param name="sourceCodeConfig">The <see cref="ISourceCodeExpressionConfigurator"/> to configure.</param>

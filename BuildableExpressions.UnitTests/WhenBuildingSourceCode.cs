@@ -11,14 +11,76 @@
     public class WhenBuildingSourceCode : TestClassBase
     {
         [Fact]
-        public void ShouldUseACustomNamespace()
+        public void ShouldUseACustomFileHeaderString()
         {
-            var doNothing = Lambda<Action>(Empty());
+            const string fileHeader = @"
+This is some auto-generated source code
+It was BuildableExpressions wot dun it!";
 
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
+                    sc.SetHeader(fileHeader.TrimStart());
+                    sc.AddClass(cls => cls.AddMethod(Lambda<Action>(Empty())));
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+// This is some auto-generated source code
+// It was BuildableExpressions wot dun it!
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public void DoAction()
+        {
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldUseACustomFileHeaderComment()
+        {
+            var fileHeader = ReadableExpression.Comment(@"
+This is some auto-generated source code.
+It was BuildableExpressions wot dun it");
+
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.SetHeader(fileHeader);
+                    sc.AddClass(cls => cls.AddMethod(Lambda<Action>(Empty())));
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+// This is some auto-generated source code.
+// It was BuildableExpressions wot dun it
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public void DoAction()
+        {
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldUseACustomNamespace()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
                     sc.SetNamespace("AgileObjects.GeneratedStuff");
+
+                    var doNothing = Lambda<Action>(Empty());
                     sc.AddClass(cls => cls.AddMethod("DoAction", doNothing));
                 })
                 .ToCSharpString();
@@ -39,12 +101,12 @@ namespace AgileObjects.GeneratedStuff
         [Fact]
         public void ShouldAllowANullNamespace()
         {
-            var doNothing = Lambda<Action>(Empty());
-
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
                     sc.SetNamespace(null);
+
+                    var doNothing = Lambda<Action>(Empty());
                     sc.AddClass(cls => cls.AddMethod("DoAction", doNothing));
                 })
                 .ToCSharpString();
@@ -62,12 +124,12 @@ public class GeneratedExpressionClass
         [Fact]
         public void ShouldAllowABlankNamespace()
         {
-            var doNothing = Lambda<Action>(Empty());
-
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
                     sc.SetNamespace(string.Empty);
+
+                    var doNothing = Lambda<Action>(Empty());
                     sc.AddClass(cls => cls.AddMethod("DoAction", doNothing));
                 })
                 .ToCSharpString();
@@ -85,13 +147,17 @@ public class GeneratedExpressionClass
         [Fact]
         public void ShouldUseACustomTypeNamespace()
         {
-            var doNothing = Lambda<Action>(Empty());
-
             var translated = BuildableExpression
-                .SourceCode(sc => sc
-                    .WithNamespaceOf<WhenBuildingSourceCode>()
-                    .AddClass(cls => cls
-                        .AddMethod("DoAction", doNothing)))
+                .SourceCode(sc =>
+                {
+                    sc.SetNamespaceToThatOf<WhenBuildingSourceCode>();
+
+                    sc.AddClass(cls =>
+                    {
+                        var doNothing = Lambda<Action>(Empty());
+                        cls.AddMethod("DoAction", doNothing);
+                    });
+                })
                 .ToCSharpString();
 
             var expected = @$"
@@ -110,8 +176,6 @@ namespace {typeof(WhenBuildingSourceCode).Namespace}
         [Fact]
         public void ShouldUseCustomClassAndMethodNamesAndStringSummaries()
         {
-            var doNothing = Lambda<Action>(Empty());
-
             const string classSummary = @"
 This is my class!
 Isn't it great?";
@@ -130,6 +194,8 @@ It's even better.";
                         cls.AddMethod("MyMethod", m =>
                         {
                             m.SetSummary(methodSummary);
+
+                            var doNothing = Lambda<Action>(Empty());
                             m.SetDefinition(doNothing);
                         });
                     });
@@ -160,8 +226,6 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldUseCustomClassAndMethodNamesAndCommentSummaries()
         {
-            var doNothing = Lambda<Action>(Empty());
-
             var classSummary = ReadableExpression.Comment(@"
 This is my class!
 Isn't it great?");
@@ -180,6 +244,8 @@ It's even better.".TrimStart());
                         cls.AddMethod("MyMethod", m =>
                         {
                             m.SetSummary(methodSummary);
+
+                            var doNothing = Lambda<Action>(Empty());
                             m.SetDefinition(doNothing);
                         });
                     });
@@ -210,9 +276,6 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldUseCustomClassAndMethodVisibilities()
         {
-            var getIntFromLong = Lambda<Func<long, int>>(Constant(2), Parameter(typeof(long), "lng"));
-            var getIntFromDate = Lambda<Func<DateTime, int>>(Constant(3), Parameter(typeof(DateTime), "date"));
-
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
@@ -230,13 +293,19 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("GetInt", m =>
                         {
                             m.SetVisibility(MemberVisibility.Protected);
-                            m.SetDefinition(getIntFromLong);
+
+                            m.SetDefinition(Lambda<Func<long, int>>(
+                                Constant(2),
+                                Parameter(typeof(long), "lng")));
                         });
 
                         cls.AddMethod("GetInt", m =>
                         {
                             m.SetVisibility(MemberVisibility.Private);
-                            m.SetDefinition(getIntFromDate);
+
+                            m.SetDefinition(Lambda<Func<DateTime, int>>(
+                                Constant(3),
+                                Parameter(typeof(DateTime), "date")));
                         });
                     });
                 })
@@ -271,41 +340,6 @@ namespace GeneratedExpressionCode
         )
         {
             return 3;
-        }
-    }
-}";
-            translated.ShouldBe(expected.TrimStart());
-        }
-
-        [Fact]
-        public void ShouldRecogniseBlockVariablesAsInScope()
-        {
-            var intParameter = Parameter(typeof(int), "scopedInt");
-            var intVariable = Variable(typeof(int), "blockScopedInt");
-            var assignBlockInt = Assign(intVariable, Constant(1));
-            var addInts = Add(intVariable, intParameter);
-            var block = Block(new[] { intVariable }, assignBlockInt, addInts);
-            var addIntsLambda = Lambda<Func<int, int>>(block, intParameter);
-
-            var translated = BuildableExpression
-                .SourceCode(sc => sc
-                    .AddClass(cls => cls
-                        .AddMethod("AddInts", addIntsLambda)))
-                .ToCSharpString();
-
-            const string expected = @"
-namespace GeneratedExpressionCode
-{
-    public class GeneratedExpressionClass
-    {
-        public int AddInts
-        (
-            int scopedInt
-        )
-        {
-            var blockScopedInt = 1;
-
-            return blockScopedInt + scopedInt;
         }
     }
 }";

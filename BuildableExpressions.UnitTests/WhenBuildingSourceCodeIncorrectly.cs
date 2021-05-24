@@ -16,7 +16,7 @@
             {
                 BuildableExpression.SourceCode(sc =>
                 {
-                    sc.WithNamespaceOf<CommentExpression>();
+                    sc.SetNamespaceToThatOf<CommentExpression>();
                 });
             });
 

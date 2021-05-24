@@ -11,6 +11,8 @@
         private const string _using = "using ";
         private const string _namespace = "namespace ";
 
+        private readonly ITranslation _header;
+        private readonly bool _hasHeader;
         private readonly IList<string> _namespaces;
         private readonly int _namespaceCount;
         private readonly bool _hasNamespace;
@@ -22,6 +24,7 @@
             SourceCodeExpression sourceCode,
             ITranslationContext context)
         {
+            _hasHeader = sourceCode.Header != null;
             _namespaces = sourceCode.Analysis.RequiredNamespaces;
             _namespaceCount = sourceCode.Analysis.RequiredNamespaces.Count;
             _hasNamespace = !string.IsNullOrWhiteSpace(sourceCode.Namespace);
@@ -29,17 +32,23 @@
             _typeCount = sourceCode.TypeExpressions.Count;
             _types = new ITranslation[_typeCount];
 
+            var keywordFormattingSize = context.GetKeywordFormattingSize();
+
             var translationSize = 6; // <- for opening and closing braces
+            var formattingSize = 0;
+
+            if (_hasHeader)
+            {
+                _header = context.GetTranslationFor(sourceCode.Header);
+                translationSize += _header.TranslationSize;
+                formattingSize += _header.FormattingSize;
+            }
 
             if (_hasNamespace)
             {
                 translationSize += _namespace.Length + sourceCode.Namespace.Length;
+                formattingSize += keywordFormattingSize;
             }
-
-            var keywordFormattingSize = context.GetKeywordFormattingSize();
-
-            var formattingSize =
-                _hasNamespace ? keywordFormattingSize : 0;
 
             if (_namespaceCount != 0)
             {
@@ -111,6 +120,11 @@
                 _namespaceCount +
                 3; // <- for braces and namespace declaration
 
+            if (_hasHeader)
+            {
+                lineCount += _header.GetLineCount();
+            }
+
             if (_namespaceCount > 0)
             {
                 ++lineCount; // <- for gap between namespaces and namespace declaration
@@ -131,6 +145,13 @@
 
         public void WriteTo(TranslationWriter writer)
         {
+            if (_hasHeader)
+            {
+                _header.WriteTo(writer);
+                writer.WriteNewLineToTranslation();
+                writer.WriteNewLineToTranslation();
+            }
+
             if (_namespaceCount != 0)
             {
                 for (var i = 0; i < _namespaceCount; ++i)

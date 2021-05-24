@@ -800,6 +800,45 @@ namespace GeneratedExpressionCode
             translated.ShouldBe(expected.TrimStart());
         }
 
+        [Fact]
+        public void ShouldRecogniseBlockVariablesAsInScope()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        var intParameter = Parameter(typeof(int), "scopedInt");
+                        var intVariable = Variable(typeof(int), "blockScopedInt");
+                        var assignBlockInt = Assign(intVariable, Constant(1));
+                        var addInts = Add(intVariable, intParameter);
+                        var block = Block(new[] { intVariable }, assignBlockInt, addInts);
+                        var addIntsLambda = Lambda<Func<int, int>>(block, intParameter);
+
+                        cls.AddMethod("AddInts", addIntsLambda);
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public int AddInts
+        (
+            int scopedInt
+        )
+        {
+            var blockScopedInt = 1;
+
+            return blockScopedInt + scopedInt;
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
         #region Helper Members
 
         public class PublicProperty<T>
