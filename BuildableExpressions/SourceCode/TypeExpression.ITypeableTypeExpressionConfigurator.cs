@@ -10,6 +10,13 @@
 
     public partial class TypeExpression : ITypeableTypeExpressionConfigurator
     {
+        void IAttributableExpressionConfigurator.AddAttribute(AttributeExpression attribute)
+        {
+            _attributeExpressions ??= new List<AttributeExpression>();
+            _attributeExpressions.Add(attribute);
+            _readOnlyAttributeExpressions = null;
+        }
+
         internal virtual void SetImplements(
             InterfaceExpression interfaceExpression,
             Action<ImplementationConfigurator> configuration)
@@ -214,7 +221,7 @@
         protected virtual void ResetType()
         {
             _rebuildType = true;
-            
+
             foreach (var memberExpression in MemberExpressionsAccessor)
             {
                 memberExpression.ResetMemberInfo();

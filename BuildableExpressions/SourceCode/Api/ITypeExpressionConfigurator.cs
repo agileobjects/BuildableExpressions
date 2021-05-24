@@ -6,7 +6,7 @@
     /// <summary>
     /// Provides options to configure a <see cref="TypeExpression"/>.
     /// </summary>
-    public interface ITypeExpressionConfigurator
+    public interface ITypeExpressionConfigurator : IAttributableExpressionConfigurator
     {
         /// <summary>
         /// Gets a Type object for the <see cref="TypeExpression"/>. The returned Type is lazily

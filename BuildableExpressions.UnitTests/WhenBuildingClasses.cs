@@ -13,8 +13,6 @@
         [Fact]
         public void ShouldBuildAnImplementationClassAndMethod()
         {
-            var sayHello = Lambda<Func<string>>(Constant("Hello!"));
-
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
@@ -22,6 +20,7 @@
                     {
                         cls.SetImplements<IMessager>(impl =>
                         {
+                            var sayHello = Lambda<Func<string>>(Constant("Hello!"));
                             impl.AddMethod(nameof(IMessager.GetMessage), sayHello);
                         });
                     });
@@ -124,7 +123,7 @@ namespace GeneratedExpressionCode
                     .AddClass("DerivedType", cls =>
                     {
                         cls.SetBaseType<BaseType>();
-                        
+
                         cls.AddConstructor(ctor =>
                         {
                             ctor.SetConstructorCall(

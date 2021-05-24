@@ -14,15 +14,10 @@
             SourceCodeExpression sourceCode,
             string name,
             Action<IStructExpressionConfigurator> configuration)
-            : this(sourceCode, name)
+            : base(sourceCode, name)
         {
             configuration.Invoke(this);
             Validate();
-        }
-
-        private ConfiguredStructExpression(SourceCodeExpression sourceCode, string name)
-            : base(sourceCode, name)
-        {
         }
 
         #region IStructExpressionConfigurator Members

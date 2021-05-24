@@ -2,7 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
+    using BuildableExpressions.Extensions;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
 
@@ -29,7 +31,13 @@
             _namespaceCount = sourceCode.Analysis.RequiredNamespaces.Count;
             _hasNamespace = !string.IsNullOrWhiteSpace(sourceCode.Namespace);
             _sourceCode = sourceCode;
-            _typeCount = sourceCode.TypeExpressions.Count;
+
+            var nonAttributeTypes = sourceCode
+                .TypeExpressions
+                .Filter(te => te is not AttributeExpression)
+                .ToList();
+
+            _typeCount = nonAttributeTypes.Count;
             _types = new ITranslation[_typeCount];
 
             var keywordFormattingSize = context.GetKeywordFormattingSize();
@@ -70,7 +78,7 @@
 
             for (var i = 0; ;)
             {
-                var @class = _types[i] = context.GetTranslationFor(sourceCode.TypeExpressions[i]);
+                var @class = _types[i] = context.GetTranslationFor(nonAttributeTypes[i]);
 
                 translationSize += @class.TranslationSize;
                 formattingSize += @class.FormattingSize;

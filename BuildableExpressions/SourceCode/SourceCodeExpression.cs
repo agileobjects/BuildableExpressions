@@ -162,6 +162,13 @@
             return Add(new ConfiguredStructExpression(this, name, configuration));
         }
 
+        AttributeExpression ISourceCodeExpressionConfigurator.AddAttribute(
+            string name,
+            Action<IAttributeExpressionConfigurator> configuration)
+        {
+            return Add(new ConfiguredAttributeExpression(this, name, configuration));
+        }
+
         EnumExpression ISourceCodeExpressionConfigurator.AddEnum(
             string name,
             Action<IEnumExpressionConfigurator> configuration)

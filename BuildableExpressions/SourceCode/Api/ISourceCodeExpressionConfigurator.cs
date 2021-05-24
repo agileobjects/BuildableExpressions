@@ -56,6 +56,16 @@
         StructExpression AddStruct(string name, Action<IStructExpressionConfigurator> configuration);
 
         /// <summary>
+        /// Adds a new <see cref="AttributeExpression"/> to this <see cref="SourceCodeExpression"/>.
+        /// </summary>
+        /// <param name="name">The name of the <see cref="AttributeExpression"/>.</param>
+        /// <param name="configuration">
+        /// The configuration with which to configure the new <see cref="AttributeExpression"/>.
+        /// </param>
+        /// <returns>The newly-created <see cref="AttributeExpression"/>.</returns>
+        AttributeExpression AddAttribute(string name, Action<IAttributeExpressionConfigurator> configuration);
+
+        /// <summary>
         /// Adds a new <see cref="EnumExpression"/> to this <see cref="SourceCodeExpression"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="EnumExpression"/>.</param>

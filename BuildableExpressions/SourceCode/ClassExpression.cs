@@ -1,15 +1,12 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
-    using System.Collections.Generic;
-    using BuildableExpressions.Extensions;
     using Generics;
-    using ReadableExpressions.Translations.Reflection;
 
     /// <summary>
     /// Represents a class in a piece of source code.
     /// </summary>
-    public abstract class ClassExpression : ConcreteTypeExpression, IClosableTypeExpression
+    public abstract class ClassExpression : ClassExpressionBase, IClosableTypeExpression
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassExpression"/> class for the given
@@ -41,16 +38,6 @@
         public bool IsStatic { get; protected set; }
 
         /// <summary>
-        /// Gets a value indicating whether this <see cref="ClassExpression"/> is abstract.
-        /// </summary>
-        public bool IsAbstract { get; protected set; }
-
-        /// <summary>
-        /// Gets a value indicating whether this <see cref="ClassExpression"/> is abstract.
-        /// </summary>
-        public bool IsSealed { get; protected set; }
-
-        /// <summary>
         /// Gets a value indicating whether this <see cref="ClassExpression"/> has the default
         /// System.Object base type.
         /// </summary>
@@ -58,59 +45,20 @@
 
         /// <summary>
         /// Gets the <see cref="ClassExpression"/> from which this <see cref="ClassExpression"/>
-        /// derives. If no base type has been set, returns null.
+        /// derives. If this <see cref="ClassExpression"/> derives from System.Object, returns null.
         /// </summary>
         public ClassExpression BaseTypeExpression { get; protected set; }
 
         /// <summary>
-        /// Gets the base type from which this <see cref="ClassExpression"/> derives. If no base
-        /// type has been set, returns typeof(System.Object).
+        /// Gets the <see cref="ClassExpression"/> from which this <see cref="ClassExpression"/>
+        /// derives. If this <see cref="ClassExpression"/> derives from System.Object, returns null.
         /// </summary>
-        public Type BaseType => BaseTypeExpression?.Type ?? typeof(object);
-
-        /// <summary>
-        /// Gets the non-object <see cref="BaseTypeExpression"/> and <see cref="InterfaceExpression"/>s
-        /// implemented by this <see cref="ClassExpression"/>.
-        /// </summary>
-        public override IEnumerable<TypeExpression> ImplementedTypeExpressions
-        {
-            get
-            {
-                if (!HasObjectBaseType)
-                {
-                    yield return BaseTypeExpression;
-                }
-
-                foreach (var @interface in base.ImplementedTypeExpressions)
-                {
-                    yield return @interface;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets the non-object base type and interfaces types implemented by this
-        /// <see cref="ClassExpression"/>.
-        /// </summary>
-        public override IEnumerable<Type> ImplementedTypes
-            => ImplementedTypeExpressions.Project(t => t.Type);
-
-        #region IType Members
-
-        IType IType.BaseType => BaseTypeExpression;
-
-        internal override bool IsClass => true;
-
-        bool IType.IsAbstract => IsAbstract;
-
-        bool IType.IsSealed => IsSealed;
-
-        #endregion
+        protected override ClassExpressionBase BaseTypeClassExpression => BaseTypeExpression;
 
         #region IClosableTypeExpression Members
-        
+
         IClosableTypeExpression IClosableTypeExpression.Close(
-            GenericParameterExpression genericParameter, 
+            GenericParameterExpression genericParameter,
             TypeExpression closedTypeExpression)
         {
             var closedClass = CreateInstance();

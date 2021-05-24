@@ -12,6 +12,8 @@
     internal class TypeTranslation
     {
         private readonly TypeExpression _type;
+        private readonly bool _hasAttributes;
+        private readonly ITranslatable _attributesTranslation;
         private readonly bool _isGenericType;
         private readonly string _typeString;
         private readonly ITranslatable _summaryTranslation;
@@ -29,6 +31,7 @@
             ITranslationContext context)
         {
             _type = type;
+            _hasAttributes = type.AttributeExpressionsAccessor != null;
             _isGenericType = type.IsGeneric;
             _typeString = typeString;
             _summaryTranslation = SummaryTranslation.For(type.Summary, context);
@@ -47,6 +50,15 @@
                 _summaryTranslation.FormattingSize +
                 keywordFormattingSize + // <- for accessibility, modifiers + type string
                 keywordFormattingSize;  // <- for type name
+
+            if (_hasAttributes)
+            {
+                _attributesTranslation =
+                    new AttributeSetTranslation(type.AttributeExpressions, context);
+
+                translationSize += _attributesTranslation.TranslationSize;
+                formattingSize += _attributesTranslation.FormattingSize;
+            }
 
             if (_isGenericType)
             {
@@ -128,6 +140,11 @@
         {
             var indentSize = 0;
 
+            if (_hasAttributes)
+            {
+                indentSize += _attributesTranslation.GetIndentSize();
+            }
+
             if (_isGenericType)
             {
                 indentSize +=
@@ -157,6 +174,11 @@
             var lineCount =
                 _summaryTranslation.GetLineCount();
 
+            if (_hasAttributes)
+            {
+                lineCount += _attributesTranslation.GetLineCount();
+            }
+
             if (_isGenericType)
             {
                 lineCount +=
@@ -185,6 +207,12 @@
             TranslationWriter writer,
             string modifiers = null)
         {
+            if (_hasAttributes)
+            {
+                _attributesTranslation.WriteTo(writer);
+                writer.WriteNewLineToTranslation();
+            }
+
             _summaryTranslation.WriteTo(writer);
 
             var declaration = _visibility + " " + modifiers + _typeString;
