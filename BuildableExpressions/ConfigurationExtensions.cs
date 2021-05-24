@@ -39,7 +39,7 @@
 
         /// <summary>
         /// Add <see cref="TypeExpression"/>s belonging to the <see cref="SourceCodeExpression"/>
-        /// to the namespace of the given <typeparamref name="T"/>.
+        /// to the namespace of the <typeparamref name="T"/> type.
         /// </summary>
         /// <typeparam name="T">The type the namespace to which generated code should belong.</typeparam>
         /// <param name="sourceCodeConfig">The <see cref="ISourceCodeExpressionConfigurator"/> to configure.</param>
@@ -93,8 +93,8 @@
 
         /// <summary>
         /// Closes the <see cref="GenericParameterExpression"/> with the given
-        /// <paramref name="genericParameterName"/> to the given <typeparamref name="TClosed"/> type
-        /// for the <see cref="TypeExpression"/>
+        /// <paramref name="genericParameterName"/> to the <typeparamref name="TClosed"/> type for
+        /// the <see cref="TypeExpression"/>
         /// </summary>
         /// <typeparam name="TClosed">
         /// The Type to which to close the <see cref="GenericParameterExpression"/> with the given
@@ -103,7 +103,7 @@
         /// <param name="implConfig">The <see cref="IImplementationConfigurator"/> to configure.</param>
         /// <param name="genericParameterName">
         /// The name of the <see cref="GenericParameterExpression"/> describing the open generic
-        /// parameter to close to the given <typeparamref name="TClosed"/> type.
+        /// parameter to close to the <typeparamref name="TClosed"/> type.
         /// </param>
         public static void SetGenericArgument<TClosed>(
             this IImplementationConfigurator implConfig,
@@ -137,8 +137,8 @@
         }
 
         /// <summary>
-        /// Closes the given <paramref name="parameter"/> to the given <typeparamref name="TClosed"/>
-        /// type for the <see cref="TypeExpression"/>
+        /// Closes the given <paramref name="parameter"/> to the <typeparamref name="TClosed"/> type
+        /// for the <see cref="TypeExpression"/>
         /// </summary>
         /// <typeparam name="TClosed">
         /// The Type to which to close the given <paramref name="parameter"/>.
@@ -146,7 +146,7 @@
         /// <param name="implConfig">The <see cref="IImplementationConfigurator"/> to configure.</param>
         /// <param name="parameter">
         /// The <see cref="GenericParameterExpression"/> describing the open generic parameter to
-        /// close to the given <typeparamref name="TClosed"/> type.
+        /// close to the <typeparamref name="TClosed"/> type.
         /// </param>
         public static void SetGenericArgument<TClosed>(
             this IImplementationConfigurator implConfig,
@@ -174,8 +174,8 @@
         }
 
         /// <summary>
-        /// Configures the <see cref="AttributeExpression"/> to derive from the given
-        /// <typeparamref name="TBaseAttribute"/>.
+        /// Configures the <see cref="AttributeExpression"/> to derive from the 
+        /// <typeparamref name="TBaseAttribute"/> type.
         /// </summary>
         /// <param name="attributeConfig">The <see cref="IAttributeExpressionConfigurator"/> to configure.</param>
         /// <typeparam name="TBaseAttribute">
@@ -226,8 +226,8 @@
         }
 
         /// <summary>
-        /// Configures the <see cref="ClassExpression"/> to derive from the given
-        /// <typeparamref name="TBase"/>.
+        /// Configures the <see cref="ClassExpression"/> to derive from the 
+        /// <typeparamref name="TBase"/> type.
         /// </summary>
         /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
         /// <typeparam name="TBase">
@@ -298,8 +298,8 @@
         }
 
         /// <summary>
-        /// Configures the <see cref="InterfaceExpression"/> to implement the given
-        /// <typeparamref name="TInterface"/>.
+        /// Configures the <see cref="InterfaceExpression"/> to implement the 
+        /// <typeparamref name="TInterface"/> type.
         /// </summary>
         /// <typeparam name="TInterface">The interface Type the <see cref="InterfaceExpression"/> should implement.</typeparam>
         /// <param name="interfaceConfig">The <see cref="IInterfaceExpressionConfigurator"/> to configure.</param>
@@ -353,8 +353,8 @@
         }
 
         /// <summary>
-        /// Configures the <see cref="ClassExpression"/> to implement the given
-        /// <typeparamref name="TInterface"/>, using the given <paramref name="configuration"/>.
+        /// Configures the <see cref="ClassExpression"/> to implement the 
+        /// <typeparamref name="TInterface"/> type, using the given <paramref name="configuration"/>.
         /// </summary>
         /// <typeparam name="TInterface">The interface Type <see cref="ClassExpression"/> should implement.</typeparam>
         /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
@@ -367,8 +367,8 @@
         }
 
         /// <summary>
-        /// Configures the <see cref="StructExpression"/> to implement the given
-        /// <typeparamref name="TInterface"/>, using the given <paramref name="configuration"/>.
+        /// Configures the <see cref="StructExpression"/> to implement the 
+        /// <typeparamref name="TInterface"/> type, using the given <paramref name="configuration"/>.
         /// </summary>
         /// <typeparam name="TInterface">The interface Type <see cref="StructExpression"/> should implement.</typeparam>
         /// <param name="structConfig">The <see cref="IStructExpressionConfigurator"/> to configure.</param>
@@ -415,7 +415,7 @@
         }
 
         /// <summary>
-        /// Adds a ParameterExpression with the given <typeparamref name="TParameter"/> Type and
+        /// Adds a ParameterExpression with the <typeparamref name="TParameter"/> type and
         /// <paramref name="name"/> to the <see cref="ConstructorExpression"/>.
         /// </summary>
         /// <typeparam name="TParameter">The type of the ParameterExpression to add.</typeparam>
@@ -1163,8 +1163,8 @@
         }
 
         /// <summary>
-        /// Set the <see cref="GenericParameterExpression"/> to be constrained to the given
-        /// <typeparamref name="T"/> Type.
+        /// Set the <see cref="GenericParameterExpression"/> to be constrained to the 
+        /// <typeparamref name="T"/> type.
         /// </summary>
         /// <typeparam name="T">The Type to which to constrain the <see cref="GenericParameterExpression"/>.</typeparam>
         /// <param name="parameterConfig">The <see cref="IGenericParameterExpressionConfigurator"/> to configure.</param>
@@ -1215,7 +1215,7 @@
 
         /// <summary>
         /// Add a ParameterExpression to the <see cref="MethodExpression"/> with the given
-        /// <paramref name="name"/> and <typeparamref name="TParameter"/>.
+        /// <paramref name="name"/> and <typeparamref name="TParameter"/> type.
         /// </summary>
         /// <typeparam name="TParameter">The type of the ParameterExpression to add.</typeparam>
         /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
