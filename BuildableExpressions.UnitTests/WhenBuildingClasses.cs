@@ -91,12 +91,14 @@ namespace GeneratedExpressionCode
         public void ShouldBuildAClassWithABaseType()
         {
             var translated = BuildableExpression
-                .SourceCode(sc => sc
-                    .AddClass("DerivedType", cls =>
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("DerivedType", cls =>
                     {
                         cls.SetBaseType<BaseType>();
                         cls.AddMethod("SayHello", Constant("Hello!"));
-                    }))
+                    });
+                })
                 .ToCSharpString();
 
             const string expected = @"

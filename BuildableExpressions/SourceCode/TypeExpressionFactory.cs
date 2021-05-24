@@ -7,13 +7,16 @@
 
     internal static class TypeExpressionFactory
     {
-        private static readonly ConcurrentDictionary<Type, TypeExpression> _cache = new ();
+        private static readonly ConcurrentDictionary<Type, TypeExpression> _cache = new();
 
         public static ClassExpression CreateClass(Type type)
             => (ClassExpression)_cache.GetOrAdd(type, CreateTypedClass);
 
         public static InterfaceExpression CreateInterface(Type type)
             => (InterfaceExpression)_cache.GetOrAdd(type, CreateTypedInterface);
+
+        public static AttributeExpression CreateAttribute(Type type)
+            => (AttributeExpression)_cache.GetOrAdd(type, CreateTypedAttribute);
 
         public static TypeExpression Create(Type type)
             => _cache.GetOrAdd(type, CreateTypeExpression);
@@ -22,7 +25,9 @@
         {
             if (type.IsClass())
             {
-                return CreateTypedClass(type);
+                return type.IsAssignableTo(typeof(Attribute))
+                    ? CreateTypedAttribute(type)
+                    : CreateTypedClass(type);
             }
 
             if (type.IsInterface())
@@ -43,10 +48,13 @@
             return new TypedStructExpression(type);
         }
 
-        private static TypedClassExpression CreateTypedClass(Type classType) 
-            => new (classType);
+        private static TypedClassExpression CreateTypedClass(Type classType)
+            => new(classType);
 
-        private static TypedInterfaceExpression CreateTypedInterface(Type interfaceType) 
-            => new (interfaceType);
+        private static TypedInterfaceExpression CreateTypedInterface(Type interfaceType)
+            => new(interfaceType);
+
+        private static TypedAttributeExpression CreateTypedAttribute(Type attributeType)
+            => new(attributeType);
     }
 }

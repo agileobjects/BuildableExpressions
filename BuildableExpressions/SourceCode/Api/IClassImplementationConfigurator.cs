@@ -2,7 +2,7 @@
 {
     /// <summary>
     /// Provides options to configure how a <see cref="ClassExpression"/> implements a base type or
-    /// an interface.
+    /// interface.
     /// </summary>
     public interface IClassImplementationConfigurator :
         IImplementationConfigurator,

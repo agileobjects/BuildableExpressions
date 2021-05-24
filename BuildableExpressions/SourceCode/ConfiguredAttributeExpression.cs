@@ -2,6 +2,7 @@
 {
     using System;
     using Api;
+    using BuildableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using Translations;
 
@@ -18,6 +19,31 @@
             configuration.Invoke(this);
             Validate();
         }
+
+        #region IAttributeExpressionConfigurator Members
+
+        void IAttributeExpressionConfigurator.SetBaseType(
+            AttributeExpression baseAttributeExpression, 
+            Action<IAttributeImplementationConfigurator> configuration)
+        {
+            baseAttributeExpression.ThrowIfNull(nameof(baseAttributeExpression));
+            //ThrowIfBaseTypeAlreadySet(baseAttributeExpression);
+            //ThrowIfInvalidBaseType(baseAttributeExpression);
+
+            if (configuration != null)
+            {
+                var configurator = new ImplementationConfigurator(
+                    this,
+                    baseAttributeExpression,
+                    configuration);
+
+                baseAttributeExpression = (AttributeExpression)configurator.ImplementedTypeExpression;
+            }
+
+            BaseTypeExpression = baseAttributeExpression;
+        }
+
+        #endregion
 
         protected override ITranslation GetTranslation(ITranslationContext context)
             => new AttributeTranslation(this, context);

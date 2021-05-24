@@ -9,28 +9,46 @@
 
     internal class ImplementationConfigurator :
         IClassImplementationConfigurator,
+        IAttributeImplementationConfigurator,
         IStructImplementationConfigurator
     {
         private readonly TypeExpression _implementingTypeExpression;
+        private IClosableTypeExpression _closableImplementedTypeExpression;
 
         internal ImplementationConfigurator(
             TypeExpression implementingTypeExpression,
             IClosableTypeExpression implementedTypeExpression,
             Action<ImplementationConfigurator> configuration)
+            : this(implementingTypeExpression, implementedTypeExpression)
         {
-            _implementingTypeExpression = implementingTypeExpression;
-            ImplementedTypeExpression = implementedTypeExpression;
-
+            _closableImplementedTypeExpression = implementedTypeExpression;
             configuration.Invoke(this);
         }
 
-        internal IClosableTypeExpression ImplementedTypeExpression { get; private set; }
+        internal ImplementationConfigurator(
+            TypeExpression implementingTypeExpression,
+            IType implementedTypeExpression,
+            Action<ImplementationConfigurator> configuration)
+            : this(implementingTypeExpression, implementedTypeExpression)
+        {
+            configuration.Invoke(this);
+        }
+
+        private ImplementationConfigurator(
+            TypeExpression implementingTypeExpression,
+            IType implementedTypeExpression)
+        {
+            _implementingTypeExpression = implementingTypeExpression;
+            ImplementedTypeExpression = implementedTypeExpression;
+        }
+
+        internal IType ImplementedTypeExpression { get; private set; }
 
         public void SetGenericArgument(
             string genericParameterName,
             TypeExpression closedTypeExpression)
         {
-            var genericParameter = ImplementedTypeExpression
+            var genericParameter = _closableImplementedTypeExpression
                 .GenericParameters
                 .FirstOrDefault(p => p.Name == genericParameterName);
 
@@ -41,7 +59,7 @@
             }
 
             throw new InvalidOperationException(
-                $"Type '{ImplementedTypeExpression.GetFriendlyName()}' has no " +
+                $"Type '{_closableImplementedTypeExpression.GetFriendlyName()}' has no " +
                 $"generic parameter named '{genericParameterName}'.");
         }
 
@@ -49,8 +67,8 @@
             GenericParameterExpression genericParameter,
             TypeExpression closedType)
         {
-            ImplementedTypeExpression = ImplementedTypeExpression
-                .Close(genericParameter, closedType);
+            ImplementedTypeExpression = _closableImplementedTypeExpression =
+                _closableImplementedTypeExpression.Close(genericParameter, closedType);
         }
 
         PropertyExpression IClassMemberConfigurator.AddProperty(

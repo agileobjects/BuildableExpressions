@@ -174,6 +174,58 @@
         }
 
         /// <summary>
+        /// Configures the <see cref="AttributeExpression"/> to derive from the given
+        /// <typeparamref name="TBaseAttribute"/>.
+        /// </summary>
+        /// <param name="attributeConfig">The <see cref="IAttributeExpressionConfigurator"/> to configure.</param>
+        /// <typeparam name="TBaseAttribute">
+        /// The base type from which the <see cref="AttributeExpression"/> should derive.
+        /// </typeparam>
+        public static void SetBaseType<TBaseAttribute>(
+            this IAttributeExpressionConfigurator attributeConfig)
+            where TBaseAttribute : Attribute
+        {
+            attributeConfig.SetBaseType(typeof(TBaseAttribute));
+        }
+
+        /// <summary>
+        /// Configures the <see cref="AttributeExpression"/> to derive from the given
+        /// <paramref name="baseAttributeType"/>.
+        /// </summary>
+        /// <param name="attributeConfig">The <see cref="IAttributeExpressionConfigurator"/> to configure.</param>
+        /// <param name="baseAttributeType">
+        /// The base System.Attribute Type from which the <see cref="AttributeExpression"/> should
+        /// derive.
+        /// </param>
+        public static void SetBaseType(
+            this IAttributeExpressionConfigurator attributeConfig,
+            Type baseAttributeType)
+        {
+            attributeConfig.SetBaseType(baseAttributeType, configuration: null);
+        }
+
+        /// <summary>
+        /// Configures the <see cref="AttributeExpression"/> to derive from the given
+        /// <paramref name="baseAttributeType"/>, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="attributeConfig">The <see cref="IAttributeExpressionConfigurator"/> to configure.</param>
+        /// <param name="baseAttributeType">
+        /// The base attribute Type from which the <see cref="AttributeExpression"/> should derive.
+        /// </param>
+        /// <param name="configuration">The configuration to use.</param>
+        public static void SetBaseType(
+            this IAttributeExpressionConfigurator attributeConfig,
+            Type baseAttributeType,
+            Action<IAttributeImplementationConfigurator> configuration)
+        {
+            ThrowIfInvalidBaseType(baseAttributeType);
+
+            attributeConfig.SetBaseType(
+                TypeExpressionFactory.CreateAttribute(baseAttributeType),
+                configuration);
+        }
+
+        /// <summary>
         /// Configures the <see cref="ClassExpression"/> to derive from the given
         /// <typeparamref name="TBase"/>.
         /// </summary>
@@ -233,7 +285,6 @@
             Action<IClassImplementationConfigurator> configuration)
         {
             ThrowIfInvalidBaseType(baseType);
-
             classConfig.SetBaseType(TypeExpressionFactory.CreateClass(baseType), configuration);
         }
 
