@@ -152,18 +152,7 @@
         {
             if (!HasObjectBaseType)
             {
-                throw new InvalidOperationException(
-                    $"Unable to set class base type to '{baseType.Name}' " +
-                    $"as it has already been set to '{BaseTypeExpression.Name}'");
-            }
-        }
-
-        private static void ThrowIfInvalidBaseType(ClassExpression baseType)
-        {
-            if (baseType.IsSealed)
-            {
-                throw new InvalidOperationException(
-                    $"Type '{baseType.Name}' is not a valid base type.");
+                ThrowBaseTypeAlreadySet(baseType, typeName: "class");
             }
         }
 

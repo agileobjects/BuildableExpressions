@@ -218,7 +218,7 @@
             Type baseAttributeType,
             Action<IAttributeImplementationConfigurator> configuration)
         {
-            ThrowIfInvalidBaseType(baseAttributeType);
+            ThrowIfInvalidAttributeBaseType(baseAttributeType);
 
             attributeConfig.SetBaseType(
                 TypeExpressionFactory.CreateAttribute(baseAttributeType),
@@ -284,8 +284,32 @@
             Type baseType,
             Action<IClassImplementationConfigurator> configuration)
         {
-            ThrowIfInvalidBaseType(baseType);
+            ThrowIfInvalidClassBaseType(baseType);
             classConfig.SetBaseType(TypeExpressionFactory.CreateClass(baseType), configuration);
+        }
+
+        private static void ThrowIfInvalidAttributeBaseType(Type baseType)
+        {
+            ThrowIfInvalidBaseType(baseType);
+
+            if (!baseType.IsAssignableTo(typeof(Attribute)))
+            {
+                throw new InvalidOperationException(
+                    $"Type '{baseType.GetFriendlyName()}' is not a valid base type " +
+                    "for a AttributeExpression. Use AddClass() to create a ClassExpression instead.");
+            }
+        }
+
+        private static void ThrowIfInvalidClassBaseType(Type baseType)
+        {
+            ThrowIfInvalidBaseType(baseType);
+
+            if (baseType.IsAssignableTo(typeof(Attribute)))
+            {
+                throw new InvalidOperationException(
+                    $"Type '{baseType.GetFriendlyName()}' is not a valid base type " +
+                     "for a ClassExpression. Use AddAttribute() to create an AttributeExpression instead.");
+            }
         }
 
         private static void ThrowIfInvalidBaseType(Type baseType)

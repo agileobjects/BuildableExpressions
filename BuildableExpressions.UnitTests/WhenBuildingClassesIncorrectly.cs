@@ -10,22 +10,22 @@
         [Fact]
         public void ShouldErrorIfNullTypeGivenAsBaseType()
         {
-            var interfaceEx = Should.Throw<ArgumentNullException>(() =>
+            var baseTypeEx = Should.Throw<ArgumentNullException>(() =>
             {
                 BuildableExpression.SourceCode(sc =>
                 {
-                    sc.AddClass(str =>
+                    sc.AddClass(cls =>
                     {
-                        str.SetBaseType(default, _ => { });
+                        cls.SetBaseType(default, _ => { });
                     });
                 });
             });
 
-            interfaceEx.Message.ShouldContain("cannot be null");
+            baseTypeEx.Message.ShouldContain("cannot be null");
         }
 
         [Fact]
-        public void ShouldErrorIfClassGivenMultipleBaseTypes()
+        public void ShouldErrorIfGivenMultipleBaseTypes()
         {
             var baseTypeEx = Should.Throw<InvalidOperationException>(() =>
             {
@@ -58,6 +58,24 @@
             });
 
             baseTypeEx.Message.ShouldContain("'IDisposable' is not a valid base type");
+        }
+
+        [Fact]
+        public void ShouldErrorIfAttributeTypeGivenAsBaseType()
+        {
+            var baseTypeEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.SetBaseType(typeof(Attribute));
+                    });
+                });
+            });
+
+            baseTypeEx.Message.ShouldContain("'Attribute' is not a valid base type");
+            baseTypeEx.Message.ShouldContain("create an AttributeExpression instead");
         }
 
         [Fact]

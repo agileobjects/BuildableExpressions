@@ -6,12 +6,16 @@
     using Api;
     using BuildableExpressions.Extensions;
     using ReadableExpressions.Translations;
+    using ReadableExpressions.Translations.Reflection;
     using Translations;
 
     internal class ConfiguredAttributeExpression :
         AttributeExpression,
         IAttributeExpressionConfigurator
     {
+        private static readonly AttributeExpression _attributeTypeExpression =
+            TypeExpressionFactory.CreateAttribute(typeof(Attribute));
+
         private static readonly AttributeExpression _attributeUsageAttribute =
             TypeExpressionFactory.CreateAttribute(typeof(AttributeUsageAttribute));
 
@@ -25,7 +29,7 @@
             : base(sourceCode, name)
         {
             _targets = AttributeTargets.All;
-            BaseTypeExpression = TypeExpressionFactory.CreateAttribute(typeof(Attribute));
+            BaseTypeExpression = _attributeTypeExpression;
 
             configuration.Invoke(this);
             EnsureUsageAttribute();
@@ -99,8 +103,8 @@
             Action<IAttributeImplementationConfigurator> configuration)
         {
             baseAttributeExpression.ThrowIfNull(nameof(baseAttributeExpression));
-            //ThrowIfBaseTypeAlreadySet(baseAttributeExpression);
-            //ThrowIfInvalidBaseType(baseAttributeExpression);
+            ThrowIfBaseTypeAlreadySet(baseAttributeExpression);
+            ThrowIfInvalidBaseType(baseAttributeExpression);
 
             if (configuration != null)
             {
@@ -113,6 +117,38 @@
             }
 
             BaseTypeExpression = baseAttributeExpression;
+        }
+
+        private void ThrowIfBaseTypeAlreadySet(IType baseType)
+        {
+            if (BaseTypeExpression != _attributeTypeExpression)
+            {
+                ThrowBaseTypeAlreadySet(baseType, typeName: "attribute");
+            }
+        }
+
+        protected override void ThrowIfInvalidBaseType(IType attemptedBaseType)
+        {
+            base.ThrowIfInvalidBaseType(attemptedBaseType);
+
+            ThrowIfNotDerivedFromAttribute(attemptedBaseType);
+        }
+
+        private static void ThrowIfNotDerivedFromAttribute(IType attemptedBaseType)
+        {
+            var baseType = attemptedBaseType;
+
+            while (baseType != null)
+            {
+                if (baseType.Equals(_attributeTypeExpression))
+                {
+                    return;
+                }
+
+                baseType = baseType.BaseType;
+            }
+
+            ThrowInvalidBaseType(attemptedBaseType);
         }
 
         #endregion
