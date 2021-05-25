@@ -22,8 +22,14 @@
                 .ToCSharpString();
 
             const string expected = @"
+using System;
+
 namespace GeneratedExpressionCode
 {
+    public class SpecialFunkyAttribute : Attribute
+    {
+    }
+
     [SpecialFunky]
     public class HasAnAttribute
     {
@@ -33,7 +39,7 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
-        public void ShouldBuildADerivedStructAttribute()
+        public void ShouldBuildAStructAttributeWithABaseType()
         {
             var translated = BuildableExpression
                 .SourceCode(sc =>
@@ -55,6 +61,10 @@ using AgileObjects.BuildableExpressions.UnitTests;
 
 namespace GeneratedExpressionCode
 {
+    public class DerivedFunkyAttribute : WhenBuildingAttributes.BaseStructAttribute
+    {
+    }
+
     [DerivedFunky]
     public struct AttributedStruct
     {
@@ -62,14 +72,59 @@ namespace GeneratedExpressionCode
 }";
             translated.ShouldBe(expected.TrimStart());
         }
-    }
 
-    #region Helper Members
+        [Fact]
+        public void ShouldBuildAClassAttributeWithABaseAttributeExpression()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var parentAttribute = sc.AddAttribute("ParentAttribute", attr =>
+                    {
+                        attr.SetAbstract();
+                    });
 
-    [AttributeUsage(AttributeTargets.Struct)]
-    public class BaseStructAttribute : Attribute
+                    var childAttribute = sc.AddAttribute("DerivedAttribute", attr =>
+                    {
+                        attr.SetBaseType(parentAttribute, _ => { });
+                        attr.SetSealed();
+                    });
+
+                    sc.AddClass("AttributedClass", str =>
+                    {
+                        str.AddAttribute(childAttribute);
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    public abstract class ParentAttribute : Attribute
     {
     }
 
-    #endregion
+    public sealed class DerivedAttribute : ParentAttribute
+    {
+    }
+
+    [Derived]
+    public class AttributedClass
+    {
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        #region Helper Members
+
+        [AttributeUsage(AttributeTargets.Struct)]
+        public class BaseStructAttribute : Attribute
+        {
+        }
+
+        #endregion
+    }
 }

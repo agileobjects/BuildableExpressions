@@ -60,6 +60,29 @@
 
         #region IClassExpressionConfigurator Members
 
+        void IClassBaseExpressionConfigurator.SetAbstract() => SetAbstract();
+
+        internal void SetAbstract()
+        {
+            ThrowIfStatic("abstract");
+            ThrowIfSealed("abstract");
+            IsAbstract = true;
+        }
+
+        void IClassBaseExpressionConfigurator.SetSealed()
+        {
+            ThrowIfStatic("sealed");
+            ThrowIfAbstract("sealed");
+            IsSealed = true;
+        }
+
+        Expression IClassBaseExpressionConfigurator.BaseInstanceExpression
+            => _baseInstanceExpression ??= InstanceExpression.Base(BaseTypeExpression);
+
+        #endregion
+
+        #region IClassExpressionConfigurator Members
+
         void IClassExpressionConfigurator.SetImplements(
             InterfaceExpression interfaceExpression,
             Action<IClassImplementationConfigurator> configuration)
@@ -72,22 +95,6 @@
             ThrowIfAbstract("static");
             ThrowIfSealed("static");
             IsStatic = true;
-        }
-
-        void IClassExpressionConfigurator.SetAbstract() => SetAbstract();
-
-        internal void SetAbstract()
-        {
-            ThrowIfStatic("abstract");
-            ThrowIfSealed("abstract");
-            IsAbstract = true;
-        }
-
-        void IClassExpressionConfigurator.SetSealed()
-        {
-            ThrowIfStatic("sealed");
-            ThrowIfAbstract("sealed");
-            IsSealed = true;
         }
 
         private void ThrowIfStatic(string conflictingModifier)
@@ -117,11 +124,8 @@
         private void ThrowModifierConflict(string modifier, string conflictingModifier)
         {
             throw new InvalidOperationException(
-                $"Class '{Name}' cannot be both {modifier} and {conflictingModifier}.");
+                $"Type '{Name}' cannot be both {modifier} and {conflictingModifier}.");
         }
-
-        Expression IClassExpressionConfigurator.BaseInstanceExpression
-            => _baseInstanceExpression ??= InstanceExpression.Base(BaseTypeExpression);
 
         void IClassExpressionConfigurator.SetBaseType(
             ClassExpression baseTypeExpression,

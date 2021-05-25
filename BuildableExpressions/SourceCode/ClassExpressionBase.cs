@@ -35,6 +35,11 @@
         }
 
         /// <summary>
+        /// Gets a value indicating whether this <see cref="ClassExpressionBase"/> is static.
+        /// </summary>
+        public bool IsStatic { get; protected set; }
+
+        /// <summary>
         /// Gets a value indicating whether this <see cref="ClassExpressionBase"/> is abstract.
         /// </summary>
         public bool IsAbstract { get; protected set; }
@@ -44,12 +49,7 @@
         /// </summary>
         public bool IsSealed { get; protected set; }
 
-        /// <summary>
-        /// When overridden in a derived class, gets the <see cref="ClassExpressionBase"/> from
-        /// which this <see cref="ClassExpressionBase"/> derives. If this 
-        /// <see cref="ClassExpressionBase"/> derives from System.Object, returns null.
-        /// </summary>
-        protected abstract ClassExpressionBase BaseTypeClassExpression { get; }
+        internal abstract ClassExpressionBase BaseTypeClassExpression { get; }
 
         /// <summary>
         /// Gets the base type from which this <see cref="ClassExpressionBase"/> derives. If this

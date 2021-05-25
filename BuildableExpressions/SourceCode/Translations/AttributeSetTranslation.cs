@@ -1,30 +1,35 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Translations
 {
     using System.Collections.Generic;
+    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
+    using static ReadableExpressions.Translations.Formatting.TokenType;
 
     internal class AttributeSetTranslation : ITranslatable
     {
         private readonly int _attributeCount;
-        private readonly IList<ITranslatable> _attributes;
+        private readonly IList<string> _attributeNames;
 
         public AttributeSetTranslation(
             IList<AttributeExpression> attributes,
             ITranslationContext context)
         {
             _attributeCount = attributes.Count;
-            _attributes = new ITranslatable[_attributeCount];
+            _attributeNames = new string[_attributeCount];
+
+            var typeNameFormattingSize = context.GetFormattingSize(TypeName);
 
             var translationSize = 0;
             var formattingSize = 0;
 
             for (var i = 0; i < _attributeCount; ++i)
             {
-                var translation = context.GetTranslationFor(attributes[i]);
+                var typeName = attributes[i].GetFriendlyName();
+                var attributeName = typeName.Substring(0, typeName.Length - "Attribute".Length);
 
-                translationSize += translation.TranslationSize;
-                formattingSize += translation.FormattingSize;
-                _attributes[i] = translation;
+                translationSize += attributeName.Length;
+                formattingSize += typeNameFormattingSize;
+                _attributeNames[i] = attributeName;
             }
 
             TranslationSize = translationSize;
@@ -43,7 +48,9 @@
         {
             for (var i = 0; ;)
             {
-                _attributes[i].WriteTo(writer);
+                writer.WriteToTranslation('[');
+                writer.WriteTypeNameToTranslation(_attributeNames[i]);
+                writer.WriteToTranslation(']');
                 ++i;
 
                 if (i == _attributeCount)

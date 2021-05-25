@@ -11,11 +11,11 @@
         private const string _classString = "class ";
 
         private readonly TypeTranslation _typeTranslation;
-        private readonly ClassExpression _class;
+        private readonly ClassExpressionBase _class;
         private readonly string _modifier;
         private readonly ITranslatable _baseTypeTranslation;
 
-        public ClassTranslation(ClassExpression @class, ITranslationContext context)
+        public ClassTranslation(ClassExpressionBase @class, ITranslationContext context)
         {
             _class = @class;
             _typeTranslation = new TypeTranslation(@class, _classString, context);
@@ -41,10 +41,10 @@
                 translationSize += _modifier.Length;
             }
 
-            if (!@class.HasObjectBaseType)
+            if (@class.BaseTypeClassExpression != null)
             {
-                var baseType = @class.BaseTypeExpression;
-                _baseTypeTranslation = context.GetTranslationFor((IType)baseType);
+                IType baseType = @class.BaseTypeClassExpression;
+                _baseTypeTranslation = context.GetTranslationFor(baseType);
                 translationSize += _baseTypeTranslation.TranslationSize;
                 formattingSize += _baseTypeTranslation.FormattingSize;
             }

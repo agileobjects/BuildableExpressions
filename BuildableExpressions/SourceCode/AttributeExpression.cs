@@ -1,11 +1,12 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
+    using ReadableExpressions.Translations.Reflection;
 
     /// <summary>
     /// Represents an attribute class in a piece of source code.
     /// </summary>
-    public abstract class AttributeExpression : ClassExpressionBase
+    public abstract class AttributeExpression : ClassExpressionBase, IType
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AttributeExpression"/> class for the given
@@ -39,12 +40,12 @@
         /// </summary>
         public AttributeExpression BaseTypeExpression { get; protected set; }
 
-        /// <summary>
-        /// Gets the <see cref="AttributeExpression"/> from which this 
-        /// <see cref="AttributeExpression"/> If this <see cref="AttributeExpression"/> derives from
-        /// System.Attribute, returns an <see cref="AttributeExpression"/> representing
-        /// System.Attribute.
-        /// </summary>
-        protected override ClassExpressionBase BaseTypeClassExpression => BaseTypeExpression;
+        internal override ClassExpressionBase BaseTypeClassExpression => BaseTypeExpression;
+
+        #region IType Members
+
+        IType IType.BaseType => ClrTypeWrapper.Attribute;
+
+        #endregion
     }
 }

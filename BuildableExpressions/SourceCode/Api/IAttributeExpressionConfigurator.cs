@@ -5,7 +5,7 @@
     /// <summary>
     /// Provides options to configure an <see cref="AttributeExpression"/>.
     /// </summary>
-    public interface IAttributeExpressionConfigurator
+    public interface IAttributeExpressionConfigurator : IClassBaseExpressionConfigurator
     {
         /// <summary>
         /// Configures the <see cref="AttributeExpression"/> to derive from the given

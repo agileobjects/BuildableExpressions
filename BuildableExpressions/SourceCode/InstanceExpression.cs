@@ -24,7 +24,7 @@
 
         #region Factory Methods
 
-        public static InstanceExpression Base(ClassExpression baseInstance)
+        public static InstanceExpression Base(ClassExpressionBase baseInstance)
         {
             return baseInstance != null
                 ? new InstanceExpression(baseInstance, "base")
@@ -32,7 +32,7 @@
         }
 
         public static InstanceExpression This(ConcreteTypeExpression instance)
-            => new InstanceExpression(instance, "this");
+            => new(instance, "this");
 
         #endregion
 

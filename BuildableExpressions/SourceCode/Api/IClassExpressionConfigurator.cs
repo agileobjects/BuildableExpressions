@@ -2,13 +2,11 @@
 {
     using System;
     using System.Linq.Expressions;
-
+    
     /// <summary>
-    /// Provides options to configure a <see cref="ClassExpression"/>.
+    /// Provides options to configure a <see cref="ClassExpressionBase"/>.
     /// </summary>
-    public interface IClassExpressionConfigurator :
-        IConcreteTypeExpressionConfigurator,
-        IClassMemberConfigurator
+    public interface IClassBaseExpressionConfigurator
     {
         /// <summary>
         /// Gets an Expression to use to refer to the base class instance of the type being created
@@ -16,6 +14,31 @@
         /// </summary>
         Expression BaseInstanceExpression { get; }
 
+        /// <summary>
+        /// Mark the <see cref="ClassExpressionBase"/> as abstract.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the <see cref="ClassExpressionBase"/> has already been made static or sealed.
+        /// </exception>
+        void SetAbstract();
+
+        /// <summary>
+        /// Mark the <see cref="ClassExpressionBase"/> as sealed.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the <see cref="ClassExpressionBase"/> has already been made static or abstract.
+        /// </exception>
+        void SetSealed();
+    }
+
+    /// <summary>
+    /// Provides options to configure a <see cref="ClassExpression"/>.
+    /// </summary>
+    public interface IClassExpressionConfigurator :
+        IConcreteTypeExpressionConfigurator,
+        IClassBaseExpressionConfigurator,
+        IClassMemberConfigurator
+    {
         /// <summary>
         /// Configures the <see cref="ClassExpression"/> to derive from the given
         /// <paramref name="baseTypeExpression"/>.
@@ -53,21 +76,5 @@
         /// Thrown if the <see cref="ClassExpression"/> has already been made abstract or sealed.
         /// </exception>
         void SetStatic();
-
-        /// <summary>
-        /// Mark the <see cref="ClassExpression"/> as abstract.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown if the <see cref="ClassExpression"/> has already been made static or sealed.
-        /// </exception>
-        void SetAbstract();
-
-        /// <summary>
-        /// Mark the <see cref="ClassExpression"/> as sealed.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown if the <see cref="ClassExpression"/> has already been made static or abstract.
-        /// </exception>
-        void SetSealed();
     }
 }

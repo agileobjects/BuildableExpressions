@@ -33,11 +33,6 @@
         }
 
         /// <summary>
-        /// Gets a value indicating whether this <see cref="ClassExpression"/> is static.
-        /// </summary>
-        public bool IsStatic { get; protected set; }
-
-        /// <summary>
         /// Gets a value indicating whether this <see cref="ClassExpression"/> has the default
         /// System.Object base type.
         /// </summary>
@@ -49,11 +44,7 @@
         /// </summary>
         public ClassExpression BaseTypeExpression { get; protected set; }
 
-        /// <summary>
-        /// Gets the <see cref="ClassExpression"/> from which this <see cref="ClassExpression"/>
-        /// derives. If this <see cref="ClassExpression"/> derives from System.Object, returns null.
-        /// </summary>
-        protected override ClassExpressionBase BaseTypeClassExpression => BaseTypeExpression;
+        internal override ClassExpressionBase BaseTypeClassExpression => BaseTypeExpression;
 
         #region IClosableTypeExpression Members
 
