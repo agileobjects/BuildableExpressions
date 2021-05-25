@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
+    using System.Linq;
     using System.Linq.Expressions;
     using Api;
     using BuildableExpressions.Extensions;
@@ -11,6 +12,10 @@
         AttributeExpression,
         IAttributeExpressionConfigurator
     {
+        private static readonly AttributeExpression _attributeUsageAttribute =
+            TypeExpressionFactory.CreateAttribute(typeof(AttributeUsageAttribute));
+
+        private AttributeTargets _targets;
         private Expression _baseInstanceExpression;
 
         public ConfiguredAttributeExpression(
@@ -19,10 +24,49 @@
             Action<IAttributeExpressionConfigurator> configuration)
             : base(sourceCode, name)
         {
+            _targets = AttributeTargets.All;
             BaseTypeExpression = TypeExpressionFactory.CreateAttribute(typeof(Attribute));
+
             configuration.Invoke(this);
+            EnsureUsageAttribute();
+
             Validate();
         }
+
+        #region Setup
+
+        private void EnsureUsageAttribute()
+        {
+            if (AddUsageAttribute())
+            {
+                AddAttribute(
+                    _attributeUsageAttribute,
+                    attr => attr.SetConstructorArguments(ValidOn));
+            }
+        }
+
+        private bool AddUsageAttribute()
+        {
+            var usageAttribute = AttributesAccessor?.FirstOrDefault(attr =>
+                attr.AttributeExpression == _attributeUsageAttribute);
+
+            if (usageAttribute == null)
+            {
+                return true;
+            }
+
+            if ((AttributeTargets)usageAttribute.Arguments.First().Value == ValidOn)
+            {
+                return false;
+            }
+
+            AttributesAccessor.Remove(usageAttribute);
+            return true;
+        }
+
+        #endregion
+
+        public override AttributeTargets ValidOn => _targets;
 
         #region IClassExpressionConfigurator Members
 
@@ -46,6 +90,9 @@
         #endregion
 
         #region IAttributeExpressionConfigurator Members
+
+        void IAttributeExpressionConfigurator.SetValidOn(AttributeTargets targets)
+            => _targets = targets;
 
         void IAttributeExpressionConfigurator.SetBaseType(
             AttributeExpression baseAttributeExpression,

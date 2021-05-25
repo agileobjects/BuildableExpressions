@@ -5,8 +5,20 @@
     /// <summary>
     /// Provides options to configure an <see cref="AttributeExpression"/>.
     /// </summary>
-    public interface IAttributeExpressionConfigurator : IClassBaseExpressionConfigurator
+    public interface IAttributeExpressionConfigurator : 
+        IClassBaseExpressionConfigurator,
+        IConstructorConfigurator
     {
+        /// <summary>
+        /// Set the System.AttributeTargets restricting to which code elements the
+        /// <see cref="AttributeExpression"/> can be applied, if restricted usage is required.
+        /// </summary>
+        /// <param name="targets">
+        /// The System.AttributeTargets restricting the set of code elements to which the
+        /// <see cref="AttributeExpression"/> can be applied.
+        /// </param>
+        void SetValidOn(AttributeTargets targets);
+
         /// <summary>
         /// Configures the <see cref="AttributeExpression"/> to derive from the given
         /// <paramref name="baseAttributeExpression"/>.

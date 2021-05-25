@@ -1,8 +1,10 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using System.Linq.Expressions;
     using Common;
     using Xunit;
+    using static System.AttributeTargets;
 
     public class WhenBuildingAttributes
     {
@@ -26,6 +28,7 @@ using System;
 
 namespace GeneratedExpressionCode
 {
+    [AttributeUsage(AttributeTargets.All)]
     public class SpecialFunkyAttribute : Attribute
     {
     }
@@ -57,10 +60,12 @@ namespace GeneratedExpressionCode
                 .ToCSharpString();
 
             const string expected = @"
+using System;
 using AgileObjects.BuildableExpressions.UnitTests;
 
 namespace GeneratedExpressionCode
 {
+    [AttributeUsage(AttributeTargets.All)]
     public class DerivedFunkyAttribute : WhenBuildingAttributes.BaseStructAttribute
     {
     }
@@ -102,10 +107,12 @@ using System;
 
 namespace GeneratedExpressionCode
 {
+    [AttributeUsage(AttributeTargets.All)]
     public abstract class ParentAttribute : Attribute
     {
     }
 
+    [AttributeUsage(AttributeTargets.All)]
     public sealed class DerivedAttribute : ParentAttribute
     {
     }
@@ -118,9 +125,94 @@ namespace GeneratedExpressionCode
             translated.ShouldBe(expected.TrimStart());
         }
 
+        [Fact]
+        public void ShouldBuildAnAttributeWithAConstructor()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var attribute = sc.AddAttribute("SecretNameAttribute", attr =>
+                    {
+                        attr.AddConstructor(ctor =>
+                        {
+                            ctor.AddParameter<string>("name");
+                            ctor.SetBody(Expression.Empty());
+                        });
+                    });
+
+                    sc.AddClass("HasAnAttribute", cls =>
+                    {
+                        cls.AddAttribute(attribute, attr =>
+                        {
+                            attr.SetConstructorArguments("It's a secret!");
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    [AttributeUsage(AttributeTargets.All)]
+    public class SecretNameAttribute : Attribute
+    {
+        public SecretNameAttribute
+        (
+            string name
+        )
+        {
+        }
+    }
+
+    [SecretName(""It's a secret!"")]
+    public class HasAnAttribute
+    {
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+        
+        [Fact]
+        public void ShouldBuildAnAttributeWithUsage()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var attribute = sc.AddAttribute("TypesOnlyAttribute", attr =>
+                    {
+                        attr.SetValidOn(Class | Struct | Interface);
+                    });
+
+                    sc.AddClass("HasAnAttribute", cls =>
+                    {
+                        cls.AddAttribute(attribute);
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface)]
+    public class TypesOnlyAttribute : Attribute
+    {
+    }
+
+    [TypesOnly]
+    public class HasAnAttribute
+    {
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
         #region Helper Members
 
-        [AttributeUsage(AttributeTargets.Struct)]
+        [AttributeUsage(Struct)]
         public class BaseStructAttribute : Attribute
         {
         }

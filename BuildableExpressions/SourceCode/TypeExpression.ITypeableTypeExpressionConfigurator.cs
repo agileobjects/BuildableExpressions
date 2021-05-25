@@ -10,11 +10,36 @@
 
     public partial class TypeExpression : ITypeableTypeExpressionConfigurator
     {
-        void IAttributableExpressionConfigurator.AddAttribute(AttributeExpression attribute)
+        AppliedAttribute IAttributableExpressionConfigurator.AddAttribute(
+            AttributeExpression attribute,
+            Action<IAttributeApplicationConfigurator> configuration)
         {
-            _attributeExpressions ??= new List<AttributeExpression>();
-            _attributeExpressions.Add(attribute);
-            _readOnlyAttributeExpressions = null;
+            return AddAttribute(attribute, configuration);
+        }
+
+        /// <summary>
+        /// Applies the given <paramref name="attribute"/> to this <see cref="TypeExpression"/>.
+        /// </summary>
+        /// <param name="attribute">
+        /// The <see cref="AttributeExpression"/> to apply to this <see cref="TypeExpression"/>.
+        /// </param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>
+        /// The <see cref="AppliedAttribute"/> describing the application of the given
+        /// <paramref name="attribute"/>.
+        /// </returns>
+        protected AppliedAttribute AddAttribute(
+            AttributeExpression attribute,
+            Action<IAttributeApplicationConfigurator> configuration)
+        {
+            var appliedAttribute = new AppliedAttribute(attribute);
+            configuration?.Invoke(appliedAttribute);
+
+            _attributes ??= new List<AppliedAttribute>();
+            _attributes.Add(appliedAttribute);
+            _readOnlyAttributes = null;
+
+            return appliedAttribute;
         }
 
         internal virtual void SetImplements(

@@ -33,6 +33,12 @@
         }
 
         /// <summary>
+        /// Gets the System.AttributeTargets defining to which code elements the
+        /// <see cref="AttributeExpression"/> can be applied.
+        /// </summary>
+        public abstract AttributeTargets ValidOn { get; }
+
+        /// <summary>
         /// Gets the <see cref="AttributeExpression"/> from which this 
         /// <see cref="AttributeExpression"/> derives. If this <see cref="AttributeExpression"/> 
         /// derives from System.Attribute, returns an <see cref="AttributeExpression"/> representing

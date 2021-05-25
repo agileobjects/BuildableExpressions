@@ -31,7 +31,7 @@
             ITranslationContext context)
         {
             _type = type;
-            _hasAttributes = type.AttributeExpressionsAccessor != null;
+            _hasAttributes = type.AttributesAccessor != null;
             _isGenericType = type.IsGeneric;
             _typeString = typeString;
             _summaryTranslation = SummaryTranslation.For(type.Summary, context);
@@ -54,7 +54,7 @@
             if (_hasAttributes)
             {
                 _attributesTranslation =
-                    new AttributeSetTranslation(type.AttributeExpressions, context);
+                    new AttributeSetTranslation(type.Attributes, context);
 
                 translationSize += _attributesTranslation.TranslationSize;
                 formattingSize += _attributesTranslation.FormattingSize;

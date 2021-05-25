@@ -28,6 +28,11 @@
         {
             _sourceCodeNamespace = type.SourceCode.Namespace;
 
+            if (type.AttributesAccessor != null)
+            {
+                HandleReferences(type.AttributesAccessor);
+            }
+
             if (type.IsGeneric)
             {
                 HandleReferences(type.GenericParameters);
@@ -109,6 +114,24 @@
             else if (@catch.Test != typeof(Exception))
             {
                 HandleReference(@catch.Test);
+            }
+        }
+
+        private void HandleReferences(IEnumerable<AppliedAttribute> attributes)
+        {
+            foreach (var attribute in attributes)
+            {
+                HandleReference(attribute.AttributeExpression);
+
+                if (attribute.ArgumentsAccessor == null)
+                {
+                    continue;
+                }
+
+                foreach (var argument in attribute.ArgumentsAccessor)
+                {
+                    HandleReference(argument);
+                }
             }
         }
 

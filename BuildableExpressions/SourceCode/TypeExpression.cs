@@ -22,8 +22,8 @@
         Expression,
         ICustomTranslationExpression
     {
-        private List<AttributeExpression> _attributeExpressions;
-        private ReadOnlyCollection<AttributeExpression> _readOnlyAttributeExpressions;
+        private List<AppliedAttribute> _attributes;
+        private ReadOnlyCollection<AppliedAttribute> _readOnlyAttributes;
         private List<GenericParameterExpression> _genericParameters;
         private ReadOnlyCollection<GenericParameterExpression> _readOnlyGenericParameters;
         private List<TypeExpression> _genericArguments;
@@ -171,14 +171,15 @@
         public CommentExpression Summary { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="AttributeExpression"/>s which have been applied to this
+        /// Gets the <see cref="AppliedAttribute"/>s describing the
+        /// <see cref="AttributeExpression"/>s which have been applied to this
         /// <see cref="TypeExpression"/>, if any.
         /// </summary>
-        public ReadOnlyCollection<AttributeExpression> AttributeExpressions
-            => _readOnlyAttributeExpressions ??= _attributeExpressions.ToReadOnlyCollection();
+        public ReadOnlyCollection<AppliedAttribute> Attributes
+            => _readOnlyAttributes ??= _attributes.ToReadOnlyCollection();
 
-        internal virtual ICollection<AttributeExpression> AttributeExpressionsAccessor
-            => _attributeExpressions;
+        internal virtual ICollection<AppliedAttribute> AttributesAccessor
+            => _attributes;
 
         /// <summary>
         /// Gets this <see cref="TypeExpression"/>'s <see cref="TypeVisibility" />.

@@ -1,12 +1,14 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
     using System;
+    using System.Reflection;
     using NetStandardPolyfills;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
 
     internal class TypedAttributeExpression : AttributeExpression, ITypedTypeExpression
     {
+        private AttributeTargets? _targets;
         private readonly Type _attributeType;
 
         public TypedAttributeExpression(Type attributeType)
@@ -23,6 +25,15 @@
 
             IsAbstract = attributeType.IsAbstract();
             IsSealed = attributeType.IsSealed();
+        }
+
+        public override AttributeTargets ValidOn => _targets ??= GetAttributeTargets();
+
+        private AttributeTargets GetAttributeTargets()
+        {
+            return _attributeType
+                .GetCustomAttribute<AttributeUsageAttribute>()?
+                .ValidOn ?? AttributeTargets.All;
         }
 
         #region IType Members

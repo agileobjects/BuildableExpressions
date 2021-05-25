@@ -415,6 +415,22 @@
         }
 
         /// <summary>
+        /// Applies the given <paramref name="attribute"/> to the source code element being
+        /// configured.
+        /// </summary>
+        /// <param name="attributeConfig">The <see cref="IAttributableExpressionConfigurator"/> to configure.</param>
+        /// <param name="attribute">
+        /// The <see cref="AttributeExpression"/> to apply to the source code element being
+        /// configured.
+        /// </param>
+        public static void AddAttribute(
+            this IAttributableExpressionConfigurator attributeConfig,
+            AttributeExpression attribute)
+        {
+            attributeConfig.AddAttribute(attribute, _ => { });
+        }
+
+        /// <summary>
         /// Adds a ParameterExpression with the <typeparamref name="TParameter"/> type and
         /// <paramref name="name"/> to the <see cref="ConstructorExpression"/>.
         /// </summary>
