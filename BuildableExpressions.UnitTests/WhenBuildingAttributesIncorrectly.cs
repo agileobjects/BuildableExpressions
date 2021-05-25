@@ -50,7 +50,7 @@
             {
                 BuildableExpression.SourceCode(sc =>
                 {
-                    sc.AddAttribute("Nope", attr =>
+                    sc.AddAttribute("NopeAttribute", attr =>
                     {
                         attr.SetBaseType(typeof(Stream));
                     });
@@ -68,7 +68,7 @@
             {
                 BuildableExpression.SourceCode(sc =>
                 {
-                    sc.AddAttribute("Nope", attr =>
+                    sc.AddAttribute("NopeAttribute", attr =>
                     {
                         attr.SetAbstract();
                         attr.SetSealed();
@@ -86,7 +86,7 @@
             {
                 BuildableExpression.SourceCode(sc =>
                 {
-                    sc.AddAttribute("Nope", attr =>
+                    sc.AddAttribute("NopeAttribute", attr =>
                     {
                         attr.SetSealed();
                         attr.SetAbstract();
@@ -95,6 +95,21 @@
             });
 
             attributeEx.Message.ShouldContain("cannot be both sealed and abstract");
+        }
+
+        [Fact]
+        public void ShouldErrorIfNameHasNoAttributeSuffix()
+        {
+            var attributeEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddAttribute("Nope", _ => { });
+                });
+            });
+
+            attributeEx.Message.ShouldContain("Attribute 'Nope':");
+            attributeEx.Message.ShouldContain("names must end with 'Attribute'");
         }
 
         #region Helper Members

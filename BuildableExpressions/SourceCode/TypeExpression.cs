@@ -393,7 +393,7 @@
         /// <summary>
         /// Validates that this <see cref="TypeExpression"/> has a valid state.
         /// </summary>
-        protected void Validate()
+        protected virtual void Validate()
         {
             ThrowIfDuplicateTypeName();
             ThrowIfInvalidImplementations();

@@ -129,6 +129,21 @@
 
         #endregion
 
+        #region Validation
+
+        protected override void Validate()
+        {
+            base.Validate();
+
+            if (!Name.EndsWith("Attribute", StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException(
+                    $"Attribute '{Name}': Attribute names must end with 'Attribute'");
+            }
+        }
+
+        #endregion
+
         protected override ITranslation GetTranslation(ITranslationContext context)
             => new ClassTranslation(this, context);
     }
