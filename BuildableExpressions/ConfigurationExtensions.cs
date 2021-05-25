@@ -455,6 +455,53 @@
         }
 
         /// <summary>
+        /// Applies the <typeparamref name="TAttribute"/> type to the source code element being
+        /// configured.
+        /// </summary>
+        /// <typeparam name="TAttribute">
+        /// The Attribute type to apply to the source code element being configured.
+        /// </typeparam>
+        /// <param name="attributeConfig">The <see cref="IAttributableExpressionConfigurator"/> to configure.</param>
+        public static void AddAttribute<TAttribute>(
+            this IAttributableExpressionConfigurator attributeConfig)
+            where TAttribute : Attribute
+        {
+            attributeConfig.AddAttribute(typeof(TAttribute));
+        }
+
+        /// <summary>
+        /// Applies the <paramref name="attributeType"/> attribute to the source code element being
+        /// configured.
+        /// </summary>
+        /// <param name="attributeConfig">The <see cref="IAttributableExpressionConfigurator"/> to configure.</param>
+        /// <param name="attributeType">
+        /// The Attribute type to apply to the source code element being configured.
+        /// </param>
+        public static void AddAttribute(
+            this IAttributableExpressionConfigurator attributeConfig,
+            Type attributeType)
+        {
+            attributeConfig.AddAttribute(attributeType, configuration: null);
+        }
+
+        /// <summary>
+        /// Applies the <paramref name="attributeType"/> attribute to the source code element being
+        /// configured, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="attributeConfig">The <see cref="IAttributableExpressionConfigurator"/> to configure.</param>
+        /// <param name="attributeType">
+        /// The Attribute type to apply to the source code element being configured.
+        /// </param>
+        /// <param name="configuration">The configuration to use.</param>
+        public static void AddAttribute(
+            this IAttributableExpressionConfigurator attributeConfig,
+            Type attributeType,
+            Action<IAttributeApplicationConfigurator> configuration)
+        {
+            attributeConfig.AddAttribute(TypeExpressionFactory.CreateAttribute(attributeType), configuration);
+        }
+
+        /// <summary>
         /// Adds a ParameterExpression with the <typeparamref name="TParameter"/> type and
         /// <paramref name="name"/> to the <see cref="ConstructorExpression"/>.
         /// </summary>

@@ -173,9 +173,9 @@ namespace GeneratedExpressionCode
 }";
             translated.ShouldBe(expected.TrimStart());
         }
-        
+
         [Fact]
-        public void ShouldBuildAnAttributeWithUsage()
+        public void ShouldBuildAnAttributeWithCustomUsage()
         {
             var translated = BuildableExpression
                 .SourceCode(sc =>
@@ -210,10 +210,58 @@ namespace GeneratedExpressionCode
             translated.ShouldBe(expected.TrimStart());
         }
 
+        [Fact]
+        public void ShouldApplyMultipleAttributes()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var attribute1 = sc.AddAttribute("Attribute1Attribute", _ => { });
+                    var attribute2 = sc.AddAttribute("Attribute2Attribute", _ => { });
+
+                    sc.AddClass("HasManyAttributes", cls =>
+                    {
+                        cls.AddAttribute(attribute1);
+                        cls.AddAttribute(attribute2);
+                        cls.AddAttribute<TestAttribute>();
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System;
+using AgileObjects.BuildableExpressions.UnitTests;
+
+namespace GeneratedExpressionCode
+{
+    [AttributeUsage(AttributeTargets.All)]
+    public class Attribute1Attribute : Attribute
+    {
+    }
+
+    [AttributeUsage(AttributeTargets.All)]
+    public class Attribute2Attribute : Attribute
+    {
+    }
+
+    [Attribute1]
+    [Attribute2]
+    [WhenBuildingAttributes.Test]
+    public class HasManyAttributes
+    {
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
         #region Helper Members
 
         [AttributeUsage(Struct)]
         public class BaseStructAttribute : Attribute
+        {
+        }
+
+        public class TestAttribute : Attribute
         {
         }
 
