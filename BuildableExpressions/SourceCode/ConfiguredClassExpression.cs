@@ -105,28 +105,6 @@
             }
         }
 
-        private void ThrowIfAbstract(string conflictingModifier)
-        {
-            if (IsAbstract)
-            {
-                ThrowModifierConflict("abstract", conflictingModifier);
-            }
-        }
-
-        private void ThrowIfSealed(string conflictingModifier)
-        {
-            if (IsSealed)
-            {
-                ThrowModifierConflict("sealed", conflictingModifier);
-            }
-        }
-
-        private void ThrowModifierConflict(string modifier, string conflictingModifier)
-        {
-            throw new InvalidOperationException(
-                $"Type '{Name}' cannot be both {modifier} and {conflictingModifier}.");
-        }
-
         void IClassExpressionConfigurator.SetBaseType(
             ClassExpression baseTypeExpression,
             Action<IClassImplementationConfigurator> configuration)

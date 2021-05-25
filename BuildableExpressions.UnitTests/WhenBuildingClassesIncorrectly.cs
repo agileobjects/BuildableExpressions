@@ -135,7 +135,7 @@
         }
 
         [Fact]
-        public void ShouldErrorIfClassMarkedStaticAndAbstract()
+        public void ShouldErrorIfMarkedStaticAndAbstract()
         {
             var classEx = Should.Throw<InvalidOperationException>(() =>
             {
@@ -153,7 +153,7 @@
         }
 
         [Fact]
-        public void ShouldErrorIfClassMarkedStaticAndSealed()
+        public void ShouldErrorIfMarkedStaticAndSealed()
         {
             var classEx = Should.Throw<InvalidOperationException>(() =>
             {
@@ -171,7 +171,7 @@
         }
 
         [Fact]
-        public void ShouldErrorIfClassMarkedAbstractAndStatic()
+        public void ShouldErrorIfMarkedAbstractAndStatic()
         {
             var classEx = Should.Throw<InvalidOperationException>(() =>
             {
@@ -189,7 +189,7 @@
         }
 
         [Fact]
-        public void ShouldErrorIfClassMarkedAbstractAndSealed()
+        public void ShouldErrorIfMarkedAbstractAndSealed()
         {
             var classEx = Should.Throw<InvalidOperationException>(() =>
             {
@@ -207,7 +207,7 @@
         }
 
         [Fact]
-        public void ShouldErrorIfClassMarkedSealedAndStatic()
+        public void ShouldErrorIfMarkedSealedAndStatic()
         {
             var classEx = Should.Throw<InvalidOperationException>(() =>
             {
@@ -225,7 +225,7 @@
         }
 
         [Fact]
-        public void ShouldErrorIfClassMarkedSealedAndAbstract()
+        public void ShouldErrorIfMarkedSealedAndAbstract()
         {
             var classEx = Should.Throw<InvalidOperationException>(() =>
             {

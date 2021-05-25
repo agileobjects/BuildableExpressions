@@ -61,6 +61,42 @@
             baseTypeEx.Message.ShouldContain("create a ClassExpression instead");
         }
 
+        [Fact]
+        public void ShouldErrorIfMarkedAbstractAndSealed()
+        {
+            var attributeEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddAttribute("Nope", attr =>
+                    {
+                        attr.SetAbstract();
+                        attr.SetSealed();
+                    });
+                });
+            });
+
+            attributeEx.Message.ShouldContain("cannot be both abstract and sealed");
+        }
+
+        [Fact]
+        public void ShouldErrorIfMarkedSealedAndAbstract()
+        {
+            var attributeEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddAttribute("Nope", attr =>
+                    {
+                        attr.SetSealed();
+                        attr.SetAbstract();
+                    });
+                });
+            });
+
+            attributeEx.Message.ShouldContain("cannot be both sealed and abstract");
+        }
+
         #region Helper Members
 
         public abstract class BaseAttribute1 : Attribute

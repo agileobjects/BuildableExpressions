@@ -124,7 +124,7 @@
         /// <param name="attemptedBaseType">
         /// The IType describing the base type which has been attempted to be set.
         /// </param>
-        protected virtual void ThrowIfInvalidBaseType(IType attemptedBaseType)
+        protected void ThrowIfInvalidBaseType(IType attemptedBaseType)
         {
             if (attemptedBaseType.IsSealed)
             {
@@ -144,6 +144,56 @@
         {
             throw new InvalidOperationException(
                 $"Type '{attemptedBaseType.Name}' is not a valid base type.");
+        }
+
+        /// <summary>
+        /// Throws an InvalidOperationException if this <see cref="ClassExpressionBase"/> is
+        /// abstract, due to the given <paramref name="conflictingModifier"/> having been set.
+        /// </summary>
+        /// <param name="conflictingModifier">
+        /// The modifier which would conflict with this <see cref="ClassExpressionBase"/> being
+        /// static.
+        /// </param>
+        protected void ThrowIfAbstract(string conflictingModifier)
+        {
+            if (IsAbstract)
+            {
+                ThrowModifierConflict("abstract", conflictingModifier);
+            }
+        }
+
+        /// <summary>
+        /// Throws an InvalidOperationException if this <see cref="ClassExpressionBase"/> is
+        /// sealed, due to the given <paramref name="conflictingModifier"/> having been set.
+        /// </summary>
+        /// <param name="conflictingModifier">
+        /// The modifier which would conflict with this <see cref="ClassExpressionBase"/> being
+        /// sealed.
+        /// </param>
+        protected void ThrowIfSealed(string conflictingModifier)
+        {
+            if (IsSealed)
+            {
+                ThrowModifierConflict("sealed", conflictingModifier);
+            }
+        }
+
+        /// <summary>
+        /// Throws an InvalidOperationException due to the attempted setting of the given
+        /// <paramref name="conflictingModifier"/>, which conflicts with the existing given
+        /// <paramref name="modifier"/>.
+        /// </summary>
+        /// <param name="modifier">
+        /// The existing modifier with which the <paramref name="conflictingModifier"/> conflicts.
+        /// </param>
+        /// <param name="conflictingModifier">
+        /// The modifier the attempted setting of which conflicted with the existing given
+        /// <paramref name="modifier"/>.
+        /// </param>
+        protected void ThrowModifierConflict(string modifier, string conflictingModifier)
+        {
+            throw new InvalidOperationException(
+                $"Type '{Name}' cannot be both {modifier} and {conflictingModifier}.");
         }
 
         #endregion

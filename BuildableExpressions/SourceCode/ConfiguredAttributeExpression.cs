@@ -78,13 +78,13 @@
 
         internal void SetAbstract()
         {
-            //ThrowIfSealed("abstract");
+            ThrowIfSealed("abstract");
             IsAbstract = true;
         }
 
         void IClassBaseExpressionConfigurator.SetSealed()
         {
-            //ThrowIfAbstract("sealed");
+            ThrowIfAbstract("sealed");
             IsSealed = true;
         }
 
@@ -125,30 +125,6 @@
             {
                 ThrowBaseTypeAlreadySet(baseType, typeName: "attribute");
             }
-        }
-
-        protected override void ThrowIfInvalidBaseType(IType attemptedBaseType)
-        {
-            base.ThrowIfInvalidBaseType(attemptedBaseType);
-
-            ThrowIfNotDerivedFromAttribute(attemptedBaseType);
-        }
-
-        private static void ThrowIfNotDerivedFromAttribute(IType attemptedBaseType)
-        {
-            var baseType = attemptedBaseType;
-
-            while (baseType != null)
-            {
-                if (baseType.Equals(_attributeTypeExpression))
-                {
-                    return;
-                }
-
-                baseType = baseType.BaseType;
-            }
-
-            ThrowInvalidBaseType(attemptedBaseType);
         }
 
         #endregion
