@@ -113,7 +113,12 @@
 
                     if (argumentType == null)
                     {
-                        continue;
+                        if (parameterType.CanBeNull())
+                        {
+                            continue;
+                        }
+
+                        break;
                     }
 
                     if (!argumentType.IsAssignableTo(parameterType))

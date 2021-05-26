@@ -264,6 +264,55 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldSupportAnAttributeWithANullConstructorArgument()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var attribute = sc.AddAttribute("SecretNameAttribute", attr =>
+                    {
+                        attr.AddConstructor(ctor =>
+                        {
+                            ctor.AddParameter<string>("name");
+                            ctor.SetBody(Empty());
+                        });
+                    });
+
+                    sc.AddClass("HasNullName", cls =>
+                    {
+                        cls.AddAttribute(attribute, attr =>
+                        {
+                            attr.SetConstructorArguments(default(string));
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    [AttributeUsage(AttributeTargets.All)]
+    public class SecretNameAttribute : Attribute
+    {
+        public SecretNameAttribute
+        (
+            string name
+        )
+        {
+        }
+    }
+
+    [SecretName(null)]
+    public class HasNullName
+    {
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAnAttributeWithCustomUsage()
         {
             var translated = BuildableExpression
