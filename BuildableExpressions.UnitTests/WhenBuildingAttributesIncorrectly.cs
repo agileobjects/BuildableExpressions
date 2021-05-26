@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using System.Linq.Expressions;
     using Common;
     using Xunit;
 
@@ -110,6 +111,38 @@
 
             attributeEx.Message.ShouldContain("Attribute 'Nope':");
             attributeEx.Message.ShouldContain("names must end with 'Attribute'");
+        }
+
+        [Fact]
+        public void ShouldErrorIfAttributeConstructorArgumentsMismatch()
+        {
+            var attributeCtorEx = Should.Throw<ArgumentException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    var ctorAttr = sc.AddAttribute("CtorAttribute", attr =>
+                    {
+                        attr.AddConstructor(ctor =>
+                        {
+                            ctor.AddParameter<object>("value");
+                            ctor.SetBody(Expression.Empty());
+                        });
+                    });
+
+                    sc.AddInterface("IAttributed", itf =>
+                    {
+                        itf.AddAttribute(ctorAttr, attr =>
+                        {
+                            attr.SetConstructorArguments(null, 123, DateTime.Now);
+                        });
+                    });
+                });
+            });
+
+            attributeCtorEx.Message.ShouldContain("Unable to find 'CtorAttribute' constructor matching");
+            attributeCtorEx.Message.ShouldContain("'null, int, DateTime'");
+            attributeCtorEx.Message.ShouldContain("Available constructor(s) are");
+            attributeCtorEx.Message.ShouldContain("- object");
         }
 
         #region Helper Members
