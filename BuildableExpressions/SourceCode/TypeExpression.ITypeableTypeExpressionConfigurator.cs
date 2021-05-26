@@ -75,6 +75,16 @@
         void ITypeExpressionConfigurator.SetVisibility(TypeVisibility visibility)
             => Visibility = visibility;
 
+        #region ITypeableTypeExpressionConfigurator Members
+
+        void ITypeableTypeExpressionConfigurator.AddGenericParameter(
+            GenericParameterExpression parameter)
+        {
+            AddGenericParameter(parameter);
+        }
+
+        #endregion
+
         GenericParameterExpression IGenericParameterConfigurator.AddGenericParameter(
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)

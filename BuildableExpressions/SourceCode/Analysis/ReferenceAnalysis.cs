@@ -26,7 +26,7 @@
 
         public void Visit(TypeExpression type)
         {
-            _sourceCodeNamespace = type.SourceCode.Namespace;
+            _sourceCodeNamespace ??= type.SourceCode.Namespace;
 
             if (type.AttributesAccessor != null)
             {
@@ -183,7 +183,7 @@
 
             var @namespace = referencedType.Namespace;
 
-            if (@namespace == null)
+            if ((@namespace == null) || (@namespace == _sourceCodeNamespace))
             {
                 return;
             }

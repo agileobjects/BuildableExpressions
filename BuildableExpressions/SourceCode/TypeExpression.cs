@@ -393,10 +393,11 @@
         /// <summary>
         /// Validates that this <see cref="TypeExpression"/> has a valid state.
         /// </summary>
-        protected virtual void Validate()
+        protected void Validate()
         {
             ThrowIfDuplicateTypeName();
             ThrowIfInvalidImplementations();
+            OnValidate();
         }
 
         private void ThrowIfDuplicateTypeName()
@@ -447,6 +448,13 @@
 
             throw new AmbiguousMatchException(
                 $"Method '{ambiguousMethod.GetSignature()}' matches multiple interface methods");
+        }
+
+        /// <summary>
+        /// Provides an extension point for derived classes to validate their state.
+        /// </summary>
+        protected virtual void OnValidate()
+        {
         }
 
         #endregion

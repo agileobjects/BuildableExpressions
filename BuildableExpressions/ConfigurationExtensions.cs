@@ -707,87 +707,87 @@
 
         /// <summary>
         /// Add a public, instance-scoped, get-set <see cref="PropertyExpression"/> to the
-        /// <see cref="ClassExpression"/>, with the given <paramref name="name"/> and
+        /// <see cref="ClassExpressionBase"/>, with the given <paramref name="name"/> and
         /// <typeparamref name="TProperty"/> type.
         /// </summary>
         /// <typeparam name="TProperty">The type of the <see cref="PropertyExpression"/>.</typeparam>
-        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="memberConfig">The <see cref="IClassMemberConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="PropertyExpression"/>.</param>
         /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
         public static PropertyExpression AddProperty<TProperty>(
-            this IClassExpressionConfigurator classConfig,
+            this IClassMemberConfigurator memberConfig,
             string name)
         {
-            return classConfig.AddProperty(name, typeof(TProperty));
+            return memberConfig.AddProperty(name, typeof(TProperty));
         }
 
         /// <summary>
-        /// Add a <see cref="PropertyExpression"/> to the <see cref="ClassExpression"/>, with the
-        /// given <paramref name="name"/>, <typeparamref name="TProperty"/> type and
+        /// Add a <see cref="PropertyExpression"/> to the <see cref="ClassExpressionBase"/>, with
+        /// the given <paramref name="name"/>, <typeparamref name="TProperty"/> type and
         /// <paramref name="configuration"/>.
         /// </summary>
         /// <typeparam name="TProperty">The type of the <see cref="PropertyExpression"/>.</typeparam>
-        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="memberConfig">The <see cref="IClassMemberConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="PropertyExpression"/>.</param>
         /// <param name="configuration">The configuration to use.</param>
         /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
         public static PropertyExpression AddProperty<TProperty>(
-            this IClassExpressionConfigurator classConfig,
+            this IClassMemberConfigurator memberConfig,
             string name,
             Action<IClassPropertyExpressionConfigurator> configuration)
         {
-            return classConfig.AddProperty(name, typeof(TProperty), configuration);
+            return memberConfig.AddProperty(name, typeof(TProperty), configuration);
         }
 
         /// <summary>
         /// Add a public, instance-scoped, get-set <see cref="PropertyExpression"/> to the
-        /// <see cref="ClassExpression"/>, with the given <paramref name="name"/> and
+        /// <see cref="ClassExpressionBase"/>, with the given <paramref name="name"/> and
         /// <paramref name="type"/>.
         /// </summary>
-        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="memberConfig">The <see cref="IClassMemberConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="PropertyExpression"/>.</param>
         /// <param name="type">The type of the <see cref="PropertyExpression"/>.</param>
         /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
         public static PropertyExpression AddProperty(
-            this IClassExpressionConfigurator classConfig,
+            this IClassMemberConfigurator memberConfig,
             string name,
             Type type)
         {
-            return classConfig.AddProperty(name, type, PublicGetSet);
+            return memberConfig.AddProperty(name, type, PublicGetSet);
         }
 
         /// <summary>
         /// Add a public, instance-scoped, get-set <see cref="PropertyExpression"/> to the
-        /// <see cref="ClassExpression"/>, with the given <paramref name="name"/>,
+        /// <see cref="ClassExpressionBase"/>, with the given <paramref name="name"/>,
         /// <paramref name="type"/> and <paramref name="configuration"/>.
         /// </summary>
-        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="memberConfig">The <see cref="IClassMemberConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="PropertyExpression"/>.</param>
         /// <param name="type">The Type of the <see cref="PropertyExpression"/>.</param>
         /// <param name="configuration">The configuration to use.</param>
         /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
         public static PropertyExpression AddProperty(
-            this IClassExpressionConfigurator classConfig,
+            this IClassMemberConfigurator memberConfig,
             string name,
             Type type,
             Action<IClassPropertyExpressionConfigurator> configuration)
         {
-            return classConfig.AddProperty(name, ClrTypeWrapper.For(type), configuration);
+            return memberConfig.AddProperty(name, ClrTypeWrapper.For(type), configuration);
         }
 
         /// <summary>
         /// Add an override of the given <paramref name="overriddenProperty"/> to the
-        /// <see cref="ClassExpression"/> by creating a public auto-property with the appropriate
+        /// <see cref="ClassExpressionBase"/> by creating a public auto-property with the appropriate
         /// accessor(s).
         /// </summary>
-        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="memberConfig">The <see cref="IClassMemberConfigurator"/> to configure.</param>
         /// <param name="overriddenProperty">The <see cref="PropertyExpression"/> to override.</param>
         /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
         public static PropertyExpression AddProperty(
-            this IClassExpressionConfigurator classConfig,
+            this IClassMemberConfigurator memberConfig,
             PropertyExpression overriddenProperty)
         {
-            return classConfig.AddProperty(overriddenProperty, p =>
+            return memberConfig.AddProperty(overriddenProperty, p =>
             {
                 Implement(overriddenProperty, p);
             });
@@ -795,18 +795,18 @@
 
         /// <summary>
         /// Add an override of the given <paramref name="overriddenProperty"/> to the
-        /// <see cref="ClassExpression"/>, using the given <paramref name="configuration"/>.
+        /// <see cref="ClassExpressionBase"/>, using the given <paramref name="configuration"/>.
         /// </summary>
-        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="memberConfig">The <see cref="IClassMemberConfigurator"/> to configure.</param>
         /// <param name="overriddenProperty">The <see cref="PropertyExpression"/> to override.</param>
         /// <param name="configuration">The configuration to use.</param>
         /// <returns>The newly-created <see cref="PropertyExpression"/>.</returns>
         public static PropertyExpression AddProperty(
-            this IClassExpressionConfigurator classConfig,
+            this IClassMemberConfigurator memberConfig,
             PropertyExpression overriddenProperty,
             Action<IClassPropertyExpressionConfigurator> configuration)
         {
-            return classConfig.AddProperty(
+            return memberConfig.AddProperty(
                 overriddenProperty.Name,
               ((IProperty)overriddenProperty).Type,
                 configuration);
@@ -1116,10 +1116,10 @@
 
         /// <summary>
         /// Add a public, instance-scoped <see cref="MethodExpression"/> to the
-        /// <see cref="ClassExpression"/>, with the given <paramref name="name"/> and
+        /// <see cref="ClassExpressionBase"/>, with the given <paramref name="name"/> and
         /// <paramref name="body"/>.
         /// </summary>
-        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="memberConfig">The <see cref="IClassMemberConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
         /// <param name="body">
         /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
@@ -1127,11 +1127,11 @@
         /// </param>
         /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
         public static MethodExpression AddMethod(
-            this IClassExpressionConfigurator classConfig,
+            this IClassMemberConfigurator memberConfig,
             string name,
             Expression body)
         {
-            return classConfig.AddMethod(name, cfg => cfg.SetBody(body));
+            return memberConfig.AddMethod(name, cfg => cfg.SetBody(body));
         }
 
         /// <summary>
@@ -1139,7 +1139,7 @@
         /// <see cref="StructExpression"/>, with the given <paramref name="name"/> and
         /// <paramref name="body"/>.
         /// </summary>
-        /// <param name="typeConfig">The <see cref="IStructExpressionConfigurator"/> to configure.</param>
+        /// <param name="structConfig">The <see cref="IStructExpressionConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
         /// <param name="body">
         /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
@@ -1147,11 +1147,11 @@
         /// </param>
         /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
         public static MethodExpression AddMethod(
-            this IStructExpressionConfigurator typeConfig,
+            this IStructExpressionConfigurator structConfig,
             string name,
             Expression body)
         {
-            return typeConfig.AddMethod(name, cfg => cfg.SetBody(body));
+            return structConfig.AddMethod(name, cfg => cfg.SetBody(body));
         }
 
         /// <summary>
@@ -1159,7 +1159,7 @@
         /// given <paramref name="name"/> and <paramref name="body"/>, using the given
         /// <paramref name="configuration"/>.
         /// </summary>
-        /// <param name="typeConfig">The <see cref="IStructExpressionConfigurator"/> to configure.</param>
+        /// <param name="structConfig">The <see cref="IStructExpressionConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
         /// <param name="body">
         /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
@@ -1170,12 +1170,12 @@
         /// </param>
         /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
         public static MethodExpression AddMethod(
-            this IStructExpressionConfigurator typeConfig,
+            this IStructExpressionConfigurator structConfig,
             string name,
             Expression body,
             Action<IConcreteTypeMethodExpressionConfigurator> configuration)
         {
-            return typeConfig.AddMethod(name, cfg =>
+            return structConfig.AddMethod(name, cfg =>
             {
                 configuration.Invoke(cfg);
                 cfg.SetBody(body);
@@ -1183,11 +1183,11 @@
         }
 
         /// <summary>
-        /// Add a <see cref="MethodExpression"/> to the <see cref="ClassExpression"/>, with the
+        /// Add a <see cref="MethodExpression"/> to the <see cref="ClassExpressionBase"/>, with the
         /// given <paramref name="name"/> and <paramref name="body"/>, using the given
         /// <paramref name="configuration"/>.
         /// </summary>
-        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="memberConfig">The <see cref="IClassMemberConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
         /// <param name="body">
         /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
@@ -1198,12 +1198,12 @@
         /// </param>
         /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
         public static MethodExpression AddMethod(
-            this IClassExpressionConfigurator classConfig,
+            this IClassMemberConfigurator memberConfig,
             string name,
             Expression body,
             Action<IClassMethodExpressionConfigurator> configuration)
         {
-            return classConfig.AddMethod(name, cfg =>
+            return memberConfig.AddMethod(name, cfg =>
             {
                 configuration.Invoke(cfg);
                 cfg.SetBody(body);
@@ -1212,18 +1212,18 @@
 
         /// <summary>
         /// Add an override of the given <paramref name="overriddenMethod"/> to the
-        /// <see cref="ClassExpression"/>, using the given <paramref name="configuration"/>.
+        /// <see cref="ClassExpressionBase"/>, using the given <paramref name="configuration"/>.
         /// </summary>
-        /// <param name="classConfig">The <see cref="IClassExpressionConfigurator"/> to configure.</param>
+        /// <param name="memberConfig">The <see cref="IClassMemberConfigurator"/> to configure.</param>
         /// <param name="overriddenMethod">The <see cref="MethodExpression"/> to override.</param>
         /// <param name="configuration">The configuration to use.</param>
         /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
         public static MethodExpression AddMethod(
-            this IClassExpressionConfigurator classConfig,
+            this IClassMemberConfigurator memberConfig,
             MethodExpression overriddenMethod,
             Action<IClassMethodExpressionConfigurator> configuration)
         {
-            return classConfig.AddMethod(overriddenMethod.Name, m =>
+            return memberConfig.AddMethod(overriddenMethod.Name, m =>
             {
                 if (overriddenMethod.ParametersAccessor != null)
                 {
@@ -1239,14 +1239,14 @@
         /// <paramref name="name"/> to the <see cref="TypeExpression"/> or
         /// <see cref="MethodExpression"/>.
         /// </summary>
-        /// <param name="methodConfig">The <see cref="IGenericParameterConfigurator"/> to configure.</param>
+        /// <param name="paramConfig">The <see cref="IGenericParameterConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="GenericParameterExpression"/>.</param>
         /// <returns>The newly-created <see cref="GenericParameterExpression"/>.</returns>
         public static GenericParameterExpression AddGenericParameter(
-            this IGenericParameterConfigurator methodConfig,
+            this IGenericParameterConfigurator paramConfig,
             string name)
         {
-            return methodConfig.AddGenericParameter(name, _ => { });
+            return paramConfig.AddGenericParameter(name, _ => { });
         }
 
         /// <summary>

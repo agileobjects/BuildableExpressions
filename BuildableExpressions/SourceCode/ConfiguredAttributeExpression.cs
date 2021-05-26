@@ -72,7 +72,7 @@
 
         public override AttributeTargets ValidOn => _targets;
 
-        #region IClassExpressionConfigurator Members
+        #region IClassBaseExpressionConfigurator Members
 
         void IClassBaseExpressionConfigurator.SetAbstract() => SetAbstract();
 
@@ -90,6 +90,25 @@
 
         Expression IClassBaseExpressionConfigurator.BaseInstanceExpression
             => _baseInstanceExpression ??= InstanceExpression.Base(BaseTypeExpression);
+
+        #endregion
+
+        #region IClassMemberConfigurator Members
+
+        PropertyExpression IClassMemberConfigurator.AddProperty(
+            string name,
+            IType type,
+            Action<IClassPropertyExpressionConfigurator> configuration)
+        {
+            return AddProperty(name, type, configuration);
+        }
+
+        MethodExpression IClassMemberConfigurator.AddMethod(
+            string name,
+            Action<IClassMethodExpressionConfigurator> configuration)
+        {
+            return AddMethod(name, configuration);
+        }
 
         #endregion
 
@@ -131,9 +150,9 @@
 
         #region Validation
 
-        protected override void Validate()
+        protected override void OnValidate()
         {
-            base.Validate();
+            base.OnValidate();
 
             if (!Name.EndsWith("Attribute", StringComparison.Ordinal))
             {

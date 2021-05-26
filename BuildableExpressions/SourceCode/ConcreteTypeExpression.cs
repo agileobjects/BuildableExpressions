@@ -67,12 +67,6 @@
         Expression IConcreteTypeExpressionConfigurator.ThisInstanceExpression
             => _thisInstanceExpression ??= InstanceExpression.This(this);
 
-        void IConcreteTypeExpressionConfigurator.AddGenericParameter(
-            GenericParameterExpression parameter)
-        {
-            AddGenericParameter(parameter);
-        }
-
         ConstructorExpression IConstructorConfigurator.AddConstructor(
             Action<IConstructorExpressionConfigurator> configuration)
         {

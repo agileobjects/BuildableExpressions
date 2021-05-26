@@ -58,7 +58,7 @@
 
         #endregion
 
-        #region IClassExpressionConfigurator Members
+        #region IClassBaseExpressionConfigurator Members
 
         void IClassBaseExpressionConfigurator.SetAbstract() => SetAbstract();
 
@@ -78,6 +78,35 @@
 
         Expression IClassBaseExpressionConfigurator.BaseInstanceExpression
             => _baseInstanceExpression ??= InstanceExpression.Base(BaseTypeExpression);
+
+        #endregion
+
+        #region IClassMemberConfigurator Members
+
+        PropertyExpression IClassMemberConfigurator.AddProperty(
+            string name,
+            IType type,
+            Action<IClassPropertyExpressionConfigurator> configuration)
+        {
+            return AddProperty(name, type, configuration);
+        }
+
+        MethodExpression IClassMemberConfigurator.AddMethod(
+            string name,
+            Action<IClassMethodExpressionConfigurator> configuration)
+        {
+            return AddMethod(name, configuration);
+        }
+
+        internal override MethodExpression AddMethod(MethodExpression method)
+        {
+            if (IsStatic)
+            {
+                ((IConcreteTypeMethodExpressionConfigurator)method).SetStatic();
+            }
+
+            return base.AddMethod(method);
+        }
 
         #endregion
 
@@ -132,31 +161,6 @@
             {
                 ThrowBaseTypeAlreadySet(baseType, typeName: "class");
             }
-        }
-
-        PropertyExpression IClassMemberConfigurator.AddProperty(
-            string name,
-            IType type,
-            Action<IClassPropertyExpressionConfigurator> configuration)
-        {
-            return AddProperty(name, type, configuration);
-        }
-
-        MethodExpression IClassMemberConfigurator.AddMethod(
-            string name,
-            Action<IClassMethodExpressionConfigurator> configuration)
-        {
-            return AddMethod(name, configuration);
-        }
-
-        internal override MethodExpression AddMethod(MethodExpression method)
-        {
-            if (IsStatic)
-            {
-                ((IConcreteTypeMethodExpressionConfigurator)method).SetStatic();
-            }
-
-            return base.AddMethod(method);
         }
 
         #endregion

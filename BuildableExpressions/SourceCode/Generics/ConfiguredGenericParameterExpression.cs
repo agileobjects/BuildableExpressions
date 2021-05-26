@@ -10,9 +10,11 @@
     using Extensions;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations.Reflection;
+    using static SourceCodeConstants;
 
     internal class ConfiguredGenericParameterExpression :
         GenericParameterExpression,
+        IType,
         IGenericParameterExpressionConfigurator,
         IEquatable<ConfiguredGenericParameterExpression>
     {
@@ -34,6 +36,7 @@
             Action<IGenericParameterExpressionConfigurator> configuration)
             : this(sourceCode, name.ThrowIfInvalidName("Generic Parameter"))
         {
+
             configuration.Invoke(this);
         }
 
@@ -46,6 +49,12 @@
 
         public override Type Type
             => _clrType ??= _typeCache.GetOrAdd(this, p => p.CreateType());
+
+        #region IType Members
+
+        string IType.Namespace => GenericParameterTypeNamespace;
+
+        #endregion
 
         #region IGenericParameterExpressionConfigurator Members
 
@@ -157,11 +166,10 @@
         {
             get
             {
-                return _readOnlyTypeConstraintTypes ??=
-                    _typeConstraints
-                        .ProjectToArray<TypeExpression, IType>(t => t)
-                        .ToReadOnlyCollection() ??
-                    Enumerable<IType>.EmptyReadOnlyCollection;
+                return _readOnlyTypeConstraintTypes ??= _typeConstraints
+                    .ProjectToArray<TypeExpression, IType>(t => t)
+                    .ToReadOnlyCollection() ??
+                     Enumerable<IType>.EmptyReadOnlyCollection;
             }
         }
 

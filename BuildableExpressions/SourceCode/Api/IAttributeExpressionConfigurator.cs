@@ -7,7 +7,8 @@
     /// </summary>
     public interface IAttributeExpressionConfigurator : 
         IClassBaseExpressionConfigurator,
-        IConstructorConfigurator
+        IConstructorConfigurator,
+        IClassMemberConfigurator
     {
         /// <summary>
         /// Set the System.AttributeTargets restricting to which code elements the

@@ -2,13 +2,12 @@
 {
     using System;
     using System.Linq.Expressions;
-    using Generics;
     using ReadableExpressions.Translations.Reflection;
 
     /// <summary>
     /// Provides options to configure a <see cref="ConcreteTypeExpression"/>.
     /// </summary>
-    public interface IConcreteTypeExpressionConfigurator : 
+    public interface IConcreteTypeExpressionConfigurator :
         ITypeableTypeExpressionConfigurator,
         IConstructorConfigurator
     {
@@ -17,13 +16,6 @@
         /// scope. This property can be used to access the 'this' keyword in a method.
         /// </summary>
         Expression ThisInstanceExpression { get; }
-
-        /// <summary>
-        /// Adds the given open generic <paramref name="parameter"/> to the
-        /// <see cref="ConcreteTypeExpression"/>.
-        /// </summary>
-        /// <param name="parameter">The <see cref="GenericParameterExpression"/> to add.</param>
-        void AddGenericParameter(GenericParameterExpression parameter);
 
         /// <summary>
         /// Add a <see cref="FieldExpression"/> to the <see cref="ConcreteTypeExpression"/>, with

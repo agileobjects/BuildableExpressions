@@ -6,7 +6,7 @@
     using ReadableExpressions.Translations.Reflection;
 
     /// <summary>
-    /// Represents a class in a piece of source code.
+    /// Represents a class or attribute class in a piece of source code.
     /// </summary>
     public abstract class ClassExpressionBase : ConcreteTypeExpression, IType
     {

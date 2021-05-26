@@ -22,6 +22,8 @@
 
         bool IType.IsNested => _structType.IsNested;
 
+        bool IType.IsPrimitive => _structType.IsPrimitive;
+
         #endregion
 
         protected override ITranslation GetTranslation(ITranslationContext context)
