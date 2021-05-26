@@ -118,6 +118,7 @@
                             continue;
                         }
 
+                        --i;
                         break;
                     }
 

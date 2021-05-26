@@ -485,6 +485,23 @@
         }
 
         /// <summary>
+        /// Applies the <typeparamref name="TAttribute"/> type to the source code element being
+        /// configured, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <typeparam name="TAttribute">
+        /// The Attribute type to apply to the source code element being configured.
+        /// </typeparam>
+        /// <param name="attributeConfig">The <see cref="IAttributableExpressionConfigurator"/> to configure.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        public static void AddAttribute<TAttribute>(
+            this IAttributableExpressionConfigurator attributeConfig,
+            Action<IAttributeApplicationConfigurator> configuration)
+            where TAttribute : Attribute
+        {
+            attributeConfig.AddAttribute(typeof(TAttribute), configuration);
+        }
+
+        /// <summary>
         /// Applies the <paramref name="attributeType"/> attribute to the source code element being
         /// configured, using the given <paramref name="configuration"/>.
         /// </summary>

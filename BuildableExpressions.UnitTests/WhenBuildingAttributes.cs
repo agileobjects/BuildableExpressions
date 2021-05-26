@@ -313,6 +313,37 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldSelectAttributeConstructorUsingANullArgument()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("PassesNull", cls =>
+                    {
+                        cls.AddAttribute<CtorHelperAttribute>(attr =>
+                        {
+                            attr.SetConstructorArguments(default(string));
+                        });
+
+                        cls.SetSealed();
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using AgileObjects.BuildableExpressions.UnitTests;
+
+namespace GeneratedExpressionCode
+{
+    [WhenBuildingAttributes.CtorHelper(null)]
+    public sealed class PassesNull
+    {
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAnAttributeWithCustomUsage()
         {
             var translated = BuildableExpression
@@ -401,6 +432,21 @@ namespace GeneratedExpressionCode
 
         public class TestAttribute : Attribute
         {
+        }
+
+        public class CtorHelperAttribute : Attribute
+        {
+            public CtorHelperAttribute(DateTime value)
+            {
+                Value = value;
+            }
+
+            public CtorHelperAttribute(string value)
+            {
+                Value = value;
+            }
+
+            public object Value { get; }
         }
 
         #endregion
