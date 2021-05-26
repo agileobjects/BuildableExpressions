@@ -5,10 +5,7 @@
     /// <summary>
     /// Provides options to configure an <see cref="AttributeExpression"/>.
     /// </summary>
-    public interface IAttributeExpressionConfigurator : 
-        IClassBaseExpressionConfigurator,
-        IConstructorConfigurator,
-        IClassMemberConfigurator
+    public interface IAttributeExpressionConfigurator : IClassBaseExpressionConfigurator
     {
         /// <summary>
         /// Set the System.AttributeTargets restricting to which code elements the

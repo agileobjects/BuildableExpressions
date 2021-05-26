@@ -3,9 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Linq;
     using System.Linq.Expressions;
     using Api;
+    using BuildableExpressions.Extensions;
     using Extensions;
     using NetStandardPolyfills;
 
@@ -50,11 +50,7 @@
         void IAttributeApplicationConfigurator.SetConstructorArguments(
             params object[] arguments)
         {
-            ConstructorExpression = AttributeExpression is ITypedTypeExpression
-                ? new ConstructorInfoConstructorExpression(
-                    AttributeExpression,
-                    AttributeExpression.Type.GetPublicInstanceConstructors().First())
-                : AttributeExpression.ConstructorExpressions.First();
+            ConstructorExpression = FindConstructorOrThrow(AttributeExpression, arguments);
 
             var parameters = ConstructorExpression.Parameters;
             var argumentCount = arguments.Length;
@@ -74,6 +70,65 @@
                 var typedArgument = Convert.ChangeType(argument, parameter.Type);
                 _arguments[i] = Expression.Constant(typedArgument, parameter.Type);
             }
+        }
+
+        private static ConstructorExpression FindConstructorOrThrow(
+            TypeExpression attribute,
+            IList<object> arguments)
+        {
+            if (attribute is ITypedTypeExpression)
+            {
+                return new ConstructorInfoConstructorExpression(
+                    attribute,
+                    FindConstructorOrThrow(
+                        attribute.Type.GetPublicInstanceConstructors(),
+                        ctorInfo => ctorInfo.GetParameters().Project(p => p.ParameterType),
+                        arguments));
+            }
+
+            return FindConstructorOrThrow(
+                attribute.ConstructorExpressions,
+                ctor => ctor.ParametersAccessor?.Project(p => p.Type) ?? Type.EmptyTypes,
+                arguments);
+        }
+
+        private static TCtor FindConstructorOrThrow<TCtor>(
+            IEnumerable<TCtor> constructors,
+            Func<TCtor, IEnumerable<Type>> ctorParameterTypesAccessor,
+            IList<object> arguments)
+        {
+            var argumentTypes = arguments.ProjectToArray(arg => arg?.GetType());
+
+            foreach (var constructor in constructors)
+            {
+                var parameterTypes =
+                    ctorParameterTypesAccessor.Invoke(constructor);
+
+                var i = 0;
+
+                foreach (var parameterType in parameterTypes)
+                {
+                    var argumentType = argumentTypes[i];
+                    ++i;
+
+                    if (argumentType == null)
+                    {
+                        continue;
+                    }
+
+                    if (!argumentType.IsAssignableTo(parameterType))
+                    {
+                        break;
+                    }
+                }
+
+                if (i == arguments.Count)
+                {
+                    return constructor;
+                }
+            }
+
+            throw new ArgumentException("Unable to find constructor");
         }
 
         #endregion

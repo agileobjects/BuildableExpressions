@@ -5,10 +5,9 @@
     /// <summary>
     /// Provides options to configure a <see cref="ClassExpression"/>.
     /// </summary>
-    public interface IClassExpressionConfigurator :
-        IConcreteTypeExpressionConfigurator,
+    public interface IClassExpressionConfigurator : 
         IClassBaseExpressionConfigurator,
-        IClassMemberConfigurator
+        ITypeableTypeExpressionConfigurator
     {
         /// <summary>
         /// Configures the <see cref="ClassExpression"/> to derive from the given

@@ -8,7 +8,7 @@
     /// Provides options to configure a <see cref="ConcreteTypeExpression"/>.
     /// </summary>
     public interface IConcreteTypeExpressionConfigurator :
-        ITypeableTypeExpressionConfigurator,
+        ITypeExpressionConfigurator,
         IConstructorConfigurator
     {
         /// <summary>

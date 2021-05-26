@@ -1,10 +1,10 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
-    using System.Linq.Expressions;
     using Common;
     using Xunit;
     using static System.AttributeTargets;
+    using static System.Linq.Expressions.Expression;
 
     public class WhenBuildingAttributes
     {
@@ -136,7 +136,7 @@ namespace GeneratedExpressionCode
                         attr.AddConstructor(ctor =>
                         {
                             ctor.AddParameter<string>("name");
-                            ctor.SetBody(Expression.Empty());
+                            ctor.SetBody(Empty());
                         });
                     });
 
@@ -168,6 +168,95 @@ namespace GeneratedExpressionCode
 
     [SecretName(""It's a secret!"")]
     public class HasAnAttribute
+    {
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldSelectAttributeConstructorByArguments()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var attribute = sc.AddAttribute("SecretNamesAttribute", attr =>
+                    {
+                        var namesProperty = attr.AddProperty<string[]>("Names", p => p.SetGetter());
+
+                        attr.AddConstructor(ctor =>
+                        {
+                            var nameParameter = ctor.AddParameter<string>("name");
+
+                            ctor.SetBody(Assign(
+                                Property(attr.ThisInstanceExpression, namesProperty.PropertyInfo),
+                                NewArrayInit(typeof(string), nameParameter)));
+                        });
+
+                        attr.AddConstructor(ctor =>
+                        {
+                            var name1Parameter = ctor.AddParameter<string>("name1");
+                            var name2Parameter = ctor.AddParameter<string>("name2");
+
+                            ctor.SetBody(Assign(
+                                Property(attr.ThisInstanceExpression, namesProperty.PropertyInfo),
+                                NewArrayInit(typeof(string), name1Parameter, name2Parameter)));
+                        });
+                    });
+
+                    sc.AddClass("HasOneName", cls =>
+                    {
+                        cls.AddAttribute(attribute, attr =>
+                        {
+                            attr.SetConstructorArguments("One name");
+                        });
+                    });
+
+                    sc.AddClass("HasTwoNames", cls =>
+                    {
+                        cls.AddAttribute(attribute, attr =>
+                        {
+                            attr.SetConstructorArguments("First name", "Second name");
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    [AttributeUsage(AttributeTargets.All)]
+    public class SecretNamesAttribute : Attribute
+    {
+        public SecretNamesAttribute
+        (
+            string name
+        )
+        {
+            this.Names = new[] { name };
+        }
+
+        public SecretNamesAttribute
+        (
+            string name1,
+            string name2
+        )
+        {
+            this.Names = new[] { name1, name2 };
+        }
+
+        public string[] Names { get; private set; }
+    }
+
+    [SecretNames(""One name"")]
+    public class HasOneName
+    {
+    }
+
+    [SecretNames(""First name"", ""Second name"")]
+    public class HasTwoNames
     {
     }
 }";

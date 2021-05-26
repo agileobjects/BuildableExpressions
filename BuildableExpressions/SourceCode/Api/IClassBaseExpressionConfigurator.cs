@@ -6,7 +6,9 @@
     /// <summary>
     /// Provides options to configure a <see cref="ClassExpressionBase"/>.
     /// </summary>
-    public interface IClassBaseExpressionConfigurator
+    public interface IClassBaseExpressionConfigurator : 
+        IConcreteTypeExpressionConfigurator,
+        IClassMemberConfigurator
     {
         /// <summary>
         /// Gets an Expression to use to refer to the base class instance of the type being created

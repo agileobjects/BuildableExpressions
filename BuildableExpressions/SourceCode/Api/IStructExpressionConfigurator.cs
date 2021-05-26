@@ -7,6 +7,7 @@
     /// </summary>
     public interface IStructExpressionConfigurator :
         IConcreteTypeExpressionConfigurator,
+        ITypeableTypeExpressionConfigurator,
         IStructMemberConfigurator
     {
         /// <summary>
