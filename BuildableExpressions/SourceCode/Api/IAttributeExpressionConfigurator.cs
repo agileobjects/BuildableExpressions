@@ -18,6 +18,12 @@
         void SetValidOn(AttributeTargets targets);
 
         /// <summary>
+        /// Allow the <see cref="AttributeExpression"/> to be applied to the same code element
+        /// multiple times.
+        /// </summary>
+        void SetMultipleAllowed();
+
+        /// <summary>
         /// Configures the <see cref="AttributeExpression"/> to derive from the given
         /// <paramref name="baseAttributeExpression"/>.
         /// </summary>

@@ -423,6 +423,46 @@ namespace GeneratedExpressionCode
             translated.ShouldBe(expected.TrimStart());
         }
 
+        [Fact]
+        public void ShouldAllowMultipleAttributes()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var attribute = sc.AddAttribute("MultiplesAttribute", attr =>
+                    {
+                        attr.SetMultipleAllowed();
+                    });
+
+                    sc.AddClass("HasMultipleAttributes", cls =>
+                    {
+                        cls.AddAttribute(attribute);
+                        cls.AddAttribute(attribute);
+                        cls.AddAttribute(attribute);
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
+    public class MultiplesAttribute : Attribute
+    {
+    }
+
+    [Multiples]
+    [Multiples]
+    [Multiples]
+    public class HasMultipleAttributes
+    {
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
         #region Helper Members
 
         [AttributeUsage(Struct)]

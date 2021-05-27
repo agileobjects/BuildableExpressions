@@ -20,6 +20,7 @@
             TypeExpressionFactory.CreateAttribute(typeof(AttributeUsageAttribute));
 
         private AttributeTargets _targets;
+        private bool _allowMultiple;
         private Expression _baseInstanceExpression;
 
         public ConfiguredAttributeExpression(
@@ -45,7 +46,15 @@
             {
                 AddAttribute(
                     _attributeUsageAttribute,
-                    attr => attr.SetConstructorArguments(ValidOn));
+                    attr =>
+                    {
+                        attr.SetConstructorArguments(ValidOn);
+
+                        if (AllowMultiple)
+                        {
+                            ((AppliedAttribute)attr).AllowMultiple = true;
+                        }
+                    });
             }
         }
 
@@ -71,6 +80,8 @@
         #endregion
 
         public override AttributeTargets ValidOn => _targets;
+
+        public override bool AllowMultiple => _allowMultiple;
 
         #region IClassBaseExpressionConfigurator Members
 
@@ -116,6 +127,11 @@
 
         void IAttributeExpressionConfigurator.SetValidOn(AttributeTargets targets)
             => _targets = targets;
+
+        void IAttributeExpressionConfigurator.SetMultipleAllowed()
+            => SetMultipleAllowed();
+
+        private void SetMultipleAllowed() => _allowMultiple = true;
 
         void IAttributeExpressionConfigurator.SetBaseType(
             AttributeExpression baseAttributeExpression,

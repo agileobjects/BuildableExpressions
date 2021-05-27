@@ -8,7 +8,9 @@
 
     internal class TypedAttributeExpression : AttributeExpression, ITypedTypeExpression
     {
-        private AttributeTargets? _targets;
+        private static readonly AttributeUsageAttribute _defaultUsage = new(AttributeTargets.All);
+
+        private AttributeUsageAttribute _usage;
         private readonly Type _attributeType;
 
         public TypedAttributeExpression(Type attributeType)
@@ -27,13 +29,14 @@
             IsSealed = attributeType.IsSealed();
         }
 
-        public override AttributeTargets ValidOn => _targets ??= GetAttributeTargets();
+        public override AttributeTargets ValidOn => GetAttributeUsage().ValidOn;
 
-        private AttributeTargets GetAttributeTargets()
+        public override bool AllowMultiple => GetAttributeUsage().AllowMultiple;
+
+        private AttributeUsageAttribute GetAttributeUsage()
         {
-            return _attributeType
-                .GetCustomAttribute<AttributeUsageAttribute>()?
-                .ValidOn ?? AttributeTargets.All;
+            return _usage ??= _attributeType
+                .GetCustomAttribute<AttributeUsageAttribute>() ?? _defaultUsage;
         }
 
         #region IType Members

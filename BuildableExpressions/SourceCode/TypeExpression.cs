@@ -178,8 +178,7 @@
         public ReadOnlyCollection<AppliedAttribute> Attributes
             => _readOnlyAttributes ??= _attributes.ToReadOnlyCollection();
 
-        internal virtual ICollection<AppliedAttribute> AttributesAccessor
-            => _attributes;
+        internal IList<AppliedAttribute> AttributesAccessor => _attributes;
 
         /// <summary>
         /// Gets this <see cref="TypeExpression"/>'s <see cref="TypeVisibility" />.

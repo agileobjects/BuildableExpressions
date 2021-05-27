@@ -1,5 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Translations
 {
+    using System;
     using System.Collections.Generic;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
@@ -12,9 +13,11 @@
         private readonly IList<ITranslatable> _attributeTranslations;
 
         public AttributeSetTranslation(
-            IList<AppliedAttribute> attributes,
+            TypeExpression typeExpression,
             ITranslationContext context)
         {
+            var attributes = typeExpression.AttributesAccessor;
+
             _attributeCount = attributes.Count;
             _attributeTranslations = new ITranslatable[_attributeCount];
 
@@ -61,6 +64,10 @@
 
         private class AppliedAttributeTranslation : ITranslatable
         {
+            private const string _allowMultiple = ", AllowMultiple = ";
+            private const string _true = "true";
+
+            private readonly bool _writeAllowMultiple;
             private readonly IList<string> _attributeNameParts;
             private readonly ParameterSetTranslation _parameters;
 
@@ -68,10 +75,11 @@
                 AppliedAttribute attribute,
                 ITranslationContext context)
             {
-                var typeName = attribute.AttributeExpression.GetFriendlyName();
+                var attributeExpression = attribute.AttributeExpression;
+                var typeName = attributeExpression.GetFriendlyName();
                 var attributeName = typeName.Substring(0, typeName.Length - "Attribute".Length);
 
-                _attributeNameParts = ((IType)attribute.AttributeExpression).IsNested
+                _attributeNameParts = ((IType)attributeExpression).IsNested
                     ? attributeName.Split('.')
                     : new[] { attributeName };
 
@@ -87,15 +95,36 @@
                             attribute.ConstructorExpression,
                             attribute.Arguments,
                             context)
-                        .WithParentheses();
+                        .WithoutParentheses();
 
                     translationSize += _parameters.TranslationSize;
                     formattingSize += _parameters.FormattingSize;
                 }
 
+                if (IsUsageAttribute(attributeExpression))
+                {
+                    if (attribute.AllowMultiple)
+                    {
+                        _writeAllowMultiple = true;
+                        translationSize += _allowMultiple.Length + _true.Length;
+                        formattingSize += context.GetKeywordFormattingSize();
+                    }
+                }
+
                 TranslationSize = translationSize;
                 FormattingSize = formattingSize;
             }
+
+            #region Setup
+
+            private static bool IsUsageAttribute(IType attribute)
+            {
+                return
+                    attribute is TypedAttributeExpression typedAttribute &&
+                    typedAttribute.Type == typeof(AttributeUsageAttribute);
+            }
+
+            #endregion
 
             public int TranslationSize { get; }
 
@@ -122,8 +151,25 @@
                     writer.WriteToTranslation('.');
                 }
 
-                _parameters?.WriteTo(writer);
-                writer.WriteToTranslation(']');
+                if (_parameters == null)
+                {
+                    writer.WriteToTranslation(']');
+                    return;
+                }
+
+                writer.WriteToTranslation('(');
+                _parameters.WriteTo(writer);
+                WriteUsageArgumentsIfRequired(writer);
+                writer.WriteToTranslation(")]");
+            }
+
+            private void WriteUsageArgumentsIfRequired(TranslationWriter writer)
+            {
+                if (_writeAllowMultiple)
+                {
+                    writer.WriteToTranslation(_allowMultiple);
+                    writer.WriteKeywordToTranslation(_true);
+                }
             }
         }
     }

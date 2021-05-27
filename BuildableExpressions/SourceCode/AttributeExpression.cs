@@ -39,6 +39,12 @@
         public abstract AttributeTargets ValidOn { get; }
 
         /// <summary>
+        /// Gets a value indicating whether this <see cref="AttributeExpression"/> to be applied to
+        /// the same code element multiple times.
+        /// </summary>
+        public abstract bool AllowMultiple { get; }
+
+        /// <summary>
         /// Gets the <see cref="AttributeExpression"/> from which this 
         /// <see cref="AttributeExpression"/> derives. If this <see cref="AttributeExpression"/> 
         /// derives from System.Attribute, returns an <see cref="AttributeExpression"/> representing

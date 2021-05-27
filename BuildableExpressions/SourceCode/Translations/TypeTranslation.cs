@@ -53,8 +53,7 @@
 
             if (_hasAttributes)
             {
-                _attributesTranslation =
-                    new AttributeSetTranslation(type.Attributes, context);
+                _attributesTranslation = new AttributeSetTranslation(type, context);
 
                 translationSize += _attributesTranslation.TranslationSize;
                 formattingSize += _attributesTranslation.FormattingSize;

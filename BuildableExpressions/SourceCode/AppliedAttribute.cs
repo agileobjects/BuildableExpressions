@@ -49,6 +49,8 @@
 
         internal ICollection<ConstantExpression> ArgumentsAccessor => _arguments;
 
+        internal bool AllowMultiple { get; set; }
+
         #region IAttributeApplicationConfigurator Members
 
         void IAttributeApplicationConfigurator.SetConstructorArguments(
