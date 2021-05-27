@@ -65,9 +65,12 @@
         private class AppliedAttributeTranslation : ITranslatable
         {
             private const string _allowMultiple = ", AllowMultiple = ";
+            private const string _inherited = ", Inherited = ";
             private const string _true = "true";
+            private const string _false = "false";
 
             private readonly bool _writeAllowMultiple;
+            private readonly bool _writeNotInherited;
             private readonly IList<string> _attributeNameParts;
             private readonly ParameterSetTranslation _parameters;
 
@@ -107,6 +110,13 @@
                     {
                         _writeAllowMultiple = true;
                         translationSize += _allowMultiple.Length + _true.Length;
+                        formattingSize += context.GetKeywordFormattingSize();
+                    }
+
+                    if (!attribute.Inherited)
+                    {
+                        _writeNotInherited = true;
+                        translationSize += _inherited.Length + _false.Length;
                         formattingSize += context.GetKeywordFormattingSize();
                     }
                 }
@@ -169,6 +179,12 @@
                 {
                     writer.WriteToTranslation(_allowMultiple);
                     writer.WriteKeywordToTranslation(_true);
+                }
+
+                if (_writeNotInherited)
+                {
+                    writer.WriteToTranslation(_inherited);
+                    writer.WriteKeywordToTranslation(_false);
                 }
             }
         }

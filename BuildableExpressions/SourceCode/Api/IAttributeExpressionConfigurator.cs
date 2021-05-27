@@ -24,6 +24,12 @@
         void SetMultipleAllowed();
 
         /// <summary>
+        /// Set the <see cref="AttributeExpression"/> to not be inherited by derived types or
+        /// members.
+        /// </summary>
+        void SetNotInherited();
+
+        /// <summary>
         /// Configures the <see cref="AttributeExpression"/> to derive from the given
         /// <paramref name="baseAttributeExpression"/>.
         /// </summary>

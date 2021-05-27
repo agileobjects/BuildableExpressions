@@ -463,6 +463,42 @@ namespace GeneratedExpressionCode
             translated.ShouldBe(expected.TrimStart());
         }
 
+        [Fact]
+        public void ShouldAllowNonInheritedAttributes()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var attribute = sc.AddAttribute("NotInheritedAttribute", attr =>
+                    {
+                        attr.SetNotInherited();
+                    });
+
+                    sc.AddClass("HasAttribute", cls =>
+                    {
+                        cls.AddAttribute(attribute);
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    [AttributeUsage(AttributeTargets.All, Inherited = false)]
+    public class NotInheritedAttribute : Attribute
+    {
+    }
+
+    [NotInherited]
+    public class HasAttribute
+    {
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
         #region Helper Members
 
         [AttributeUsage(Struct)]

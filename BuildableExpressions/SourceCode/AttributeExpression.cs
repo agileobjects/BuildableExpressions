@@ -40,9 +40,15 @@
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="AttributeExpression"/> to be applied to
-        /// the same code element multiple times.
+        /// the same code element multiple times. Defaults to false.
         /// </summary>
         public abstract bool AllowMultiple { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="AttributeExpression"/> is inherited by
+        /// derived types and members. Defaults to true.
+        /// </summary>
+        public abstract bool Inherited { get; }
 
         /// <summary>
         /// Gets the <see cref="AttributeExpression"/> from which this 

@@ -32,6 +32,8 @@
         public override AttributeTargets ValidOn => GetAttributeUsage().ValidOn;
 
         public override bool AllowMultiple => GetAttributeUsage().AllowMultiple;
+        
+        public override bool Inherited => GetAttributeUsage().Inherited;
 
         private AttributeUsageAttribute GetAttributeUsage()
         {

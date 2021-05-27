@@ -25,6 +25,8 @@
             AttributeExpression attributeExpression)
         {
             AttributeExpression = attributeExpression;
+            AllowMultiple = attributeExpression.AllowMultiple;
+            Inherited = attributeExpression.Inherited;
         }
 
         /// <summary>
@@ -50,6 +52,8 @@
         internal ICollection<ConstantExpression> ArgumentsAccessor => _arguments;
 
         internal bool AllowMultiple { get; set; }
+
+        internal bool Inherited { get; set; }
 
         #region IAttributeApplicationConfigurator Members
 
