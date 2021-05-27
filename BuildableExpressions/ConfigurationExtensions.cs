@@ -62,7 +62,36 @@
         }
 
         /// <summary>
-        /// Adds a public <see cref="EnumExpression"/> to this <see cref="SourceCodeExpression"/>.
+        /// Adds a new marker <see cref="InterfaceExpression"/> to this
+        /// <see cref="SourceCodeExpression"/>, with no properties or methods.
+        /// </summary>
+        /// <param name="sourceCodeConfig">The <see cref="ISourceCodeExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="InterfaceExpression"/>.</param>
+        /// <returns>The newly-created <see cref="InterfaceExpression"/>.</returns>
+        public static InterfaceExpression AddInterface(
+            this ISourceCodeExpressionConfigurator sourceCodeConfig,
+            string name)
+        {
+            return sourceCodeConfig.AddInterface(name, _ => { });
+        }
+
+        /// <summary>
+        /// Adds a new marker <see cref="AttributeExpression"/> to this
+        /// <see cref="SourceCodeExpression"/>, with no members.
+        /// </summary>
+        /// <param name="sourceCodeConfig">The <see cref="ISourceCodeExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="AttributeExpression"/>.</param>
+        /// <returns>The newly-created <see cref="AttributeExpression"/>.</returns>
+        public static AttributeExpression AddAttribute(
+            this ISourceCodeExpressionConfigurator sourceCodeConfig,
+            string name)
+        {
+            return sourceCodeConfig.AddAttribute(name, _ => { });
+        }
+
+        /// <summary>
+        /// Adds a public <see cref="EnumExpression"/> to this <see cref="SourceCodeExpression"/>,
+        /// with the given <paramref name="name"/> and <paramref name="memberNames"/>.
         /// </summary>
         /// <param name="sourceCodeConfig">The <see cref="ISourceCodeExpressionConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="EnumExpression"/>.</param>

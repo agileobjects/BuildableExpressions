@@ -10,6 +10,7 @@
     using Extensions;
     using NetStandardPolyfills;
     using ReadableExpressions.Extensions;
+    using ReadableExpressions.Translations.Reflection;
     using static System.Environment;
 
     /// <summary>
@@ -53,7 +54,9 @@
         void IAttributeApplicationConfigurator.SetConstructorArguments(
             params object[] arguments)
         {
-            ConstructorExpression = FindConstructorOrThrow(AttributeExpression, arguments);
+            arguments ??= new object[] { null };
+
+            ConstructorExpression = FindSingleConstructorOrThrow(AttributeExpression, arguments);
 
             var parameters = ConstructorExpression.Parameters;
             var argumentCount = arguments.Length;
@@ -75,7 +78,7 @@
             }
         }
 
-        private static ConstructorExpression FindConstructorOrThrow(
+        private static ConstructorExpression FindSingleConstructorOrThrow(
             TypeExpression attribute,
             IList<object> arguments)
         {
@@ -83,32 +86,40 @@
             {
                 return new ConstructorInfoConstructorExpression(
                     attribute,
-                    FindConstructorOrThrow(
+                    FindSingleConstructorOrThrow(
                         attribute,
                         attribute.Type.GetPublicInstanceConstructors(),
                         ctorInfo => ctorInfo.GetParameters().Project(p => p.ParameterType),
                         arguments));
             }
 
-            return FindConstructorOrThrow(
+            return FindSingleConstructorOrThrow(
                 attribute,
                 attribute.ConstructorExpressions,
                 ctor => ctor.ParametersAccessor?.Project(p => p.Type) ?? Type.EmptyTypes,
                 arguments);
         }
 
-        private static TCtor FindConstructorOrThrow<TCtor>(
-            TypeExpression attribute,
+        private static TCtor FindSingleConstructorOrThrow<TCtor>(
+            IType attribute,
             IEnumerable<TCtor> constructors,
             Func<TCtor, IEnumerable<Type>> ctorParameterTypesAccessor,
             IList<object> arguments)
         {
             var argumentTypes = arguments.ProjectToArray(arg => arg?.GetType());
+            var argumentCount = arguments.Count;
+            var matchingConstructors = new List<TCtor>();
 
             foreach (var constructor in constructors)
             {
-                var parameterTypes =
-                    ctorParameterTypesAccessor.Invoke(constructor);
+                var parameterTypes = ctorParameterTypesAccessor
+                    .Invoke(constructor)
+                    .ToList();
+
+                if (parameterTypes.Count != argumentCount)
+                {
+                    continue;
+                }
 
                 var i = 0;
 
@@ -134,28 +145,84 @@
                     }
                 }
 
-                if (i == arguments.Count)
+                if (i == argumentCount)
                 {
-                    return constructor;
+                    matchingConstructors.Add(constructor);
                 }
             }
 
-            var givenArgumentTypeNames = argumentTypes.Project(t => t?.GetFriendlyName() ?? "null");
+            switch (matchingConstructors.Count)
+            {
+                case 0:
+                    throw ConstructorNotFound(
+                        attribute,
+                        constructors,
+                        ctorParameterTypesAccessor,
+                        argumentTypes);
 
-            var validParameterTypes = constructors
+                case 1:
+                    return matchingConstructors[0];
+
+                default:
+                    throw ConstructorAmbiguous(
+                        attribute,
+                        matchingConstructors,
+                        ctorParameterTypesAccessor,
+                        argumentTypes);
+            }
+        }
+
+        private static Exception ConstructorAmbiguous<TCtor>(
+            IType attribute,
+            IEnumerable<TCtor> matchingConstructors,
+            Func<TCtor, IEnumerable<Type>> ctorParameterTypesAccessor,
+            IEnumerable<Type> argumentTypes)
+        {
+            var matchingCtorParameterTypes = GetConstructorParameterTypes(
+                GetConstructorParameterTypes(matchingConstructors, ctorParameterTypesAccessor));
+
+            return new ArgumentException(
+                $"Multiple '{attribute.GetFriendlyName()}' constructors " +
+                $"match argument type(s) '{GetArgumentTypeNames(argumentTypes)}':" +
+                 matchingCtorParameterTypes);
+        }
+
+        private static Exception ConstructorNotFound<TCtor>(
+            IType attribute,
+            IEnumerable<TCtor> constructors,
+            Func<TCtor, IEnumerable<Type>> ctorParameterTypesAccessor,
+            IEnumerable<Type> argumentTypes)
+        {
+            var validParameterTypes =
+                GetConstructorParameterTypes(constructors, ctorParameterTypesAccessor);
+
+            var availableCtor = validParameterTypes.Any()
+                ? "Available constructor(s) are:" + GetConstructorParameterTypes(validParameterTypes)
+                : "Only a parameterless constructor is available";
+
+            return new ArgumentException(
+                $"Unable to find '{attribute.GetFriendlyName()}' constructor " +
+                $"matching argument type(s) '{GetArgumentTypeNames(argumentTypes)}'. " +
+                availableCtor);
+        }
+
+        private static string GetArgumentTypeNames(IEnumerable<Type> argumentTypes)
+            => string.Join(", ", argumentTypes.Project(t => t?.GetFriendlyName() ?? "null"));
+
+        private static ICollection<string> GetConstructorParameterTypes<TCtor>(
+            IEnumerable<TCtor> constructors,
+            Func<TCtor, IEnumerable<Type>> ctorParameterTypesAccessor)
+        {
+            return constructors
                 .Project(ctorParameterTypesAccessor.Invoke)
                 .Project(pt => string.Join(", ", pt.Project(t => t.GetFriendlyName())))
                 .ToList();
+        }
 
-            var availableCtor = validParameterTypes.Any()
-                ? $"Available constructor(s) are:{NewLine}  - " +
-                  string.Join(NewLine + "  - ", validParameterTypes)
-                  : "Only a parameterless constructor is available";
-
-            throw new ArgumentException(
-                $"Unable to find '{attribute.GetFriendlyName()}' constructor " +
-                $"matching argument type(s) '{string.Join(", ", givenArgumentTypeNames)}'. " +
-                 availableCtor);
+        private static string GetConstructorParameterTypes(IEnumerable<string> ctorParameterTypes)
+        {
+            var separator = NewLine + "  - (";
+            return separator + string.Join(")" + separator, ctorParameterTypes) + ")";
         }
 
         #endregion

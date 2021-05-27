@@ -15,7 +15,7 @@
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
-                    sc.AddInterface("IMarker", itf => { });
+                    sc.AddInterface("IMarker");
                 })
                 .ToCSharpString();
 

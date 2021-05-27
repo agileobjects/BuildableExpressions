@@ -26,7 +26,8 @@
         void SetNamespace(string @namespace);
 
         /// <summary>
-        /// Adds a new <see cref="InterfaceExpression"/> to this <see cref="SourceCodeExpression"/>.
+        /// Adds a new <see cref="InterfaceExpression"/> to this <see cref="SourceCodeExpression"/>,
+        /// using the given <paramref name="configuration"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="InterfaceExpression"/>.</param>
         /// <param name="configuration">
@@ -36,7 +37,8 @@
         InterfaceExpression AddInterface(string name, Action<IInterfaceExpressionConfigurator> configuration);
 
         /// <summary>
-        /// Adds a new <see cref="ClassExpression"/> to this <see cref="SourceCodeExpression"/>.
+        /// Adds a new <see cref="ClassExpression"/> to this <see cref="SourceCodeExpression"/>,
+        /// using the given <paramref name="configuration"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="ClassExpression"/>.</param>
         /// <param name="configuration">
@@ -46,7 +48,8 @@
         ClassExpression AddClass(string name, Action<IClassExpressionConfigurator> configuration);
 
         /// <summary>
-        /// Adds a new <see cref="StructExpression"/> to this <see cref="SourceCodeExpression"/>.
+        /// Adds a new <see cref="StructExpression"/> to this <see cref="SourceCodeExpression"/>,
+        /// using the given <paramref name="configuration"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="StructExpression"/>.</param>
         /// <param name="configuration">
@@ -56,7 +59,8 @@
         StructExpression AddStruct(string name, Action<IStructExpressionConfigurator> configuration);
 
         /// <summary>
-        /// Adds a new <see cref="AttributeExpression"/> to this <see cref="SourceCodeExpression"/>.
+        /// Adds a new <see cref="AttributeExpression"/> to this <see cref="SourceCodeExpression"/>,
+        /// using the given <paramref name="configuration"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="AttributeExpression"/>.</param>
         /// <param name="configuration">
@@ -66,7 +70,8 @@
         AttributeExpression AddAttribute(string name, Action<IAttributeExpressionConfigurator> configuration);
 
         /// <summary>
-        /// Adds a new <see cref="EnumExpression"/> to this <see cref="SourceCodeExpression"/>.
+        /// Adds a new <see cref="EnumExpression"/> to this <see cref="SourceCodeExpression"/>, using
+        /// the given <paramref name="configuration"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="EnumExpression"/>.</param>
         /// <param name="configuration">
