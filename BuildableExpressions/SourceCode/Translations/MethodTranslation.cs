@@ -100,12 +100,7 @@
 
         public void WriteTo(TranslationWriter writer)
         {
-            if (!_attributesTranslation.IsEmpty)
-            {
-                _attributesTranslation.WriteTo(writer);
-                writer.WriteNewLineToTranslation();
-            }
-
+            _attributesTranslation.WriteWithNewLineIfNotEmptyTo(writer);
             _summaryTranslation.WriteTo(writer);
             _definitionTranslation.WriteTo(writer);
 

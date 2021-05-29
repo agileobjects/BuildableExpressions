@@ -7,6 +7,7 @@
 
     internal class PropertyTranslation : PropertyDefinitionTranslation
     {
+        private readonly IPotentialEmptyTranslatable _attributesTranslation;
         private readonly bool _isAutoProperty;
 
         public PropertyTranslation(
@@ -16,11 +17,15 @@
                 propertyExpression,
                 propertyExpression.GetAccessors().ToList(),
                 includeDeclaringType: false,
-                (p, acc, stg) => PropertyAccessorTranslation.For(propertyExpression, acc, p, context),
+                (p, acc, _) => PropertyAccessorTranslation.For(propertyExpression, acc, p, context),
                 context.Settings)
         {
+            _attributesTranslation = AttributeSetTranslation.For(propertyExpression, context);
             _isAutoProperty = propertyExpression.IsAutoProperty;
         }
+
+        protected override void WritePropertyStartTo(TranslationWriter writer) 
+            => _attributesTranslation.WriteWithNewLineIfNotEmptyTo(writer);
 
         protected override void WriteAccessorsStartTo(TranslationWriter writer)
         {

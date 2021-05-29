@@ -13,7 +13,7 @@
         private readonly int _attributeCount;
         private readonly IList<ITranslatable> _attributeTranslations;
 
-        public AttributeSetTranslation(
+        private AttributeSetTranslation(
             IList<AppliedAttribute> attributes,
             ITranslationContext context)
         {

@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Translations
 {
     using ReadableExpressions.Extensions;
+    using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
 
     internal static class TranslationExtensions
@@ -27,6 +28,19 @@
             }
 
             return modifiers;
+        }
+
+        public static void WriteWithNewLineIfNotEmptyTo(
+            this IPotentialEmptyTranslatable translatable,
+            TranslationWriter writer)
+        {
+            if (translatable.IsEmpty)
+            {
+                return;
+            }
+
+            translatable.WriteTo(writer);
+            writer.WriteNewLineToTranslation();
         }
     }
 }

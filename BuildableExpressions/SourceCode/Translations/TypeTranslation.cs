@@ -13,7 +13,7 @@
     {
         private readonly TypeExpression _type;
         private readonly bool _hasAttributes;
-        private readonly ITranslatable _attributesTranslation;
+        private readonly IPotentialEmptyTranslatable _attributesTranslation;
         private readonly bool _isGenericType;
         private readonly string _typeString;
         private readonly ITranslatable _summaryTranslation;
@@ -208,8 +208,7 @@
         {
             if (_hasAttributes)
             {
-                _attributesTranslation.WriteTo(writer);
-                writer.WriteNewLineToTranslation();
+                _attributesTranslation.WriteWithNewLineIfNotEmptyTo(writer);
             }
 
             _summaryTranslation.WriteTo(writer);

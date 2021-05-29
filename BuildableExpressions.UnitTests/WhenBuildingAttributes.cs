@@ -500,6 +500,48 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldApplyAnAttributeToAProperty()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var attribute = sc.AddAttribute("FancyAttribute", attr =>
+                    {
+                        attr.SetValidOn(AttributeTargets.Property);
+                        attr.SetMultipleAllowed();
+                        attr.SetSealed();
+                    });
+
+                    sc.AddClass("HasPropertyAttribute", cls =>
+                    {
+                        cls.AddProperty<string>("SomeValue", p =>
+                        {
+                            p.AddAttribute(attribute);
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
+    public sealed class FancyAttribute : Attribute
+    {
+    }
+
+    public class HasPropertyAttribute
+    {
+        [Fancy]
+        public string SomeValue { get; set; }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
         public void ShouldApplyAnAttributeToAMethod()
         {
             var translated = BuildableExpression
