@@ -30,10 +30,12 @@
                 context.Settings);
 
             var translationSize =
+                _attributesTranslation.TranslationSize + 
                 _summaryTranslation.TranslationSize +
                 _definitionTranslation.TranslationSize;
 
             var formattingSize =
+                _attributesTranslation.FormattingSize + 
                 _summaryTranslation.FormattingSize +
                 _definitionTranslation.FormattingSize;
 

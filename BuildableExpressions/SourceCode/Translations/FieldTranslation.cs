@@ -7,7 +7,8 @@
 
     internal class FieldTranslation : ITranslation
     {
-        private readonly ITranslatable _summary;
+        private readonly IPotentialEmptyTranslatable _attributesTranslation;
+        private readonly ITranslatable _summaryTranslation;
         private readonly FieldDefinitionTranslation _definitionTranslation;
         private readonly ITranslatable _valueTranslation;
 
@@ -17,7 +18,8 @@
         {
             NodeType = fieldExpression.NodeType;
 
-            _summary = SummaryTranslation.For(fieldExpression, context);
+            _attributesTranslation = AttributeSetTranslation.For(fieldExpression, context);
+            _summaryTranslation = SummaryTranslation.For(fieldExpression, context);
 
             _definitionTranslation = new FieldDefinitionTranslation(
                 fieldExpression,
@@ -25,11 +27,13 @@
                 context.Settings);
 
             var translationSize =
-                _summary.TranslationSize +
+                _attributesTranslation.TranslationSize +
+                _summaryTranslation.TranslationSize +
                 _definitionTranslation.TranslationSize;
 
             var formattingSize =
-                _summary.FormattingSize +
+                _attributesTranslation.FormattingSize +
+                _summaryTranslation.FormattingSize +
                 _definitionTranslation.FormattingSize;
 
             if (fieldExpression.InitialValue != null)
@@ -60,7 +64,8 @@
 
         public void WriteTo(TranslationWriter writer)
         {
-            _summary.WriteTo(writer);
+            _attributesTranslation.WriteWithNewLineIfNotEmptyTo(writer);
+            _summaryTranslation.WriteTo(writer);
 
             if (_valueTranslation == null)
             {

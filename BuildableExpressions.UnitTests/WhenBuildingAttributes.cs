@@ -500,6 +500,47 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldApplyAnAttributeToAField()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var attribute = sc.AddAttribute("ThisIsAFieldAttribute", attr =>
+                    {
+                        attr.SetValidOn(AttributeTargets.Field);
+                        attr.SetNotInherited();
+                    });
+
+                    sc.AddClass("HasFieldAttribute", cls =>
+                    {
+                        cls.AddField<int>("IntValue", f =>
+                        {
+                            f.AddAttribute(attribute);
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    [AttributeUsage(AttributeTargets.Field, Inherited = false)]
+    public class ThisIsAFieldAttribute : Attribute
+    {
+    }
+
+    public class HasFieldAttribute
+    {
+        [ThisIsAField]
+        public int IntValue;
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
         public void ShouldApplyAnAttributeToAProperty()
         {
             var translated = BuildableExpression
