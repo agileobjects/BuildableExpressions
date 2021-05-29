@@ -57,10 +57,20 @@
         public int FormattingSize { get; }
 
         public int GetIndentSize()
-            => _definitionTranslation.GetIndentSize();
+        {
+            return
+                _attributesTranslation.GetIndentSize() +
+                _summaryTranslation.GetIndentSize() +
+                _definitionTranslation.GetIndentSize();
+        }
 
         public int GetLineCount()
-            => _definitionTranslation.GetLineCount();
+        {
+            return
+                _attributesTranslation.GetLineCount() +
+                _summaryTranslation.GetLineCount() +
+                _definitionTranslation.GetLineCount();
+        }
 
         public void WriteTo(TranslationWriter writer)
         {

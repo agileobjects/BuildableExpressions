@@ -8,7 +8,8 @@
 
     internal class ConstructorTranslation : ITranslation
     {
-        private readonly ITranslatable _summary;
+        private readonly IPotentialEmptyTranslatable _attributesTranslation;
+        private readonly ITranslatable _summaryTranslation;
         private readonly ITranslation _definitionTranslation;
         private readonly bool _hasChainedCtorCall;
         private readonly ITranslatable _chainedCtorCallTranslation;
@@ -19,7 +20,8 @@
             ConstructorExpression ctorExpression,
             ITranslationContext context)
         {
-            _summary = SummaryTranslation.For(ctorExpression, context);
+            _attributesTranslation = AttributeSetTranslation.For(ctorExpression, context);
+            _summaryTranslation = SummaryTranslation.For(ctorExpression, context);
 
             _definitionTranslation =
                 new ConstructorDefinitionTranslation(ctorExpression, context.Settings);
@@ -27,11 +29,13 @@
             _hasChainedCtorCall = ctorExpression.HasChainedConstructorCall;
 
             var translationSize =
-                _summary.TranslationSize +
+                _attributesTranslation.TranslationSize +
+                _summaryTranslation.TranslationSize +
                 _definitionTranslation.TranslationSize;
 
             var formattingSize =
-                _summary.FormattingSize +
+                _attributesTranslation.FormattingSize +
+                _summaryTranslation.FormattingSize +
                 _definitionTranslation.FormattingSize;
 
             if (_hasChainedCtorCall)
@@ -72,7 +76,8 @@
         public int GetIndentSize()
         {
             var indentSize =
-                _summary.GetIndentSize() +
+                _attributesTranslation.GetIndentSize() +
+                _summaryTranslation.GetIndentSize() +
                 _definitionTranslation.GetIndentSize();
 
             if (_hasChainedCtorCall)
@@ -91,7 +96,8 @@
         public int GetLineCount()
         {
             var lineCount =
-                _summary.GetLineCount() +
+                _attributesTranslation.GetLineCount() +
+                _summaryTranslation.GetLineCount() +
                 _definitionTranslation.GetLineCount();
 
             if (_hasChainedCtorCall)
@@ -109,7 +115,8 @@
 
         public void WriteTo(TranslationWriter writer)
         {
-            _summary.WriteTo(writer);
+            _attributesTranslation.WriteWithNewLineIfNotEmptyTo(writer);
+            _summaryTranslation.WriteTo(writer);
             _definitionTranslation.WriteTo(writer);
 
             if (_hasChainedCtorCall)

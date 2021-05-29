@@ -500,6 +500,67 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldApplyAnAttributeToAConstructor()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var attribute = sc.AddAttribute("CtorTimeAttribute", attr =>
+                    {
+                        attr.SetValidOn(Constructor);
+                        attr.SetMultipleAllowed();
+                        attr.SetNotInherited();
+                    });
+
+                    sc.AddClass("HasCtorAttribute", cls =>
+                    {
+                        var intField = cls.AddField<int>("IntValue", f =>
+                        {
+                            f.SetReadonly();
+                        });
+
+                        cls.AddConstructor(ctor =>
+                        {
+                            ctor.AddAttribute(attribute);
+                            ctor.AddAttribute(attribute);
+
+                            ctor.SetBody(Assign(
+                                Field(cls.ThisInstanceExpression, intField.FieldInfo),
+                                ctor.AddParameter<int>("intValue")));
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    [AttributeUsage(AttributeTargets.Constructor, AllowMultiple = true, Inherited = false)]
+    public class CtorTimeAttribute : Attribute
+    {
+    }
+
+    public class HasCtorAttribute
+    {
+        public readonly int IntValue;
+
+        [CtorTime]
+        [CtorTime]
+        public HasCtorAttribute
+        (
+            int intValue
+        )
+        {
+            this.IntValue = intValue;
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
         public void ShouldApplyAnAttributeToAField()
         {
             var translated = BuildableExpression
