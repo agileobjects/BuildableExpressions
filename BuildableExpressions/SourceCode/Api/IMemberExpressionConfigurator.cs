@@ -7,7 +7,7 @@
     /// Provides options to configure a <see cref="PropertyExpression"/> or
     /// <see cref="MethodExpression"/>.
     /// </summary>
-    public interface IMemberExpressionConfigurator
+    public interface IMemberExpressionConfigurator : IAttributableExpressionConfigurator
     {
         /// <summary>
         /// Set the summary documentation of the <see cref="MemberExpression"/>.

@@ -2,22 +2,21 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
     using static ReadableExpressions.Translations.Formatting.TokenType;
 
-    internal class AttributeSetTranslation : ITranslatable
+    internal class AttributeSetTranslation : IPotentialEmptyTranslatable
     {
         private readonly int _attributeCount;
         private readonly IList<ITranslatable> _attributeTranslations;
 
         public AttributeSetTranslation(
-            TypeExpression typeExpression,
+            IList<AppliedAttribute> attributes,
             ITranslationContext context)
         {
-            var attributes = typeExpression.AttributesAccessor;
-
             _attributeCount = attributes.Count;
             _attributeTranslations = new ITranslatable[_attributeCount];
 
@@ -38,9 +37,30 @@
             FormattingSize = formattingSize;
         }
 
+        #region Factory Methods
+
+        public static IPotentialEmptyTranslatable For(TypeExpression type, ITranslationContext context)
+            => For(type.AttributesAccessor, context);
+
+        public static IPotentialEmptyTranslatable For(MemberExpressionBase member, ITranslationContext context)
+            => For(member.AttributesAccessor, context);
+
+        private static IPotentialEmptyTranslatable For(
+            IList<AppliedAttribute> attributes, 
+            ITranslationContext context)
+        {
+            return attributes?.Any() == true
+                ? new AttributeSetTranslation(attributes, context)
+                : EmptyTranslatable.Instance;
+        }
+
+        #endregion
+
         public int TranslationSize { get; }
 
         public int FormattingSize { get; }
+
+        public bool IsEmpty => false;
 
         public int GetIndentSize() => 0;
 

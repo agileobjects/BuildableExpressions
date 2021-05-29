@@ -19,7 +19,7 @@
             ConstructorExpression ctorExpression,
             ITranslationContext context)
         {
-            _summary = SummaryTranslation.For(ctorExpression.Summary, context);
+            _summary = SummaryTranslation.For(ctorExpression, context);
 
             _definitionTranslation =
                 new ConstructorDefinitionTranslation(ctorExpression, context.Settings);

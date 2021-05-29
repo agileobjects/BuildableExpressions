@@ -499,6 +499,40 @@ namespace GeneratedExpressionCode
             translated.ShouldBe(expected.TrimStart());
         }
 
+        [Fact]
+        public void ShouldApplyAnAttributeToAMethod()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("HasMethodAttribute", cls =>
+                    {
+                        cls.AddMethod("Nowt", m =>
+                        {
+                            m.AddAttribute<TestAttribute>();
+                            m.SetStatic();
+                            m.SetBody(Empty());
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using AgileObjects.BuildableExpressions.UnitTests;
+
+namespace GeneratedExpressionCode
+{
+    public class HasMethodAttribute
+    {
+        [WhenBuildingAttributes.Test]
+        public static void Nowt()
+        {
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
         #region Helper Members
 
         [AttributeUsage(Struct)]

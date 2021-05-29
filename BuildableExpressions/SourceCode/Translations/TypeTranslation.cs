@@ -34,7 +34,7 @@
             _hasAttributes = type.AttributesAccessor != null;
             _isGenericType = type.IsGeneric;
             _typeString = typeString;
-            _summaryTranslation = SummaryTranslation.For(type.Summary, context);
+            _summaryTranslation = SummaryTranslation.For(type, context);
             _visibility = type.Visibility.ToString().ToLowerInvariant();
 
             var translationSize =
@@ -53,7 +53,7 @@
 
             if (_hasAttributes)
             {
-                _attributesTranslation = new AttributeSetTranslation(type, context);
+                _attributesTranslation = AttributeSetTranslation.For(type, context);
 
                 translationSize += _attributesTranslation.TranslationSize;
                 formattingSize += _attributesTranslation.FormattingSize;

@@ -21,7 +21,7 @@
         public EnumTranslation(EnumExpression @enum, ITranslationContext context)
         {
             _enum = @enum;
-            _summaryTranslation = SummaryTranslation.For(@enum.Summary, context);
+            _summaryTranslation = SummaryTranslation.For(@enum, context);
             _visibility = @enum.Visibility.ToString().ToLowerInvariant();
 
             var translationSize =

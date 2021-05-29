@@ -17,7 +17,7 @@
         {
             NodeType = fieldExpression.NodeType;
 
-            _summary = SummaryTranslation.For(fieldExpression.Summary, context);
+            _summary = SummaryTranslation.For(fieldExpression, context);
 
             _definitionTranslation = new FieldDefinitionTranslation(
                 fieldExpression,

@@ -9,20 +9,14 @@
     using ReadableExpressions.Translations.Formatting;
     using static System.Environment;
 
-    internal class SummaryTranslation : ITranslatable
+    internal class SummaryTranslation : IPotentialEmptyTranslatable
     {
-        private static readonly ITranslatable _empty = new SummaryTranslation();
-
         private const string _tripleSlash = "/// ";
         private const string _summaryStart = _tripleSlash + "<summary>";
         private const string _summaryEnd = _tripleSlash + "</summary>";
 
         private readonly int _lineCount;
         private readonly IList<string> _textLines;
-
-        private SummaryTranslation()
-        {
-        }
 
         private SummaryTranslation(IList<string> textLines, ITranslationContext context)
         {
@@ -38,13 +32,19 @@
                 GetLineCount() * context.GetFormattingSize(TokenType.Comment);
         }
 
-        #region Factory Method
+        #region Factory Methods
 
-        public static ITranslatable For(CommentExpression summary, ITranslationContext context)
+        public static IPotentialEmptyTranslatable For(TypeExpression type, ITranslationContext context)
+            => For(type.Summary, context);
+
+        public static IPotentialEmptyTranslatable For(MemberExpression member, ITranslationContext context)
+            => For(member.Summary, context);
+
+        private static IPotentialEmptyTranslatable For(CommentExpression summary, ITranslationContext context)
         {
             return summary?.Comment.TextLines.Any() == true
                 ? new SummaryTranslation(summary.Comment.TextLines.ToList(), context)
-                : _empty;
+                : EmptyTranslatable.Instance;
         }
 
         #endregion
@@ -53,17 +53,14 @@
 
         public int FormattingSize { get; }
 
+        public bool IsEmpty => false;
+
         public int GetIndentSize() => 0;
 
         public int GetLineCount() => _lineCount + 2;
 
         public void WriteTo(TranslationWriter writer)
         {
-            if (_lineCount == 0)
-            {
-                return;
-            }
-
             writer.WriteToTranslation(_summaryStart, TokenType.Comment);
             writer.WriteNewLineToTranslation();
 

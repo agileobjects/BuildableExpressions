@@ -1,6 +1,5 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode
 {
-    using System;
     using System.Linq.Expressions;
     using Api;
     using ReadableExpressions;

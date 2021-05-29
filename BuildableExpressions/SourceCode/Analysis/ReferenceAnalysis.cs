@@ -28,10 +28,7 @@
         {
             _sourceCodeNamespace ??= type.SourceCode.Namespace;
 
-            if (type.AttributesAccessor != null)
-            {
-                HandleReferences(type.AttributesAccessor);
-            }
+            HandleReferences(type.AttributesAccessor);
 
             if (type.IsGeneric)
             {
@@ -82,6 +79,8 @@
 
         public void Visit(MethodExpressionBase method)
         {
+            HandleReferences(method.AttributesAccessor);
+
             if (method.IsGeneric)
             {
                 HandleReferences(method.GenericParameters);
@@ -119,6 +118,11 @@
 
         private void HandleReferences(IEnumerable<AppliedAttribute> attributes)
         {
+            if (attributes == null)
+            {
+                return;
+            }
+
             foreach (var attribute in attributes)
             {
                 HandleReference(attribute.AttributeExpression);
