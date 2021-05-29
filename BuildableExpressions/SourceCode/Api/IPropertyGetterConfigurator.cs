@@ -5,7 +5,7 @@
     /// <summary>
     /// Provides options to configure a <see cref="PropertyExpression"/> getter accessor.
     /// </summary>
-    public interface IPropertyGetterConfigurator
+    public interface IPropertyGetterConfigurator : IAttributableExpressionConfigurator
     {
         /// <summary>
         /// Gives the <see cref="PropertyExpression"/> getter the given

@@ -8,7 +8,7 @@
 
     internal class ConstructorTranslation : ITranslation
     {
-        private readonly IPotentialEmptyTranslatable _attributesTranslation;
+        private readonly AttributeSetTranslation _attributesTranslation;
         private readonly ITranslatable _summaryTranslation;
         private readonly ITranslation _definitionTranslation;
         private readonly bool _hasChainedCtorCall;
@@ -115,7 +115,7 @@
 
         public void WriteTo(TranslationWriter writer)
         {
-            _attributesTranslation.WriteWithNewLineIfNotEmptyTo(writer);
+            _attributesTranslation.WriteWithTrailingNewLineTo(writer);
             _summaryTranslation.WriteTo(writer);
             _definitionTranslation.WriteTo(writer);
 

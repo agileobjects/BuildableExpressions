@@ -1,5 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.SourceCode.Translations
 {
+    using System;
     using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations;
     using ReadableExpressions.Translations.Reflection;
@@ -30,17 +31,27 @@
             return modifiers;
         }
 
-        public static void WriteWithNewLineIfNotEmptyTo(
-            this IPotentialEmptyTranslatable translatable,
+        public static void WriteWithTrailingNewLineTo(
+            this AttributeSetTranslation translatable,
             TranslationWriter writer)
         {
-            if (translatable.IsEmpty)
+            translatable.WriteWithTrailingSeparatorTo(
+                writer,
+                w => w.WriteNewLineToTranslation());
+        }
+
+        public static void WriteWithTrailingSeparatorTo(
+            this AttributeSetTranslation attributesTranslation,
+            TranslationWriter writer,
+            Action<TranslationWriter> separatorWriter)
+        {
+            if (attributesTranslation.IsEmpty)
             {
                 return;
             }
 
-            translatable.WriteTo(writer);
-            writer.WriteNewLineToTranslation();
+            attributesTranslation.WriteTo(writer, separatorWriter);
+            separatorWriter.Invoke(writer);
         }
     }
 }

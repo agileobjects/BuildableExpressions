@@ -10,8 +10,14 @@
 
     internal class AttributeSetTranslation : IPotentialEmptyTranslatable
     {
+        private static readonly AttributeSetTranslation _empty = new();
+
         private readonly int _attributeCount;
         private readonly IList<ITranslatable> _attributeTranslations;
+
+        private AttributeSetTranslation()
+        {
+        }
 
         private AttributeSetTranslation(
             IList<AppliedAttribute> attributes,
@@ -39,19 +45,19 @@
 
         #region Factory Methods
 
-        public static IPotentialEmptyTranslatable For(TypeExpression type, ITranslationContext context)
+        public static AttributeSetTranslation For(TypeExpression type, ITranslationContext context)
             => For(type.AttributesAccessor, context);
 
-        public static IPotentialEmptyTranslatable For(MemberExpressionBase member, ITranslationContext context)
+        public static AttributeSetTranslation For(MemberExpressionBase member, ITranslationContext context)
             => For(member.AttributesAccessor, context);
 
-        private static IPotentialEmptyTranslatable For(
-            IList<AppliedAttribute> attributes, 
+        private static AttributeSetTranslation For(
+            IList<AppliedAttribute> attributes,
             ITranslationContext context)
         {
             return attributes?.Any() == true
                 ? new AttributeSetTranslation(attributes, context)
-                : EmptyTranslatable.Instance;
+                : _empty;
         }
 
         #endregion
@@ -60,14 +66,24 @@
 
         public int FormattingSize { get; }
 
-        public bool IsEmpty => false;
+        public bool IsEmpty => _attributeCount == 0;
 
         public int GetIndentSize() => 0;
 
         public int GetLineCount() => _attributeCount;
 
         public void WriteTo(TranslationWriter writer)
+            => WriteTo(writer, w => w.WriteNewLineToTranslation());
+
+        public void WriteTo(
+            TranslationWriter writer,
+            Action<TranslationWriter> separatorWriter)
         {
+            if (IsEmpty)
+            {
+                return;
+            }
+
             for (var i = 0; ;)
             {
                 _attributeTranslations[i].WriteTo(writer);
@@ -78,7 +94,7 @@
                     break;
                 }
 
-                writer.WriteNewLineToTranslation();
+                separatorWriter.Invoke(writer);
             }
         }
 
@@ -178,7 +194,7 @@
                         break;
                     }
 
-                    writer.WriteToTranslation('.');
+                    writer.WriteDotToTranslation();
                 }
 
                 if (_parameters == null)

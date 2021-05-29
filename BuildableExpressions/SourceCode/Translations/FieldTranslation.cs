@@ -7,7 +7,7 @@
 
     internal class FieldTranslation : ITranslation
     {
-        private readonly IPotentialEmptyTranslatable _attributesTranslation;
+        private readonly AttributeSetTranslation _attributesTranslation;
         private readonly ITranslatable _summaryTranslation;
         private readonly FieldDefinitionTranslation _definitionTranslation;
         private readonly ITranslatable _valueTranslation;
@@ -74,7 +74,7 @@
 
         public void WriteTo(TranslationWriter writer)
         {
-            _attributesTranslation.WriteWithNewLineIfNotEmptyTo(writer);
+            _attributesTranslation.WriteWithTrailingNewLineTo(writer);
             _summaryTranslation.WriteTo(writer);
 
             if (_valueTranslation == null)

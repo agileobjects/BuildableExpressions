@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using BuildableExpressions.SourceCode;
     using Common;
     using Xunit;
     using static System.AttributeTargets;
@@ -638,6 +639,59 @@ namespace GeneratedExpressionCode
     {
         [Fancy]
         public string SomeValue { get; set; }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldApplyAnAttributeToAPropertyAccessor()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var attribute = sc.AddAttribute("FancyAttribute");
+
+                    sc.AddClass("HasPropertyAttribute", cls =>
+                    {
+                        var field = cls.AddField<string>("_someValue", f =>
+                        {
+                            f.SetVisibility(MemberVisibility.Private);
+                        });
+
+                        cls.AddProperty<string>("SomeValue", p =>
+                        {
+                            p.SetGetter(gtr =>
+                            {
+                                gtr.AddAttribute(attribute);
+                                gtr.SetBody(Field(cls.ThisInstanceExpression, field.FieldInfo));
+                            });
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System;
+
+namespace GeneratedExpressionCode
+{
+    [AttributeUsage(AttributeTargets.All)]
+    public class FancyAttribute : Attribute
+    {
+    }
+
+    public class HasPropertyAttribute
+    {
+        private string _someValue;
+
+        public string SomeValue
+        {
+            [Fancy] get
+            {
+                return this._someValue;
+            }
+        }
     }
 }";
             translated.ShouldBe(expected.TrimStart());

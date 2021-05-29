@@ -6,7 +6,7 @@
     /// <summary>
     /// Provides options to configure a <see cref="PropertyExpression"/> setter accessor.
     /// </summary>
-    public interface IPropertySetterConfigurator
+    public interface IPropertySetterConfigurator : IAttributableExpressionConfigurator
     {
         /// <summary>
         /// Gives the <see cref="PropertyExpression"/> setter the given

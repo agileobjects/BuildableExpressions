@@ -7,7 +7,7 @@
 
     internal class PropertyTranslation : PropertyDefinitionTranslation
     {
-        private readonly IPotentialEmptyTranslatable _attributesTranslation;
+        private readonly AttributeSetTranslation _attributesTranslation;
         private readonly bool _isAutoProperty;
 
         public PropertyTranslation(
@@ -24,8 +24,8 @@
             _isAutoProperty = propertyExpression.IsAutoProperty;
         }
 
-        protected override void WritePropertyStartTo(TranslationWriter writer) 
-            => _attributesTranslation.WriteWithNewLineIfNotEmptyTo(writer);
+        protected override void WritePropertyStartTo(TranslationWriter writer)
+            => _attributesTranslation.WriteWithTrailingNewLineTo(writer);
 
         protected override void WriteAccessorsStartTo(TranslationWriter writer)
         {
@@ -51,6 +51,7 @@
 
         private class PropertyAccessorTranslation : PropertyAccessorDefinitionTranslation
         {
+            private readonly AttributeSetTranslation _attributesTranslation;
             private readonly ITranslation _accessorTranslation;
 
             private PropertyAccessorTranslation(
@@ -66,6 +67,8 @@
                     ? propertyExpression.GetterExpression
                     : propertyExpression.SetterExpression;
 
+                _attributesTranslation = AttributeSetTranslation.For(accessorExpression, context);
+
                 var accessorCodeBlock = context
                     .GetCodeBlockTranslationFor(accessorExpression)
                     .WithBraces()
@@ -76,8 +79,16 @@
                     accessorCodeBlock.WithReturnKeyword();
                 }
 
-                TranslationSize = base.TranslationSize + accessorCodeBlock.TranslationSize;
-                FormattingSize = base.FormattingSize + accessorCodeBlock.FormattingSize;
+                TranslationSize =
+                    base.TranslationSize +
+                    _attributesTranslation.TranslationSize +
+                    accessorCodeBlock.TranslationSize;
+
+                FormattingSize =
+                    base.FormattingSize +
+                    _attributesTranslation.FormattingSize +
+                    accessorCodeBlock.FormattingSize;
+
                 _accessorTranslation = accessorCodeBlock;
             }
 
@@ -112,6 +123,10 @@
 
             public override void WriteTo(TranslationWriter writer)
             {
+                _attributesTranslation.WriteWithTrailingSeparatorTo(
+                    writer,
+                    w => w.WriteSpaceToTranslation());
+
                 WriteAccessorTo(writer);
                 _accessorTranslation.WriteTo(writer);
             }

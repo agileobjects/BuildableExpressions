@@ -10,7 +10,7 @@
     internal class MethodTranslation : ITranslation
     {
         private readonly MethodExpression _methodExpression;
-        private readonly IPotentialEmptyTranslatable _attributesTranslation;
+        private readonly AttributeSetTranslation _attributesTranslation;
         private readonly ITranslatable _summaryTranslation;
         private readonly ITranslatable _definitionTranslation;
         private readonly bool _methodHasBody;
@@ -102,7 +102,7 @@
 
         public void WriteTo(TranslationWriter writer)
         {
-            _attributesTranslation.WriteWithNewLineIfNotEmptyTo(writer);
+            _attributesTranslation.WriteWithTrailingNewLineTo(writer);
             _summaryTranslation.WriteTo(writer);
             _definitionTranslation.WriteTo(writer);
 

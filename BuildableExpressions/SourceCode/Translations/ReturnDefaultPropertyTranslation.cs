@@ -105,7 +105,7 @@
             }
 
             _typeNameTranslation.WriteTo(writer);
-            writer.WriteToTranslation(' ');
+            writer.WriteSpaceToTranslation();
             writer.WriteToTranslation(_property.Name);
             writer.WriteToTranslation(_accessors);
         }
