@@ -13,7 +13,7 @@
         private readonly ITranslationContext _context;
         private readonly string _keyword;
         private readonly ChainedConstructorCallExpression _chainedCtorCallExpression;
-        private readonly ITranslatable _parameterTranslations;
+        private readonly ITranslatable _argumentTranslations;
 
         public ChainedConstructorCallTranslation(
             ChainedConstructorCallExpression chainedCtorCallExpression,
@@ -28,7 +28,7 @@
 
             _chainedCtorCallExpression = chainedCtorCallExpression;
 
-            _parameterTranslations = ParameterSetTranslation
+            _argumentTranslations = ParameterSetTranslation
                 .For(
                     chainedCtorCallExpression.TargetConstructor,
                     chainedCtorCallExpression.Arguments,
@@ -38,11 +38,11 @@
             TranslationSize =
                 Environment.NewLine.Length +
                 2 + _keyword.Length +
-                _parameterTranslations.TranslationSize;
+                _argumentTranslations.TranslationSize;
 
             FormattingSize =
                 context.GetKeywordFormattingSize() +
-                _parameterTranslations.FormattingSize;
+                _argumentTranslations.FormattingSize;
         }
 
         public ExpressionType NodeType => _chainedCtorCallExpression.NodeType;
@@ -55,14 +55,14 @@
 
         public int GetIndentSize() => _context.Settings.IndentLength;
 
-        public int GetLineCount() => _parameterTranslations.GetLineCount();
+        public int GetLineCount() => _argumentTranslations.GetLineCount();
 
         public void WriteTo(TranslationWriter writer)
         {
             writer.WriteNewLineToTranslation();
             writer.WriteToTranslation(": ");
             writer.WriteKeywordToTranslation(_keyword);
-            _parameterTranslations.WriteTo(writer);
+            _argumentTranslations.WriteTo(writer);
         }
     }
 }

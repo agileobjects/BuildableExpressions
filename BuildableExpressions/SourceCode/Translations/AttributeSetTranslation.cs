@@ -108,7 +108,7 @@
             private readonly bool _writeAllowMultiple;
             private readonly bool _writeNotInherited;
             private readonly IList<string> _attributeNameParts;
-            private readonly ParameterSetTranslation _parameters;
+            private readonly ITranslatable _arguments;
 
             public AppliedAttributeTranslation(
                 AppliedAttribute attribute,
@@ -129,15 +129,15 @@
 
                 if (attribute.ArgumentsAccessor != null)
                 {
-                    _parameters = ParameterSetTranslation
+                    _arguments = ParameterSetTranslation
                         .For(
                             attribute.ConstructorExpression,
                             attribute.Arguments,
                             context)
                         .WithoutParentheses();
 
-                    translationSize += _parameters.TranslationSize;
-                    formattingSize += _parameters.FormattingSize;
+                    translationSize += _arguments.TranslationSize;
+                    formattingSize += _arguments.FormattingSize;
                 }
 
                 if (IsUsageAttribute(attributeExpression))
@@ -176,9 +176,9 @@
 
             public int FormattingSize { get; }
 
-            public int GetIndentSize() => _parameters?.GetIndentSize() ?? 0;
+            public int GetIndentSize() => _arguments?.GetIndentSize() ?? 0;
 
-            public int GetLineCount() => _parameters?.GetLineCount() ?? 1;
+            public int GetLineCount() => _arguments?.GetLineCount() ?? 1;
 
             public void WriteTo(TranslationWriter writer)
             {
@@ -197,14 +197,14 @@
                     writer.WriteDotToTranslation();
                 }
 
-                if (_parameters == null)
+                if (_arguments == null)
                 {
                     writer.WriteToTranslation(']');
                     return;
                 }
 
                 writer.WriteToTranslation('(');
-                _parameters.WriteTo(writer);
+                _arguments.WriteTo(writer);
                 WriteUsageArgumentsIfRequired(writer);
                 writer.WriteToTranslation(")]");
             }

@@ -709,6 +709,7 @@ namespace GeneratedExpressionCode
                         {
                             m.AddAttribute<TestAttribute>();
                             m.SetStatic();
+                            m.AddParameter<int>("value");
                             m.SetBody(Empty());
                         });
                     });
@@ -723,7 +724,10 @@ namespace GeneratedExpressionCode
     public class HasMethodAttribute
     {
         [WhenBuildingAttributes.Test]
-        public static void Nowt()
+        public static void Nowt
+        (
+            int value
+        )
         {
         }
     }
