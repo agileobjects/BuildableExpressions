@@ -36,9 +36,9 @@
             Parent.VariableAccessed(variable);
         }
 
-        public override void Finalise(Expression finalisedBody)
+        public override void FinaliseBody(Expression finalisedBody)
         {
-            base.Finalise(finalisedBody);
+            base.FinaliseBody(finalisedBody);
 
             var owningTypeExpression = RootMethodExpression.DeclaringTypeExpression;
 

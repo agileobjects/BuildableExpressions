@@ -10,15 +10,71 @@
     using static MemberVisibility;
 
     /// <summary>
-    /// Abstract base class for types describing a member.
+    /// Abstract base class for types to which <see cref="AttributeExpression"/>s can be applied.
     /// </summary>
-    public abstract class MemberExpressionBase : 
-        Expression, 
-        IMember,
+    public abstract class AttributableExpressionBase :
+        Expression,
         IAttributableExpressionConfigurator
     {
         private List<AppliedAttribute> _attributes;
         private ReadOnlyCollection<AppliedAttribute> _readOnlyAttributes;
+
+        /// <summary>
+        /// Gets the <see cref="AppliedAttribute"/>s describing the
+        /// <see cref="AttributeExpression"/>s which have been applied to this
+        /// <see cref="AttributableExpressionBase"/>, if any.
+        /// </summary>
+        public ReadOnlyCollection<AppliedAttribute> Attributes
+            => _readOnlyAttributes ??= _attributes.ToReadOnlyCollection();
+
+        internal IList<AppliedAttribute> AttributesAccessor => _attributes;
+
+        #region IAttributableExpressionConfigurator Members
+
+        AppliedAttribute IAttributableExpressionConfigurator.AddAttribute(
+            AttributeExpression attribute,
+            Action<IAttributeApplicationConfigurator> configuration)
+        {
+            return AddAttribute(attribute, configuration);
+        }
+
+        /// <summary>
+        /// Applies the given <paramref name="attribute"/> to this
+        /// <see cref="AttributableExpressionBase"/>.
+        /// </summary>
+        /// <param name="attribute">
+        /// The <see cref="AttributeExpression"/> to apply to this
+        /// <see cref="AttributableExpressionBase"/>.
+        /// </param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>
+        /// The <see cref="AppliedAttribute"/> describing the application of the given
+        /// <paramref name="attribute"/>.
+        /// </returns>
+        protected AppliedAttribute AddAttribute(
+            AttributeExpression attribute,
+            Action<IAttributeApplicationConfigurator> configuration)
+        {
+            var appliedAttribute = new AppliedAttribute(attribute);
+            configuration?.Invoke(appliedAttribute);
+
+            _attributes ??= new List<AppliedAttribute>();
+            _attributes.Add(appliedAttribute);
+            _readOnlyAttributes = null;
+
+            return appliedAttribute;
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Abstract base class for types describing a member.
+    /// </summary>
+    public abstract class MemberExpressionBase :
+        AttributableExpressionBase,
+        IMember
+    {
         private IType _type;
 
         /// <summary>
@@ -34,16 +90,6 @@
         /// Gets this <see cref="MemberExpressionBase"/>'s parent Type.
         /// </summary>
         public abstract IType DeclaringType { get; }
-
-        /// <summary>
-        /// Gets the <see cref="AppliedAttribute"/>s describing the
-        /// <see cref="AttributeExpression"/>s which have been applied to this
-        /// <see cref="TypeExpression"/>, if any.
-        /// </summary>
-        public ReadOnlyCollection<AppliedAttribute> Attributes
-            => _readOnlyAttributes ??= _attributes.ToReadOnlyCollection();
-
-        internal IList<AppliedAttribute> AttributesAccessor => _attributes;
 
         /// <summary>
         /// Gets the <see cref="MemberVisibility"/> of this <see cref="MemberExpressionBase"/>.
@@ -70,24 +116,6 @@
         /// Gets the name of this <see cref="MemberExpressionBase"/>.
         /// </summary>
         public virtual string Name { get; }
-
-        #region IAttributableExpressionConfigurator Members
-
-        AppliedAttribute IAttributableExpressionConfigurator.AddAttribute(
-            AttributeExpression attribute,
-            Action<IAttributeApplicationConfigurator> configuration)
-        {
-            var appliedAttribute = new AppliedAttribute(attribute);
-            configuration?.Invoke(appliedAttribute);
-
-            _attributes ??= new List<AppliedAttribute>();
-            _attributes.Add(appliedAttribute);
-            _readOnlyAttributes = null;
-
-            return appliedAttribute;
-        }
-
-        #endregion
 
         #region IMember Members
 

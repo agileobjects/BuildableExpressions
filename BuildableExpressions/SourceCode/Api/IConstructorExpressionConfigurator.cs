@@ -7,7 +7,7 @@
     /// Provides options to configure a <see cref="ConstructorExpression"/> for a
     /// <see cref="ClassExpression"/> or <see cref="StructExpression"/>.
     /// </summary>
-    public interface IConstructorExpressionConfigurator : IMemberExpressionConfigurator
+    public interface IConstructorExpressionConfigurator : IMethodExpressionBaseConfigurator
     {
         /// <summary>
         /// Mark the <see cref="ConstructorExpression"/> as static.
@@ -17,12 +17,6 @@
         /// had a non-private visibility set.
         /// </exception>
         void SetStatic();
-
-        /// <summary>
-        /// Adds the given <paramref name="parameters"/> to the <see cref="ConstructorExpression"/>.
-        /// </summary>
-        /// <param name="parameters">The ParameterExpression to add.</param>
-        void AddParameters(params ParameterExpression[] parameters);
 
         /// <summary>
         /// Adds a call from the <see cref="ConstructorExpression"/> to the given sibling or base

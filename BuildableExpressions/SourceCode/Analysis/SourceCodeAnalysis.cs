@@ -178,7 +178,7 @@
 
             var updatedExpression = visitAndConvert.Invoke(expression);
 
-            blockMethodScope.Finalise(updatedExpression);
+            blockMethodScope.FinaliseBody(updatedExpression);
 
             extractedMethod = blockMethodScope.BlockMethod;
 
@@ -307,7 +307,7 @@
             VisitAndConvert(method.Parameters);
             var updatedBody = VisitAndConvert(method.Body);
 
-            _currentMethodScope.Finalise(updatedBody);
+            _currentMethodScope.FinaliseBody(updatedBody);
             _referenceAnalysis.Visit(method);
 
             ExitMethodScope();
@@ -340,10 +340,7 @@
         }
 
         protected override Expression VisitAndConvert(ParameterExpression variable)
-        {
-            _currentMethodScope.VariableAccessed(variable);
-            return base.VisitAndConvert(variable);
-        }
+            => _currentMethodScope.FinaliseParameter(base.VisitAndConvert(variable));
 
         private SourceCodeExpression VisitAndConvert(SourceCodeExpression sourceCode)
         {

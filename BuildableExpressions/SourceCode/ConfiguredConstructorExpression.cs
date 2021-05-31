@@ -59,16 +59,7 @@
 
         #region IClassConstructorExpressionConfigurator Members
 
-        void IConstructorExpressionConfigurator.SetStatic()
-        {
-            SetStatic();
-        }
-
-        void IConstructorExpressionConfigurator.AddParameters(
-            params ParameterExpression[] parameters)
-        {
-            AddParameters(parameters);
-        }
+        void IConstructorExpressionConfigurator.SetStatic() => SetStatic();
 
         void IConstructorExpressionConfigurator.SetConstructorCall(
             ConstructorExpression targetConstructorExpression,

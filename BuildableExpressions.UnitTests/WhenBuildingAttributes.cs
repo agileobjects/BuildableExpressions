@@ -743,14 +743,14 @@ namespace GeneratedExpressionCode
                 {
                     sc.AddClass("HasMethodParameterAttribute", cls =>
                     {
-                        cls.AddMethod("Nowt", m =>
+                        cls.AddMethod("Double", m =>
                         {
-                            m.AddParameter<int>("hasAttribute", p =>
+                            var parameter = m.AddParameter<int>("hasAttribute", p =>
                             {
-
+                                p.AddAttribute<TestAttribute>();
                             });
 
-                            m.SetBody(Empty());
+                            m.SetBody(Multiply(parameter, Constant(2)));
                         });
                     });
                 })
@@ -763,11 +763,12 @@ namespace GeneratedExpressionCode
 {
     public class HasMethodParameterAttribute
     {
-        public static void Nowt
+        public int Double
         (
-            [WhenBuildingAttributes.Test] int value
+            [WhenBuildingAttributes.Test] int hasAttribute
         )
         {
+            return hasAttribute * 2;
         }
     }
 }";

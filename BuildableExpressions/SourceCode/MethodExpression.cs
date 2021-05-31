@@ -170,13 +170,6 @@
 
         #endregion
 
-        #region IMethodExpressionConfigurator Members
-
-        void IMethodExpressionConfigurator.AddParameters(params ParameterExpression[] parameters)
-            => AddParameters(parameters);
-
-        #endregion
-
         #region IConcreteTypeMethodExpressionConfigurator Members
 
         void IConcreteTypeMethodExpressionConfigurator.SetStatic()

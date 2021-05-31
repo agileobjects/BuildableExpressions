@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using Api;
     using BuildableExpressions.Extensions;
     using Extensions;
     using Generics;
@@ -16,12 +17,14 @@
     /// </summary>
     public abstract class MethodExpressionBase :
         MemberExpression,
+        IMethodExpressionBaseConfigurator,
         IMethod,
         IConcreteTypeExpression,
         IHasSignature
     {
         private List<ParameterExpression> _parameters;
         private ReadOnlyCollection<IParameter> _readOnlyParameters;
+        private Dictionary<ParameterExpression, MethodParameterInfo> _parameterAttributes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MethodExpressionBase"/> class.
@@ -141,16 +144,16 @@
 
             var parameters = Definition?.Parameters ?? (IList<ParameterExpression>)_parameters;
 
-            var readonlyParameters = parameters
+            var readOnlyParameters = parameters
                 .ProjectToArray<ParameterExpression, IParameter>(p => new MethodParameter(p))
                 .ToReadOnlyCollection();
 
             if (Definition != null)
             {
-                _readOnlyParameters = readonlyParameters;
+                _readOnlyParameters = readOnlyParameters;
             }
 
-            return readonlyParameters;
+            return readOnlyParameters;
         }
 
         #endregion
@@ -203,26 +206,38 @@
             => AddParameters(parameters.ProjectToArray(p => Parameter(p.ParameterType, p.Name)));
 
         /// <summary>
-        /// Add the given <paramref name="parameters"/> to this <see cref="MethodExpressionBase"/>.
+        /// Adds the given <paramref name="parameters"/> to this <see cref="MethodExpressionBase"/>.
         /// </summary>
         /// <param name="parameters">The ParameterExpressions to add.</param>
-        protected void AddParameters(IList<ParameterExpression> parameters)
+        /// <returns>
+        /// True if any of the given <paramref name="parameters"/> did not already exist and were
+        /// added, otherwise false.
+        /// </returns>
+        private bool AddParameters(IList<ParameterExpression> parameters)
         {
             if (!parameters.Any())
             {
-                return;
+                return false;
             }
 
             if (_parameters == null)
             {
                 _parameters = new List<ParameterExpression>(parameters);
+                _readOnlyParameters = null;
+                return true;
             }
-            else
+
+            var currentCount = _parameters.Count;
+            _parameters.AddRange(parameters.Except(_parameters));
+
+            if (currentCount == _parameters.Count)
             {
-                _parameters.AddRange(parameters.Except(_parameters));
+                return false;
             }
 
             _readOnlyParameters = null;
+            return true;
+
         }
 
         /// <summary>
@@ -278,6 +293,49 @@
         /// </param>
         /// <returns>The signature of this <see cref="MethodExpressionBase"/></returns>
         protected abstract string GetSignature(bool includeTypeName);
+
+        internal bool HasAttributes(
+            ParameterExpression parameterExpression,
+            out IList<AppliedAttribute> attributes)
+        {
+            if (_parameterAttributes != null &&
+                _parameterAttributes.TryGetValue(parameterExpression, out var info))
+            {
+                attributes = info.AttributesAccessor;
+                return attributes != null;
+            }
+
+            attributes = null;
+            return false;
+        }
+
+        #region IMethodExpressionBaseConfigurator Members
+
+        void IMethodExpressionBaseConfigurator.AddParameter(
+            ParameterExpression parameter,
+            Action<IParameterExpressionConfigurator> configuration)
+        {
+            if (!AddParameters(new[] { parameter }))
+            {
+                return;
+            }
+
+            if (configuration == null)
+            {
+                return;
+            }
+
+            var info = new MethodParameterInfo();
+            configuration.Invoke(info);
+
+            _parameterAttributes ??= new Dictionary<ParameterExpression, MethodParameterInfo>();
+            _parameterAttributes[parameter] = info;
+        }
+
+        void IMethodExpressionBaseConfigurator.AddParameters(params ParameterExpression[] parameters)
+            => AddParameters(parameters);
+
+        #endregion
 
         #region Validation
 
@@ -405,6 +463,12 @@
             public bool IsOut => false;
 
             public bool IsParamsArray => false;
+        }
+
+        private class MethodParameterInfo :
+            AttributableExpressionBase,
+            IParameterExpressionConfigurator
+        {
         }
 
         #endregion

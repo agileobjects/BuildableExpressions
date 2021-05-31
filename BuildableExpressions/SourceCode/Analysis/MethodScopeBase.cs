@@ -43,7 +43,17 @@
         public bool IsMethodParameter(ParameterExpression parameter)
             => _unscopedVariables.Contains(parameter);
 
-        public virtual void Finalise(Expression finalisedBody)
+        public virtual Expression FinaliseParameter(Expression parameter)
+        {
+            if (parameter is ParameterExpression variable)
+            {
+                VariableAccessed(variable);
+            }
+
+            return parameter;
+        }
+
+        public virtual void FinaliseBody(Expression finalisedBody)
         {
             if (_unscopedVariables.Any())
             {
