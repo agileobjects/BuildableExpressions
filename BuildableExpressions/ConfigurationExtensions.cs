@@ -1347,7 +1347,7 @@
         }
 
         /// <summary>
-        /// Add a ParameterExpression to the <see cref="MethodExpression"/> with the given
+        /// Add a ParameterExpression to the <see cref="MethodExpressionBase"/> with the given
         /// <paramref name="name"/> and <typeparamref name="TParameter"/> type.
         /// </summary>
         /// <typeparam name="TParameter">The type of the ParameterExpression to add.</typeparam>
@@ -1362,7 +1362,7 @@
         }
 
         /// <summary>
-        /// Add a ParameterExpression to the <see cref="MethodExpression"/> with the given
+        /// Add a ParameterExpression to the <see cref="MethodExpressionBase"/> with the given
         /// <paramref name="name"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
@@ -1380,7 +1380,7 @@
         }
 
         /// <summary>
-        /// Add the given <paramref name="parameter"/> to the <see cref="MethodExpression"/>.
+        /// Add the given <paramref name="parameter"/> to the <see cref="MethodExpressionBase"/>.
         /// </summary>
         /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
         /// <param name="parameter">The ParameterExpression to add.</param>
@@ -1388,11 +1388,11 @@
             this IMethodExpressionConfigurator methodConfig,
             ParameterExpression parameter)
         {
-            methodConfig.AddParameters(parameter);
+            methodConfig.AddParameter(parameter, configuration: null);
         }
 
         /// <summary>
-        /// Add the given <paramref name="parameters"/> to the <see cref="MethodExpression"/>.
+        /// Add the given <paramref name="parameters"/> to the <see cref="MethodExpressionBase"/>.
         /// </summary>
         /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
         /// <param name="parameters">The ParameterExpressions to add.</param>

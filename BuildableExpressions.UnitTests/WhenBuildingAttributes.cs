@@ -735,6 +735,45 @@ namespace GeneratedExpressionCode
             translated.ShouldBe(expected.TrimStart());
         }
 
+        [Fact]
+        public void ShouldApplyAnAttributeToAMethodParameter()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("HasMethodParameterAttribute", cls =>
+                    {
+                        cls.AddMethod("Nowt", m =>
+                        {
+                            m.AddParameter<int>("hasAttribute", p =>
+                            {
+
+                            });
+
+                            m.SetBody(Empty());
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using AgileObjects.BuildableExpressions.UnitTests;
+
+namespace GeneratedExpressionCode
+{
+    public class HasMethodParameterAttribute
+    {
+        public static void Nowt
+        (
+            [WhenBuildingAttributes.Test] int value
+        )
+        {
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
         #region Helper Members
 
         [AttributeUsage(Struct)]
