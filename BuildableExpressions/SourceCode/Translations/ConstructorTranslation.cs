@@ -23,8 +23,13 @@
             _attributesTranslation = AttributeSetTranslation.For(ctorExpression, context);
             _summaryTranslation = SummaryTranslation.For(ctorExpression, context);
 
-            _definitionTranslation =
-                new ConstructorDefinitionTranslation(ctorExpression, context.Settings);
+            var parametersTranslation = AttributedParameterSetDefinitionTranslation
+                .For(ctorExpression, context);
+
+            _definitionTranslation = new ConstructorDefinitionTranslation(
+                ctorExpression,
+                parametersTranslation,
+                context.Settings);
 
             _hasChainedCtorCall = ctorExpression.HasChainedConstructorCall;
 

@@ -346,6 +346,8 @@
             ParameterExpression parameter,
             Action<IParameterExpressionConfigurator> configuration)
         {
+            parameter.ThrowIfNull(nameof(parameter));
+
             if (!AddParameters(new[] { parameter }))
             {
                 return;

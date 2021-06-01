@@ -548,51 +548,98 @@
         }
 
         /// <summary>
-        /// Adds a ParameterExpression with the <typeparamref name="TParameter"/> type and
-        /// <paramref name="name"/> to the <see cref="ConstructorExpression"/>.
+        /// Add a ParameterExpression to the <see cref="MethodExpressionBase"/> with the given
+        /// <paramref name="name"/> and <typeparamref name="TParameter"/> type.
         /// </summary>
         /// <typeparam name="TParameter">The type of the ParameterExpression to add.</typeparam>
-        /// <param name="ctorConfig">The <see cref="IConstructorExpressionConfigurator"/> to configure.</param>
+        /// <param name="methodConfig">The <see cref="IMethodExpressionBaseConfigurator"/> to configure.</param>
         /// <param name="name">The name of the ParameterExpression to add.</param>
-        /// <returns>The newly-added ParameterExpression.</returns>
+        /// <returns>The added ParameterExpression.</returns>
         public static ParameterExpression AddParameter<TParameter>(
-            this IConstructorExpressionConfigurator ctorConfig,
+            this IMethodExpressionBaseConfigurator methodConfig,
             string name)
         {
-            return ctorConfig.AddParameter(name, typeof(TParameter));
+            return methodConfig.AddParameter(typeof(TParameter), name);
         }
 
         /// <summary>
-        /// Adds a ParameterExpression with the given <paramref name="name"/> and
-        /// <paramref name="type"/> to the <see cref="ConstructorExpression"/>.
+        /// Add a ParameterExpression to the <see cref="MethodExpressionBase"/> with the given
+        /// <paramref name="name"/>, <typeparamref name="TParameter"/> type and
+        /// <paramref name="configuration"/>.
         /// </summary>
-        /// <param name="ctorConfig">The <see cref="IConstructorExpressionConfigurator"/> to configure.</param>
+        /// <typeparam name="TParameter">The type of the ParameterExpression to add.</typeparam>
+        /// <param name="methodConfig">The <see cref="IMethodExpressionBaseConfigurator"/> to configure.</param>
         /// <param name="name">The name of the ParameterExpression to add.</param>
-        /// <param name="type">The type of the ParameterExpression to add.</param>
-        /// <returns>The newly-added ParameterExpression.</returns>
-        public static ParameterExpression AddParameter(
-            this IConstructorExpressionConfigurator ctorConfig,
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The added ParameterExpression.</returns>
+        public static ParameterExpression AddParameter<TParameter>(
+            this IMethodExpressionBaseConfigurator methodConfig,
             string name,
-            Type type)
+            Action<IParameterExpressionConfigurator> configuration)
+        {
+            return methodConfig.AddParameter(typeof(TParameter), name, configuration);
+        }
+
+        /// <summary>
+        /// Add a ParameterExpression to the <see cref="MethodExpressionBase"/> with the given
+        /// <paramref name="name"/> and <paramref name="type"/>.
+        /// </summary>
+        /// <param name="methodConfig">The <see cref="IMethodExpressionBaseConfigurator"/> to configure.</param>
+        /// <param name="type">The type of the ParameterExpression to add.</param>
+        /// <param name="name">The name of the ParameterExpression to add.</param>
+        /// <returns>The added ParameterExpression.</returns>
+        public static ParameterExpression AddParameter(
+            this IMethodExpressionBaseConfigurator methodConfig,
+            Type type,
+            string name)
+        {
+            return methodConfig.AddParameter(type, name, configuration: null);
+        }
+
+        /// <summary>
+        /// Add a ParameterExpression to the <see cref="MethodExpressionBase"/> with the given
+        /// <paramref name="name"/> and <paramref name="type"/>.
+        /// </summary>
+        /// <param name="methodConfig">The <see cref="IMethodExpressionBaseConfigurator"/> to configure.</param>
+        /// <param name="type">The type of the ParameterExpression to add.</param>
+        /// <param name="name">The name of the ParameterExpression to add.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The added ParameterExpression.</returns>
+        public static ParameterExpression AddParameter(
+            this IMethodExpressionBaseConfigurator methodConfig,
+            Type type,
+            string name,
+            Action<IParameterExpressionConfigurator> configuration)
         {
             name.ThrowIfInvalidName("Parameter");
 
-            var parameterExpression = Expression.Parameter(type, name);
-            ctorConfig.AddParameter(parameterExpression);
-            return parameterExpression;
+            var parameter = Expression.Parameter(type, name);
+            methodConfig.AddParameter(parameter, configuration);
+            return parameter;
         }
 
         /// <summary>
-        /// Adds the given <paramref name="parameter"/> to the <see cref="ConstructorExpression"/>.
+        /// Add the given <paramref name="parameter"/> to the <see cref="MethodExpressionBase"/>.
         /// </summary>
-        /// <param name="ctorConfig">The <see cref="IConstructorExpressionConfigurator"/> to configure.</param>
+        /// <param name="methodConfig">The <see cref="IMethodExpressionBaseConfigurator"/> to configure.</param>
         /// <param name="parameter">The ParameterExpression to add.</param>
         public static void AddParameter(
-            this IConstructorExpressionConfigurator ctorConfig,
+            this IMethodExpressionBaseConfigurator methodConfig,
             ParameterExpression parameter)
         {
-            parameter.ThrowIfNull(nameof(parameter));
-            ctorConfig.AddParameters(parameter);
+            methodConfig.AddParameter(parameter, configuration: null);
+        }
+
+        /// <summary>
+        /// Add the given <paramref name="parameters"/> to the <see cref="MethodExpressionBase"/>.
+        /// </summary>
+        /// <param name="methodConfig">The <see cref="IMethodExpressionBaseConfigurator"/> to configure.</param>
+        /// <param name="parameters">The ParameterExpressions to add.</param>
+        public static void AddParameters(
+            this IMethodExpressionBaseConfigurator methodConfig,
+            IEnumerable<ParameterExpression> parameters)
+        {
+            methodConfig.AddParameters(parameters.ToArray());
         }
 
         /// <summary>
@@ -1344,99 +1391,6 @@
             params Type[] types)
         {
             parameterConfig.AddTypeConstraints(types.ProjectToArray(TypeExpressionFactory.Create));
-        }
-
-        /// <summary>
-        /// Add a ParameterExpression to the <see cref="MethodExpressionBase"/> with the given
-        /// <paramref name="name"/> and <typeparamref name="TParameter"/> type.
-        /// </summary>
-        /// <typeparam name="TParameter">The type of the ParameterExpression to add.</typeparam>
-        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
-        /// <param name="name">The name of the ParameterExpression to add.</param>
-        /// <returns>The added ParameterExpression.</returns>
-        public static ParameterExpression AddParameter<TParameter>(
-            this IMethodExpressionConfigurator methodConfig,
-            string name)
-        {
-            return methodConfig.AddParameter(typeof(TParameter), name);
-        }
-
-        /// <summary>
-        /// Add a ParameterExpression to the <see cref="MethodExpressionBase"/> with the given
-        /// <paramref name="name"/>, <typeparamref name="TParameter"/> type and
-        /// <paramref name="configuration"/>.
-        /// </summary>
-        /// <typeparam name="TParameter">The type of the ParameterExpression to add.</typeparam>
-        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
-        /// <param name="name">The name of the ParameterExpression to add.</param>
-        /// <param name="configuration">The configuration to use.</param>
-        /// <returns>The added ParameterExpression.</returns>
-        public static ParameterExpression AddParameter<TParameter>(
-            this IMethodExpressionConfigurator methodConfig,
-            string name,
-            Action<IParameterExpressionConfigurator> configuration)
-        {
-            return methodConfig.AddParameter(typeof(TParameter), name, configuration);
-        }
-
-        /// <summary>
-        /// Add a ParameterExpression to the <see cref="MethodExpressionBase"/> with the given
-        /// <paramref name="name"/> and <paramref name="type"/>.
-        /// </summary>
-        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
-        /// <param name="type">The type of the ParameterExpression to add.</param>
-        /// <param name="name">The name of the ParameterExpression to add.</param>
-        /// <returns>The added ParameterExpression.</returns>
-        public static ParameterExpression AddParameter(
-            this IMethodExpressionConfigurator methodConfig,
-            Type type,
-            string name)
-        {
-            return methodConfig.AddParameter(type, name, configuration: null);
-        }
-
-        /// <summary>
-        /// Add a ParameterExpression to the <see cref="MethodExpressionBase"/> with the given
-        /// <paramref name="name"/> and <paramref name="type"/>.
-        /// </summary>
-        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
-        /// <param name="type">The type of the ParameterExpression to add.</param>
-        /// <param name="name">The name of the ParameterExpression to add.</param>
-        /// <param name="configuration">The configuration to use.</param>
-        /// <returns>The added ParameterExpression.</returns>
-        public static ParameterExpression AddParameter(
-            this IMethodExpressionConfigurator methodConfig,
-            Type type,
-            string name,
-            Action<IParameterExpressionConfigurator> configuration)
-        {
-            var parameter = Expression.Parameter(type, name);
-            methodConfig.AddParameter(parameter, configuration);
-            return parameter;
-        }
-
-        /// <summary>
-        /// Add the given <paramref name="parameter"/> to the <see cref="MethodExpressionBase"/>.
-        /// </summary>
-        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
-        /// <param name="parameter">The ParameterExpression to add.</param>
-        public static void AddParameter(
-            this IMethodExpressionConfigurator methodConfig,
-            ParameterExpression parameter)
-        {
-            methodConfig.AddParameter(parameter, configuration: null);
-        }
-
-        /// <summary>
-        /// Add the given <paramref name="parameters"/> to the <see cref="MethodExpressionBase"/>.
-        /// </summary>
-        /// <param name="methodConfig">The <see cref="IMethodExpressionConfigurator"/> to configure.</param>
-        /// <param name="parameters">The ParameterExpressions to add.</param>
-        public static void AddParameters(
-            this IMethodExpressionConfigurator methodConfig,
-            IEnumerable<ParameterExpression> parameters)
-        {
-            methodConfig.AddParameters(parameters.ToArray());
         }
 
         /// <summary>

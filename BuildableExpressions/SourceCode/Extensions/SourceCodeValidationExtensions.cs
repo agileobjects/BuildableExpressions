@@ -6,29 +6,21 @@
 
     internal static class SourceCodeValidationExtensions
     {
-        public static string ThrowIfInvalidName(
-            this string name,
-            string symbolType,
-            bool throwIfNull = true)
+        public static string ThrowIfInvalidName(this string name, string symbolType)
         {
             if (name == null)
             {
-                if (throwIfNull)
-                {
-                    throw Create<ArgumentNullException>(symbolType + " names cannot be null");
-                }
-
-                return null;
+                throw new ArgumentNullException(symbolType + " names cannot be null", innerException: null);
             }
 
             if (name.Trim() == string.Empty)
             {
-                throw Create<ArgumentException>(symbolType + " names cannot be blank");
+                throw new ArgumentException(symbolType + " names cannot be blank");
             }
 
             if (char.IsDigit(name[0]) || name.Any(IsInvalidTypeNameCharacter))
             {
-                throw Create<ArgumentException>($"'{name}' is an invalid {symbolType.ToLowerInvariant()} name");
+                throw new ArgumentException($"'{name}' is an invalid {symbolType.ToLowerInvariant()} name");
             }
 
             return name;
@@ -47,9 +39,6 @@
                     return !char.IsLetterOrDigit(character);
             }
         }
-
-        private static Exception Create<TException>(string message)
-            => (Exception)Activator.CreateInstance(typeof(TException), message);
 
         public static void ValidateSetStatic<TMember>(this TMember memberExpression)
             where TMember : MemberExpression, IConcreteTypeExpression, IHasSignature

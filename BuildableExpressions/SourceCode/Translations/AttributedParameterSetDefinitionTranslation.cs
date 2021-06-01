@@ -7,6 +7,8 @@
     internal class AttributedParameterSetDefinitionTranslation : ParameterSetDefinitionTranslation
     {
         private readonly Dictionary<int, AttributeSetTranslation> _parameterAttributeTranslations;
+        private readonly int _translationSize;
+        private readonly int _formattingSize;
 
         private AttributedParameterSetDefinitionTranslation(
             MethodExpressionBase methodExpression,
@@ -20,12 +22,23 @@
             _parameterAttributeTranslations =
                 new Dictionary<int, AttributeSetTranslation>(parameterAttributes.Count);
 
+            var translationSize = 0;
+            var formattingSize = 0;
+
             foreach (var indexAndAttributes in parameterAttributes)
             {
-                _parameterAttributeTranslations.Add(
-                    indexAndAttributes.Key,
-                    new AttributeSetTranslation(indexAndAttributes.Value, context));
+                var attributesTranslation =
+                    new AttributeSetTranslation(indexAndAttributes.Value, context);
+
+                _parameterAttributeTranslations
+                    .Add(indexAndAttributes.Key, attributesTranslation);
+
+                translationSize += attributesTranslation.TranslationSize;
+                formattingSize += attributesTranslation.FormattingSize;
             }
+
+            _translationSize = translationSize;
+            _formattingSize = formattingSize;
         }
 
         #region Factory Method
@@ -69,6 +82,12 @@
         }
 
         #endregion
+
+        public override int TranslationSize
+            => _translationSize + base.TranslationSize;
+
+        public override int FormattingSize
+            => _formattingSize + base.FormattingSize;
 
         protected override void WriteParameterStartTo(TranslationWriter writer, int parameterIndex)
             => _parameterAttributeTranslations[parameterIndex].WriteSingleLineTo(writer);

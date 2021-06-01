@@ -562,6 +562,59 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldApplyAnAttributeToAConstructorParameter()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    var attribute = sc.AddAttribute("CtorParamAttribute", attr =>
+                    {
+                        attr.SetVisibility(TypeVisibility.Internal);
+                    });
+
+                    sc.AddClass("HasCtorParameterAttributes", cls =>
+                    {
+                        cls.AddConstructor(ctor =>
+                        {
+                            ctor.SetVisibility(MemberVisibility.Internal);
+
+                            ctor.AddParameter<int>("hasAttributes", p =>
+                            {
+                                p.AddAttribute(attribute);
+                                p.AddAttribute<TestAttribute>();
+                            });
+
+                            ctor.SetBody(Empty());
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System;
+using AgileObjects.BuildableExpressions.UnitTests;
+
+namespace GeneratedExpressionCode
+{
+    [AttributeUsage(AttributeTargets.All)]
+    internal class CtorParamAttribute : Attribute
+    {
+    }
+
+    public class HasCtorParameterAttributes
+    {
+        internal HasCtorParameterAttributes
+        (
+            [CtorParam] [WhenBuildingAttributes.Test] int hasAttributes
+        )
+        {
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
         public void ShouldApplyAnAttributeToAField()
         {
             var translated = BuildableExpression
