@@ -19,28 +19,6 @@
 
         public override MethodExpressionBase RootMethodExpression => _methodExpression;
 
-        public override Expression FinaliseParameter(Expression parameter)
-        {
-            var finalisedParameter = base.FinaliseParameter(parameter);
-
-            if (finalisedParameter is not ParameterExpression parameterExpression)
-            {
-                return finalisedParameter;
-            }
-
-            if (!IsMethodParameter(parameterExpression))
-            {
-                return parameterExpression;
-            }
-
-            if (_methodExpression.HasAttributes(parameterExpression, out var attributes))
-            {
-                return new AttributedParameterExpression(parameterExpression, attributes);
-            }
-
-            return parameterExpression;
-        }
-
         public override void FinaliseBody(Expression finalisedBody)
         {
             base.FinaliseBody(finalisedBody);

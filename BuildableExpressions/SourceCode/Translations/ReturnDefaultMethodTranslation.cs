@@ -21,6 +21,7 @@
 
             _definitionTranslation = new MethodDefinitionTranslation(
                 method,
+                ParameterSetDefinitionTranslation.For(method, context.Settings),
                 includeDeclaringType: false,
                 context.Settings);
 

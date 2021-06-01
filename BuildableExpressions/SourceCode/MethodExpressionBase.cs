@@ -24,7 +24,7 @@
     {
         private List<ParameterExpression> _parameters;
         private ReadOnlyCollection<IParameter> _readOnlyParameters;
-        private Dictionary<ParameterExpression, MethodParameterInfo> _parameterAttributes;
+        private Dictionary<ParameterExpression, MethodParameterInfo> _parameterInfos;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MethodExpressionBase"/> class.
@@ -144,9 +144,27 @@
 
             var parameters = Definition?.Parameters ?? (IList<ParameterExpression>)_parameters;
 
-            var readOnlyParameters = parameters
-                .ProjectToArray<ParameterExpression, IParameter>(p => new MethodParameter(p))
-                .ToReadOnlyCollection();
+            ReadOnlyCollection<IParameter> readOnlyParameters;
+
+            if (parameters != null)
+            {
+                var parameterCount = parameters.Count;
+                var parameterAbstractions = new IParameter[parameterCount];
+
+                for (var i = 0; i < parameterCount; ++i)
+                {
+                    var parameter = parameters[i];
+
+                    parameterAbstractions[i] = TryGetParameterInfo(parameter, out var info)
+                        ? info : new MethodParameterInfo(parameter);
+                }
+
+                readOnlyParameters = parameterAbstractions.ToReadOnlyCollection();
+            }
+            else
+            {
+                readOnlyParameters = Enumerable<IParameter>.EmptyReadOnlyCollection;
+            }
 
             if (Definition != null)
             {
@@ -154,6 +172,20 @@
             }
 
             return readOnlyParameters;
+        }
+
+        private bool TryGetParameterInfo(
+            ParameterExpression parameter,
+            out MethodParameterInfo info)
+        {
+            if (_parameterInfos != null &&
+                _parameterInfos.TryGetValue(parameter, out info))
+            {
+                return true;
+            }
+
+            info = null;
+            return false;
         }
 
         #endregion
@@ -294,12 +326,11 @@
         /// <returns>The signature of this <see cref="MethodExpressionBase"/></returns>
         protected abstract string GetSignature(bool includeTypeName);
 
-        internal bool HasAttributes(
+        internal bool TryGetAttributes(
             ParameterExpression parameterExpression,
             out IList<AppliedAttribute> attributes)
         {
-            if (_parameterAttributes != null &&
-                _parameterAttributes.TryGetValue(parameterExpression, out var info))
+            if (TryGetParameterInfo(parameterExpression, out var info))
             {
                 attributes = info.AttributesAccessor;
                 return attributes != null;
@@ -325,11 +356,12 @@
                 return;
             }
 
-            var info = new MethodParameterInfo();
+            _parameterInfos ??= new Dictionary<ParameterExpression, MethodParameterInfo>();
+
+            var info = new MethodParameterInfo(parameter);
             configuration.Invoke(info);
 
-            _parameterAttributes ??= new Dictionary<ParameterExpression, MethodParameterInfo>();
-            _parameterAttributes[parameter] = info;
+            _parameterInfos[parameter] = info;
         }
 
         void IMethodExpressionBaseConfigurator.AddParameters(params ParameterExpression[] parameters)
@@ -445,17 +477,20 @@
 
         #region Helper Classes
 
-        private class MethodParameter : IParameter
+        private class MethodParameterInfo :
+            AttributableExpressionBase,
+            IParameterExpressionConfigurator,
+            IParameter
         {
             private readonly ParameterExpression _parameter;
             private IType _type;
 
-            public MethodParameter(ParameterExpression parameter)
+            public MethodParameterInfo(ParameterExpression parameter)
             {
                 _parameter = parameter;
             }
 
-            public IType Type
+            IType IParameter.Type
                 => _type ??= ClrTypeWrapper.For(_parameter.Type);
 
             public string Name => _parameter.Name;
@@ -463,12 +498,6 @@
             public bool IsOut => false;
 
             public bool IsParamsArray => false;
-        }
-
-        private class MethodParameterInfo :
-            AttributableExpressionBase,
-            IParameterExpressionConfigurator
-        {
         }
 
         #endregion

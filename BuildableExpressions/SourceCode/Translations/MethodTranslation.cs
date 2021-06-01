@@ -24,18 +24,22 @@
             _attributesTranslation = AttributeSetTranslation.For(methodExpression, context);
             _summaryTranslation = SummaryTranslation.For(methodExpression, context);
 
+            var parametersTranslation = AttributedParameterSetDefinitionTranslation
+                .For(methodExpression, context);
+
             _definitionTranslation = new MethodDefinitionTranslation(
                 methodExpression,
+                parametersTranslation,
                 includeDeclaringType: false,
                 context.Settings);
 
             var translationSize =
-                _attributesTranslation.TranslationSize + 
+                _attributesTranslation.TranslationSize +
                 _summaryTranslation.TranslationSize +
                 _definitionTranslation.TranslationSize;
 
             var formattingSize =
-                _attributesTranslation.FormattingSize + 
+                _attributesTranslation.FormattingSize +
                 _summaryTranslation.FormattingSize +
                 _definitionTranslation.FormattingSize;
 

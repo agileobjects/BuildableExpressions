@@ -340,7 +340,10 @@
         }
 
         protected override Expression VisitAndConvert(ParameterExpression variable)
-            => _currentMethodScope.FinaliseParameter(base.VisitAndConvert(variable));
+        {
+            _currentMethodScope.VariableAccessed(variable);
+            return base.VisitAndConvert(variable);
+        }
 
         private SourceCodeExpression VisitAndConvert(SourceCodeExpression sourceCode)
         {

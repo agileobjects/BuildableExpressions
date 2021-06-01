@@ -89,6 +89,11 @@
             foreach (var parameter in method.Parameters)
             {
                 Visit(parameter);
+
+                if (method.TryGetAttributes(parameter, out var attributes))
+                {
+                    HandleReferences(attributes);
+                }
             }
 
             HandleReference(method);
