@@ -25,7 +25,7 @@
         }
 
         protected override void WritePropertyStartTo(TranslationWriter writer)
-            => _attributesTranslation.WriteWithTrailingNewLineTo(writer);
+            => _attributesTranslation.WriteMultiLineTo(writer);
 
         protected override void WriteAccessorsStartTo(TranslationWriter writer)
         {
@@ -123,9 +123,7 @@
 
             public override void WriteTo(TranslationWriter writer)
             {
-                _attributesTranslation.WriteWithTrailingSeparatorTo(
-                    writer,
-                    w => w.WriteSpaceToTranslation());
+                _attributesTranslation.WriteSingleLineTo(writer);
 
                 WriteAccessorTo(writer);
                 _accessorTranslation.WriteTo(writer);

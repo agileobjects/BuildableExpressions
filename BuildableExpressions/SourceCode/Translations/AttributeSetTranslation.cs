@@ -19,7 +19,7 @@
         {
         }
 
-        private AttributeSetTranslation(
+        public AttributeSetTranslation(
             IList<AppliedAttribute> attributes,
             ITranslationContext context)
         {

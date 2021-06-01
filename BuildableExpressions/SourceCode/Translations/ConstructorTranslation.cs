@@ -115,7 +115,7 @@
 
         public void WriteTo(TranslationWriter writer)
         {
-            _attributesTranslation.WriteWithTrailingNewLineTo(writer);
+            _attributesTranslation.WriteMultiLineTo(writer);
             _summaryTranslation.WriteTo(writer);
             _definitionTranslation.WriteTo(writer);
 

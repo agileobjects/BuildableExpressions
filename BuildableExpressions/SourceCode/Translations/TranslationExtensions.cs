@@ -31,7 +31,7 @@
             return modifiers;
         }
 
-        public static void WriteWithTrailingNewLineTo(
+        public static void WriteMultiLineTo(
             this AttributeSetTranslation translatable,
             TranslationWriter writer)
         {
@@ -40,7 +40,16 @@
                 w => w.WriteNewLineToTranslation());
         }
 
-        public static void WriteWithTrailingSeparatorTo(
+        public static void WriteSingleLineTo(
+            this AttributeSetTranslation translatable,
+            TranslationWriter writer)
+        {
+            translatable.WriteWithTrailingSeparatorTo(
+                writer,
+                w => w.WriteSpaceToTranslation());
+        }
+
+        private static void WriteWithTrailingSeparatorTo(
             this AttributeSetTranslation attributesTranslation,
             TranslationWriter writer,
             Action<TranslationWriter> separatorWriter)

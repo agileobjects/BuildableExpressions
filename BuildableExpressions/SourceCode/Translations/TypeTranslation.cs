@@ -208,7 +208,7 @@
         {
             if (_hasAttributes)
             {
-                _attributesTranslation.WriteWithTrailingNewLineTo(writer);
+                _attributesTranslation.WriteMultiLineTo(writer);
             }
 
             _summaryTranslation.WriteTo(writer);
