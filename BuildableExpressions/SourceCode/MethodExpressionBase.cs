@@ -10,6 +10,7 @@
     using BuildableExpressions.Extensions;
     using Extensions;
     using Generics;
+    using ReadableExpressions.Extensions;
     using ReadableExpressions.Translations.Reflection;
 
     /// <summary>
@@ -259,6 +260,14 @@
                 return true;
             }
 
+            var lastParameter = _parameters.Last();
+
+            if (TryGetParameterInfo(lastParameter, out var info) && info.IsParamsArray)
+            {
+                throw new InvalidOperationException(
+                    $"New parameters cannot be added after params array '{lastParameter.Name}'.");
+            }
+
             var currentCount = _parameters.Count;
             _parameters.AddRange(parameters.Except(_parameters));
 
@@ -497,7 +506,7 @@
             IType IParameter.Type
                 => _type ??= ClrTypeWrapper.For(_parameterType);
 
-            public string Name => _parameter.Name;
+            public string Name => _parameter.Name ?? "Unnamed";
 
             public bool IsOut { get; private set; }
 
@@ -542,9 +551,7 @@
                     return;
                 }
 
-                ThrowIfOutParameter("params");
-                ThrowIfRefParameter("params");
-
+                ThrowIfInvalidForParamsArray();
                 IsParamsArray = true;
             }
 
@@ -553,6 +560,19 @@
                 _parameterType = _parameter.Type.MakeByRefType();
                 _parameter = Parameter(_parameterType, Name);
                 _type = null;
+            }
+
+            private void ThrowIfInvalidForParamsArray()
+            {
+                ThrowIfOutParameter("params");
+                ThrowIfRefParameter("params");
+
+                if (!_parameterType.IsArray)
+                {
+                    throw new InvalidOperationException(
+                        $"Parameter '{Name}' cannot be a params array as it " +
+                        $"has type '{_parameterType.GetFriendlyName()}'.");
+                }
             }
 
             private void ThrowIfRefParameter(string conflictingModifier)
@@ -582,8 +602,7 @@
             private void ThrowModifierConflict(string modifier, string conflictingModifier)
             {
                 throw new InvalidOperationException(
-                    $"Parameter '{Name ?? "Unnamed"}' cannot be " +
-                    $"both {modifier} and {conflictingModifier}.");
+                    $"Parameter '{Name}' cannot be both {modifier} and {conflictingModifier}.");
             }
 
             #endregion 

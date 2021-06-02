@@ -532,5 +532,55 @@
 
             paramEx.Message.ShouldContain("cannot be both params and ref");
         }
+
+        [Fact]
+        public void ShouldErrorIfParamsArrayIsNotArrayType()
+        {
+            var paramEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("Nope", m =>
+                        {
+                            m.AddParameter(typeof(string), "words", p =>
+                            {
+                                p.SetParamsArray();
+                            });
+                        });
+                    });
+                });
+            });
+
+            paramEx.Message.ShouldContain("cannot be a params array");
+            paramEx.Message.ShouldContain("has type 'string'.");
+        }
+
+        [Fact]
+        public void ShouldErrorIfParameterAddedAfterParamsArray()
+        {
+            var paramEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("Nope", m =>
+                        {
+                            m.AddParameter(typeof(string[]), "words", p =>
+                            {
+                                p.SetParamsArray();
+                            });
+
+                            m.AddParameter<int>("count");
+                        });
+                    });
+                });
+            });
+
+            paramEx.Message.ShouldContain(
+                "parameters cannot be added after params array 'words'");
+        }
     }
 }
