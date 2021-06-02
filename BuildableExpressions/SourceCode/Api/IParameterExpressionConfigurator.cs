@@ -5,5 +5,9 @@
     /// </summary>
     public interface IParameterExpressionConfigurator : IAttributableExpressionConfigurator
     {
+        /// <summary>
+        /// Set the <see cref="MethodExpressionBase"/> ParameterExpression to an out parameter.
+        /// </summary>
+        void SetOut();
     }
 }

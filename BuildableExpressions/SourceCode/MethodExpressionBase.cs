@@ -484,22 +484,41 @@
             IParameterExpressionConfigurator,
             IParameter
         {
-            private readonly ParameterExpression _parameter;
+            private ParameterExpression _parameter;
+            private Type _parameterType;
             private IType _type;
 
             public MethodParameterInfo(ParameterExpression parameter)
             {
                 _parameter = parameter;
+                _parameterType = parameter.Type;
             }
 
             IType IParameter.Type
-                => _type ??= ClrTypeWrapper.For(_parameter.Type);
+                => _type ??= ClrTypeWrapper.For(_parameterType);
 
             public string Name => _parameter.Name;
 
-            public bool IsOut => false;
+            public bool IsOut { get; private set; }
 
             public bool IsParamsArray => false;
+
+            #region IParameterExpressionConfigurator Members
+
+            void IParameterExpressionConfigurator.SetOut()
+            {
+                if (IsOut)
+                {
+                    return;
+                }
+
+                IsOut = true;
+                _parameterType = _parameter.Type.MakeByRefType();
+                _parameter = Parameter(_parameterType, Name);
+                _type = null;
+            }
+
+            #endregion 
         }
 
         #endregion

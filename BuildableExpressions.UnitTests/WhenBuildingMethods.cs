@@ -185,7 +185,6 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildAMethodWithACustomReturnType()
         {
-
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
@@ -208,6 +207,48 @@ namespace GeneratedExpressionCode
         public object Get1000()
         {
             return 1000;
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldBuildAMethodWithAnOutParameter()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("TryGet1000", m =>
+                        {
+                            var outParam = m.AddParameter<int>("value", p =>
+                            {
+                                p.SetOut();
+                            });
+
+                            m.SetBody(Block(
+                                Assign(outParam, Constant(1000)),
+                                Constant(true)));
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public bool TryGet1000
+        (
+            out int value
+        )
+        {
+            value = 1000;
+
+            return true;
         }
     }
 }";
