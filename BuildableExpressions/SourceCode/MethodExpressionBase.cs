@@ -501,6 +501,8 @@
 
             public bool IsOut { get; private set; }
 
+            public bool IsRef { get; private set; }
+
             public bool IsParamsArray => false;
 
             #region IParameterExpressionConfigurator Members
@@ -513,6 +515,22 @@
                 }
 
                 IsOut = true;
+                UpdateParameterType();
+            }
+
+            void IParameterExpressionConfigurator.SetRef()
+            {
+                if (IsRef)
+                {
+                    return;
+                }
+
+                IsRef = true;
+                UpdateParameterType();
+            }
+
+            private void UpdateParameterType()
+            {
                 _parameterType = _parameter.Type.MakeByRefType();
                 _parameter = Parameter(_parameterType, Name);
                 _type = null;

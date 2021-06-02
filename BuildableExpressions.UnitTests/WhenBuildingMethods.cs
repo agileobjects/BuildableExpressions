@@ -256,6 +256,46 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldBuildAMethodWithARefParameter()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("SetRef", m =>
+                        {
+                            var refParam = m.AddParameter<int>("value", p =>
+                            {
+                                p.SetRef();
+                            });
+
+                            m.SetBody(
+                                Assign(refParam, Constant(1000)),
+                                typeof(void));
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public void SetRef
+        (
+            ref int value
+        )
+        {
+            value = 1000;
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAGenericParameterMethod()
         {
             var sourceCode = BuildableExpression.SourceCode(sc =>
