@@ -582,5 +582,26 @@
             paramEx.Message.ShouldContain(
                 "parameters cannot be added after params array 'words'");
         }
+
+        [Fact]
+        public void ShouldErrorIfNonStaticClassMethodMarkedAsExtensionMethod()
+        {
+            var methodEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("Nope", m =>
+                        {
+                            m.SetExtensionMethod();
+                        });
+                    });
+                });
+            });
+
+            methodEx.Message.ShouldContain("Unable to set method");
+            methodEx.Message.ShouldContain("as declaring class is non-static");
+        }
     }
 }

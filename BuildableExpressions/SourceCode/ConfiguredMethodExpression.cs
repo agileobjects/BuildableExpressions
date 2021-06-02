@@ -83,8 +83,22 @@
 
         void IClassMethodExpressionConfigurator.SetExtensionMethod()
         {
+            ValidateSetExtensionMethod();
+
             SetStatic();
             _isExtensionMethod = true;
+        }
+
+        private void ValidateSetExtensionMethod()
+        {
+            if (!((ClassExpression)DeclaringTypeExpression).IsStatic)
+            {
+                throw new InvalidOperationException(
+                    $"Unable to set method '{GetSignature(includeTypeName: true)}' " +
+                     "to an extension method as declaring class is non-static.");
+            }
+
+            this.ValidateSetStatic();
         }
 
         protected override IType GetReturnType()
@@ -106,7 +120,7 @@
 
         #endregion
 
-        internal override void ResetMemberInfo() 
+        internal override void ResetMemberInfo()
             => SetMethodInfo(null);
     }
 }
