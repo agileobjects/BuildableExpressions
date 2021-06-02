@@ -14,5 +14,11 @@
         /// Set the <see cref="MethodExpressionBase"/> ParameterExpression to a ref parameter.
         /// </summary>
         void SetRef();
+
+        /// <summary>
+        /// Set the <see cref="MethodExpressionBase"/> ParameterExpression to a params array
+        /// parameter.
+        /// </summary>
+        void SetParamsArray();
     }
 }

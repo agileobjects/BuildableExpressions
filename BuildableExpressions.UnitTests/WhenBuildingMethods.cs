@@ -296,6 +296,43 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldBuildAMethodWithAParamsArrayParameter()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("GimmeWords", m =>
+                        {
+                            m.AddParameter<string[]>("words", p =>
+                            {
+                                p.SetParamsArray();
+                            });
+
+                            m.SetBody(Empty());
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public void GimmeWords
+        (
+            params string[] words
+        )
+        {
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAGenericParameterMethod()
         {
             var sourceCode = BuildableExpression.SourceCode(sc =>

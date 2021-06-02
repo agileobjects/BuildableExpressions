@@ -503,7 +503,7 @@
 
             public bool IsRef { get; private set; }
 
-            public bool IsParamsArray => false;
+            public bool IsParamsArray { get; private set; }
 
             #region IParameterExpressionConfigurator Members
 
@@ -528,6 +528,9 @@
                 IsRef = true;
                 UpdateParameterType();
             }
+
+            void IParameterExpressionConfigurator.SetParamsArray()
+                => IsParamsArray = true;
 
             private void UpdateParameterType()
             {
