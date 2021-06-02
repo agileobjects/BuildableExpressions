@@ -96,7 +96,7 @@
         private static void ThrowIfAbstract<TMember>(
             this TMember memberExpression,
             string conflictingModifier)
-            where TMember : MemberExpression, IConcreteTypeExpression, IHasSignature
+            where TMember : IConcreteTypeExpression, IHasSignature
         {
             if (memberExpression.IsAbstract)
             {
@@ -119,7 +119,7 @@
             this TMember memberExpression,
             string modifier,
             string conflictingModifier)
-            where TMember : MemberExpression, IHasSignature
+            where TMember : IHasSignature
         {
             var memberName = GetMemberTypeName<TMember>();
 

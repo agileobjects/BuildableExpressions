@@ -29,5 +29,11 @@
         /// Thrown if the class <see cref="MethodExpression"/> has already been marked as virtual.
         /// </exception>
         void SetAbstract(IType returnType);
+
+        /// <summary>
+        /// Mark the <see cref="MethodExpression"/> as an extension method. The first added
+        /// parameter added will be the subject of the extension.
+        /// </summary>
+        void SetExtensionMethod();
     }
 }

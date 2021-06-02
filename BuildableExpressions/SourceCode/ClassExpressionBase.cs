@@ -3,12 +3,16 @@
     using System;
     using System.Collections.Generic;
     using BuildableExpressions.Extensions;
+    using Extensions;
     using ReadableExpressions.Translations.Reflection;
 
     /// <summary>
     /// Represents a class or attribute class in a piece of source code.
     /// </summary>
-    public abstract class ClassExpressionBase : ConcreteTypeExpression, IType
+    public abstract class ClassExpressionBase : 
+        ConcreteTypeExpression, 
+        IType,
+        IHasSignature
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassExpressionBase"/> class for the given
@@ -192,10 +196,12 @@
         /// </param>
         protected void ThrowModifierConflict(string modifier, string conflictingModifier)
         {
-            throw new InvalidOperationException(
-                $"Type '{Name}' cannot be both {modifier} and {conflictingModifier}.");
+            SourceCodeValidationExtensions
+                .ThrowModifierConflict(this, modifier, conflictingModifier);
         }
 
         #endregion
+
+        string IHasSignature.GetSignature() => Name;
     }
 }

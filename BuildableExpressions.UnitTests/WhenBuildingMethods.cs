@@ -773,6 +773,44 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldBuildAnExtensionMethod()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("IntExtensions", cls =>
+                    {
+                        cls.SetStatic();
+
+                        cls.AddMethod("Square", m =>
+                        {
+                            m.SetExtensionMethod();
+
+                            var intValue = m.AddParameter<int>("value");
+                            m.SetBody(Multiply(intValue, intValue));
+                        });
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+namespace GeneratedExpressionCode
+{
+    public static class IntExtensions
+    {
+        public static int Square
+        (
+            this int value
+        )
+        {
+            return value * value;
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
         public void ShouldOrderMethodsByVisibility()
         {
             var translated = BuildableExpression

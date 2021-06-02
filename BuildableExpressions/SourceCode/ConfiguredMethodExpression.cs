@@ -9,9 +9,11 @@
 
     internal class ConfiguredMethodExpression :
         MethodExpression,
-        IClassMethodExpressionConfigurator
+        IClassMethodExpressionConfigurator,
+        IMethodBase
     {
         private bool? _isOverride;
+        private bool _isExtensionMethod;
         private IType _returnType;
 
         public ConfiguredMethodExpression(
@@ -79,8 +81,20 @@
             SetAbstract();
         }
 
+        void IClassMethodExpressionConfigurator.SetExtensionMethod()
+        {
+            SetStatic();
+            _isExtensionMethod = true;
+        }
+
         protected override IType GetReturnType()
             => _returnType ??= ClrTypeWrapper.For(ReturnType);
+
+        #endregion
+
+        #region IMethodBase Members
+
+        bool IMethodBase.IsExtensionMethod => _isExtensionMethod;
 
         #endregion
 
