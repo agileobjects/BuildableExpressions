@@ -14,7 +14,8 @@
     public class InputFilesFinderTests
     {
         private const string _contentRoot = @"C:\Data\VisualStudio\BuildableExpressions";
-        private const string _projectFilePath = _contentRoot + @"\MyProject.csproj";
+        private const string _solutionPath = _contentRoot + @"\MySolution.sln";
+        private const string _projectPath = _contentRoot + @"\MyProject.csproj";
         private const string _rootNamespace = "AgileObjects.BuildableExpressions";
 
         [Fact]
@@ -31,7 +32,7 @@
                 fileManagerMock.Object);
 
             var inputFiles = finder.GetInputFiles(
-                new Config(_projectFilePath, _rootNamespace));
+                new Config(_solutionPath, _projectPath, _rootNamespace));
 
             var inputFile = inputFiles.ShouldHaveSingleItem();
             inputFile.FilePath.ShouldBe(Path.Combine(_contentRoot, DefaultInputFileName));
@@ -77,7 +78,7 @@ namespace {DefaultInputFileNamespace}
                 fileManagerMock.Object);
 
             var inputFiles = finder.GetInputFiles(
-                new Config(_projectFilePath, _rootNamespace));
+                new Config(_solutionPath, _projectPath, _rootNamespace));
 
             inputFiles.Count.ShouldBe(2);
 
@@ -111,7 +112,7 @@ namespace {DefaultInputFileNamespace}
                 fileManagerMock.Object);
 
             var inputFiles = finder.GetInputFiles(
-                new Config(_projectFilePath, _rootNamespace));
+                new Config(_solutionPath, _projectPath, _rootNamespace));
 
             inputFiles.ShouldHaveSingleItem().FilePath.ShouldBe(filePath3);
         }
@@ -151,7 +152,7 @@ namespace MyOtherClassNamespace
                 fileManagerMock.Object);
 
             var inputFiles = finder.GetInputFiles(
-                new Config(_projectFilePath, _rootNamespace));
+                new Config(_solutionPath, _projectPath, _rootNamespace));
 
             inputFiles.ShouldHaveSingleItem().FilePath.ShouldBe(filePath1);
 

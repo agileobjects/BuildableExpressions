@@ -2,10 +2,8 @@
 namespace AgileObjects.BuildableExpressions.Generator.UnitTests.ProjectManagement
 {
     using System.Linq;
-    using System.Runtime.InteropServices;
     using BuildableExpressions.Generator.ProjectManagement;
     using BuildableExpressions.UnitTests.Common;
-    using EnvDTE;
     using Xunit;
 
     public class EnvDteExtensionsTests
@@ -13,9 +11,10 @@ namespace AgileObjects.BuildableExpressions.Generator.UnitTests.ProjectManagemen
         [Fact]
         public void ShouldRetrieveSolutionProjects()
         {
-            var dte = (DTE)Marshal.GetActiveObject("VisualStudio.DTE");
+            var devTools = DevToolsFactory
+                .GetDevToolsOrNullFor("BuildableExpressions.sln");
 
-            var projectNames = dte
+            var projectNames = devTools
                 .Solution
                 .EnumerateProjects()
                 .Select(p => p.Name)

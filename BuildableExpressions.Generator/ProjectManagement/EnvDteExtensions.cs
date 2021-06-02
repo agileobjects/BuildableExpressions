@@ -1,9 +1,9 @@
 ﻿#if NETFRAMEWORK
 namespace AgileObjects.BuildableExpressions.Generator.ProjectManagement
 {
-    using EnvDTE;
     using System.Collections;
     using System.Collections.Generic;
+    using EnvDTE;
 
     internal static class EnvDteExtensions
     {

@@ -4,9 +4,7 @@ namespace AgileObjects.BuildableExpressions.Generator.ProjectManagement
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Runtime.InteropServices;
     using Configuration;
-    using EnvDTE;
 
     internal class NetFrameworkProject : IProject
     {
@@ -19,9 +17,10 @@ namespace AgileObjects.BuildableExpressions.Generator.ProjectManagement
 
         public void Add(IEnumerable<string> relativeFilePaths)
         {
-            var dte = (DTE)Marshal.GetActiveObject("VisualStudio.DTE");
+            var devTools = DevToolsFactory
+                .GetDevToolsOrNullFor(_config.SolutionName);
 
-            var project = dte
+            var project = devTools
                 .Solution
                 .EnumerateProjects()
                 .First(p => p.FullName == _config.ProjectPath);

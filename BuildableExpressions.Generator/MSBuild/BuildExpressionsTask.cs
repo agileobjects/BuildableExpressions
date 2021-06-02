@@ -15,6 +15,12 @@ namespace BuildXpr
     public class BuildExpressionsTask : MsBuildTask
     {
         /// <summary>
+        /// Gets or sets the full path of the solution providing the 
+        /// <see cref="SourceCodeExpression"/>(s) to build.
+        /// </summary>
+        public string SolutionPath { get; set; }
+
+        /// <summary>
         /// Gets or sets the full path of the project providing the 
         /// <see cref="SourceCodeExpression"/>(s) to build.
         /// </summary>
@@ -44,7 +50,7 @@ namespace BuildXpr
                 new OutputWriter(fileManager),
                 new ProjectFactory(logger, fileManager));
             
-            return generator.Execute(new Config(ProjectPath, RootNamespace));
+            return generator.Execute(new Config(SolutionPath, ProjectPath, RootNamespace));
         }
     }
 }

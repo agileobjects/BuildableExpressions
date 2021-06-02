@@ -15,7 +15,8 @@
     public class OutputWriterTests
     {
         private const string _projectDirectory = @"C:\Data\VisualStudio\BuildableExpressions";
-        private const string _projectFilePath = _projectDirectory + @"\MyProject.csproj";
+        private const string _solutionPath = _projectDirectory + @"\MySolution.sln";
+        private const string _projectPath = _projectDirectory + @"\MyProject.csproj";
         private const string _rootNamespace = "AgileObjects.BuildableExpressions";
 
         [Fact]
@@ -38,7 +39,9 @@
 
             var fileName = sourceCode.TypeExpressions.First().Name + ".cs";
 
-            outputWriter.Write(new Config(_projectFilePath, _rootNamespace), sourceCode);
+            outputWriter.Write(
+                new Config(_solutionPath, _projectPath, _rootNamespace),
+                sourceCode);
 
             fileManagerMock.Verify(fm => fm.EnsureDirectory(_projectDirectory), Never);
 
@@ -67,7 +70,7 @@
             var fileName = sourceCode.TypeExpressions.First().Name + ".cs";
 
             outputWriter.Write(
-                new Config(_projectFilePath, _rootNamespace),
+                new Config(_solutionPath, _projectPath, _rootNamespace),
                 new List<SourceCodeExpression> { sourceCode });
 
             var expectedOutputDirectory =

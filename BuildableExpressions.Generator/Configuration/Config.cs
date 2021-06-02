@@ -4,8 +4,13 @@
 
     internal class Config
     {
-        public Config(string projectPath, string rootNamespace)
+        public Config(
+            string solutionPath,
+            string projectPath, 
+            string rootNamespace)
         {
+            SolutionPath = solutionPath;
+            SolutionName = Path.GetFileName(solutionPath);
             ProjectPath = projectPath;
             ContentRoot = Path.GetDirectoryName(projectPath);
 
@@ -14,6 +19,10 @@
                 RootNamespace = rootNamespace;
             }
         }
+
+        public string SolutionPath { get; }
+
+        public string SolutionName { get; }
 
         public string ProjectPath { get; }
 
