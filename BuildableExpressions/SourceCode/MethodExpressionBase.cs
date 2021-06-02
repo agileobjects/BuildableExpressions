@@ -514,6 +514,9 @@
                     return;
                 }
 
+                ThrowIfRefParameter("out");
+                ThrowIfParamsArray("out");
+
                 IsOut = true;
                 UpdateParameterType();
             }
@@ -525,18 +528,62 @@
                     return;
                 }
 
+                ThrowIfOutParameter("ref");
+                ThrowIfParamsArray("ref");
+
                 IsRef = true;
                 UpdateParameterType();
             }
 
             void IParameterExpressionConfigurator.SetParamsArray()
-                => IsParamsArray = true;
+            {
+                if (IsParamsArray)
+                {
+                    return;
+                }
+
+                ThrowIfOutParameter("params");
+                ThrowIfRefParameter("params");
+
+                IsParamsArray = true;
+            }
 
             private void UpdateParameterType()
             {
                 _parameterType = _parameter.Type.MakeByRefType();
                 _parameter = Parameter(_parameterType, Name);
                 _type = null;
+            }
+
+            private void ThrowIfRefParameter(string conflictingModifier)
+            {
+                if (IsRef)
+                {
+                    ThrowModifierConflict("ref", conflictingModifier);
+                }
+            }
+
+            private void ThrowIfOutParameter(string conflictingModifier)
+            {
+                if (IsOut)
+                {
+                    ThrowModifierConflict("out", conflictingModifier);
+                }
+            }
+
+            private void ThrowIfParamsArray(string conflictingModifier)
+            {
+                if (IsParamsArray)
+                {
+                    ThrowModifierConflict("params", conflictingModifier);
+                }
+            }
+
+            private void ThrowModifierConflict(string modifier, string conflictingModifier)
+            {
+                throw new InvalidOperationException(
+                    $"Parameter '{Name ?? "Unnamed"}' cannot be " +
+                    $"both {modifier} and {conflictingModifier}.");
             }
 
             #endregion 

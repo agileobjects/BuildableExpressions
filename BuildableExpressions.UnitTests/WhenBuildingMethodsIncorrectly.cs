@@ -385,5 +385,152 @@
 
             methodEx.Message.ShouldContain("undefined variable(s) 'int int1', 'int int2'");
         }
+
+        [Fact]
+        public void ShouldErrorIfOutParameterSetToRef()
+        {
+            var paramEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("Nope", m =>
+                        {
+                            m.AddParameter(Parameter(typeof(string)), p =>
+                            {
+                                p.SetOut();
+                                p.SetOut();
+                                p.SetRef();
+                            });
+                        });
+                    });
+                });
+            });
+
+            paramEx.Message.ShouldContain("cannot be both out and ref");
+        }
+
+        [Fact]
+        public void ShouldErrorIfOutParameterSetToParamsArray()
+        {
+            var paramEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("Nope", m =>
+                        {
+                            m.AddParameter(typeof(string[]), "words", p =>
+                            {
+                                p.SetOut();
+                                p.SetParamsArray();
+                            });
+                        });
+                    });
+                });
+            });
+
+            paramEx.Message.ShouldContain("cannot be both out and params");
+        }
+
+        [Fact]
+        public void ShouldErrorIfRefParameterSetToOut()
+        {
+            var paramEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("Nope", m =>
+                        {
+                            m.AddParameter(Parameter(typeof(string)), p =>
+                            {
+                                p.SetRef();
+                                p.SetOut();
+                            });
+                        });
+                    });
+                });
+            });
+
+            paramEx.Message.ShouldContain("cannot be both ref and out");
+        }
+
+        [Fact]
+        public void ShouldErrorIfRefParameterSetToParamsArray()
+        {
+            var paramEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("Nope", m =>
+                        {
+                            m.AddParameter(typeof(string[]), "words", p =>
+                            {
+                                p.SetRef();
+                                p.SetRef();
+                                p.SetParamsArray();
+                            });
+                        });
+                    });
+                });
+            });
+
+            paramEx.Message.ShouldContain("cannot be both ref and params");
+        }
+
+        [Fact]
+        public void ShouldErrorIfParamsArraySetToOutParameter()
+        {
+            var paramEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("Nope", m =>
+                        {
+                            m.AddParameter(typeof(string[]), "words", p =>
+                            {
+                                p.SetParamsArray();
+                                p.SetParamsArray();
+                                p.SetOut();
+                            });
+                        });
+                    });
+                });
+            });
+
+            paramEx.Message.ShouldContain("cannot be both params and out");
+        }
+
+        [Fact]
+        public void ShouldErrorIfParamsArraySetToRefParameter()
+        {
+            var paramEx = Should.Throw<InvalidOperationException>(() =>
+            {
+                BuildableExpression.SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("Nope", m =>
+                        {
+                            m.AddParameter(typeof(string[]), "words", p =>
+                            {
+                                p.SetParamsArray();
+                                p.SetRef();
+                            });
+                        });
+                    });
+                });
+            });
+
+            paramEx.Message.ShouldContain("cannot be both params and ref");
+        }
     }
 }
