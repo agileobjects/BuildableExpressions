@@ -9,6 +9,7 @@
     using InputOutput;
     using Logging;
     using NetStandardPolyfills;
+    using static System.StringComparison;
 
     internal class AssemblyResolver
     {
@@ -53,23 +54,27 @@
 
             foreach (var assemblyPath in outputAssemblyPaths)
             {
-                Assembly assembly;
-
-                try
-                {
-                    assembly = Assembly.LoadFile(assemblyPath);
-                    
-                    _logger.Info(
-                        $"Loaded assembly '{assembly.FullName}' " +
-                        $"from {Path.GetDirectoryName(assemblyPath)}");
-                }
-                catch
+                if (Ignore(assemblyPath))
                 {
                     continue;
                 }
 
-                yield return assembly;
+                if (TryLoadAssembly(assemblyPath, out var assembly))
+                {
+                    yield return assembly;
+                }
             }
+        }
+
+        private static bool Ignore(string assemblyPath)
+        {
+            var assemblyFileName = Path.GetFileName(assemblyPath);
+
+            return 
+                assemblyFileName.StartsWith("Microsoft.VisualStudio.", OrdinalIgnoreCase) ||
+                assemblyFileName.StartsWith("nunit.", OrdinalIgnoreCase) ||
+                assemblyFileName.StartsWith("xunit.", OrdinalIgnoreCase) ||
+                assemblyFileName.StartsWith("Shouldy", OrdinalIgnoreCase);
         }
 
         private Assembly ResolveAssemblyIfAvailable(object sender, ResolveEventArgs args)
@@ -80,10 +85,11 @@
             _logger.Info($"Attempting to resolve assembly '{assemblyInfo}'...");
 
             var loadedAssembly = _outputAssemblies
-                .FirstOrDefault(a => a.GetName().Name == assemblyName);
+                .FirstOrDefault(a => a.GetName().Name == assemblyInfo.Name);
 
             if (loadedAssembly != null)
             {
+                _logger.Info($"Loaded assembly '{assemblyName}' from {loadedAssembly.GetLocation()}");
                 return loadedAssembly;
             }
 
@@ -102,21 +108,40 @@
 
         private bool TryFindAssembly(string searchPath, string assemblyName, out Assembly assembly)
         {
-            _logger.Info($"Looking for assembly '{assemblyName}' in {_installPath}...");
+            _logger.Info($"Looking for assembly '{assemblyName}' in {searchPath}...");
 
             var assemblyPath = _fileManager
                 .FindFiles(searchPath, assemblyName)
                 .FirstOrDefault();
 
-            if (assemblyPath == null)
+            if (assemblyPath != null)
             {
+                return TryLoadAssembly(assemblyPath, out assembly);
+            }
+
+            assembly = null;
+            return false;
+        }
+
+        private bool TryLoadAssembly(string assemblyPath, out Assembly assembly)
+        {
+            var assemblyFileName = Path.GetFileName(assemblyPath);
+
+            try
+            {
+                assembly = Assembly.LoadFrom(assemblyPath);
+                _logger.Info($"Loaded assembly '{assemblyFileName}' from {assemblyPath}");
+                return true;
+            }
+            catch (Exception loadEx)
+            {
+                _logger.Warning(
+                    $"Loading assembly '{assemblyFileName}' from {assemblyPath} FAILED: " +
+                    loadEx.Message);
+
                 assembly = null;
                 return false;
             }
-
-            _logger.Info($"Loading assembly '{assemblyName}' from {_installPath}");
-            assembly = Assembly.LoadFrom(assemblyPath);
-            return true;
         }
     }
 }

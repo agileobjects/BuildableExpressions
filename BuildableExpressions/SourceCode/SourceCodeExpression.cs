@@ -12,6 +12,7 @@
     using ReadableExpressions;
     using ReadableExpressions.Translations;
     using Translations;
+    using static SourceCodeConstants;
 
     /// <summary>
     /// Represents a piece of complete source code.
@@ -26,7 +27,7 @@
         private ReadOnlyCollection<Assembly> _referencedAssemblies;
 
         internal SourceCodeExpression(Action<ISourceCodeExpressionConfigurator> configuration)
-            : this("GeneratedExpressionCode")
+            : this(DefaultGeneratedCodeNamespace)
         {
             configuration.Invoke(this);
             Validate();

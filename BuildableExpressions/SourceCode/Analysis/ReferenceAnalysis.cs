@@ -178,7 +178,7 @@
                 referencedType.Equals(ClrTypeWrapper.Void) ||
                 referencedType.Equals(ClrTypeWrapper.String) ||
                 referencedType.Equals(ClrTypeWrapper.Object) ||
-               (referencedType.Namespace == GenericParameterTypeNamespace))
+                referencedType.Namespace == GenericParameterTypeNamespace)
             {
                 return;
             }
@@ -192,7 +192,7 @@
 
             var @namespace = referencedType.Namespace;
 
-            if ((@namespace == null) || (@namespace == _sourceCodeNamespace))
+            if (@namespace is null or DefaultGeneratedCodeNamespace || (@namespace == _sourceCodeNamespace))
             {
                 return;
             }
