@@ -4,15 +4,16 @@
     <_BuildXprFramework Condition="'$(MSBuildRuntimeType)' != 'Core'">net461</_BuildXprFramework>
     <_BuildXprFramework Condition="'$(MSBuildRuntimeType)' == 'Core'">netstandard2.0</_BuildXprFramework>
     <_BuildXprTaskAssembly>..\tools\$(_BuildXprFramework)\AgileObjects.BuildableExpressions.Generator.dll</_BuildXprTaskAssembly>
-    <ProjectPath>"$(MSBuildProjectFullPath)"</ProjectPath>
   </PropertyGroup>
 
   <UsingTask AssemblyFile="$(_BuildXprTaskAssembly)" TaskName="BuildXpr.BuildExpressionsTask" />
 
-  <Target Name="BuildExpressions" BeforeTargets="BeforeCompile" Condition="'$(BuildExpressions)' != 'False'">
+  <Target Name="BuildExpressions" Condition="'$(BuildExpressions)' != 'False'" 
+          DependsOnTargets="CoreCompile" AfterTargets="CoreCompile">
     <BuildXpr.BuildExpressionsTask
       SolutionPath="$(SolutionPath)"
       ProjectPath="$(MSBuildProjectFullPath)"
-      RootNamespace="$(RootNamespace)" />
+      RootNamespace="$(RootNamespace)"
+      OutputDirectory="$(OutputPath)" />
   </Target>
 </Project>

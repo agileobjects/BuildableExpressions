@@ -21,7 +21,7 @@
             _fileManager = fileManager;
         }
 
-        public IProject GetProjectOrThrow(Config config)
+        public IProject GetProjectOrThrow(IConfig config)
         {
             using var fileReadStream = _fileManager.OpenRead(config.ProjectPath);
             using var fileReader = new StreamReader(fileReadStream);
@@ -62,7 +62,7 @@
             }
         }
 
-        private static void TryPopulateRootNamespace(Config config, TextReader fileReader)
+        private static void TryPopulateRootNamespace(IConfig config, TextReader fileReader)
         {
             string fileLine;
 

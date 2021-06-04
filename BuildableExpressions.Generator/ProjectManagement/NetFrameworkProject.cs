@@ -8,17 +8,20 @@ namespace AgileObjects.BuildableExpressions.Generator.ProjectManagement
 
     internal class NetFrameworkProject : IProject
     {
-        private readonly Config _config;
+        private readonly IConfig _config;
 
-        public NetFrameworkProject(Config config)
+        public NetFrameworkProject(IConfig config)
         {
             _config = config;
         }
 
         public void Add(IEnumerable<string> relativeFilePaths)
         {
+            var solutionName = _config.GetSolutionName();
+            var contentRoot = _config.GetContentRoot();
+
             var devTools = DevToolsFactory
-                .GetDevToolsOrNullFor(_config.SolutionName);
+                .GetDevToolsOrNullFor(solutionName);
 
             var project = devTools
                 .Solution
@@ -27,7 +30,7 @@ namespace AgileObjects.BuildableExpressions.Generator.ProjectManagement
 
             foreach (var filePath in relativeFilePaths)
             {
-                var absoluteFilePath = Path.Combine(_config.ContentRoot, filePath);
+                var absoluteFilePath = Path.Combine(contentRoot, filePath);
                 project.ProjectItems.AddFromFile(absoluteFilePath);
             }
         }

@@ -1,20 +1,19 @@
 ﻿namespace AgileObjects.BuildableExpressions.Generator
 {
     using System;
-    using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
+    using BuildableExpressions.Compilation;
     using Compilation;
     using Configuration;
     using InputOutput;
     using Logging;
     using ProjectManagement;
     using SourceCode;
-    using static GeneratorConstants;
 
     internal class SourceCodeGenerator
     {
         private readonly ILogger _logger;
+        private readonly AssemblyResolver _assemblyResolver;
         private readonly InputFilesFinder _inputFilesFinder;
         private readonly OutputWriter _outputWriter;
         private readonly IProjectFactory _projectFactory;
@@ -27,31 +26,27 @@
             IProjectFactory projectFactory)
         {
             _logger = logger;
+            _assemblyResolver = assemblyResolver;
             _inputFilesFinder = inputFilesFinder;
             _outputWriter = outputWriter;
             _projectFactory = projectFactory;
-
-            assemblyResolver.Init();
         }
 
-        public bool Execute(Config config)
+        public bool Execute(IConfig config)
         {
             try
             {
                 var project = _projectFactory.GetProjectOrThrow(config);
-                var inputFiles = _inputFilesFinder.GetInputFiles(config);
 
                 _logger.Info("Compiling Expression files...");
 
-                if (CompilationFailed(inputFiles, out var compilationResult))
+                if (CompilationFailed(config, out var compilationResult))
                 {
                     return false;
                 }
 
                 var sourceCodeExpressions = compilationResult.ToSourceCodeExpressions();
                 var writtenFiles = _outputWriter.Write(config, sourceCodeExpressions);
-
-                writtenFiles.Insert(0, Path.GetFileName(inputFiles.First().FilePath));
 
                 project.Add(writtenFiles);
 
@@ -66,11 +61,14 @@
         }
 
         private bool CompilationFailed(
-            IEnumerable<InputFile> inputFiles,
+            IConfig config,
             out CompilationResult compilationResult)
         {
+            var referenceAssemblies = _assemblyResolver.GetReferenceAssemblies(config);
+            var inputFiles = _inputFilesFinder.GetInputFiles(config);
+
             compilationResult = CSharpCompiler.Compile(
-                new[] { ThisAssembly },
+                referenceAssemblies,
                 inputFiles.Select(file => file.Contents));
 
             if (!compilationResult.Failed)

@@ -3,10 +3,10 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Compilation;
     using AgileObjects.BuildableExpressions.SourceCode;
     using NetStandardPolyfills;
     using AgileObjects.ReadableExpressions.Extensions;
+    using BuildableExpressions.Compilation;
 
     internal static class SourceCodeExtensions
     {

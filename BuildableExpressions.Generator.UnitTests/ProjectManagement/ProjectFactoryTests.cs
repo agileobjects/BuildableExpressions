@@ -13,26 +13,20 @@
 
     public class ProjectFactoryTests
     {
-        private const string _solutionPath =
-            @"C:\Projects\BuildableExpressions\BuildableExpressions.sln";
-
-        private const string _projectPath =
-            @"C:\Projects\BuildableExpressions\BuildableExpressions.Test\BuildableExpressions.Test.csproj";
-
         [Fact]
         public void ShouldErrorIfNonProjectFile()
         {
             var fileManager = CreateFileManager("Hi! I am a file");
+            var config = new TestConfig(rootNamespace: null);
             var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
             var projectEx = Should.Throw<NotSupportedException>(() =>
             {
-                factory.GetProjectOrThrow(
-                    new Config(_solutionPath, _projectPath, rootNamespace: null));
+                factory.GetProjectOrThrow(config);
             });
 
             projectEx.Message.ShouldContain("Unable to find <Project />");
-            projectEx.Message.ShouldContain(_projectPath);
+            projectEx.Message.ShouldContain(config.ProjectPath);
         }
 
         [Fact]
@@ -48,16 +42,16 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
+            var config = new TestConfig(rootNamespace: null);
             var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
             var projectEx = Should.Throw<NotSupportedException>(() =>
             {
-                factory.GetProjectOrThrow(
-                    new Config(_solutionPath, _projectPath, rootNamespace: null));
+                factory.GetProjectOrThrow(config);
             });
 
             projectEx.Message.ShouldContain("Unable to find <Project />");
-            projectEx.Message.ShouldContain(_projectPath);
+            projectEx.Message.ShouldContain(config.ProjectPath);
         }
 
         [Fact]
@@ -79,8 +73,7 @@
             var fileManager = CreateFileManager(fileContents);
             var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
-            var project = factory.GetProjectOrThrow(
-                new Config(_solutionPath, _projectPath, rootNamespace: null));
+            var project = factory.GetProjectOrThrow(new TestConfig(rootNamespace: null));
 
             project.ShouldBeOfType<SdkProject>();
         }
@@ -103,7 +96,7 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
-            var config = new Config(_solutionPath, _projectPath, rootNamespace: null);
+            var config = new TestConfig(rootNamespace: null);
             var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
             factory.GetProjectOrThrow(config);
@@ -138,10 +131,10 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
+            var config = new TestConfig(rootNamespace: string.Empty);
             var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
-            var project = factory.GetProjectOrThrow(
-                new Config(_solutionPath, _projectPath, rootNamespace: string.Empty));
+            var project = factory.GetProjectOrThrow(config);
 
             project.ShouldBeOfType<NetFrameworkProject>();
         }
@@ -173,7 +166,7 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
-            var config = new Config(_solutionPath, _projectPath, rootNamespace: string.Empty);
+            var config = new TestConfig(rootNamespace: string.Empty);
             var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
 
             factory.GetProjectOrThrow(config);
@@ -190,7 +183,7 @@
 
             var fileManagerMock = new Mock<IFileManager>();
             fileManagerMock
-                .Setup(fm => fm.OpenRead(_projectPath))
+                .Setup(fm => fm.OpenRead(TestConfig.Default.ProjectPath))
                 .Returns(stubFileStream);
 
             return fileManagerMock.Object;

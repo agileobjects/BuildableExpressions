@@ -46,7 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.6.85" PrivateAssets="All"  />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.6.85" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -61,9 +61,7 @@
 
   <Target Name="PackDependencies" BeforeTargets="GenerateNuspec">
     <ItemGroup>
-      <_PackageFiles
-        Include="$(_BinPath)\*.dll;$(_BinPath)\*.deps.json;$(_BinPath)\*.Generator.pdb"
-        Exclude="$(_BinPath)\*.Generator.dll;$(_BinPath)\Microsoft.Build.*;$(_SharedAssemblies)">
+      <_PackageFiles Include="$(_BinPath)\*.dll;$(_BinPath)\*.deps.json;$(_BinPath)\*.Generator.pdb" Exclude="$(_BinPath)\*.Generator.dll;$(_BinPath)\Microsoft.Build.*;$(_SharedAssemblies)">
         <PackagePath>tools\%(RecursiveDir)</PackagePath>
         <Visible>false</Visible>
         <BuildAction>Content</BuildAction>
@@ -73,7 +71,7 @@
         <Visible>false</Visible>
         <BuildAction>Content</BuildAction>
       </_PackageFiles>
-      <_PackageFiles Include="bin\$(Configuration)\net461\**\Microsoft.*.resources.dll">
+      <_PackageFiles Include="$(_NetFrameworkPath)\**\Microsoft.*.resources.dll">
         <PackagePath>tools\shared\$([System.IO.Path]::GetFileName('$(Directory)'))</PackagePath>
         <Visible>false</Visible>
         <BuildAction>Content</BuildAction>

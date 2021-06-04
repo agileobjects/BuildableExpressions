@@ -17,14 +17,14 @@
         }
 
         public List<string> Write(
-            Config config,
+            IConfig config,
             params SourceCodeExpression[] sourceCodeExpressions)
         {
             return Write(config, sourceCodeExpressions.AsEnumerable());
         }
 
         public List<string> Write(
-            Config config,
+            IConfig config,
             IEnumerable<SourceCodeExpression> sourceCodeExpressions)
         {
             var rootNamespace = config.RootNamespace;
@@ -34,7 +34,7 @@
             {
                 var @namespace = sourceCodeExpression.Namespace;
 
-                var outputDirectory = config.ContentRoot;
+                var outputDirectory = config.GetContentRoot();
                 string relativeFilePath;
 
                 if (@namespace != rootNamespace &&

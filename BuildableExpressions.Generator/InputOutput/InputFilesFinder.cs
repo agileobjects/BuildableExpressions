@@ -30,10 +30,10 @@
             _fileManager = fileManager;
         }
 
-        public ICollection<InputFile> GetInputFiles(Config config)
+        public ICollection<InputFile> GetInputFiles(IConfig config)
         {
             var inputFiles = _fileManager
-                .FindFiles(config.ContentRoot, "*.cs")
+                .FindFiles(config.GetContentRoot(), "*.cs")
                 .Where(cSharpFilePath => !_binOrObjPathMatcher.IsMatch(cSharpFilePath))
                 .Select(cSharpFilePath => new InputFile
                 {
@@ -64,7 +64,7 @@
             return new[] { defaultInputFile };
         }
 
-        private static InputFile GetDefaultInputFile(Config config)
+        private static InputFile GetDefaultInputFile(IConfig config)
         {
             var defaultInputFileResourceName = ThisAssembly
                 .GetManifestResourceNames()
@@ -86,7 +86,7 @@
 
                 return new InputFile
                 {
-                    FilePath = Combine(config.ContentRoot, DefaultInputFileName),
+                    FilePath = Combine(config.GetContentRoot(), DefaultInputFileName),
                     Contents = contents
                 };
             }
