@@ -1,7 +1,7 @@
-﻿namespace AgileObjects.BuildableExpressions
+﻿namespace AgileObjects.BuildableExpressions.Generator
 {
     using System.Collections.Generic;
-    using SourceCode;
+    using BuildableExpressions.SourceCode;
 
     /// <summary>
     /// Implementing classes will build one or more <see cref="SourceCodeExpression"/>s to be

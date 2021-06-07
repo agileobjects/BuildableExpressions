@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using AgileObjects.BuildableExpressions;
+    using AgileObjects.BuildableExpressions.Generator;
     using AgileObjects.BuildableExpressions.SourceCode;
 
     /// <summary>
