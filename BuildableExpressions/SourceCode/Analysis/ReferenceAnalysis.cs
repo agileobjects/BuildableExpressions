@@ -192,7 +192,7 @@
 
             var @namespace = referencedType.Namespace;
 
-            if (@namespace is null or DefaultGeneratedCodeNamespace || (@namespace == _sourceCodeNamespace))
+            if (@namespace == null || (@namespace == _sourceCodeNamespace))
             {
                 return;
             }

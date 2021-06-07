@@ -372,6 +372,8 @@ namespace GeneratedExpressionCode
         {
             var sourceCode = BuildableExpression.SourceCode(sc =>
             {
+                sc.SetNamespaceToThatOf(typeof(WhenBuildingMethods));
+
                 sc.AddClass(cls =>
                 {
                     cls.AddMethod("GetNames", m =>
@@ -405,7 +407,7 @@ namespace GeneratedExpressionCode
             var translated = sourceCode.ToCSharpString();
 
             const string expected = @"
-namespace GeneratedExpressionCode
+namespace AgileObjects.BuildableExpressions.UnitTests
 {
     public class GeneratedExpressionClass
     {

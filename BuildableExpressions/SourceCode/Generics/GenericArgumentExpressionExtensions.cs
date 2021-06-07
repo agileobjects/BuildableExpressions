@@ -6,6 +6,7 @@
     using BuildableExpressions.Extensions;
     using Compilation;
     using static System.Linq.Expressions.Expression;
+    using static SourceCodeConstants;
 
     internal static class GenericArgumentExpressionExtensions
     {
@@ -14,6 +15,8 @@
         {
             var paramSourceCode = BuildableExpression.SourceCode(sc =>
             {
+                sc.SetNamespace(GenericParameterTypeNamespace);
+
                 if (CreateClass(parameter))
                 {
                     sc.AddClass(parameter.Name, parameter.ConfigureClass);
