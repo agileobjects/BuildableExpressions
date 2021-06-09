@@ -2,12 +2,12 @@
 {
     internal interface IConfig
     {
-        public string SolutionPath { get; }
+        string SolutionPath { get; }
 
-        public string ProjectPath { get; }
+        string ProjectPath { get; }
 
-        public string RootNamespace { get; set; }
+        string RootNamespace { get; set; }
 
-        public string OutputDirectory { get; set; }
+        string OutputDirectory { get; set; }
     }
 }

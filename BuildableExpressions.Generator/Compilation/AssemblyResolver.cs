@@ -10,28 +10,29 @@
     using Extensions;
     using InputOutput;
     using Logging;
+    using static System.IO.Path;
 
     internal class AssemblyResolver
     {
-        private static readonly string _installPath =
-            Path.GetDirectoryName(typeof(AssemblyResolver).Assembly.Location);
+        private static readonly string _installPath = 
+            GetDirectoryName(typeof(AssemblyResolver).Assembly.Location);
 
-        private static readonly string _installRootPath = Path.GetDirectoryName(_installPath);
-        private static readonly string _sharedPath = Path.Combine(_installRootPath!, "shared");
+        private static readonly string _installRootPath = GetDirectoryName(_installPath);
+        private static readonly string _sharedPath = Combine(_installRootPath!, "shared");
 
         private readonly ILogger _logger;
         private readonly IFileManager _fileManager;
         private readonly ConcurrentDictionary<string, Lazy<Assembly>> _assemblyLoadersByName;
 
-        public AssemblyResolver(ILogger logger, IFileManager fileManager)
+        public AssemblyResolver(
+            ILogger logger, 
+            IFileManager fileManager,
+            IConfig config)
         {
             _logger = logger;
             _fileManager = fileManager;
             _assemblyLoadersByName = new ConcurrentDictionary<string, Lazy<Assembly>>();
-        }
 
-        public void Init(IConfig config)
-        {
             PopulateAssemblyLoadersFromOutput(config);
             AppDomain.CurrentDomain.AssemblyResolve += ResolveAssemblyIfAvailable;
         }
@@ -61,7 +62,7 @@
 
         private static bool IncludeOutputAssembly(string assemblyPath)
         {
-            var assemblyFileName = Path.GetFileName(assemblyPath);
+            var assemblyFileName = GetFileName(assemblyPath);
 
             return
                 assemblyFileName.DoesNotStartWithIgnoreCase("Microsoft.VisualStudio.") ||
@@ -110,7 +111,7 @@
             out ICollection<Lazy<Assembly>> assemblyLoaders)
         {
             assemblyLoaders = _assemblyLoadersByName
-                .Where(kvp => matcher.Invoke(Path.GetFileNameWithoutExtension(kvp.Key)))
+                .Where(kvp => matcher.Invoke(GetFileNameWithoutExtension(kvp.Key)))
                 .Select(kvp => kvp.Value)
                 .ToList();
 
@@ -122,8 +123,6 @@
             var assemblyInfo = new AssemblyName(args.Name);
             var assemblyName = assemblyInfo.Name;
             var assemblyDllName = assemblyName + ".dll";
-
-            _logger.Info($"attempting to resolve assembly '{assemblyInfo}'...");
 
             if (TryFindAssemblyLoaders(name => name == assemblyName, out var loaders) &&
                 loaders.First().IsValueCreated)
@@ -180,8 +179,8 @@
 
         private Assembly LoadAssembly(string assemblyPath)
         {
-            var assemblyFileName = Path.GetFileName(assemblyPath);
-            var assemblyFolderName = Path.GetDirectoryName(assemblyPath);
+            var assemblyFileName = GetFileName(assemblyPath);
+            var assemblyFolderName = GetDirectoryName(assemblyPath);
 
             try
             {

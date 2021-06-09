@@ -56,7 +56,7 @@ namespace BuildXpr
 #endif
             var logger = new MsBuildTaskLogger(Log);
             var fileManager = SystemIoFileManager.Instance;
-            var assemblyResolver = new AssemblyResolver(logger, fileManager);
+            var assemblyResolver = new AssemblyResolver(logger, fileManager, this);
 
             var generator = new SourceCodeGenerator(
                 logger,

@@ -25,8 +25,6 @@
 
         public ICollection<ISourceCodeExpressionBuilder> Find(IConfig config)
         {
-            _assemblyResolver.Init(config);
-
             var projectAssemblies = _assemblyResolver.LoadAssemblies(IsProjectAssembly);
 
             if (projectAssemblies.Count == 0)
@@ -57,10 +55,8 @@
                 assemblyName.DoesNotEqualIgnoreCase("AgileObjects.AgileMapper") &&
                 assemblyName.DoesNotStartWithIgnoreCase("System.") &&
                 assemblyName.DoesNotStartWithIgnoreCase("Microsoft.") &&
-#if NETFRAMEWORK
                 assemblyName.DoesNotStartWithIgnoreCase("EnvDTE") &&
                 assemblyName.DoesNotStartWithIgnoreCase("stdole") &&
-#endif
                 assemblyName.DoesNotStartWithIgnoreCase("netstandard") &&
                 assemblyName.DoesNotStartWithIgnoreCase("Moq") &&
                 assemblyName.DoesNotStartWithIgnoreCase("Castle");
