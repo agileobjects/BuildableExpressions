@@ -26,7 +26,7 @@
                 {
                     var doNothing = Expression.Empty();
 
-                    cls.AddMethod("DoNowt", doNothing);
+                    cls.AddMethod("DoNothingNet461", doNothing);
                 });
             });
 

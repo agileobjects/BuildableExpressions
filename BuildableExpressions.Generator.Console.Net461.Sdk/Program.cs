@@ -1,4 +1,4 @@
-﻿namespace AgileObjects.BuildableExpressions.Console
+﻿namespace AgileObjects.BuildableExpressions.Generator.Console
 {
     public class Program
     {
