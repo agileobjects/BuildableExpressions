@@ -14,33 +14,35 @@ namespace AgileObjects.BuildableExpressions.Generator.ProjectManagement.NonSdk
         {
             foreach (var item in items)
             {
-                if (item is Project project)
+                var candidateProject = item;
+
+                if (candidateProject is ProjectItem { SubProject: { } } projectItem)
                 {
-                    yield return project;
+                    candidateProject = projectItem.SubProject;
+                }
 
-                    try
-                    {
-                        if (project.ProjectItems == null)
-                        {
-                            continue;
-                        }
-                    }
-                    catch
-                    {
-                        continue;
-                    }
-
-                    foreach (var subProject in Enumerate(project.ProjectItems))
-                    {
-                        yield return subProject;
-                    }
-
+                if (candidateProject is not Project project)
+                {
                     continue;
                 }
 
-                if (item is ProjectItem projectItem && projectItem.SubProject != null)
+                yield return project;
+
+                try
                 {
-                    yield return projectItem.SubProject;
+                    if (project.ProjectItems == null)
+                    {
+                        continue;
+                    }
+                }
+                catch
+                {
+                    continue;
+                }
+
+                foreach (var subProject in Enumerate(project.ProjectItems))
+                {
+                    yield return subProject;
                 }
             }
         }
