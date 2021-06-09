@@ -123,7 +123,7 @@
             var assemblyName = assemblyInfo.Name;
             var assemblyDllName = assemblyName + ".dll";
 
-            _logger.Info($"Attempting to resolve assembly '{assemblyInfo}'...");
+            _logger.Info($"attempting to resolve assembly '{assemblyInfo}'...");
 
             if (TryFindAssemblyLoaders(name => name == assemblyName, out var loaders) &&
                 loaders.First().IsValueCreated)
@@ -189,13 +189,13 @@
                     ? Assembly.LoadFrom(assemblyPath)
                     : LoadAssemblyFromInMemoryCopy(assemblyPath);
 
-                _logger.Info($"Loaded assembly '{assemblyFileName}' from {assemblyFolderName}");
+                _logger.Info($"loaded assembly '{assemblyFileName}' from {assemblyFolderName}");
                 return assembly;
             }
             catch (Exception loadEx)
             {
                 _logger.Warning(
-                    $"Loading assembly '{assemblyFileName}' from {assemblyFolderName} FAILED: " +
+                    $"loading assembly '{assemblyFileName}' from {assemblyFolderName} FAILED: " +
                     loadEx.Message);
 
                 return null;

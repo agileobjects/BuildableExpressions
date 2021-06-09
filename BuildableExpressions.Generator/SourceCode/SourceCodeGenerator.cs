@@ -32,7 +32,7 @@
             try
             {
                 var projectName = config.GetProjectNameWithoutExtension();
-                _logger.Info($"Source Code Expressions for project '{projectName}': starting...");
+                _logger.Info($"project '{projectName}' starting...");
 
                 var builders = _buildersFinder.Find(config);
 
@@ -41,20 +41,20 @@
                     goto Complete;
                 }
 
-                _logger.Info($"Source Code Expression Builders: {builders.Count} found...");
+                _logger.Info($"{builders.Count} builder(s) found...");
                 var project = _projectFactory.GetProjectOrThrow(config);
 
                 var sourceCodeExpressions = builders.ToSourceCodeExpressions();
-                _logger.Info($"Source Code Expressions: {sourceCodeExpressions.Count} built...");
+                _logger.Info($"{sourceCodeExpressions.Count} Expression(s) built...");
 
                 var writtenFiles = _outputWriter.Write(config, sourceCodeExpressions);
 
                 project.Add(writtenFiles);
-                _logger.Info($"Source Code Expression files: {writtenFiles.Count} written");
+                _logger.Info($"{writtenFiles.Count} file(s) written");
                 result.BuiltExpressionsCount = writtenFiles.Count;
 
             Complete:
-                _logger.Info($"Source Code Expressions for project '{projectName}': complete");
+                _logger.Info($"project '{projectName}' complete");
                 result.Success = true;
             }
             catch (Exception ex)

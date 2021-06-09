@@ -5,7 +5,6 @@
     using System.Linq;
     using Configuration;
     using InputOutput;
-    using Logging;
 #if NETFRAMEWORK
     using NonSdk;
 #endif
@@ -13,14 +12,10 @@
 
     internal class ProjectFactory : IProjectFactory
     {
-        private readonly ILogger _logger;
         private readonly IFileManager _fileManager;
 
-        public ProjectFactory(
-            ILogger logger,
-            IFileManager fileManager)
+        public ProjectFactory(IFileManager fileManager)
         {
-            _logger = logger;
             _fileManager = fileManager;
         }
 
@@ -37,8 +32,7 @@
                 {
                     var ex = new NotSupportedException(
                         $"Unable to find <Project /> element in file '{config.ProjectPath}'");
-                    
-                    _logger.Error(ex);
+
                     throw ex;
                 }
 

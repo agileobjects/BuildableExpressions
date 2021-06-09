@@ -9,7 +9,7 @@
     using Logging;
     using Moq;
     using Xunit;
-    using static Generator.InputOutput.InputFilesFinder;
+    //using static Generator.InputOutput.InputFilesFinder;
     using static Moq.Times;
 
 //    public class InputFilesFinderTests

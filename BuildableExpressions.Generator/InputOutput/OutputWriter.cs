@@ -70,7 +70,7 @@
         public void Write(string filePath, string content)
         {
             _fileManager.Write(filePath, content);
-            _logger.Info($"Source Code Expression file '{Path.GetFileName(filePath)}' written");
+            _logger.Info($"output file '{Path.GetFileName(filePath)}' written");
         }
     }
 }

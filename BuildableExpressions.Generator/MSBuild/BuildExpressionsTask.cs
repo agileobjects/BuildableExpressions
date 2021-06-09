@@ -60,7 +60,7 @@ namespace BuildXpr
 
             var generator = new SourceCodeGenerator(
                 logger,
-                new ProjectFactory(logger, fileManager),
+                new ProjectFactory(fileManager),
                 new ExpressionBuildersFinder(logger, assemblyResolver),
                 new OutputWriter(logger, fileManager));
 

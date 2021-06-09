@@ -42,8 +42,8 @@
             }
 
             _logger.Warning(
-                $"Source Code Expression {nameof(ISourceCodeExpressionBuilder)}s: " +
-                $"no implementations found in project {config.GetProjectNameWithoutExtension()}");
+                $"no {nameof(ISourceCodeExpressionBuilder)} implementations " +
+                $"found in project {config.GetProjectNameWithoutExtension()}");
 
             return Array.Empty<ISourceCodeExpressionBuilder>();
         }
@@ -91,8 +91,8 @@
                 }
 
                 _logger.Info(
-                    $"Source Code Expression {nameof(ISourceCodeExpressionBuilder)}s: " +
-                    $"{builderTypes.Count} found in {assembly.GetName().Name}");
+                    $"{builderTypes.Count} {nameof(ISourceCodeExpressionBuilder)}(s) " +
+                    $"found in {assembly.GetName().Name}");
 
                 foreach (var builderType in builderTypes)
                 {

@@ -6,6 +6,7 @@
 
     internal class MsBuildTaskLogger : ILogger
     {
+        private const string _prefix = "Source Code Expressions: ";
         private readonly TaskLoggingHelper _taskLog;
 
         public MsBuildTaskLogger(TaskLoggingHelper taskLog)
@@ -14,10 +15,10 @@
         }
 
         public void Info(string message)
-            => _taskLog.LogMessage(MessageImportance.High, message);
+            => _taskLog.LogMessage(MessageImportance.High, _prefix + message);
 
         public void Warning(string message)
-            => _taskLog.LogMessage(MessageImportance.High, message);
+            => _taskLog.LogMessage(MessageImportance.High, _prefix + message);
 
         public void Error(Exception ex)
             => _taskLog.LogErrorFromException(ex);

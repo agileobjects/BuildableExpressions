@@ -21,7 +21,8 @@
 
   <Target Name="BuildWithBuiltExpressions" Condition="'$(BuiltExpressionsCount)' != '' and '$(BuiltExpressionsCount)' != '0'"
           DependsOnTargets="BuildExpressions" AfterTargets="BuildExpressions">
-    <Message Text="Rebuilding with $(BuiltExpressionsCount) Source Code Expression output(s)..." Importance="High" />
+    <Message Text="Source Code Expressions: Rebuilding with $(BuiltExpressionsCount) Source Code Expression output(s)..." 
+             Importance="High" />
     <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="Build"
              Properties="BuildExpressions=False;Configuration=$(Configuration)" />
   </Target>

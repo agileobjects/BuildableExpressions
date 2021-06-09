@@ -10,7 +10,6 @@
 #if NETFRAMEWORK
     using Generator.ProjectManagement.NonSdk;
 #endif
-    using Logging;
     using Moq;
     using Xunit;
 
@@ -21,7 +20,7 @@
         {
             var fileManager = CreateFileManager("Hi! I am a file");
             var config = new TestConfig(rootNamespace: null);
-            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
+            var factory = new ProjectFactory(fileManager);
 
             var projectEx = Should.Throw<NotSupportedException>(() =>
             {
@@ -46,7 +45,7 @@
 
             var fileManager = CreateFileManager(fileContents);
             var config = new TestConfig(rootNamespace: null);
-            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
+            var factory = new ProjectFactory(fileManager);
 
             var projectEx = Should.Throw<NotSupportedException>(() =>
             {
@@ -74,7 +73,7 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
-            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
+            var factory = new ProjectFactory(fileManager);
 
             var project = factory.GetProjectOrThrow(new TestConfig(rootNamespace: null));
 
@@ -100,7 +99,7 @@
 
             var fileManager = CreateFileManager(fileContents);
             var config = new TestConfig(rootNamespace: null);
-            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
+            var factory = new ProjectFactory(fileManager);
 
             factory.GetProjectOrThrow(config);
 
@@ -135,7 +134,7 @@
 
             var fileManager = CreateFileManager(fileContents);
             var config = new TestConfig(rootNamespace: string.Empty);
-            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
+            var factory = new ProjectFactory(fileManager);
 
             var project = factory.GetProjectOrThrow(config);
 
@@ -170,7 +169,7 @@
 
             var fileManager = CreateFileManager(fileContents);
             var config = new TestConfig(rootNamespace: string.Empty);
-            var factory = new ProjectFactory(Mock.Of<ILogger>(), fileManager);
+            var factory = new ProjectFactory(fileManager);
 
             factory.GetProjectOrThrow(config);
 
