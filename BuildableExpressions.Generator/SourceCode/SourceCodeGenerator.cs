@@ -1,11 +1,10 @@
-﻿namespace AgileObjects.BuildableExpressions.Generator
+﻿namespace AgileObjects.BuildableExpressions.Generator.SourceCode
 {
     using System;
     using Configuration;
     using InputOutput;
     using Logging;
     using ProjectManagement;
-    using SourceCode;
 
     internal class SourceCodeGenerator
     {

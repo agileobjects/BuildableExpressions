@@ -1,12 +1,12 @@
 ﻿// ReSharper disable once CheckNamespace
 namespace BuildXpr
 {
-    using AgileObjects.BuildableExpressions.Generator;
     using AgileObjects.BuildableExpressions.Generator.Compilation;
     using AgileObjects.BuildableExpressions.Generator.Configuration;
     using AgileObjects.BuildableExpressions.Generator.InputOutput;
     using AgileObjects.BuildableExpressions.Generator.Logging;
     using AgileObjects.BuildableExpressions.Generator.ProjectManagement;
+    using AgileObjects.BuildableExpressions.Generator.SourceCode;
     using AgileObjects.BuildableExpressions.SourceCode;
     using Microsoft.Build.Framework;
     using MsBuildTask = Microsoft.Build.Utilities.Task;

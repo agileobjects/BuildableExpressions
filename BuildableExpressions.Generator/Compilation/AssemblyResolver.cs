@@ -93,7 +93,11 @@
         {
             if (TryFindAssemblyLoaders(matcher, out var loaders))
             {
-                assemblies = loaders.Select(l => l.Value).ToList();
+                assemblies = loaders
+                    .Select(l => l.Value)
+                    .Where(assembly => assembly != null)
+                    .ToList();
+
                 return assemblies.Any();
             }
 
