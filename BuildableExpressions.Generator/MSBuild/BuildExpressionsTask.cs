@@ -8,6 +8,7 @@ namespace BuildXpr
     using AgileObjects.BuildableExpressions.Generator.Logging;
     using AgileObjects.BuildableExpressions.Generator.ProjectManagement;
     using AgileObjects.BuildableExpressions.SourceCode;
+    using Microsoft.Build.Framework;
     using MsBuildTask = Microsoft.Build.Utilities.Task;
 
     /// <summary>
@@ -39,6 +40,13 @@ namespace BuildXpr
         public string OutputDirectory { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating the number of <see cref="SourceCodeExpression"/>s built
+        /// into output files by the execution of this <see cref="BuildExpressionsTask"/>.
+        /// </summary>
+        [Output]
+        public int BuiltExpressionsCount { get; set; }
+
+        /// <summary>
         /// Generates source code files from a set of <see cref="SourceCodeExpression"/>s.
         /// </summary>
         public override bool Execute()
@@ -48,15 +56,18 @@ namespace BuildXpr
 #endif
             var logger = new MsBuildTaskLogger(Log);
             var fileManager = SystemIoFileManager.Instance;
+            var assemblyResolver = new AssemblyResolver(logger, fileManager);
 
             var generator = new SourceCodeGenerator(
                 logger,
-                new AssemblyResolver(logger, fileManager),
-                new InputFilesFinder(logger, fileManager),
-                new OutputWriter(fileManager),
-                new ProjectFactory(logger, fileManager));
-            
-            return generator.Execute(this);
+                new ProjectFactory(logger, fileManager),
+                new ExpressionBuildersFinder(logger, assemblyResolver),
+                new OutputWriter(logger, fileManager));
+
+            var result = generator.Execute(this);
+
+            BuiltExpressionsCount = result.BuiltExpressionsCount;
+            return result.Success;
         }
     }
 }

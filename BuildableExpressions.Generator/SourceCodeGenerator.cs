@@ -1,9 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.Generator
 {
     using System;
-    using System.Linq;
-    using BuildableExpressions.Compilation;
-    using Compilation;
     using Configuration;
     using InputOutput;
     using Logging;
@@ -13,78 +10,67 @@
     internal class SourceCodeGenerator
     {
         private readonly ILogger _logger;
-        private readonly AssemblyResolver _assemblyResolver;
-        private readonly InputFilesFinder _inputFilesFinder;
-        private readonly OutputWriter _outputWriter;
         private readonly IProjectFactory _projectFactory;
+        private readonly ExpressionBuildersFinder _buildersFinder;
+        private readonly OutputWriter _outputWriter;
 
         public SourceCodeGenerator(
             ILogger logger,
-            AssemblyResolver assemblyResolver,
-            InputFilesFinder inputFilesFinder,
-            OutputWriter outputWriter,
-            IProjectFactory projectFactory)
+            IProjectFactory projectFactory,
+            ExpressionBuildersFinder buildersFinder,
+            OutputWriter outputWriter)
         {
             _logger = logger;
-            _assemblyResolver = assemblyResolver;
-            _inputFilesFinder = inputFilesFinder;
-            _outputWriter = outputWriter;
             _projectFactory = projectFactory;
+            _buildersFinder = buildersFinder;
+            _outputWriter = outputWriter;
         }
 
-        public bool Execute(IConfig config)
+        public SourceCodeGenerationResult Execute(IConfig config)
         {
+            var result = new SourceCodeGenerationResult();
+
             try
             {
-                var project = _projectFactory.GetProjectOrThrow(config);
+                var projectName = config.GetProjectNameWithoutExtension();
+                _logger.Info($"Source Code Expressions for project '{projectName}': transpiling...");
 
-                _logger.Info("Compiling Expression files...");
+                var builders = _buildersFinder.Find(config);
 
-                if (CompilationFailed(config, out var compilationResult))
+                if (builders.Count == 0)
                 {
-                    return false;
+                    goto Complete;
                 }
 
-                var sourceCodeExpressions = compilationResult.ToSourceCodeExpressions();
+                _logger.Info($"Source Code Expression Builders: {builders.Count} found...");
+                var project = _projectFactory.GetProjectOrThrow(config);
+
+                var sourceCodeExpressions = builders.ToSourceCodeExpressions();
+                _logger.Info($"Source Code Expressions: {sourceCodeExpressions.Count} built...");
+
                 var writtenFiles = _outputWriter.Write(config, sourceCodeExpressions);
 
                 project.Add(writtenFiles);
+                _logger.Info($"Source Code Expression files: {writtenFiles.Count} written");
+                result.BuiltExpressionsCount = writtenFiles.Count;
 
-                _logger.Info("Expression compilation output updated");
-                return true;
+            Complete:
+                _logger.Info($"Source Code Expressions for project '{projectName}': transpiling complete");
+                result.Success = true;
             }
             catch (Exception ex)
             {
                 _logger.Error(ex);
-                return false;
             }
+            
+            return result;
         }
 
-        private bool CompilationFailed(
-            IConfig config,
-            out CompilationResult compilationResult)
+        public class SourceCodeGenerationResult
         {
-            var referenceAssemblies = _assemblyResolver.GetReferenceAssemblies(config);
-            var inputFiles = _inputFilesFinder.GetInputFiles(config);
-
-            compilationResult = CSharpCompiler.Compile(
-                referenceAssemblies,
-                inputFiles.Select(file => file.Contents));
-
-            if (!compilationResult.Failed)
-            {
-                _logger.Info("Expression compilation succeeded");
-                return false;
-            }
-
-            _logger.Error("Expression compilation failed:");
-
-            foreach (var error in compilationResult.Errors)
-            {
-                _logger.Error(error);
-            }
-
-            return true;
+            public bool Success { get; set; }
+            
+            public int BuiltExpressionsCount { get; set; }
         }
     }
 }

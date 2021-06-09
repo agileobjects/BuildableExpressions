@@ -8,12 +8,21 @@
 
   <UsingTask AssemblyFile="$(_BuildXprTaskAssembly)" TaskName="BuildXpr.BuildExpressionsTask" />
 
-  <Target Name="BuildExpressions" Condition="'$(BuildExpressions)' != 'False'" 
-          DependsOnTargets="CoreCompile" AfterTargets="CoreCompile">
+  <Target Name="BuildExpressions" Condition="'$(BuildExpressions)' != 'False'"
+          DependsOnTargets="AfterBuild" AfterTargets="AfterBuild">
     <BuildXpr.BuildExpressionsTask
-      SolutionPath="$(SolutionPath)"
-      ProjectPath="$(MSBuildProjectFullPath)"
-      RootNamespace="$(RootNamespace)"
-      OutputDirectory="$(OutputPath)" />
+        SolutionPath="$(SolutionPath)"
+        ProjectPath="$(MSBuildProjectFullPath)"
+        RootNamespace="$(RootNamespace)"
+        OutputDirectory="$(MSBuildProjectDirectory)\bin\$(Configuration)\$(TargetFramework)">
+      <Output TaskParameter="BuiltExpressionsCount" PropertyName="BuiltExpressionsCount" />
+    </BuildXpr.BuildExpressionsTask>
+  </Target>
+
+  <Target Name="BuildWithBuiltExpressions" Condition="'$(BuiltExpressionsCount)' != '' and '$(BuiltExpressionsCount)' != '0'"
+          DependsOnTargets="BuildExpressions" AfterTargets="BuildExpressions">
+    <Message Text="Rebuilding with $(BuiltExpressionsCount) Source Code Expression output(s)..." Importance="High" />
+    <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="Build"
+             Properties="BuildExpressions=False;Configuration=$(Configuration)" />
   </Target>
 </Project>

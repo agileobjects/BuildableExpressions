@@ -17,7 +17,7 @@
         public static SourceCodeExpression SourceCode(
             Action<ISourceCodeExpressionConfigurator> configuration)
         {
-            return new SourceCodeExpression(configuration);
+            return new(configuration);
         }
     }
 }

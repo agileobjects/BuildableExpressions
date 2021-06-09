@@ -5,25 +5,28 @@
     using System.Linq;
     using AgileObjects.BuildableExpressions.SourceCode;
     using Configuration;
+    using Logging;
     using static System.StringComparison;
 
     internal class OutputWriter
     {
+        private readonly ILogger _logger;
         private readonly IFileManager _fileManager;
 
-        public OutputWriter(IFileManager fileManager)
+        public OutputWriter(ILogger logger, IFileManager fileManager)
         {
+            _logger = logger;
             _fileManager = fileManager;
         }
 
-        public List<string> Write(
+        public ICollection<string> Write(
             IConfig config,
             params SourceCodeExpression[] sourceCodeExpressions)
         {
             return Write(config, sourceCodeExpressions.AsEnumerable());
         }
 
-        public List<string> Write(
+        public ICollection<string> Write(
             IConfig config,
             IEnumerable<SourceCodeExpression> sourceCodeExpressions)
         {
@@ -57,11 +60,17 @@
 
                 var sourceCode = sourceCodeExpression.ToCSharpString();
 
-                _fileManager.Write(filePath, sourceCode);
+                Write(filePath, sourceCode);
                 newFilePaths.Add(Path.Combine(relativeFilePath, fileName));
             }
 
             return newFilePaths;
+        }
+
+        public void Write(string filePath, string content)
+        {
+            _fileManager.Write(filePath, content);
+            _logger.Info($"Source Code Expression file '{Path.GetFileName(filePath)}' written");
         }
     }
 }

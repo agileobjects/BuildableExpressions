@@ -30,11 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="ExpressionBuilder.cs" />
-    <EmbeddedResource Include="ExpressionBuilder.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="MSBuild\AgileObjects.BuildableExpressions.Generator.targets" />
     <Content Include="MSBuild\AgileObjects.BuildableExpressions.Generator.targets">
       <PackagePath>build</PackagePath>
@@ -42,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <PackageReference Include="EnvDTE" Version="16.9.31023.347" PrivateAssets="All" />
+    <PackageReference Include="EnvDTE" Version="16.9.31023.347" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,7 +50,7 @@
 
   <PropertyGroup>
     <_BinPath>bin\$(Configuration)\*</_BinPath>
-    <_NetFrameworkPath>bin\$(Configuration)\net461</_NetFrameworkPath>
+    <_SharedAssembliesPath>bin\$(Configuration)\netstandard2.0</_SharedAssembliesPath>
     <_SharedAssemblies>bin\$(Configuration)\**\Microsoft.CodeAnalysis.*;$(_BinPath)\System.Collections.Immutable.*;$(_BinPath)\System.Reflection.Metadata.*</_SharedAssemblies>
   </PropertyGroup>
 
@@ -66,13 +61,13 @@
         <Visible>false</Visible>
         <BuildAction>Content</BuildAction>
       </_PackageFiles>
-      <_PackageFiles Include="$(_NetFrameworkPath)\Microsoft.CodeAnalysis.*;$(_NetFrameworkPath)\System.Collections.Immutable.*;$(_NetFrameworkPath)\System.Reflection.Metadata.*">
+      <_PackageFiles Include="$(_SharedAssembliesPath)\Microsoft.CodeAnalysis.*;$(_SharedAssembliesPath)\System.Collections.Immutable.*;$(_SharedAssembliesPath)\System.Reflection.Metadata.*">
         <PackagePath>tools\shared</PackagePath>
         <Visible>false</Visible>
         <BuildAction>Content</BuildAction>
       </_PackageFiles>
-      <_PackageFiles Include="$(_NetFrameworkPath)\**\Microsoft.*.resources.dll">
-        <PackagePath>tools\shared\$([System.IO.Path]::GetFileName('$(Directory)'))</PackagePath>
+      <_PackageFiles Include="$(_SharedAssembliesPath)\**\Microsoft.*.resources.dll">
+        <PackagePath>tools\shared\$([System.IO.Path]::GetFileName("$(Directory)"))</PackagePath>
         <Visible>false</Visible>
         <BuildAction>Content</BuildAction>
       </_PackageFiles>

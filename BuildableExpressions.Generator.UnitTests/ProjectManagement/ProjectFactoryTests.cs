@@ -7,6 +7,9 @@
     using BuildableExpressions.Generator.ProjectManagement;
     using BuildableExpressions.UnitTests.Common;
     using Configuration;
+#if NETFRAMEWORK
+    using Generator.ProjectManagement.NonSdk;
+#endif
     using Logging;
     using Moq;
     using Xunit;

@@ -6,6 +6,9 @@
     using Configuration;
     using InputOutput;
     using Logging;
+#if NETFRAMEWORK
+    using NonSdk;
+#endif
     using static System.StringComparison;
 
     internal class ProjectFactory : IProjectFactory

@@ -1,106 +1,145 @@
 ﻿namespace AgileObjects.BuildableExpressions.Generator.Compilation
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Reflection;
     using Configuration;
+    using Extensions;
     using InputOutput;
     using Logging;
-    using NetStandardPolyfills;
-    using static System.StringComparison;
 
     internal class AssemblyResolver
     {
         private static readonly string _installPath =
-            Path.GetDirectoryName(typeof(AssemblyResolver).GetAssembly().GetLocation());
+            Path.GetDirectoryName(typeof(AssemblyResolver).Assembly.Location);
 
-        private static readonly string _sharedPath =
-            Path.Combine(Path.GetDirectoryName(_installPath)!, "shared");
+        private static readonly string _installRootPath = Path.GetDirectoryName(_installPath);
+        private static readonly string _sharedPath = Path.Combine(_installRootPath!, "shared");
 
         private readonly ILogger _logger;
         private readonly IFileManager _fileManager;
-        private readonly List<Assembly> _outputAssemblies;
-        private readonly object _outputAssembliesSync;
+        private readonly ConcurrentDictionary<string, Lazy<Assembly>> _assemblyLoadersByName;
 
         public AssemblyResolver(ILogger logger, IFileManager fileManager)
         {
             _logger = logger;
             _fileManager = fileManager;
-            _outputAssemblies = new List<Assembly>();
-            _outputAssembliesSync = new object();
+            _assemblyLoadersByName = new ConcurrentDictionary<string, Lazy<Assembly>>();
+        }
 
+        public void Init(IConfig config)
+        {
+            PopulateAssemblyLoadersFromOutput(config);
             AppDomain.CurrentDomain.AssemblyResolve += ResolveAssemblyIfAvailable;
         }
 
-        public IEnumerable<Assembly> GetReferenceAssemblies(IConfig config)
+        private void PopulateAssemblyLoadersFromOutput(IConfig config)
         {
-            lock (_outputAssembliesSync)
+            foreach (var assemblyPath in EnumerateOutputAssemblyPaths(config))
             {
-                if (!_outputAssemblies.Any())
-                {
-                    _outputAssemblies.AddRange(EnumerateReferenceAssemblies(config));
-                }
-
-                return _outputAssemblies;
+                AddAssemblyLoader(assemblyPath, LoadAssembly);
             }
         }
 
-        private IEnumerable<Assembly> EnumerateReferenceAssemblies(IConfig config)
+        private IEnumerable<string> EnumerateOutputAssemblyPaths(IConfig config)
         {
+            var outputPath = config.GetOutputPath();
+
             var outputAssemblyPaths = _fileManager
-                .FindFiles(config.GetOutputPath(), "*.dll");
+                .FindFiles(outputPath, "*.dll");
 
-            foreach (var assemblyPath in outputAssemblyPaths)
-            {
-                if (Ignore(assemblyPath))
-                {
-                    continue;
-                }
+            var outputExePaths = _fileManager
+                .FindFiles(outputPath, "*.exe");
 
-                if (TryLoadAssembly(assemblyPath, out var assembly))
-                {
-                    yield return assembly;
-                }
-            }
+            return outputAssemblyPaths
+                .Concat(outputExePaths)
+                .Where(IncludeOutputAssembly);
         }
 
-        private static bool Ignore(string assemblyPath)
+        private static bool IncludeOutputAssembly(string assemblyPath)
         {
             var assemblyFileName = Path.GetFileName(assemblyPath);
 
-            return 
-                assemblyFileName.StartsWith("Microsoft.VisualStudio.", OrdinalIgnoreCase) ||
-                assemblyFileName.StartsWith("nunit.", OrdinalIgnoreCase) ||
-                assemblyFileName.StartsWith("xunit.", OrdinalIgnoreCase) ||
-                assemblyFileName.StartsWith("Shouldy", OrdinalIgnoreCase);
+            return
+                assemblyFileName.DoesNotStartWithIgnoreCase("Microsoft.VisualStudio.") ||
+                assemblyFileName.DoesNotStartWithIgnoreCase("nunit.") ||
+                assemblyFileName.DoesNotStartWithIgnoreCase("xunit.") ||
+                assemblyFileName.DoesNotStartWithIgnoreCase("Shouldy");
+        }
+
+        private void AddAssemblyLoader(string assemblyPath, Func<string, Assembly> loader)
+        {
+            _assemblyLoadersByName.TryAdd(
+                assemblyPath,
+                new Lazy<Assembly>(() => loader.Invoke(assemblyPath)));
+        }
+
+        public ICollection<Assembly> LoadAssemblies(Func<string, bool> matcher)
+        {
+            if (TryLoadAssemblies(matcher, out var projectAssemblies))
+            {
+                return projectAssemblies;
+            }
+
+            return Array.Empty<Assembly>();
+        }
+
+        private bool TryLoadAssemblies(
+            Func<string, bool> matcher,
+            out ICollection<Assembly> assemblies)
+        {
+            if (TryFindAssemblyLoaders(matcher, out var loaders))
+            {
+                assemblies = loaders.Select(l => l.Value).ToList();
+                return assemblies.Any();
+            }
+
+            assemblies = Array.Empty<Assembly>();
+            return false;
+        }
+
+        private bool TryFindAssemblyLoaders(
+            Func<string, bool> matcher,
+            out ICollection<Lazy<Assembly>> assemblyLoaders)
+        {
+            assemblyLoaders = _assemblyLoadersByName
+                .Where(kvp => matcher.Invoke(Path.GetFileNameWithoutExtension(kvp.Key)))
+                .Select(kvp => kvp.Value)
+                .ToList();
+
+            return assemblyLoaders.Any();
         }
 
         private Assembly ResolveAssemblyIfAvailable(object sender, ResolveEventArgs args)
         {
             var assemblyInfo = new AssemblyName(args.Name);
-            var assemblyName = assemblyInfo.Name + ".dll";
+            var assemblyName = assemblyInfo.Name;
+            var assemblyDllName = assemblyName + ".dll";
 
             _logger.Info($"Attempting to resolve assembly '{assemblyInfo}'...");
 
-            var loadedAssembly = _outputAssemblies
-                .FirstOrDefault(a => a.GetName().Name == assemblyInfo.Name);
-
-            if (loadedAssembly != null)
+            if (TryFindAssemblyLoaders(name => name == assemblyName, out var loaders) &&
+                loaders.First().IsValueCreated)
             {
-                _logger.Info($"Loaded assembly '{assemblyName}' from {loadedAssembly.GetLocation()}");
-                return loadedAssembly;
+                return loaders.First().Value;
             }
 
-            if (TryFindAssembly(_installPath, assemblyName, out var assembly))
+            if (TryFindAssembly(_installPath, assemblyDllName, out var assembly))
             {
                 return assembly;
             }
 
-            if (TryFindAssembly(_sharedPath, assemblyName, out assembly))
+            if (TryFindAssembly(_sharedPath, assemblyDllName, out assembly))
             {
                 return assembly;
+            }
+
+            if (TryLoadAssemblies(name => name == assemblyName, out var assemblies))
+            {
+                return assemblies.First();
             }
 
             return null;
@@ -108,8 +147,6 @@
 
         private bool TryFindAssembly(string searchPath, string assemblyName, out Assembly assembly)
         {
-            _logger.Info($"Looking for assembly '{assemblyName}' in {searchPath}...");
-
             var assemblyPath = _fileManager
                 .FindFiles(searchPath, assemblyName)
                 .FirstOrDefault();
@@ -125,23 +162,49 @@
 
         private bool TryLoadAssembly(string assemblyPath, out Assembly assembly)
         {
+            assembly = LoadAssembly(assemblyPath);
+
+            if (assembly == null)
+            {
+                return false;
+            }
+
+            var loadedAssembly = assembly;
+            AddAssemblyLoader(assemblyPath, _ => loadedAssembly);
+            return true;
+        }
+
+        private Assembly LoadAssembly(string assemblyPath)
+        {
             var assemblyFileName = Path.GetFileName(assemblyPath);
+            var assemblyFolderName = Path.GetDirectoryName(assemblyPath);
 
             try
             {
-                assembly = Assembly.LoadFrom(assemblyPath);
-                _logger.Info($"Loaded assembly '{assemblyFileName}' from {assemblyPath}");
-                return true;
+                var assembly = assemblyPath.StartsWithIgnoreCase(_installRootPath)
+                    ? Assembly.LoadFrom(assemblyPath)
+                    : LoadAssemblyFromInMemoryCopy(assemblyPath);
+
+                _logger.Info($"Loaded assembly '{assemblyFileName}' from {assemblyFolderName}");
+                return assembly;
             }
             catch (Exception loadEx)
             {
                 _logger.Warning(
-                    $"Loading assembly '{assemblyFileName}' from {assemblyPath} FAILED: " +
+                    $"Loading assembly '{assemblyFileName}' from {assemblyFolderName} FAILED: " +
                     loadEx.Message);
 
-                assembly = null;
-                return false;
+                return null;
             }
+        }
+
+        private Assembly LoadAssemblyFromInMemoryCopy(string assemblyPath)
+        {
+            using var fileStream = _fileManager.OpenRead(assemblyPath);
+            using var assemblyStream = new MemoryStream();
+
+            fileStream.CopyTo(assemblyStream);
+            return Assembly.Load(assemblyStream.ToArray());
         }
     }
 }

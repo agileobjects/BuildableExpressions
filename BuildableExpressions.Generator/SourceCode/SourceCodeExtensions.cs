@@ -2,20 +2,17 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using AgileObjects.BuildableExpressions.SourceCode;
-    using NetStandardPolyfills;
     using AgileObjects.ReadableExpressions.Extensions;
-    using BuildableExpressions.Compilation;
 
     internal static class SourceCodeExtensions
     {
-        public static IEnumerable<SourceCodeExpression> ToSourceCodeExpressions(
-            this CompilationResult compilationResult)
+        public static ICollection<SourceCodeExpression> ToSourceCodeExpressions(
+            this IEnumerable<ISourceCodeExpressionBuilder> builders)
         {
             var allExpressions = new List<SourceCodeExpression>();
 
-            foreach (var builder in GetBuildersOrThrow(compilationResult))
+            foreach (var builder in builders)
             {
                 var expressions = builder.Build();
 
@@ -29,26 +26,6 @@
             }
 
             return allExpressions;
-        }
-
-        private static IEnumerable<ISourceCodeExpressionBuilder> GetBuildersOrThrow(
-            CompilationResult compilationResult)
-        {
-            var builders = compilationResult
-                .CompiledAssembly
-                .GetTypes()
-                .Where(t => t.IsAssignableTo(typeof(ISourceCodeExpressionBuilder)))
-                .Select(Activator.CreateInstance)
-                .Cast<ISourceCodeExpressionBuilder>()
-                .ToList();
-
-            if (builders.Count == 0)
-            {
-                throw new NotSupportedException(
-                    $"No {nameof(ISourceCodeExpressionBuilder)} implementations found in project");
-            }
-
-            return builders;
         }
     }
 }

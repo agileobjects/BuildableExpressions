@@ -8,6 +8,7 @@
     using BuildableExpressions.UnitTests.Common;
     using Configuration;
     using Generator.Configuration;
+    using Logging;
     using Moq;
     using Xunit;
     using static System.Linq.Expressions.Expression;
@@ -23,7 +24,7 @@
         {
             var fileManagerMock = new Mock<IFileManager>();
 
-            var outputWriter = new OutputWriter(fileManagerMock.Object);
+            var outputWriter = new OutputWriter(Mock.Of<ILogger>(), fileManagerMock.Object);
 
             var sourceCode = BuildableExpression
                 .SourceCode(sc =>
@@ -52,7 +53,7 @@
         {
             var fileManagerMock = new Mock<IFileManager>();
 
-            var outputWriter = new OutputWriter(fileManagerMock.Object);
+            var outputWriter = new OutputWriter(Mock.Of<ILogger>(), fileManagerMock.Object);
 
             var sourceCode = BuildableExpression.SourceCode(sc =>
             {

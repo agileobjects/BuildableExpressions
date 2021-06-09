@@ -7,6 +7,12 @@
         public static string GetSolutionName(this IConfig config)
             => Path.GetFileName(config.SolutionPath);
 
+        public static string GetProjectNameWithoutExtension(this IConfig config)
+            => Path.GetFileNameWithoutExtension(config.GetProjectName());
+
+        public static string GetProjectName(this IConfig config)
+            => Path.GetFileName(config.ProjectPath);
+
         public static string GetContentRoot(this IConfig config)
             => Path.GetDirectoryName(config.ProjectPath);
 

@@ -1,12 +1,12 @@
 ﻿#if NETFRAMEWORK
-namespace AgileObjects.BuildableExpressions.Generator.UnitTests.ProjectManagement
+namespace AgileObjects.BuildableExpressions.Generator.UnitTests.ProjectManagement.NonSdk
 {
     using System.Linq;
-    using BuildableExpressions.Generator.ProjectManagement;
     using BuildableExpressions.UnitTests.Common;
+    using Generator.ProjectManagement.NonSdk;
     using Xunit;
 
-    public class EnvDteExtensionsTests
+    public class DevToolsFactoryTests
     {
         [Fact]
         public void ShouldRetrieveSolutionProjects()

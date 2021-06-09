@@ -1,5 +1,5 @@
 ﻿#if NETFRAMEWORK
-namespace AgileObjects.BuildableExpressions.Generator.ProjectManagement
+namespace AgileObjects.BuildableExpressions.Generator.ProjectManagement.NonSdk
 {
     using System.Collections;
     using System.Collections.Generic;

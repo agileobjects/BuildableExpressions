@@ -8,8 +8,6 @@
         
         void Warning(string message);
 
-        void Error(string message);
-
         void Error(Exception ex);
     }
 }
