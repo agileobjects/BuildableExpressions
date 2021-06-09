@@ -42,8 +42,8 @@
             }
 
             _logger.Warning(
-                $"No {nameof(ISourceCodeExpressionBuilder)} implementations " +
-                $"found in project {config.GetProjectNameWithoutExtension()}");
+                $"Source Code Expression {nameof(ISourceCodeExpressionBuilder)}s: " +
+                $"no implementations found in project {config.GetProjectNameWithoutExtension()}");
 
             return Array.Empty<ISourceCodeExpressionBuilder>();
         }

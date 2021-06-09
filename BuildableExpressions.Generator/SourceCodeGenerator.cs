@@ -33,7 +33,7 @@
             try
             {
                 var projectName = config.GetProjectNameWithoutExtension();
-                _logger.Info($"Source Code Expressions for project '{projectName}': transpiling...");
+                _logger.Info($"Source Code Expressions for project '{projectName}': starting...");
 
                 var builders = _buildersFinder.Find(config);
 
@@ -55,7 +55,7 @@
                 result.BuiltExpressionsCount = writtenFiles.Count;
 
             Complete:
-                _logger.Info($"Source Code Expressions for project '{projectName}': transpiling complete");
+                _logger.Info($"Source Code Expressions for project '{projectName}': complete");
                 result.Success = true;
             }
             catch (Exception ex)
