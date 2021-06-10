@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>AgileObjects.BuildableExpressions.Generator.Library</RootNamespace>
+    <AssemblyName>AgileObjects.BuildableExpressions.Generator.Library.NetStandard2</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AgileObjects.BuildableExpressions.Generator" Version="0.1.0-preview1" />
+  </ItemGroup>
+
+</Project>
