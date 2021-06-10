@@ -33,7 +33,7 @@
             _fileManager = fileManager;
             _assemblyLoadersByName = new ConcurrentDictionary<string, Lazy<Assembly>>();
 
-            PopulateFrameworkAssemblyLoaders();
+            PopulateFrameworkAssemblyLoaders(config);
             PopulateAssemblyLoadersFromOutput(config);
             AppDomain.CurrentDomain.AssemblyResolve += ResolveAssemblyIfAvailable;
         }
@@ -50,7 +50,7 @@
             {
                 packageRootPath = GetDirectoryName(packageRootPath);
             }
-            
+
             _packagesRootPath = GetDirectoryName(packageRootPath);
 
             _frameworkAssemblyNames = new[]
@@ -63,17 +63,26 @@
 
         #region Setup
 
-        private void PopulateFrameworkAssemblyLoaders()
+        private void PopulateFrameworkAssemblyLoaders(IConfig config)
         {
             var frameworkDirectories = _fileManager
-                .FindDirectories(_packagesRootPath, "AgileObjects.*")
+                .FindDirectories(_packagesRootPath, "AgileObjects.*", recursive: false)
                 .ToList();
+
+            var targetFramework = config.TargetFramework;
 
             foreach (var frameworkAssemblyName in _frameworkAssemblyNames)
             {
                 var frameworkAssemblyPath = frameworkDirectories
-                    .SelectMany(directory => _fileManager
-                        .FindFiles(directory, frameworkAssemblyName))
+                    .SelectMany(directory =>
+                    {
+                        var frameworkDirectory = _fileManager
+                            .FindDirectories(directory, targetFramework, recursive: true)
+                            .First();
+
+                        return _fileManager
+                            .FindFiles(frameworkDirectory, frameworkAssemblyName);
+                    })
                     .FirstOrDefault();
 
                 if (frameworkAssemblyPath != null)

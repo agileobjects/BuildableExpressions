@@ -26,8 +26,10 @@
 
         public string ProjectPath => _projectPath;
 
+        public string TargetFramework => "net4*";
+
         public string RootNamespace { get; set; }
-        
+
         public string OutputDirectory { get; set; }
     }
 }

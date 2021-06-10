@@ -5,7 +5,10 @@
 
     internal interface IFileManager
     {
-        IEnumerable<string> FindDirectories(string path, string pattern);
+        IEnumerable<string> FindDirectories(
+            string path, 
+            string pattern,
+            bool recursive);
 
         IEnumerable<string> FindFiles(string path, string pattern);
 

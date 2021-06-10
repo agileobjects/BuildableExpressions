@@ -9,10 +9,16 @@
     {
         public static readonly IFileManager Instance = new SystemIoFileManager();
 
-        public IEnumerable<string> FindDirectories(string path, string pattern)
+        public IEnumerable<string> FindDirectories(
+            string path,
+            string pattern,
+            bool recursive)
         {
             return Directory.Exists(path)
-                ? Directory.EnumerateDirectories(path, pattern, AllDirectories)
+                ? Directory.EnumerateDirectories(
+                    path,
+                    pattern,
+                    recursive ? AllDirectories : TopDirectoryOnly)
                 : Array.Empty<string>();
         }
 

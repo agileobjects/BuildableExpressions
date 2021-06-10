@@ -3,6 +3,7 @@ namespace BuildXpr
 {
     using AgileObjects.BuildableExpressions.Generator.Compilation;
     using AgileObjects.BuildableExpressions.Generator.Configuration;
+    using AgileObjects.BuildableExpressions.Generator.Extensions;
     using AgileObjects.BuildableExpressions.Generator.InputOutput;
     using AgileObjects.BuildableExpressions.Generator.Logging;
     using AgileObjects.BuildableExpressions.Generator.ProjectManagement;
@@ -33,6 +34,12 @@ namespace BuildXpr
         /// <see cref="SourceCodeExpression"/>(s) to build.
         /// </summary>
         public string RootNamespace { get; set; }
+
+        /// <summary>
+        /// Gets or sets the target framework against which <see cref="SourceCodeExpression"/>(s)
+        /// are being built.
+        /// </summary>
+        public string TargetFramework { get; set; }
 
         /// <summary>
         /// Gets or sets the relative path to which build output is written.
@@ -69,5 +76,8 @@ namespace BuildXpr
             BuiltExpressionsCount = result.BuiltExpressionsCount;
             return result.Success;
         }
+
+        string IConfig.TargetFramework
+            => TargetFramework.StartsWithIgnoreCase("net4") ? "net4*" : "netstandard2.0";
     }
 }

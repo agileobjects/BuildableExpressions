@@ -13,6 +13,7 @@
     <BuildXpr.BuildExpressionsTask
         SolutionPath="$(SolutionPath)"
         ProjectPath="$(MSBuildProjectFullPath)"
+        TargetFramework="$(TargetFramework)"
         RootNamespace="$(RootNamespace)"
         OutputDirectory="$(MSBuildProjectDirectory)\bin\$(Configuration)\$(TargetFramework)">
       <Output TaskParameter="BuiltExpressionsCount" PropertyName="BuiltExpressionsCount" />
