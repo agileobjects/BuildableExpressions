@@ -5,11 +5,11 @@
 
     internal interface IFileManager
     {
+        IEnumerable<string> FindDirectories(string path, string pattern);
+
         IEnumerable<string> FindFiles(string path, string pattern);
 
         Stream OpenRead(string filePath);
-
-        string Read(string filePath);
 
         void Write(string filePath, string contents);
 

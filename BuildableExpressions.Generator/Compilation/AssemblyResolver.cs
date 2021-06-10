@@ -14,18 +14,18 @@
 
     internal class AssemblyResolver
     {
-        private static readonly string _installPath = 
-            GetDirectoryName(typeof(AssemblyResolver).Assembly.Location);
-
-        private static readonly string _installRootPath = GetDirectoryName(_installPath);
-        private static readonly string _sharedPath = Combine(_installRootPath!, "shared");
+        private static readonly string _packageInstallPath;
+        private static readonly string _packageToolsPath;
+        private static readonly string _packageSharedPath;
+        private static readonly string _packagesRootPath;
+        private static readonly string[] _frameworkAssemblyNames;
 
         private readonly ILogger _logger;
         private readonly IFileManager _fileManager;
         private readonly ConcurrentDictionary<string, Lazy<Assembly>> _assemblyLoadersByName;
 
         public AssemblyResolver(
-            ILogger logger, 
+            ILogger logger,
             IFileManager fileManager,
             IConfig config)
         {
@@ -33,8 +33,54 @@
             _fileManager = fileManager;
             _assemblyLoadersByName = new ConcurrentDictionary<string, Lazy<Assembly>>();
 
+            PopulateFrameworkAssemblyLoaders();
             PopulateAssemblyLoadersFromOutput(config);
             AppDomain.CurrentDomain.AssemblyResolve += ResolveAssemblyIfAvailable;
+        }
+
+        static AssemblyResolver()
+        {
+            _packageInstallPath = GetDirectoryName(typeof(AssemblyResolver).Assembly.Location);
+            _packageToolsPath = GetDirectoryName(_packageInstallPath);
+            _packageSharedPath = Combine(_packageToolsPath!, "shared");
+
+            var packageRootPath = _packageToolsPath;
+
+            while (GetFileName(packageRootPath).DoesNotStartWithIgnoreCase("AgileObjects."))
+            {
+                packageRootPath = GetDirectoryName(packageRootPath);
+            }
+            
+            _packagesRootPath = GetDirectoryName(packageRootPath);
+
+            _frameworkAssemblyNames = new[]
+            {
+                "AgileObjects.NetStandardPolyfills.dll",
+                "AgileObjects.ReadableExpressions.dll",
+                "AgileObjects.BuildableExpressions.dll"
+            };
+        }
+
+        #region Setup
+
+        private void PopulateFrameworkAssemblyLoaders()
+        {
+            var frameworkDirectories = _fileManager
+                .FindDirectories(_packagesRootPath, "AgileObjects.*")
+                .ToList();
+
+            foreach (var frameworkAssemblyName in _frameworkAssemblyNames)
+            {
+                var frameworkAssemblyPath = frameworkDirectories
+                    .SelectMany(directory => _fileManager
+                        .FindFiles(directory, frameworkAssemblyName))
+                    .FirstOrDefault();
+
+                if (frameworkAssemblyPath != null)
+                {
+                    AddAssemblyLoader(frameworkAssemblyPath, Assembly.LoadFrom);
+                }
+            }
         }
 
         private void PopulateAssemblyLoadersFromOutput(IConfig config)
@@ -77,6 +123,8 @@
                 assemblyPath,
                 new Lazy<Assembly>(() => loader.Invoke(assemblyPath)));
         }
+
+        #endregion
 
         public ICollection<Assembly> LoadAssemblies(Func<string, bool> matcher)
         {
@@ -130,12 +178,12 @@
                 return loaders.First().Value;
             }
 
-            if (TryFindAssembly(_installPath, assemblyDllName, out var assembly))
+            if (TryFindAssembly(_packageInstallPath, assemblyDllName, out var assembly))
             {
                 return assembly;
             }
 
-            if (TryFindAssembly(_sharedPath, assemblyDllName, out assembly))
+            if (TryFindAssembly(_packageSharedPath, assemblyDllName, out assembly))
             {
                 return assembly;
             }
@@ -184,7 +232,7 @@
 
             try
             {
-                var assembly = assemblyPath.StartsWithIgnoreCase(_installRootPath)
+                var assembly = assemblyPath.StartsWithIgnoreCase(_packageToolsPath)
                     ? Assembly.LoadFrom(assemblyPath)
                     : LoadAssemblyFromInMemoryCopy(assemblyPath);
 

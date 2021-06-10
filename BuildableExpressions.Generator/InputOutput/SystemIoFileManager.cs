@@ -9,6 +9,13 @@
     {
         public static readonly IFileManager Instance = new SystemIoFileManager();
 
+        public IEnumerable<string> FindDirectories(string path, string pattern)
+        {
+            return Directory.Exists(path)
+                ? Directory.EnumerateDirectories(path, pattern, AllDirectories)
+                : Array.Empty<string>();
+        }
+
         public IEnumerable<string> FindFiles(string path, string pattern)
         {
             return Directory.Exists(path)
@@ -17,8 +24,6 @@
         }
 
         public Stream OpenRead(string filePath) => File.OpenRead(filePath);
-
-        public string Read(string filePath) => File.ReadAllText(filePath);
 
         public void Write(string filePath, string contents)
             => File.WriteAllText(filePath, contents);

@@ -37,6 +37,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildableExpressions.Genera
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildableExpressions.Generator.Console.NetCore3", "BuildableExpressions.Generator.Console.NetCore3\BuildableExpressions.Generator.Console.NetCore3.csproj", "{19805A90-6094-410B-8041-12AB38318FFF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildableExpressions.Generator.Library.NetStandard2", "BuildableExpressions.Generator.Library.NetStandard2\BuildableExpressions.Generator.Library.NetStandard2.csproj", "{111C2B98-94FF-4357-8838-107B3AB8DC53}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{19805A90-6094-410B-8041-12AB38318FFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19805A90-6094-410B-8041-12AB38318FFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19805A90-6094-410B-8041-12AB38318FFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{111C2B98-94FF-4357-8838-107B3AB8DC53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{111C2B98-94FF-4357-8838-107B3AB8DC53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{111C2B98-94FF-4357-8838-107B3AB8DC53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{111C2B98-94FF-4357-8838-107B3AB8DC53}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +108,7 @@ Global
 		{EACB4487-216A-4545-B9AB-8037C0B26177} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
 		{70754637-57FF-493E-AA0A-154AD0A16A5C} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
 		{19805A90-6094-410B-8041-12AB38318FFF} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
+		{111C2B98-94FF-4357-8838-107B3AB8DC53} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {82AABD60-FAC0-4471-94A9-069251EB8534}
