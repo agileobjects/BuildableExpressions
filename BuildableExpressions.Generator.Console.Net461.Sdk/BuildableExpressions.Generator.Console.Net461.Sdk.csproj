@@ -7,6 +7,10 @@
     <AssemblyName>AgileObjects.BuildableExpressions.Generator.Console.Net461.Sdk</AssemblyName>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DebugExpressions>true</DebugExpressions>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="AgileObjects.BuildableExpressions.Generator" Version="0.1.0-preview1" />
   </ItemGroup>

@@ -1,6 +1,7 @@
 ﻿// ReSharper disable once CheckNamespace
 namespace BuildXpr
 {
+    using System.Diagnostics;
     using AgileObjects.BuildableExpressions.Generator.Compilation;
     using AgileObjects.BuildableExpressions.Generator.Configuration;
     using AgileObjects.BuildableExpressions.Generator.Extensions;
@@ -47,6 +48,12 @@ namespace BuildXpr
         public string OutputDirectory { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the debugger should be launched during the
+        /// task execution.
+        /// </summary>
+        public string Debug { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating the number of <see cref="SourceCodeExpression"/>s built
         /// into output files by the execution of this <see cref="BuildExpressionsTask"/>.
         /// </summary>
@@ -58,9 +65,11 @@ namespace BuildXpr
         /// </summary>
         public override bool Execute()
         {
-#if DEBUG
-            System.Diagnostics.Debugger.Launch();
-#endif
+            if (LaunchDebugger)
+            {
+                Debugger.Launch();
+            }
+
             var logger = new MsBuildTaskLogger(Log);
             var fileManager = SystemIoFileManager.Instance;
             var assemblyResolver = new AssemblyResolver(logger, fileManager, this);
@@ -76,6 +85,8 @@ namespace BuildXpr
             BuiltExpressionsCount = result.BuiltExpressionsCount;
             return result.Success;
         }
+
+        private bool LaunchDebugger => bool.TryParse(Debug, out var value) && value;
 
         string IConfig.TargetFramework
             => TargetFramework.StartsWithIgnoreCase("net4") ? "net4*" : "netstandard2.0";

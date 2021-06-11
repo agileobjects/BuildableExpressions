@@ -15,7 +15,8 @@
         ProjectPath="$(MSBuildProjectFullPath)"
         TargetFramework="$(TargetFramework)"
         RootNamespace="$(RootNamespace)"
-        OutputDirectory="$(MSBuildProjectDirectory)\bin\$(Configuration)\$(TargetFramework)">
+        OutputDirectory="$(MSBuildProjectDirectory)\bin\$(Configuration)\$(TargetFramework)"
+        Debug="$(DebugExpressions)">
       <Output TaskParameter="BuiltExpressionsCount" PropertyName="BuiltExpressionsCount" />
     </BuildXpr.BuildExpressionsTask>
   </Target>
