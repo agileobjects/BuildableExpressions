@@ -18,6 +18,20 @@ namespace XprGenerator
     /// </summary>
     public class XprGenerateTask : MsBuildTask, IConfig
     {
+        private readonly MsBuildTaskLogger _logger;
+        private readonly IFileManager _fileManager;
+        private readonly AssemblyResolver _assemblyResolver;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="XprGenerateTask"/> class.
+        /// </summary>
+        public XprGenerateTask()
+        {
+            _logger = new MsBuildTaskLogger(Log);
+            _fileManager = SystemIoFileManager.Instance;
+            _assemblyResolver = new AssemblyResolver(_logger, _fileManager);
+        }
+
         /// <summary>
         /// Gets or sets the full path of the solution providing the 
         /// <see cref="SourceCodeExpression"/>(s) to build.
@@ -76,25 +90,45 @@ namespace XprGenerator
                 Debugger.Launch();
             }
 
-            var logger = new MsBuildTaskLogger(Log);
-            var fileManager = SystemIoFileManager.Instance;
-            var assemblyResolver = new AssemblyResolver(logger, fileManager, this);
+            _assemblyResolver.Init(this);
 
+            if (TryBuildExpressions(out var builtExpressionsCount))
+            {
+                BuiltExpressionsCount = builtExpressionsCount;
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool TryBuildExpressions(out int builtExpressionsCount)
+        {
             var generator = new SourceCodeGenerator(
-                logger,
-                new ProjectFactory(fileManager),
-                new ExpressionBuildersFinder(logger, assemblyResolver),
-                new OutputWriter(logger, fileManager));
+                _logger,
+                new ProjectFactory(_fileManager),
+                new ExpressionBuildersFinder(_logger, _assemblyResolver),
+                new OutputWriter(_logger, _fileManager));
 
             var result = generator.Execute(this);
 
-            BuiltExpressionsCount = result.BuiltExpressionsCount;
+            builtExpressionsCount = result.BuiltExpressionsCount;
             return result.Success;
         }
 
         private bool LaunchDebugger => bool.TryParse(Debug, out var value) && value;
 
-        string IConfig.TargetFramework
-            => TargetFramework.StartsWithIgnoreCase("net4") ? "net4*" : "netstandard2.0";
+        string IConfig.TargetFramework => GetTargetFramework();
+
+        private string GetTargetFramework()
+        {
+            const string net40Wildcard = "net4*";
+
+            if (string.IsNullOrEmpty(TargetFramework))
+            {
+                return net40Wildcard;
+            }
+
+            return TargetFramework.StartsWithIgnoreCase("net4") ? net40Wildcard : "netstandard2.0";
+        }
     }
 }

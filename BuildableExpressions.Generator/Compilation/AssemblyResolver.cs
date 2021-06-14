@@ -24,17 +24,12 @@
         private readonly IFileManager _fileManager;
         private readonly ConcurrentDictionary<string, Lazy<Assembly>> _assemblyLoadersByName;
 
-        public AssemblyResolver(
-            ILogger logger,
-            IFileManager fileManager,
-            IConfig config)
+        public AssemblyResolver(ILogger logger, IFileManager fileManager)
         {
             _logger = logger;
             _fileManager = fileManager;
             _assemblyLoadersByName = new ConcurrentDictionary<string, Lazy<Assembly>>();
 
-            PopulateFrameworkAssemblyLoaders(config);
-            PopulateAssemblyLoadersFromInput(config);
             AppDomain.CurrentDomain.AssemblyResolve += ResolveAssemblyIfAvailable;
         }
 
@@ -62,6 +57,12 @@
         }
 
         #region Setup
+
+        public void Init(IConfig config)
+        {
+            PopulateFrameworkAssemblyLoaders(config);
+            PopulateAssemblyLoadersFromInput(config);
+        }
 
         private void PopulateFrameworkAssemblyLoaders(IConfig config)
         {

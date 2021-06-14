@@ -8,13 +8,14 @@
     internal static class SourceCodeExtensions
     {
         public static ICollection<SourceCodeExpression> ToSourceCodeExpressions(
-            this IEnumerable<ISourceCodeExpressionBuilder> builders)
+            this IEnumerable<ISourceCodeExpressionBuilder> builders,
+            IExpressionBuildContext context)
         {
             var allExpressions = new List<SourceCodeExpression>();
 
             foreach (var builder in builders)
             {
-                var expressions = builder.Build();
+                var expressions = builder.Build(context);
 
                 if (expressions == null)
                 {

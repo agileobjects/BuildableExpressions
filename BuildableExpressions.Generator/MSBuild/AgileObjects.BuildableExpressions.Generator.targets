@@ -4,19 +4,19 @@
     <_XprGeneratorFramework Condition="'$(MSBuildRuntimeType)' != 'Core'">net461</_XprGeneratorFramework>
     <_XprGeneratorFramework Condition="'$(MSBuildRuntimeType)' == 'Core'">netstandard2.0</_XprGeneratorFramework>
     <_XprGeneratorTaskAssembly>..\tools\$(_XprGeneratorFramework)\AgileObjects.BuildableExpressions.Generator.dll</_XprGeneratorTaskAssembly>
-    <_XprGeneratorInputProject>$(MSBuildProjectFullPath)</_XprGeneratorInputProject>
-    <_XprGeneratorOutputProject Condition="'$(XprGeneratorOutputProject)' != ''">$(XprGeneratorOutputProject)</_XprGeneratorOutputProject>
-    <_XprGeneratorOutputProject Condition="'$(XprGeneratorOutputProject)' == ''">$(_XprGeneratorInputProject)</_XprGeneratorOutputProject>
   </PropertyGroup>
 
   <UsingTask AssemblyFile="$(_XprGeneratorTaskAssembly)" TaskName="XprGenerator.XprGenerateTask" />
 
   <Target Name="BuildExpressions" Condition="'$(XprGenerator)' != 'False'"
           DependsOnTargets="AfterBuild" AfterTargets="AfterBuild">
+    <PropertyGroup>
+      <XprGeneratorOutputProject Condition="'$(XprGeneratorOutputProject)' == ''">$(MSBuildProjectFullPath)</XprGeneratorOutputProject>
+    </PropertyGroup>
     <XprGenerator.XprGenerateTask
         SolutionPath="$(SolutionPath)"
-        InputProjectPath="$(_XprGeneratorInputProject)"
-        OutputProjectPath="$(_XprGeneratorOutputProject)"
+        InputProjectPath="$(MSBuildProjectFullPath)"
+        OutputProjectPath="$(XprGeneratorOutputProject)"
         TargetFramework="$(TargetFramework)"
         RootNamespace="$(RootNamespace)"
         InputDirectory="bin\$(Configuration)\$(TargetFramework)"
@@ -27,9 +27,9 @@
 
   <Target Name="BuildWithBuiltExpressions" Condition="'$(BuiltExpressionsCount)' != '' and '$(BuiltExpressionsCount)' != '0'"
           DependsOnTargets="BuildExpressions" AfterTargets="BuildExpressions">
-    <Message Text="Source Code Expressions: project '$([System.IO.Path]::GetFileNameWithoutExtension('$(_XprGeneratorOutputProject))'))' rebuilding with $(BuiltExpressionsCount) Source Code Expression output(s)..." 
+    <Message Text="Source Code Expressions: project '$([System.IO.Path]::GetFileNameWithoutExtension('$(XprGeneratorOutputProject)'))' rebuilding with $(BuiltExpressionsCount) Source Code Expression output(s)..." 
              Importance="High" />
-    <MSBuild Projects="$(_XprGeneratorOutputProject)" Targets="Build"
+    <MSBuild Projects="$(XprGeneratorOutputProject)" Targets="Build"
              Properties="XprGenerator=False;Configuration=$(Configuration)" />
   </Target>
 </Project>

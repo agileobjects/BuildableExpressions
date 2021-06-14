@@ -13,7 +13,11 @@
         /// Builds the <see cref="SourceCodeExpression"/>s which should be translated into source
         /// code files during compilation.
         /// </summary>
+        /// <param name="context">
+        /// An <see cref="IExpressionBuildContext"/> describing the context in which the
+        /// <see cref="SourceCodeExpression"/>s are being built.
+        /// </param>
         /// <returns>One or more <see cref="SourceCodeExpression"/>s.</returns>
-        IEnumerable<SourceCodeExpression> Build();
+        IEnumerable<SourceCodeExpression> Build(IExpressionBuildContext context);
     }
 }

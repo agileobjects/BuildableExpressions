@@ -15,8 +15,12 @@
         /// Builds one or more <see cref="SourceCodeExpression"/>s to compile to source code files
         /// when this project is built.
         /// </summary>
+        /// <param name="context">
+        /// An <see cref="IExpressionBuildContext"/> describing the context in which the
+        /// <see cref="SourceCodeExpression"/>s are being built.
+        /// </param>
         /// <returns><see cref="SourceCodeExpression"/>s to compile to source code files.</returns>
-        public IEnumerable<SourceCodeExpression> Build()
+        public IEnumerable<SourceCodeExpression> Build(IExpressionBuildContext context)
         {
             // Replace this code with your own, building SourceCodeExpression(s)
             // to be compiled to one or more source code files:

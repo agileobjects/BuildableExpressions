@@ -11,10 +11,11 @@
     using Logging;
     using NetStandardPolyfills;
 
-    internal class ExpressionBuildersFinder
+    internal class ExpressionBuildersFinder : IExpressionBuildContext
     {
         private readonly ILogger _logger;
         private readonly AssemblyResolver _assemblyResolver;
+        private ICollection<Assembly> _projectAssemblies;
 
         public ExpressionBuildersFinder(
             ILogger logger,
@@ -37,6 +38,7 @@
 
             if (builders.Any())
             {
+                _projectAssemblies = projectAssemblies;
                 return builders;
             }
 
@@ -106,5 +108,8 @@
                 }
             }
         }
+
+        IEnumerable<Assembly> IExpressionBuildContext.ProjectAssemblies 
+            => _projectAssemblies;
     }
 }
