@@ -116,6 +116,37 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldIncludeAUsingFromABuildableTypeOfExpression()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod(
+                            "GetStreamTypeName", 
+                            Property(BuildableExpression.TypeOf(typeof(Stream)), "Name"));
+                    });
+                })
+                .ToCSharpString();
+
+            const string expected = @"
+using System.IO;
+
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public string GetStreamTypeName()
+        {
+            return typeof(Stream).Name;
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
         public void ShouldIncludeAUsingFromATypedConstant()
         {
             var getStringCollection = Lambda<Func<object>>(

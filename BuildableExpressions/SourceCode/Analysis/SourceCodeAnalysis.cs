@@ -135,6 +135,9 @@
                 case Extension when expression is NameOfOperatorExpression nameOf:
                     return nameOf.Update(VisitAndConvert(nameOf.Operand));
 
+                case Extension when expression is TypeOfOperatorExpression typeOf:
+                    return VisitAndConvert(typeOf);
+
                 default:
                     return base.VisitAndConvert(expression);
             }
@@ -380,6 +383,12 @@
 
             type.Finalise();
             return type;
+        }
+
+        private Expression VisitAndConvert(TypeOfOperatorExpression typeOf)
+        {
+            _referenceAnalysis.HandleReference(typeOf.Operand);
+            return typeOf;
         }
 
         public override bool ShouldBeDeclaredInVariableList(

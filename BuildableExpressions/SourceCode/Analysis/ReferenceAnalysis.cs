@@ -168,7 +168,7 @@
             return expression;
         }
 
-        private void HandleReference(Type type) => HandleReference(ClrTypeWrapper.For(type));
+        public void HandleReference(Type type) => HandleReference(ClrTypeWrapper.For(type));
 
         private void HandleReference(IType referencedType)
         {

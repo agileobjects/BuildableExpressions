@@ -33,7 +33,7 @@
         /// the given <paramref name="typeExpression"/>
         /// </returns>
         public static TypeOfOperatorExpression TypeOf(TypeExpression typeExpression)
-            => new TypeOfOperatorExpression(typeExpression);
+            => new(typeExpression);
 
         /// <summary>
         /// Create a <see cref="NameOfOperatorExpression"/> that represents use of the nameof

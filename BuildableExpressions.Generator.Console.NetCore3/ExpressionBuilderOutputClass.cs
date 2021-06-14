@@ -1,9 +1,12 @@
+using DefaultNamespace;
+
 namespace GeneratedExpressionCode
 {
     public class ExpressionBuilderOutputClass
     {
-        public void DoNothingNetCore3()
+        public string GetNameNetCore3()
         {
+            return typeof(ExpressionBuilder).Name;
         }
     }
 }

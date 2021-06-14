@@ -28,9 +28,11 @@
             {
                 sc.AddClass(nameof(ExpressionBuilder) + "OutputClass", cls =>
                 {
-                    var doNothing = Expression.Empty();
-
-                    cls.AddMethod("DoNothingNetCore3", doNothing);
+                    cls.AddMethod(
+                        "GetNameNetCore3", 
+                        Expression.Property(
+                            BuildableExpression.TypeOf(typeof(ExpressionBuilder)),
+                            "Name"));
                 });
             });
 
