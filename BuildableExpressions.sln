@@ -37,7 +37,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildableExpressions.Genera
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildableExpressions.Generator.Console.NetCore3", "BuildableExpressions.Generator.Console.NetCore3\BuildableExpressions.Generator.Console.NetCore3.csproj", "{19805A90-6094-410B-8041-12AB38318FFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildableExpressions.Generator.Library.NetStandard2", "BuildableExpressions.Generator.Library.NetStandard2\BuildableExpressions.Generator.Library.NetStandard2.csproj", "{111C2B98-94FF-4357-8838-107B3AB8DC53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildableExpressions.Generator.Library.NetStandard2", "BuildableExpressions.Generator.Library.NetStandard2\BuildableExpressions.Generator.Library.NetStandard2.csproj", "{111C2B98-94FF-4357-8838-107B3AB8DC53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildableExpressions.Generator.Console.Net5", "BuildableExpressions.Generator.Console.Net5\BuildableExpressions.Generator.Console.Net5.csproj", "{10DE7734-48B1-46B3-B042-C71D806CFB52}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildableExpressions.Generator.Console.NetCore2", "BuildableExpressions.Generator.Console.NetCore2\BuildableExpressions.Generator.Console.NetCore2.csproj", "{A6B382B2-1F25-4D03-A213-3A3A3FEC4213}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +97,14 @@ Global
 		{111C2B98-94FF-4357-8838-107B3AB8DC53}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{111C2B98-94FF-4357-8838-107B3AB8DC53}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{111C2B98-94FF-4357-8838-107B3AB8DC53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10DE7734-48B1-46B3-B042-C71D806CFB52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10DE7734-48B1-46B3-B042-C71D806CFB52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10DE7734-48B1-46B3-B042-C71D806CFB52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10DE7734-48B1-46B3-B042-C71D806CFB52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6B382B2-1F25-4D03-A213-3A3A3FEC4213}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6B382B2-1F25-4D03-A213-3A3A3FEC4213}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6B382B2-1F25-4D03-A213-3A3A3FEC4213}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6B382B2-1F25-4D03-A213-3A3A3FEC4213}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -109,6 +121,8 @@ Global
 		{70754637-57FF-493E-AA0A-154AD0A16A5C} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
 		{19805A90-6094-410B-8041-12AB38318FFF} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
 		{111C2B98-94FF-4357-8838-107B3AB8DC53} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
+		{10DE7734-48B1-46B3-B042-C71D806CFB52} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
+		{A6B382B2-1F25-4D03-A213-3A3A3FEC4213} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {82AABD60-FAC0-4471-94A9-069251EB8534}

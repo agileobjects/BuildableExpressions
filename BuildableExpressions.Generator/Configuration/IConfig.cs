@@ -4,12 +4,14 @@
     {
         string SolutionPath { get; }
 
-        string ProjectPath { get; }
+        string InputProjectPath { get; }
+
+        string OutputProjectPath { get; }
 
         string TargetFramework { get; }
 
         string RootNamespace { get; set; }
 
-        string OutputDirectory { get; set; }
+        string InputDirectory { get; set; }
     }
 }

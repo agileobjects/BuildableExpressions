@@ -18,7 +18,7 @@ namespace AgileObjects.BuildableExpressions.Generator.ProjectManagement.NonSdk
         public void Add(IEnumerable<string> relativeFilePaths)
         {
             var solutionName = _config.GetSolutionName();
-            var contentRoot = _config.GetContentRoot();
+            var contentRoot = _config.GetOutputRoot();
 
             var devTools = DevToolsFactory
                 .GetDevToolsOrNullFor(solutionName);
@@ -26,7 +26,7 @@ namespace AgileObjects.BuildableExpressions.Generator.ProjectManagement.NonSdk
             var project = devTools
                 .Solution
                 .EnumerateProjects()
-                .First(p => p.FullName == _config.ProjectPath);
+                .First(p => p.FullName == _config.InputProjectPath);
 
             foreach (var filePath in relativeFilePaths)
             {

@@ -24,11 +24,11 @@
 
             var projectEx = Should.Throw<NotSupportedException>(() =>
             {
-                factory.GetProjectOrThrow(config);
+                factory.GetOutputProjectOrThrow(config);
             });
 
             projectEx.Message.ShouldContain("Unable to find <Project />");
-            projectEx.Message.ShouldContain(config.ProjectPath);
+            projectEx.Message.ShouldContain(config.OutputProjectPath);
         }
 
         [Fact]
@@ -49,11 +49,11 @@
 
             var projectEx = Should.Throw<NotSupportedException>(() =>
             {
-                factory.GetProjectOrThrow(config);
+                factory.GetOutputProjectOrThrow(config);
             });
 
             projectEx.Message.ShouldContain("Unable to find <Project />");
-            projectEx.Message.ShouldContain(config.ProjectPath);
+            projectEx.Message.ShouldContain(config.OutputProjectPath);
         }
 
         [Fact]
@@ -75,7 +75,7 @@
             var fileManager = CreateFileManager(fileContents);
             var factory = new ProjectFactory(fileManager);
 
-            var project = factory.GetProjectOrThrow(new TestConfig(rootNamespace: null));
+            var project = factory.GetOutputProjectOrThrow(new TestConfig(rootNamespace: null));
 
             project.ShouldBeOfType<SdkProject>();
         }
@@ -101,7 +101,7 @@
             var config = new TestConfig(rootNamespace: null);
             var factory = new ProjectFactory(fileManager);
 
-            factory.GetProjectOrThrow(config);
+            factory.GetOutputProjectOrThrow(config);
 
             config.RootNamespace.ShouldBe("AgileObjects.BuildableExpressions.Generator.UnitTests");
         }
@@ -136,7 +136,7 @@
             var config = new TestConfig(rootNamespace: string.Empty);
             var factory = new ProjectFactory(fileManager);
 
-            var project = factory.GetProjectOrThrow(config);
+            var project = factory.GetOutputProjectOrThrow(config);
 
             project.ShouldBeOfType<NetFrameworkProject>();
         }
@@ -171,7 +171,7 @@
             var config = new TestConfig(rootNamespace: string.Empty);
             var factory = new ProjectFactory(fileManager);
 
-            factory.GetProjectOrThrow(config);
+            factory.GetOutputProjectOrThrow(config);
 
             config.RootNamespace.ShouldBe("AgileObjects.BuildableExpressions.Generator.UnitTests");
         }
@@ -185,7 +185,7 @@
 
             var fileManagerMock = new Mock<IFileManager>();
             fileManagerMock
-                .Setup(fm => fm.OpenRead(TestConfig.Default.ProjectPath))
+                .Setup(fm => fm.OpenRead(TestConfig.Default.InputProjectPath))
                 .Returns(stubFileStream);
 
             return fileManagerMock.Object;

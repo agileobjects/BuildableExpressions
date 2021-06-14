@@ -1,5 +1,5 @@
 ﻿// ReSharper disable once CheckNamespace
-namespace BuildXpr
+namespace XprGenerator
 {
     using System.Diagnostics;
     using AgileObjects.BuildableExpressions.Generator.Compilation;
@@ -16,7 +16,7 @@ namespace BuildXpr
     /// <summary>
     /// An MSBuild Task to generate source code files from <see cref="SourceCodeExpression"/>s.
     /// </summary>
-    public class BuildExpressionsTask : MsBuildTask, IConfig
+    public class XprGenerateTask : MsBuildTask, IConfig
     {
         /// <summary>
         /// Gets or sets the full path of the solution providing the 
@@ -28,7 +28,13 @@ namespace BuildXpr
         /// Gets or sets the full path of the project providing the 
         /// <see cref="SourceCodeExpression"/>(s) to build.
         /// </summary>
-        public string ProjectPath { get; set; }
+        public string InputProjectPath { get; set; }
+
+        /// <summary>
+        /// Gets or sets the full path of the project to which the generated 
+        /// <see cref="SourceCodeExpression"/> classes should be added.
+        /// </summary>
+        public string OutputProjectPath { get; set; }
 
         /// <summary>
         /// Gets or sets the root namespace of the project providing the 
@@ -43,9 +49,9 @@ namespace BuildXpr
         public string TargetFramework { get; set; }
 
         /// <summary>
-        /// Gets or sets the relative path to which build output is written.
+        /// Gets or sets the relative path to which the input project's build output is written.
         /// </summary>
-        public string OutputDirectory { get; set; }
+        public string InputDirectory { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the debugger should be launched during the
@@ -55,7 +61,7 @@ namespace BuildXpr
 
         /// <summary>
         /// Gets or sets a value indicating the number of <see cref="SourceCodeExpression"/>s built
-        /// into output files by the execution of this <see cref="BuildExpressionsTask"/>.
+        /// into output files by the execution of this <see cref="XprGenerateTask"/>.
         /// </summary>
         [Output]
         public int BuiltExpressionsCount { get; set; }

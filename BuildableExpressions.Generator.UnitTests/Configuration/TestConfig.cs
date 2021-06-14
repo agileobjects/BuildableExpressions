@@ -19,17 +19,20 @@
                 RootNamespace = rootNamespace;
             }
 
-            OutputDirectory = "bin\\Debug\\net461";
+            InputDirectory = "bin\\Debug\\net461";
+            OutputProjectPath = _projectPath;
         }
 
         public string SolutionPath => _solutionPath;
 
-        public string ProjectPath => _projectPath;
+        public string InputProjectPath => _projectPath;
+
+        public string OutputProjectPath { get; set; }
 
         public string TargetFramework => "net4*";
 
         public string RootNamespace { get; set; }
 
-        public string OutputDirectory { get; set; }
+        public string InputDirectory { get; set; }
     }
 }

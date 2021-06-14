@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Reflection;
     using Compilation;
@@ -46,8 +47,17 @@
             return Array.Empty<ISourceCodeExpressionBuilder>();
         }
 
-        private static bool IsProjectAssembly(string assemblyName)
+        private static bool IsProjectAssembly(string assemblyPath)
         {
+            var assemblyDirectory = Path.GetFileName(Path.GetDirectoryName(assemblyPath));
+
+            if (assemblyDirectory.EqualsIgnoreCase("ref"))
+            {
+                return false;
+            }
+
+            var assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
+
             return
                 assemblyName.DoesNotEqualIgnoreCase("AgileObjects.NetStandardPolyfills") &&
                 assemblyName.DoesNotEqualIgnoreCase("AgileObjects.ReadableExpressions") &&

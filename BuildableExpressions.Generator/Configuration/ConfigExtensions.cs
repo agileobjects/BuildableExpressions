@@ -8,15 +8,21 @@
             => Path.GetFileName(config.SolutionPath);
 
         public static string GetProjectNameWithoutExtension(this IConfig config)
-            => Path.GetFileNameWithoutExtension(config.GetProjectName());
+            => GetProjectNameWithoutExtension(config.InputProjectPath);
 
-        public static string GetProjectName(this IConfig config)
-            => Path.GetFileName(config.ProjectPath);
+        public static string GetOutputProjectNameWithoutExtension(this IConfig config)
+            => GetProjectNameWithoutExtension(config.OutputProjectPath);
 
-        public static string GetContentRoot(this IConfig config)
-            => Path.GetDirectoryName(config.ProjectPath);
+        private static string GetProjectNameWithoutExtension(string projectPath)
+            => Path.GetFileNameWithoutExtension(Path.GetFileName(projectPath));
 
-        public static string GetOutputPath(this IConfig config)
-            => Path.Combine(config.GetContentRoot(), config.OutputDirectory);
+        public static string GetOutputRoot(this IConfig config)
+            => Path.GetDirectoryName(config.OutputProjectPath);
+
+        public static string GetInputPath(this IConfig config)
+            => Path.Combine(config.GetInputRoot(), config.InputDirectory);
+
+        public static string GetInputRoot(this IConfig config)
+            => Path.GetDirectoryName(config.InputProjectPath);
     }
 }

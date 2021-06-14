@@ -42,15 +42,19 @@
                 }
 
                 _logger.Info($"{builders.Count} builder(s) found...");
-                var project = _projectFactory.GetProjectOrThrow(config);
+                var outputProject = _projectFactory.GetOutputProjectOrThrow(config);
 
                 var sourceCodeExpressions = builders.ToSourceCodeExpressions();
                 _logger.Info($"{sourceCodeExpressions.Count} Expression(s) built...");
 
                 var writtenFiles = _outputWriter.Write(config, sourceCodeExpressions);
 
-                project.Add(writtenFiles);
-                _logger.Info($"{writtenFiles.Count} file(s) written");
+                outputProject.Add(writtenFiles);
+                
+                _logger.Info(
+                    $"{writtenFiles.Count} file(s) written to " +
+                    $"project '{config.GetOutputProjectNameWithoutExtension()}'");
+                
                 result.BuiltExpressionsCount = writtenFiles.Count;
 
             Complete:

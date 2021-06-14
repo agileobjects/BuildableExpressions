@@ -16,7 +16,7 @@
 
     public class OutputWriterTests
     {
-        private static readonly string _projectDirectory = TestConfig.Default.GetContentRoot();
+        private static readonly string _projectDirectory = TestConfig.Default.GetOutputRoot();
         private const string _rootNamespace = "AgileObjects.BuildableExpressions";
 
         [Fact]

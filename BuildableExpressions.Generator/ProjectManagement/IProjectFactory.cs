@@ -4,6 +4,6 @@
 
     internal interface IProjectFactory
     {
-        IProject GetProjectOrThrow(IConfig config);
+        IProject GetOutputProjectOrThrow(IConfig config);
     }
 }

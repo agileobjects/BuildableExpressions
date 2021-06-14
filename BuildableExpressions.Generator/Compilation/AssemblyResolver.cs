@@ -34,7 +34,7 @@
             _assemblyLoadersByName = new ConcurrentDictionary<string, Lazy<Assembly>>();
 
             PopulateFrameworkAssemblyLoaders(config);
-            PopulateAssemblyLoadersFromOutput(config);
+            PopulateAssemblyLoadersFromInput(config);
             AppDomain.CurrentDomain.AssemblyResolve += ResolveAssemblyIfAvailable;
         }
 
@@ -92,26 +92,26 @@
             }
         }
 
-        private void PopulateAssemblyLoadersFromOutput(IConfig config)
+        private void PopulateAssemblyLoadersFromInput(IConfig config)
         {
-            foreach (var assemblyPath in EnumerateOutputAssemblyPaths(config))
+            foreach (var assemblyPath in EnumerateInputAssemblyPaths(config))
             {
                 AddAssemblyLoader(assemblyPath, LoadAssembly);
             }
         }
 
-        private IEnumerable<string> EnumerateOutputAssemblyPaths(IConfig config)
+        private IEnumerable<string> EnumerateInputAssemblyPaths(IConfig config)
         {
-            var outputPath = config.GetOutputPath();
+            var inputPath = config.GetInputPath();
 
-            var outputAssemblyPaths = _fileManager
-                .FindFiles(outputPath, "*.dll");
+            var inputAssemblyPaths = _fileManager
+                .FindFiles(inputPath, "*.dll");
 
-            var outputExePaths = _fileManager
-                .FindFiles(outputPath, "*.exe");
+            var inputExePaths = _fileManager
+                .FindFiles(inputPath, "*.exe");
 
-            return outputAssemblyPaths
-                .Concat(outputExePaths)
+            return inputAssemblyPaths
+                .Concat(inputExePaths)
                 .Where(IncludeOutputAssembly);
         }
 
@@ -168,7 +168,7 @@
             out ICollection<Lazy<Assembly>> assemblyLoaders)
         {
             assemblyLoaders = _assemblyLoadersByName
-                .Where(kvp => matcher.Invoke(GetFileNameWithoutExtension(kvp.Key)))
+                .Where(kvp => matcher.Invoke(kvp.Key))
                 .Select(kvp => kvp.Value)
                 .ToList();
 
@@ -181,7 +181,7 @@
             var assemblyName = assemblyInfo.Name;
             var assemblyDllName = assemblyName + ".dll";
 
-            if (TryFindAssemblyLoaders(name => name == assemblyName, out var loaders) &&
+            if (TryFindAssemblyLoaders(path => MatchesName(assemblyName, path), out var loaders) &&
                 loaders.First().IsValueCreated)
             {
                 return loaders.First().Value;
@@ -197,13 +197,16 @@
                 return assembly;
             }
 
-            if (TryLoadAssemblies(name => name == assemblyName, out var assemblies))
+            if (TryLoadAssemblies(path => MatchesName(assemblyName, path), out var assemblies))
             {
                 return assemblies.First();
             }
 
             return null;
         }
+
+        private static bool MatchesName(string assemblyName, string assemblyPath)
+            => GetFileNameWithoutExtension(assemblyPath) == assemblyName;
 
         private bool TryFindAssembly(string searchPath, string assemblyName, out Assembly assembly)
         {

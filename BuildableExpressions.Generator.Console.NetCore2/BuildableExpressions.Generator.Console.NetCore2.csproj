@@ -1,14 +1,15 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <RootNamespace>AgileObjects.BuildableExpressions.Generator.Console</RootNamespace>
-    <AssemblyName>AgileObjects.BuildableExpressions.Generator.Console.Net461.Sdk</AssemblyName>
+    <AssemblyName>AgileObjects.BuildableExpressions.Generator.Console.NetCore2</AssemblyName>
   </PropertyGroup>
-
+  
   <PropertyGroup>
     <XprGeneratorDebug>false</XprGeneratorDebug>
+    <XprGeneratorOutputProject>..\BuildableExpressions.Generator.Console.Net5\BuildableExpressions.Generator.Console.Net5.csproj</XprGeneratorOutputProject>
   </PropertyGroup>
 
   <ItemGroup>

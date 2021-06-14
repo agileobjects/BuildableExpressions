@@ -19,9 +19,11 @@
             _fileManager = fileManager;
         }
 
-        public IProject GetProjectOrThrow(IConfig config)
+        public IProject GetOutputProjectOrThrow(IConfig config)
         {
-            using var fileReadStream = _fileManager.OpenRead(config.ProjectPath);
+            var outputProject = config.OutputProjectPath;
+
+            using var fileReadStream = _fileManager.OpenRead(outputProject);
             using var fileReader = new StreamReader(fileReadStream);
 
             while (true)
@@ -31,7 +33,7 @@
                 if (fileLine == null || char.IsWhiteSpace(fileLine.First()))
                 {
                     var ex = new NotSupportedException(
-                        $"Unable to find <Project /> element in file '{config.ProjectPath}'");
+                        $"Unable to find <Project /> element in file '{outputProject}'");
 
                     throw ex;
                 }

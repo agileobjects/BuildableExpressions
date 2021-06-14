@@ -37,7 +37,7 @@
             {
                 var @namespace = sourceCodeExpression.Namespace;
 
-                var outputDirectory = config.GetContentRoot();
+                var outputDirectory = config.GetOutputRoot();
                 string relativeFilePath;
 
                 if (@namespace != rootNamespace &&
