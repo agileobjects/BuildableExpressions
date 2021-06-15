@@ -107,7 +107,11 @@
             }
         }
 
-        IEnumerable<Assembly> IExpressionBuildContext.ProjectAssemblies 
+        IEnumerable<Assembly> IExpressionBuildContext.ProjectAssemblies
             => _projectAssemblies;
+
+        public void Log(string message) => _logger.Info(message);
+
+        public void Log(Exception exception) => _logger.Error(exception);
     }
 }

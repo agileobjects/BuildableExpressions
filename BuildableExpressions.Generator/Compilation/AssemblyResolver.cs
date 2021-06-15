@@ -269,12 +269,6 @@
 
         private Assembly LoadAssemblyFromCopy(string assemblyPath)
         {
-            //using var fileStream = _fileManager.OpenRead(assemblyPath);
-            //using var assemblyStream = new MemoryStream();
-
-            //fileStream.CopyTo(assemblyStream);
-            //return Assembly.Load(assemblyStream.ToArray());
-
             var assemblyDirectory = GetDirectoryName(assemblyPath);
             var assemblyName = GetFileNameWithoutExtension(assemblyPath);
             var extension = GetExtension(assemblyPath);
