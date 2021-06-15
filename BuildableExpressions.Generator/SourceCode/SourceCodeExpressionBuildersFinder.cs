@@ -1,4 +1,4 @@
-﻿namespace AgileObjects.BuildableExpressions.Generator.InputOutput
+﻿namespace AgileObjects.BuildableExpressions.Generator.SourceCode
 {
     using System;
     using System.Collections.Generic;
@@ -11,19 +11,21 @@
     using NetStandardPolyfills;
     using static Compilation.AssemblyResolver;
 
-    internal class ExpressionBuildersFinder : IExpressionBuildContext
+    internal class SourceCodeExpressionBuildersFinder
     {
         private readonly ILogger _logger;
         private readonly AssemblyResolver _assemblyResolver;
         private ICollection<Assembly> _projectAssemblies;
 
-        public ExpressionBuildersFinder(
+        public SourceCodeExpressionBuildersFinder(
             ILogger logger,
             AssemblyResolver assemblyResolver)
         {
             _logger = logger;
             _assemblyResolver = assemblyResolver;
         }
+
+        public IEnumerable<Assembly> ProjectAssemblies => _projectAssemblies;
 
         public ICollection<ISourceCodeExpressionBuilder> Find(IConfig config)
         {
@@ -59,10 +61,10 @@
             var assemblyName = key.AssemblyName;
 
             return
-                assemblyName.DoesNotEqualIgnoreCase("AgileObjects.NetStandardPolyfills") &&
-                assemblyName.DoesNotEqualIgnoreCase("AgileObjects.ReadableExpressions") &&
-                assemblyName.DoesNotEqualIgnoreCase("AgileObjects.BuildableExpressions") &&
-                assemblyName.DoesNotEqualIgnoreCase("AgileObjects.AgileMapper") &&
+                assemblyName.DoesNotEqualIgnoreCase("AgileObjects.NetStandardPolyfills.dll") &&
+                assemblyName.DoesNotEqualIgnoreCase("AgileObjects.ReadableExpressions.dll") &&
+                assemblyName.DoesNotEqualIgnoreCase("AgileObjects.BuildableExpressions.dll") &&
+                assemblyName.DoesNotEqualIgnoreCase("AgileObjects.AgileMapper.dll") &&
                 assemblyName.DoesNotStartWithIgnoreCase("System.") &&
                 assemblyName.DoesNotStartWithIgnoreCase("Microsoft.") &&
                 assemblyName.DoesNotStartWithIgnoreCase("EnvDTE") &&
@@ -106,12 +108,5 @@
                 }
             }
         }
-
-        IEnumerable<Assembly> IExpressionBuildContext.ProjectAssemblies
-            => _projectAssemblies;
-
-        public void Log(string message) => _logger.Info(message);
-
-        public void Log(Exception exception) => _logger.Error(exception);
     }
 }

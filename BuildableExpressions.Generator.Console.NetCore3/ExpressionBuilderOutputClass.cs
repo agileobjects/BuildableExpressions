@@ -1,6 +1,6 @@
 using DefaultNamespace;
 
-namespace GeneratedExpressionCode
+namespace AgileObjects.BuildableExpressions.Generator.Console
 {
     public class ExpressionBuilderOutputClass
     {

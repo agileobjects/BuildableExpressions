@@ -2,8 +2,8 @@
 {
     using System;
     using System.IO;
-    using System.Linq;
     using Configuration;
+    using Extensions;
     using InputOutput;
 #if NETFRAMEWORK
     using NonSdk;
@@ -22,6 +22,9 @@
         public IProject GetOutputProjectOrThrow(IConfig config)
         {
             var outputProject = config.OutputProjectPath;
+            var rootNamespace = Path.GetFileNameWithoutExtension(outputProject);
+
+            var projectFactory = default(Func<IConfig, string, IProject>);
 
             using var fileReadStream = _fileManager.OpenRead(outputProject);
             using var fileReader = new StreamReader(fileReadStream);
@@ -30,55 +33,41 @@
             {
                 var fileLine = fileReader.ReadLine();
 
-                if (fileLine == null || char.IsWhiteSpace(fileLine.First()))
+                if (fileLine == null)
                 {
-                    var ex = new NotSupportedException(
+                    if (projectFactory != null)
+                    {
+                        break;
+                    }
+
+                    throw new NotSupportedException(
                         $"Unable to find <Project /> element in file '{outputProject}'");
-
-                    throw ex;
                 }
 
-                if (!fileLine.StartsWith("<Project", OrdinalIgnoreCase))
+                if (fileLine.StartsWithIgnoreCase("<Project"))
                 {
-                    continue;
-                }
-
-                if (string.IsNullOrWhiteSpace(config.RootNamespace))
-                {
-                    TryPopulateRootNamespace(config, fileReader);
-                }
-
 #if NETFRAMEWORK
-                if (fileLine.IndexOf(" Sdk=\"", OrdinalIgnoreCase) != -1)
-                {
-                    return new SdkProject();
-                }
-
-                return new NetFrameworkProject(config);
-#else
-                return new SdkProject();
+                    if (fileLine.IndexOf(" Sdk=\"", OrdinalIgnoreCase) == -1)
+                    {
+                        projectFactory = (cfg, ns) => new NetFrameworkProject(cfg, ns);
+                        continue;
+                    }
 #endif
-            }
-        }
-
-        private static void TryPopulateRootNamespace(IConfig config, TextReader fileReader)
-        {
-            string fileLine;
-
-            while ((fileLine = fileReader.ReadLine()?.TrimStart()) != null)
-            {
-                if (!fileLine.StartsWith("<RootNamespace>", OrdinalIgnoreCase))
-                {
+                    projectFactory = (cfg, ns) => new SdkProject(cfg, ns);
                     continue;
                 }
 
-                var @namespace = fileLine
-                    .Substring("<RootNamespace>".Length)
-                    .Split('<')[0];
+                if (fileLine.TrimStart().StartsWithIgnoreCase("<RootNamespace"))
+                {
+                    rootNamespace = fileLine
+                        .Substring(fileLine.IndexOf('>') + 1)
+                        .Split('<')[0];
 
-                config.RootNamespace = @namespace;
-                return;
+                    break;
+                }
             }
+
+            return projectFactory!.Invoke(config, rootNamespace);
         }
     }
 }

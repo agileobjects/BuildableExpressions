@@ -18,7 +18,6 @@
         InputProjectPath="$(MSBuildProjectFullPath)"
         OutputProjectPath="$(XprGeneratorOutputProject)"
         TargetFramework="$(TargetFramework)"
-        RootNamespace="$(RootNamespace)"
         InputDirectory="bin\$(Configuration)\$(TargetFramework)"
         Debug="$(XprGeneratorDebug)">
       <Output TaskParameter="BuiltExpressionsCount" PropertyName="BuiltExpressionsCount" />

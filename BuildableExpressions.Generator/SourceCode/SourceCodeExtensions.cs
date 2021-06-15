@@ -11,6 +11,8 @@
             this IEnumerable<ISourceCodeExpressionBuilder> builders,
             IExpressionBuildContext context)
         {
+            BuildableExpression.DefaultNamespace = context.RootNamespace;
+
             var allExpressions = new List<SourceCodeExpression>();
 
             foreach (var builder in builders)

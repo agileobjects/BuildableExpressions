@@ -18,6 +18,11 @@
         IEnumerable<Assembly> ProjectAssemblies { get; }
 
         /// <summary>
+        /// Gets the root namespace to which generated source code will be added.
+        /// </summary>
+        string RootNamespace { get; }
+
+        /// <summary>
         /// Log the given <paramref name="message"/> to the build output.
         /// </summary>
         /// <param name="message">The message to log to the build output.</param>

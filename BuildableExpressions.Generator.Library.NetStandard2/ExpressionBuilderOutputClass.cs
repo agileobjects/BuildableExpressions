@@ -1,4 +1,4 @@
-namespace GeneratedExpressionCode
+namespace AgileObjects.BuildableExpressions.Generator.Library
 {
     public class ExpressionBuilderOutputClass
     {

@@ -19,7 +19,7 @@
         public void ShouldErrorIfNonProjectFile()
         {
             var fileManager = CreateFileManager("Hi! I am a file");
-            var config = new TestConfig(rootNamespace: null);
+            var config = TestConfig.Default;
             var factory = new ProjectFactory(fileManager);
 
             var projectEx = Should.Throw<NotSupportedException>(() =>
@@ -44,7 +44,7 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
-            var config = new TestConfig(rootNamespace: null);
+            var config = TestConfig.Default;
             var factory = new ProjectFactory(fileManager);
 
             var projectEx = Should.Throw<NotSupportedException>(() =>
@@ -75,7 +75,7 @@
             var fileManager = CreateFileManager(fileContents);
             var factory = new ProjectFactory(fileManager);
 
-            var project = factory.GetOutputProjectOrThrow(new TestConfig(rootNamespace: null));
+            var project = factory.GetOutputProjectOrThrow(TestConfig.Default);
 
             project.ShouldBeOfType<SdkProject>();
         }
@@ -98,12 +98,11 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
-            var config = new TestConfig(rootNamespace: null);
             var factory = new ProjectFactory(fileManager);
 
-            factory.GetOutputProjectOrThrow(config);
+            var project = factory.GetOutputProjectOrThrow(TestConfig.Default);
 
-            config.RootNamespace.ShouldBe("AgileObjects.BuildableExpressions.Generator.UnitTests");
+            project.RootNamespace.ShouldBe("AgileObjects.BuildableExpressions.Generator.UnitTests");
         }
 
 #if NETFRAMEWORK
@@ -133,10 +132,9 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
-            var config = new TestConfig(rootNamespace: string.Empty);
             var factory = new ProjectFactory(fileManager);
 
-            var project = factory.GetOutputProjectOrThrow(config);
+            var project = factory.GetOutputProjectOrThrow(TestConfig.Default);
 
             project.ShouldBeOfType<NetFrameworkProject>();
         }
@@ -168,12 +166,11 @@
             #endregion
 
             var fileManager = CreateFileManager(fileContents);
-            var config = new TestConfig(rootNamespace: string.Empty);
             var factory = new ProjectFactory(fileManager);
 
-            factory.GetOutputProjectOrThrow(config);
+            var project = factory.GetOutputProjectOrThrow(TestConfig.Default);
 
-            config.RootNamespace.ShouldBe("AgileObjects.BuildableExpressions.Generator.UnitTests");
+            project.RootNamespace.ShouldBe("AgileObjects.BuildableExpressions.Generator.UnitTests");
         }
 #endif
         #region Helper Members

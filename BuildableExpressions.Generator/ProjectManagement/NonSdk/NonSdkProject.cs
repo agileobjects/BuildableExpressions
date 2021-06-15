@@ -8,29 +8,34 @@ namespace AgileObjects.BuildableExpressions.Generator.ProjectManagement.NonSdk
 
     internal class NetFrameworkProject : IProject
     {
-        private readonly IConfig _config;
+        private readonly string _solutionName;
 
-        public NetFrameworkProject(IConfig config)
+        public NetFrameworkProject(IConfig config, string rootNamespace)
         {
-            _config = config;
+            _solutionName = config.GetSolutionName();
+            FilePath = config.OutputProjectPath;
+            RootNamespace = rootNamespace;
         }
+
+        public string FilePath { get; }
+
+        public string RootNamespace { get; }
 
         public void Add(IEnumerable<string> relativeFilePaths)
         {
-            var solutionName = _config.GetSolutionName();
-            var contentRoot = _config.GetOutputRoot();
+            var contentRoot = Path.GetDirectoryName(FilePath);
 
             var devTools = DevToolsFactory
-                .GetDevToolsOrNullFor(solutionName);
+                .GetDevToolsOrNullFor(_solutionName);
 
             var project = devTools
                 .Solution
                 .EnumerateProjects()
-                .First(p => p.FullName == _config.InputProjectPath);
+                .First(p => p.FullName == FilePath);
 
             foreach (var filePath in relativeFilePaths)
             {
-                var absoluteFilePath = Path.Combine(contentRoot, filePath);
+                var absoluteFilePath = Path.Combine(contentRoot!, filePath);
                 project.ProjectItems.AddFromFile(absoluteFilePath);
             }
         }

@@ -10,8 +10,6 @@
 
         string TargetFramework { get; }
 
-        string RootNamespace { get; set; }
-
-        string InputDirectory { get; set; }
+        string InputDirectory { get; }
     }
 }

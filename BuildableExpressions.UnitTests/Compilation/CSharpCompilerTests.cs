@@ -192,7 +192,9 @@ namespace MyNamespace
     }
 }
     ";
-            var result = CSharpCompiler.Compile(source);
+            var result = CSharpCompiler.Compile(
+                new[] { typeof(BuildableExpression).GetAssembly() },
+                source);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()

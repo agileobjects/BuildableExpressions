@@ -51,12 +51,6 @@ namespace XprGenerator
         public string OutputProjectPath { get; set; }
 
         /// <summary>
-        /// Gets or sets the root namespace of the project providing the 
-        /// <see cref="SourceCodeExpression"/>(s) to build.
-        /// </summary>
-        public string RootNamespace { get; set; }
-
-        /// <summary>
         /// Gets or sets the target framework against which <see cref="SourceCodeExpression"/>(s)
         /// are being built.
         /// </summary>
@@ -106,7 +100,7 @@ namespace XprGenerator
             var generator = new SourceCodeGenerator(
                 _logger,
                 new ProjectFactory(_fileManager),
-                new ExpressionBuildersFinder(_logger, _assemblyResolver),
+                new SourceCodeExpressionBuildersFinder(_logger, _assemblyResolver),
                 new OutputWriter(_logger, _fileManager));
 
             var result = generator.Execute(this);

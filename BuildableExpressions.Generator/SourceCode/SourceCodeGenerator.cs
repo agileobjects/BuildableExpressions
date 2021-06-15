@@ -10,13 +10,13 @@
     {
         private readonly ILogger _logger;
         private readonly IProjectFactory _projectFactory;
-        private readonly ExpressionBuildersFinder _buildersFinder;
+        private readonly SourceCodeExpressionBuildersFinder _buildersFinder;
         private readonly OutputWriter _outputWriter;
 
         public SourceCodeGenerator(
             ILogger logger,
             IProjectFactory projectFactory,
-            ExpressionBuildersFinder buildersFinder,
+            SourceCodeExpressionBuildersFinder buildersFinder,
             OutputWriter outputWriter)
         {
             _logger = logger;
@@ -42,12 +42,18 @@
                 }
 
                 _logger.Info($"{builders.Count} builder(s) found...");
+
                 var outputProject = _projectFactory.GetOutputProjectOrThrow(config);
 
-                var sourceCodeExpressions = builders.ToSourceCodeExpressions(_buildersFinder);
+                var buildContext = new SourceCodeExpressionBuildContext(
+                    _logger, 
+                    _buildersFinder, 
+                    outputProject);
+
+                var sourceCodeExpressions = builders.ToSourceCodeExpressions(buildContext);
                 _logger.Info($"{sourceCodeExpressions.Count} Expression(s) built...");
 
-                var writtenFiles = _outputWriter.Write(config, sourceCodeExpressions);
+                var writtenFiles = _outputWriter.Write(outputProject, sourceCodeExpressions);
 
                 outputProject.Add(writtenFiles);
                 

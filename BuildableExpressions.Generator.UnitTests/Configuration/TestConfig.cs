@@ -1,37 +1,25 @@
 ﻿namespace AgileObjects.BuildableExpressions.Generator.UnitTests.Configuration
 {
     using Generator.Configuration;
+    using static TestConstants;
 
     internal class TestConfig : IConfig
     {
-        public static readonly IConfig Default = new TestConfig("BuildableExpressions.Test");
+        public static readonly IConfig Default = new TestConfig();
 
-        private const string _solutionPath =
-            @"C:\Projects\BuildableExpressions\BuildableExpressions.sln";
-
-        private const string _projectPath =
-            @"C:\Projects\BuildableExpressions\BuildableExpressions.Test\BuildableExpressions.Test.csproj";
-
-        public TestConfig(string rootNamespace)
+        public TestConfig()
         {
-            if (!string.IsNullOrEmpty(rootNamespace))
-            {
-                RootNamespace = rootNamespace;
-            }
-
             InputDirectory = "bin\\Debug\\net461";
-            OutputProjectPath = _projectPath;
+            OutputProjectPath = TestProjectPath;
         }
 
-        public string SolutionPath => _solutionPath;
+        public string SolutionPath => TestSolutionPath;
 
-        public string InputProjectPath => _projectPath;
+        public string InputProjectPath => TestProjectPath;
 
         public string OutputProjectPath { get; set; }
 
         public string TargetFramework => "net4*";
-
-        public string RootNamespace { get; set; }
 
         public string InputDirectory { get; set; }
     }
