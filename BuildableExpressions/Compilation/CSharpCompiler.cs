@@ -8,6 +8,7 @@
     using System.Reflection;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
+    using static BuildableExpressionExtensions;
     using static Microsoft.CodeAnalysis.OutputKind;
 
     /// <summary>
@@ -90,7 +91,7 @@
             var assemblyReferences = CreateReferences(referenceAssemblies);
             var sourceTrees = cSharpSourceCodes.Select(s => SyntaxFactory.ParseSyntaxTree(s));
 
-            var assemblyPath = GetTempAssemblyPath("BuildXprOutput_");
+            var assemblyPath = GetTempCopyFilePath("BuildXprCompilerOutput", extension: ".dll");
             var assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
 
             using (var outputStream = File.OpenWrite(assemblyPath))
@@ -163,16 +164,6 @@
             return _references.GetOrAdd(
                 assembly.Location,
                 loc => MetadataReference.CreateFromFile(loc));
-        }
-
-        internal static string GetTempAssemblyPath(string assemblyName, string extension = ".dll")
-        {
-            var tempFilePath = Path.GetTempFileName();
-            var tempAssemblyName = assemblyName + Path.GetFileNameWithoutExtension(tempFilePath);
-            var tempDirectory = Path.GetDirectoryName(tempFilePath);
-            var tempAssemblyPath = Path.Combine(tempDirectory!, tempAssemblyName + extension);
-
-            return tempAssemblyPath;
         }
     };
 }

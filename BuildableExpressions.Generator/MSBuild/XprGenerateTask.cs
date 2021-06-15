@@ -68,11 +68,11 @@ namespace XprGenerator
         public string Debug { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating the number of <see cref="SourceCodeExpression"/>s built
-        /// into output files by the execution of this <see cref="XprGenerateTask"/>.
+        /// Gets the number of <see cref="SourceCodeExpression"/>s built into output files by the
+        /// execution of this <see cref="XprGenerateTask"/>.
         /// </summary>
         [Output]
-        public int BuiltExpressionsCount { get; set; }
+        public int BuiltExpressionsCount { get; private set; }
 
         /// <summary>
         /// Generates source code files from a set of <see cref="SourceCodeExpression"/>s.

@@ -11,7 +11,7 @@
     using InputOutput;
     using Logging;
     using static System.IO.Path;
-    using static BuildableExpressions.Compilation.CSharpCompiler;
+    using static BuildableExpressionExtensions;
 
     internal class AssemblyResolver
     {
@@ -286,7 +286,7 @@
                 }
             }
 
-            var copyAssemblyPath = GetTempAssemblyPath(assemblyName + "_", extension);
+            var copyAssemblyPath = GetTempCopyFilePath(assemblyName, extension);
 
             CopyFile(assemblyPath, copyAssemblyPath);
             return Assembly.LoadFrom(copyAssemblyPath);
