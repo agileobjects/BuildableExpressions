@@ -8,8 +8,6 @@
     using System.Reflection;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
-    using NetStandardPolyfills;
-    using ReadableExpressions;
     using static Microsoft.CodeAnalysis.OutputKind;
 
     /// <summary>
@@ -25,14 +23,11 @@
         /// </summary>
         public static readonly IList<Assembly> CompilationAssemblies = CollectReferencedAssemblies(new[]
         {
-            typeof(object).GetAssembly(),
-            typeof(Enumerable).GetAssembly(),
+            typeof(object).Assembly,
+            typeof(Enumerable).Assembly,
 #if NETSTANDARD
-            typeof(List<>).GetAssembly(),
+            typeof(List<>).Assembly,
 #endif
-            typeof(AssemblyExtensionsPolyfill).GetAssembly(),
-            typeof(ReadableExpression).GetAssembly(),
-            typeof(BuildableExpression).GetAssembly()
         });
 
         private static readonly ConcurrentDictionary<string, MetadataReference> _references = new();
@@ -95,29 +90,31 @@
             var assemblyReferences = CreateReferences(referenceAssemblies);
             var sourceTrees = cSharpSourceCodes.Select(s => SyntaxFactory.ParseSyntaxTree(s));
 
-            using var outputStream = new MemoryStream();
+            var assemblyPath = GetTempAssemblyPath("BuildXprOutput_");
+            var assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
 
-            var compilationResult = CSharpCompilation
-                .Create("BuildableExpOutput_" + Path.GetFileNameWithoutExtension(Path.GetTempFileName()))
-                .WithOptions(new CSharpCompilationOptions(DynamicallyLinkedLibrary))
-                .AddReferences(assemblyReferences)
-                .AddSyntaxTrees(sourceTrees)
-                .Emit(outputStream);
-
-            if (!compilationResult.Success)
+            using (var outputStream = File.OpenWrite(assemblyPath))
             {
-                return new CompilationResult
+                var compilationResult = CSharpCompilation
+                    .Create(assemblyName)
+                    .WithOptions(new CSharpCompilationOptions(DynamicallyLinkedLibrary))
+                    .AddReferences(assemblyReferences)
+                    .AddSyntaxTrees(sourceTrees)
+                    .Emit(outputStream);
+
+                if (!compilationResult.Success)
                 {
-                    Errors = compilationResult
-                        .Diagnostics
-                        .Select(ce => $"Error ({ce.Id}): {ce.GetMessage()}, Line {ce.Location.GetLineSpan()}")
-                        .ToList()
-                };
+                    return new CompilationResult
+                    {
+                        Errors = compilationResult
+                            .Diagnostics
+                            .Select(ce => $"Error ({ce.Id}): {ce.GetMessage()}, Line {ce.Location.GetLineSpan()}")
+                            .ToList()
+                    };
+                }
             }
 
-            outputStream.Position = 0;
-
-            var compiledAssembly = Assembly.Load(outputStream.ToArray());
+            var compiledAssembly = Assembly.LoadFrom(assemblyPath);
 
             return new CompilationResult { CompiledAssembly = compiledAssembly };
         }
@@ -166,6 +163,16 @@
             return _references.GetOrAdd(
                 assembly.Location,
                 loc => MetadataReference.CreateFromFile(loc));
+        }
+
+        internal static string GetTempAssemblyPath(string assemblyName, string extension = ".dll")
+        {
+            var tempFilePath = Path.GetTempFileName();
+            var tempAssemblyName = assemblyName + Path.GetFileNameWithoutExtension(tempFilePath);
+            var tempDirectory = Path.GetDirectoryName(tempFilePath);
+            var tempAssemblyPath = Path.Combine(tempDirectory!, tempAssemblyName + extension);
+
+            return tempAssemblyPath;
         }
     };
 }

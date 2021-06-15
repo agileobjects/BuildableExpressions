@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.IO;
+    //using System.IO;
     using System.Linq;
     using System.Reflection;
     using Configuration;
@@ -11,24 +11,26 @@
     using InputOutput;
     using Logging;
     using static System.IO.Path;
+    using static BuildableExpressions.Compilation.CSharpCompiler;
 
     internal class AssemblyResolver
     {
         private static readonly string _packageInstallPath;
-        private static readonly string _packageToolsPath;
         private static readonly string _packageSharedPath;
         private static readonly string _packagesRootPath;
         private static readonly string[] _frameworkAssemblyNames;
 
         private readonly ILogger _logger;
         private readonly IFileManager _fileManager;
-        private readonly ConcurrentDictionary<string, Lazy<Assembly>> _assemblyLoadersByName;
+        private readonly ConcurrentDictionary<AssemblyKey, Lazy<Assembly>> _assemblyLoadersByName;
 
         public AssemblyResolver(ILogger logger, IFileManager fileManager)
         {
             _logger = logger;
             _fileManager = fileManager;
-            _assemblyLoadersByName = new ConcurrentDictionary<string, Lazy<Assembly>>();
+
+            _assemblyLoadersByName =
+                new ConcurrentDictionary<AssemblyKey, Lazy<Assembly>>(AssemblyKeyComparer.Default);
 
             AppDomain.CurrentDomain.AssemblyResolve += ResolveAssemblyIfAvailable;
         }
@@ -36,10 +38,10 @@
         static AssemblyResolver()
         {
             _packageInstallPath = GetDirectoryName(typeof(AssemblyResolver).Assembly.Location);
-            _packageToolsPath = GetDirectoryName(_packageInstallPath);
-            _packageSharedPath = Combine(_packageToolsPath!, "shared");
+            var packageToolsPath = GetDirectoryName(_packageInstallPath);
+            _packageSharedPath = Combine(packageToolsPath!, "shared");
 
-            var packageRootPath = _packageToolsPath;
+            var packageRootPath = packageToolsPath;
 
             while (GetFileName(packageRootPath).DoesNotStartWithIgnoreCase("AgileObjects."))
             {
@@ -121,22 +123,22 @@
             var assemblyFileName = GetFileName(assemblyPath);
 
             return
-                assemblyFileName.DoesNotStartWithIgnoreCase("Microsoft.VisualStudio.") ||
-                assemblyFileName.DoesNotStartWithIgnoreCase("nunit.") ||
-                assemblyFileName.DoesNotStartWithIgnoreCase("xunit.") ||
+                assemblyFileName.DoesNotStartWithIgnoreCase("Microsoft.VisualStudio.") &&
+                assemblyFileName.DoesNotStartWithIgnoreCase("nunit.") &&
+                assemblyFileName.DoesNotStartWithIgnoreCase("xunit.") &&
                 assemblyFileName.DoesNotStartWithIgnoreCase("Shouldy");
         }
 
         private void AddAssemblyLoader(string assemblyPath, Func<string, Assembly> loader)
         {
             _assemblyLoadersByName.TryAdd(
-                assemblyPath,
+                new AssemblyKey(_fileManager, assemblyPath),
                 new Lazy<Assembly>(() => loader.Invoke(assemblyPath)));
         }
 
         #endregion
 
-        public ICollection<Assembly> LoadAssemblies(Func<string, bool> matcher)
+        public ICollection<Assembly> LoadAssemblies(Func<AssemblyKey, bool> matcher)
         {
             if (TryLoadAssemblies(matcher, out var projectAssemblies))
             {
@@ -147,7 +149,7 @@
         }
 
         private bool TryLoadAssemblies(
-            Func<string, bool> matcher,
+            Func<AssemblyKey, bool> matcher,
             out ICollection<Assembly> assemblies)
         {
             if (TryFindAssemblyLoaders(matcher, out var loaders))
@@ -165,7 +167,7 @@
         }
 
         private bool TryFindAssemblyLoaders(
-            Func<string, bool> matcher,
+            Func<AssemblyKey, bool> matcher,
             out ICollection<Lazy<Assembly>> assemblyLoaders)
         {
             assemblyLoaders = _assemblyLoadersByName
@@ -179,10 +181,9 @@
         private Assembly ResolveAssemblyIfAvailable(object sender, ResolveEventArgs args)
         {
             var assemblyInfo = new AssemblyName(args.Name);
-            var assemblyName = assemblyInfo.Name;
-            var assemblyDllName = assemblyName + ".dll";
+            var assemblyDllName = assemblyInfo.Name + ".dll";
 
-            if (TryFindAssemblyLoaders(path => MatchesName(assemblyName, path), out var loaders) &&
+            if (TryFindAssemblyLoaders(key => Matches(assemblyDllName, key), out var loaders) &&
                 loaders.First().IsValueCreated)
             {
                 return loaders.First().Value;
@@ -198,7 +199,7 @@
                 return assembly;
             }
 
-            if (TryLoadAssemblies(path => MatchesName(assemblyName, path), out var assemblies))
+            if (TryLoadAssemblies(key => Matches(assemblyDllName, key), out var assemblies))
             {
                 return assemblies.First();
             }
@@ -206,8 +207,8 @@
             return null;
         }
 
-        private static bool MatchesName(string assemblyName, string assemblyPath)
-            => GetFileNameWithoutExtension(assemblyPath) == assemblyName;
+        private static bool Matches(string assemblyDllName, AssemblyKey key)
+            => assemblyDllName.EqualsIgnoreCase(key.AssemblyName);
 
         private bool TryFindAssembly(string searchPath, string assemblyName, out Assembly assembly)
         {
@@ -245,11 +246,15 @@
 
             try
             {
-                var assembly = assemblyPath.StartsWithIgnoreCase(_packageToolsPath)
+                var assembly = assemblyPath.StartsWithIgnoreCase(_packagesRootPath)
                     ? Assembly.LoadFrom(assemblyPath)
-                    : LoadAssemblyFromInMemoryCopy(assemblyPath);
+                    : LoadAssemblyFromCopy(assemblyPath);
 
-                _logger.Info($"loaded assembly '{assemblyFileName}' from {assemblyFolderName}");
+                if (assembly != null)
+                {
+                    _logger.Info($"loaded assembly '{assemblyFileName}' from {assemblyFolderName}");
+                }
+
                 return assembly;
             }
             catch (Exception loadEx)
@@ -262,13 +267,83 @@
             }
         }
 
-        private Assembly LoadAssemblyFromInMemoryCopy(string assemblyPath)
+        private Assembly LoadAssemblyFromCopy(string assemblyPath)
         {
-            using var fileStream = _fileManager.OpenRead(assemblyPath);
-            using var assemblyStream = new MemoryStream();
+            //using var fileStream = _fileManager.OpenRead(assemblyPath);
+            //using var assemblyStream = new MemoryStream();
 
-            fileStream.CopyTo(assemblyStream);
-            return Assembly.Load(assemblyStream.ToArray());
+            //fileStream.CopyTo(assemblyStream);
+            //return Assembly.Load(assemblyStream.ToArray());
+
+            var assemblyDirectory = GetDirectoryName(assemblyPath);
+            var assemblyName = GetFileNameWithoutExtension(assemblyPath);
+            var extension = GetExtension(assemblyPath);
+
+            if (extension.EqualsIgnoreCase(".exe"))
+            {
+                var matchingDllExists = _fileManager
+                    .FindFiles(assemblyDirectory, assemblyName + ".dll")
+                    .Any();
+
+                if (matchingDllExists)
+                {
+                    _logger.Info($"skipping '{assemblyName}.exe' as matching DLL exists");
+                    return null;
+                }
+            }
+
+            var copyAssemblyPath = GetTempAssemblyPath(assemblyName + "_", extension);
+
+            CopyFile(assemblyPath, copyAssemblyPath);
+            return Assembly.LoadFrom(copyAssemblyPath);
         }
+
+        private void CopyFile(string sourcePath, string targetPath)
+        {
+            using var assemblyReader = _fileManager.OpenRead(sourcePath);
+            using var assemblyWriter = _fileManager.OpenWrite(targetPath);
+
+            assemblyReader.CopyTo(assemblyWriter);
+        }
+
+        #region Helper Class
+
+        public class AssemblyKey
+        {
+            private readonly Lazy<string> _versionLoader;
+
+            public AssemblyKey(
+                IFileManager fileManager,
+                string assemblyPath)
+            {
+                AssemblyName = GetFileName(assemblyPath);
+                AssemblyDirectory = GetFileName(GetDirectoryName(assemblyPath));
+                _versionLoader = new Lazy<string>(() => fileManager.GetVersion(assemblyPath));
+            }
+
+            public string AssemblyName { get; }
+
+            public string AssemblyDirectory { get; }
+
+            public string Version => _versionLoader.Value;
+
+            public override string ToString() => AssemblyName;
+        }
+
+        private class AssemblyKeyComparer : IEqualityComparer<AssemblyKey>
+        {
+            public static readonly IEqualityComparer<AssemblyKey> Default =
+                new AssemblyKeyComparer();
+
+            public bool Equals(AssemblyKey x, AssemblyKey y)
+            {
+                return x!.AssemblyName.EqualsIgnoreCase(y!.AssemblyName) &&
+                       x.Version == y.Version;
+            }
+
+            public int GetHashCode(AssemblyKey obj) => 0;
+        }
+
+        #endregion
     }
 }

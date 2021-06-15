@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using static System.IO.SearchOption;
 
@@ -30,6 +31,11 @@
         }
 
         public Stream OpenRead(string filePath) => File.OpenRead(filePath);
+
+        public string GetVersion(string filePath)
+            => FileVersionInfo.GetVersionInfo(filePath).FileVersion;
+
+        public Stream OpenWrite(string filePath) => File.OpenWrite(filePath);
 
         public void Write(string filePath, string contents)
             => File.WriteAllText(filePath, contents);

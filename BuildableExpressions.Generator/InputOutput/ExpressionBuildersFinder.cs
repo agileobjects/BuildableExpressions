@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Reflection;
     using Compilation;
@@ -10,6 +9,7 @@
     using Extensions;
     using Logging;
     using NetStandardPolyfills;
+    using static Compilation.AssemblyResolver;
 
     internal class ExpressionBuildersFinder : IExpressionBuildContext
     {
@@ -49,16 +49,14 @@
             return Array.Empty<ISourceCodeExpressionBuilder>();
         }
 
-        private static bool IsProjectAssembly(string assemblyPath)
+        private static bool IsProjectAssembly(AssemblyKey key)
         {
-            var assemblyDirectory = Path.GetFileName(Path.GetDirectoryName(assemblyPath));
-
-            if (assemblyDirectory.EqualsIgnoreCase("ref"))
+            if (key.AssemblyDirectory.EqualsIgnoreCase("ref"))
             {
                 return false;
             }
 
-            var assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
+            var assemblyName = key.AssemblyName;
 
             return
                 assemblyName.DoesNotEqualIgnoreCase("AgileObjects.NetStandardPolyfills") &&
