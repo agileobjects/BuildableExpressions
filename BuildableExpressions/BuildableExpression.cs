@@ -12,7 +12,7 @@
         /// <summary>
         /// Gets or sets the default namespace to which generated types will be added.
         /// </summary>
-        internal static string DefaultNamespace { get; set; }
+        public static string DefaultNamespace { get; set; }
 
         /// <summary>
         /// Create a <see cref="SourceCodeExpression"/> representing a complete piece of source code.
