@@ -9,6 +9,56 @@
     public interface IAttributableExpressionConfigurator
     {
         /// <summary>
+        /// Applies the <typeparamref name="TAttribute"/> type to the source code element being
+        /// configured.
+        /// </summary>
+        /// <typeparam name="TAttribute">
+        /// The Attribute type to apply to the source code element being configured.
+        /// </typeparam>
+        void AddAttribute<TAttribute>();
+
+        /// <summary>
+        /// Applies the <typeparamref name="TAttribute"/> type to the source code element being
+        /// configured, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <typeparam name="TAttribute">
+        /// The Attribute type to apply to the source code element being configured.
+        /// </typeparam>
+        /// <param name="configuration">The configuration to use.</param>
+        void AddAttribute<TAttribute>(Action<IAttributeApplicationConfigurator> configuration);
+
+        /// <summary>
+        /// Applies the <paramref name="attributeType"/> attribute to the source code element being
+        /// configured.
+        /// </summary>
+        /// <param name="attributeType">
+        /// The Attribute type to apply to the source code element being configured.
+        /// </param>
+        void AddAttribute(Type attributeType);
+
+        /// <summary>
+        /// Applies the <paramref name="attributeType"/> attribute to the source code element being
+        /// configured, using the given <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="attributeType">
+        /// The Attribute type to apply to the source code element being configured.
+        /// </param>
+        /// <param name="configuration">The configuration to use.</param>
+        void AddAttribute(
+            Type attributeType,
+            Action<IAttributeApplicationConfigurator> configuration);
+
+        /// <summary>
+        /// Applies the given <paramref name="attribute"/> to the source code element being
+        /// configured.
+        /// </summary>
+        /// <param name="attribute">
+        /// The <see cref="AttributeExpression"/> to apply to the source code element being
+        /// configured.
+        /// </param>
+        void AddAttribute(AttributeExpression attribute);
+
+        /// <summary>
         /// Applies the given <paramref name="attribute"/> to the source code element being
         /// configured, using the given <paramref name="configuration"/>.
         /// </summary>

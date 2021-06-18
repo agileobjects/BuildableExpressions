@@ -72,6 +72,16 @@
             return AddConstructor(configuration);
         }
 
+        FieldExpression IConcreteTypeExpressionConfigurator.AddField<TField>(string name) 
+            => AddField(name, ClrTypeWrapper.For(typeof(TField)), configuration: null);
+
+        FieldExpression IConcreteTypeExpressionConfigurator.AddField<TField>(
+            string name,
+            Action<IFieldExpressionConfigurator> configuration)
+        {
+            return AddField(name, ClrTypeWrapper.For(typeof(TField)), configuration);
+        }
+
         FieldExpression IConcreteTypeExpressionConfigurator.AddField(
             string name,
             IType type,

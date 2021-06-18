@@ -351,7 +351,47 @@
 
         #region IMethodExpressionBaseConfigurator Members
 
+        ParameterExpression IMethodExpressionBaseConfigurator.AddParameter<TParameter>(string name)
+            => AddParameter(typeof(TParameter), name, configuration: null);
+
+        ParameterExpression IMethodExpressionBaseConfigurator.AddParameter<TParameter>(
+            string name,
+            Action<IParameterExpressionConfigurator> configuration)
+        {
+            return AddParameter(typeof(TParameter), name, configuration);
+        }
+
+        ParameterExpression IMethodExpressionBaseConfigurator.AddParameter(Type type, string name)
+            => AddParameter(type, name, configuration: null);
+
+        ParameterExpression IMethodExpressionBaseConfigurator.AddParameter(
+            Type type,
+            string name,
+            Action<IParameterExpressionConfigurator> configuration)
+        {
+            return AddParameter(type, name, configuration);
+        }
+
+        private ParameterExpression AddParameter(
+            Type type,
+            string name,
+            Action<IParameterExpressionConfigurator> configuration)
+        {
+            name.ThrowIfInvalidName("Parameter");
+            return AddParameter(Parameter(type, name), configuration);
+        }
+
+        void IMethodExpressionBaseConfigurator.AddParameter(ParameterExpression parameter)
+            => AddParameter(parameter, configuration: null);
+
         void IMethodExpressionBaseConfigurator.AddParameter(
+            ParameterExpression parameter,
+            Action<IParameterExpressionConfigurator> configuration)
+        {
+            AddParameter(parameter, configuration);
+        }
+
+        private ParameterExpression AddParameter(
             ParameterExpression parameter,
             Action<IParameterExpressionConfigurator> configuration)
         {
@@ -359,12 +399,12 @@
 
             if (!AddParameters(new[] { parameter }))
             {
-                return;
+                return parameter;
             }
 
             if (configuration == null)
             {
-                return;
+                return parameter;
             }
 
             _parameterInfos ??= new Dictionary<ParameterExpression, MethodParameterInfo>();
@@ -373,7 +413,11 @@
             configuration.Invoke(info);
 
             _parameterInfos[parameter] = info;
+            return parameter;
         }
+
+        void IMethodExpressionBaseConfigurator.AddParameters(IEnumerable<ParameterExpression> parameters)
+            => AddParameters(parameters.ToArray());
 
         void IMethodExpressionBaseConfigurator.AddParameters(params ParameterExpression[] parameters)
             => AddParameters(parameters);

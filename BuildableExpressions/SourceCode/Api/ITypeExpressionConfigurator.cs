@@ -18,6 +18,12 @@
         /// <summary>
         /// Set the summary documentation of the <see cref="TypeExpression"/>.
         /// </summary>
+        /// <param name="summary">The summary documentation of the <see cref="TypeExpression"/>.</param>
+        void SetSummary(string summary);
+
+        /// <summary>
+        /// Set the summary documentation of the <see cref="TypeExpression"/>.
+        /// </summary>
         /// <param name="summary">
         /// A <see cref="CommentExpression"/> containing summary documentation of the
         /// <see cref="TypeExpression"/>.

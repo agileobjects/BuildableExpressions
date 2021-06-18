@@ -31,7 +31,7 @@
             : base(declaringTypeExpression, name)
         {
             _type = type;
-            configuration.Invoke(this);
+            configuration?.Invoke(this);
 
             if (Visibility == default)
             {
@@ -109,6 +109,9 @@
         void IFieldExpressionConfigurator.SetConstant() => IsConstant = _isReadonly = true;
 
         void IFieldExpressionConfigurator.SetReadonly() => _isReadonly = true;
+
+        void IFieldExpressionConfigurator.SetInitialValue<TValue>(TValue value) 
+            => InitialValue = Constant(value, typeof(TValue));
 
         void IFieldExpressionConfigurator.SetInitialValue(Expression value)
             => InitialValue = value;

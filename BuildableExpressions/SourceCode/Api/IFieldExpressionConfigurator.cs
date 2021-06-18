@@ -26,6 +26,14 @@
         /// Set the <see cref="FieldExpression"/>'s initial value to the given
         /// <paramref name="value"/>.
         /// </summary>
+        /// <typeparam name="TValue">The type of the value to set.</typeparam>
+        /// <param name="value">The value to which to initialise the <see cref="FieldExpression"/>.</param>
+        void SetInitialValue<TValue>(TValue value);
+
+        /// <summary>
+        /// Set the <see cref="FieldExpression"/>'s initial value to the given
+        /// <paramref name="value"/>.
+        /// </summary>
         /// <param name="value">
         /// An Expression representing the value to which to initialise the
         /// <see cref="FieldExpression"/>.

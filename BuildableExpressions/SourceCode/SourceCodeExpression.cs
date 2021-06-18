@@ -136,13 +136,32 @@
 
         #region ISourceCodeExpressionConfigurator Members
 
+        void ISourceCodeExpressionConfigurator.SetHeader(string header)
+            => Header = ReadableExpression.Comment(header);
+
         void ISourceCodeExpressionConfigurator.SetHeader(CommentExpression header)
             => Header = header;
+
+        void ISourceCodeExpressionConfigurator.SetNamespaceToThatOf<T>()
+            => Namespace = typeof(T).Namespace;
+
+        void ISourceCodeExpressionConfigurator.SetNamespaceToThatOf(Type type)
+            => Namespace = type.Namespace;
 
         void ISourceCodeExpressionConfigurator.SetNamespace(string @namespace)
             => Namespace = @namespace;
 
+        InterfaceExpression ISourceCodeExpressionConfigurator.AddInterface(string name)
+            => Add(new ConfiguredInterfaceExpression(this, name, _ => { }));
+
         InterfaceExpression ISourceCodeExpressionConfigurator.AddInterface(
+            string name,
+            Action<IInterfaceExpressionConfigurator> configuration)
+        {
+            return AddInterface(name, configuration);
+        }
+
+        private InterfaceExpression AddInterface(
             string name,
             Action<IInterfaceExpressionConfigurator> configuration)
         {
@@ -163,7 +182,17 @@
             return Add(new ConfiguredStructExpression(this, name, configuration));
         }
 
+        AttributeExpression ISourceCodeExpressionConfigurator.AddAttribute(string name)
+            => AddAttribute(name, _ => { });
+
         AttributeExpression ISourceCodeExpressionConfigurator.AddAttribute(
+            string name,
+            Action<IAttributeExpressionConfigurator> configuration)
+        {
+            return AddAttribute(name, configuration);
+        }
+
+        private AttributeExpression AddAttribute(
             string name,
             Action<IAttributeExpressionConfigurator> configuration)
         {
@@ -172,10 +201,20 @@
 
         EnumExpression ISourceCodeExpressionConfigurator.AddEnum(
             string name,
+            params string[] memberNames)
+        {
+            return AddEnum(name, enm => enm.AddMembers(memberNames));
+        }
+
+        EnumExpression ISourceCodeExpressionConfigurator.AddEnum(
+            string name,
             Action<IEnumExpressionConfigurator> configuration)
         {
-            return Add(new ConfiguredEnumExpression(this, name, configuration));
+            return AddEnum(name, configuration);
         }
+
+        private EnumExpression AddEnum(string name, Action<IEnumExpressionConfigurator> configuration)
+            => Add(new ConfiguredEnumExpression(this, name, configuration));
 
         internal TType Add<TType>(TType type)
             where TType : TypeExpression

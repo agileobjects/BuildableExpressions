@@ -58,6 +58,9 @@
 
         #region IMemberExpressionConfigurator Members
 
+        void IMemberExpressionConfigurator.SetSummary(string summary) 
+            => Summary = ReadableExpression.Comment(summary);
+
         void IMemberExpressionConfigurator.SetSummary(CommentExpression summary)
             => Summary = summary;
 

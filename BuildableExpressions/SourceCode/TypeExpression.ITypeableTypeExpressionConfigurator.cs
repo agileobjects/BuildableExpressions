@@ -37,6 +37,9 @@
             _readOnlyInterfaceTypes = null;
         }
 
+        void ITypeExpressionConfigurator.SetSummary(string summary)
+            => Summary = ReadableExpression.Comment(summary);
+
         void ITypeExpressionConfigurator.SetSummary(CommentExpression summary)
             => Summary = summary;
 
@@ -130,21 +133,22 @@
             return AddMember(ctor);
         }
 
-        internal FieldExpression AddField(
+        /// <summary>
+        /// Add a <see cref="FieldExpression"/> to this <see cref="TypeExpression"/>, with the
+        /// given <paramref name="name"/>, <paramref name="type"/> and
+        /// <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="name">The name of the <see cref="FieldExpression"/>.</param>
+        /// <param name="type">The <see cref="IType"/> of the <see cref="FieldExpression"/>.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The newly-created <see cref="FieldExpression"/>.</returns>
+        protected FieldExpression AddField(
             string name,
             IType type,
             Action<FieldExpression> configuration)
         {
-            return AddField(new FieldExpression(this, name, type, configuration));
-        }
+            var field = new FieldExpression(this, name, type, configuration);
 
-        /// <summary>
-        /// Adds the given <paramref name="field"/> to this <see cref="TypeExpression"/>.
-        /// </summary>
-        /// <param name="field">The <see cref="FieldExpression"/> to add.</param>
-        /// <returns>The given <paramref name="field"/>.</returns>
-        protected FieldExpression AddField(FieldExpression field)
-        {
             _fieldExpressions ??= new List<FieldExpression>();
             _fieldExpressions.Add(field);
             _readOnlyFieldExpressions = null;

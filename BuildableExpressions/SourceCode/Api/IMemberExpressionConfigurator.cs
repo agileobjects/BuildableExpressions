@@ -10,6 +10,12 @@
     public interface IMemberExpressionConfigurator : IAttributableExpressionConfigurator
     {
         /// <summary>
+        /// Set the summary documentation of the <see cref="SourceCode.MemberExpression"/>.
+        /// </summary>
+        /// <param name="summary">The summary documentation of the <see cref="SourceCode.MemberExpression"/>.</param>
+        void SetSummary(string summary);
+
+        /// <summary>
         /// Set the summary documentation of the <see cref="MemberExpression"/>.
         /// </summary>
         /// <param name="summary">
