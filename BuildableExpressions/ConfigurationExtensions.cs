@@ -12,7 +12,6 @@
     using ReadableExpressions.Translations.Reflection;
     using SourceCode;
     using SourceCode.Api;
-    using SourceCode.Extensions;
     using SourceCode.Generics;
     using static SourceCode.MemberVisibility;
 
@@ -21,6 +20,90 @@
     /// </summary>
     public static class ConfigurationExtensions
     {
+        /// <summary>
+        /// Sets the header documentation of the <see cref="SourceCodeExpression"/> to the given
+        /// <paramref name="header"/>.
+        /// </summary>
+        /// <param name="sourceCodeConfig">The <see cref="ISourceCodeExpressionConfigurator"/> to configure.</param>
+        /// <param name="header">
+        /// Text to use for the file header of the source code generated from the
+        /// <see cref="SourceCodeExpression"/>.
+        /// </param>
+        public static void SetHeader(
+            this ISourceCodeExpressionConfigurator sourceCodeConfig,
+            string header)
+        {
+            sourceCodeConfig.SetHeader(ReadableExpression.Comment(header));
+        }
+
+        /// <summary>
+        /// Add <see cref="TypeExpression"/>s belonging to the <see cref="SourceCodeExpression"/>
+        /// to the namespace of the <typeparamref name="T"/> type.
+        /// </summary>
+        /// <typeparam name="T">The type the namespace to which generated code should belong.</typeparam>
+        /// <param name="sourceCodeConfig">The <see cref="ISourceCodeExpressionConfigurator"/> to configure.</param>
+        public static void SetNamespaceToThatOf<T>(
+            this ISourceCodeExpressionConfigurator sourceCodeConfig)
+        {
+            sourceCodeConfig.SetNamespaceToThatOf(typeof(T));
+        }
+
+        /// <summary>
+        /// Add <see cref="TypeExpression"/>s belonging to the <see cref="SourceCodeExpression"/>
+        /// to the namespace of the given <paramref name="type"/>.
+        /// </summary>
+        /// <param name="sourceCodeConfig">The <see cref="ISourceCodeExpressionConfigurator"/> to configure.</param>
+        /// <param name="type">The type the namespace of which the generated code should use.</param>
+        public static void SetNamespaceToThatOf(
+            this ISourceCodeExpressionConfigurator sourceCodeConfig, Type type)
+        {
+            sourceCodeConfig.SetNamespace(type.Namespace);
+        }
+
+        /// <summary>
+        /// Adds a new marker <see cref="InterfaceExpression"/> to this
+        /// <see cref="SourceCodeExpression"/>, with no properties or methods.
+        /// </summary>
+        /// <param name="sourceCodeConfig">The <see cref="ISourceCodeExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="InterfaceExpression"/>.</param>
+        /// <returns>The newly-created <see cref="InterfaceExpression"/>.</returns>
+        public static InterfaceExpression AddInterface(
+            this ISourceCodeExpressionConfigurator sourceCodeConfig,
+            string name)
+        {
+            return sourceCodeConfig.AddInterface(name, configuration: null);
+        }
+
+        /// <summary>
+        /// Adds a new marker <see cref="AttributeExpression"/> to this
+        /// <see cref="SourceCodeExpression"/>, with no members.
+        /// </summary>
+        /// <param name="sourceCodeConfig">The <see cref="ISourceCodeExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="AttributeExpression"/>.</param>
+        /// <returns>The newly-created <see cref="AttributeExpression"/>.</returns>
+        public static AttributeExpression AddAttribute(
+            this ISourceCodeExpressionConfigurator sourceCodeConfig,
+            string name)
+        {
+            return sourceCodeConfig.AddAttribute(name, configuration: null);
+        }
+
+        /// <summary>
+        /// Adds a public <see cref="EnumExpression"/> to this <see cref="SourceCodeExpression"/>,
+        /// with the given <paramref name="name"/> and <paramref name="memberNames"/>.
+        /// </summary>
+        /// <param name="sourceCodeConfig">The <see cref="ISourceCodeExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="EnumExpression"/>.</param>
+        /// <param name="memberNames">The names of the members of the new <see cref="EnumExpression"/>.</param>
+        /// <returns>The newly-created <see cref="EnumExpression"/>.</returns>
+        public static EnumExpression AddEnum(
+            this ISourceCodeExpressionConfigurator sourceCodeConfig,
+            string name,
+            params string[] memberNames)
+        {
+            return sourceCodeConfig.AddEnum(name, enm => enm.AddMembers(memberNames));
+        }
+
         /// <summary>
         /// Closes the <see cref="GenericParameterExpression"/> with the given
         /// <paramref name="genericParameterName"/> to the <typeparamref name="TClosed"/> type for

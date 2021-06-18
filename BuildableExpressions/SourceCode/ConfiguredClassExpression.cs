@@ -13,14 +13,16 @@
         ClassExpression,
         IClassExpressionConfigurator
     {
+        private readonly ConfiguredSourceCodeExpression _sourceCode;
         private Expression _baseInstanceExpression;
 
         public ConfiguredClassExpression(
-            SourceCodeExpression sourceCode,
+            ConfiguredSourceCodeExpression sourceCode,
             string name,
             Action<IClassExpressionConfigurator> configuration)
             : this(sourceCode, name)
         {
+            _sourceCode = sourceCode;
             configuration.Invoke(this);
             Validate();
 
@@ -38,7 +40,7 @@
             }
         }
 
-        private ConfiguredClassExpression(SourceCodeExpression sourceCode, string name)
+        private ConfiguredClassExpression(ConfiguredSourceCodeExpression sourceCode, string name)
             : base(sourceCode, name)
         {
         }
@@ -47,7 +49,7 @@
 
         protected override ClassExpression CreateInstance()
         {
-            return new ConfiguredClassExpression(SourceCode, Name)
+            return new ConfiguredClassExpression(_sourceCode, Name)
             {
                 BaseTypeExpression = BaseTypeExpression,
                 IsStatic = IsStatic,

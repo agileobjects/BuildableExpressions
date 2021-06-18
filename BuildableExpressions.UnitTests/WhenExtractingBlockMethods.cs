@@ -40,7 +40,7 @@
                         cls.AddMethod("GetYepOrNope", yepOrNopeBlock);
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System;
@@ -97,7 +97,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("AddBool", Lambda<Action<List<bool>>>(addBoolCall, boolListParam));
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System;
@@ -150,7 +150,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("GetInts", conditionalLambda)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -223,7 +223,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("GetYepOrNope", yepOrNopeLambda)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -306,7 +306,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("ParseStrings", parseStringsLambda);
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System.Collections.Generic;
@@ -365,7 +365,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("GetInt", assignmentLambda)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -443,7 +443,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -507,7 +507,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System;
@@ -576,7 +576,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System;
@@ -637,7 +637,7 @@ namespace GeneratedExpressionCode
 
                     transientClassType = testClass.Type;
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             transientClassType.ShouldNotBeNull();
 
@@ -710,7 +710,7 @@ namespace GeneratedExpressionCode
                             });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System;
@@ -775,7 +775,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("GetIntValue", ifStatementLambda);
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -818,7 +818,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("AddInts", addIntsLambda);
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode

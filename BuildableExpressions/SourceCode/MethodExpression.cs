@@ -120,7 +120,7 @@
             ThrowIfTypeGenericParameterNameClash(name);
 
             var parameter = new ConfiguredGenericParameterExpression(
-                DeclaringTypeExpression.SourceCode,
+               (ConfiguredSourceCodeExpression)DeclaringTypeExpression.SourceCode,
                 name,
                 configuration);
 

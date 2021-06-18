@@ -23,7 +23,7 @@ It was BuildableExpressions wot dun it!";
                     sc.SetHeader(fileHeader.TrimStart());
                     sc.AddClass(cls => cls.AddMethod(Lambda<Action>(Empty())));
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 // This is some auto-generated source code
@@ -54,7 +54,7 @@ It was BuildableExpressions wot dun it");
                     sc.SetHeader(fileHeader);
                     sc.AddClass(cls => cls.AddMethod(Lambda<Action>(Empty())));
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 // This is some auto-generated source code.
@@ -83,7 +83,7 @@ namespace GeneratedExpressionCode
                     var doNothing = Lambda<Action>(Empty());
                     sc.AddClass(cls => cls.AddMethod("DoAction", doNothing));
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace AgileObjects.GeneratedStuff
@@ -109,7 +109,7 @@ namespace AgileObjects.GeneratedStuff
                     var doNothing = Lambda<Action>(Empty());
                     sc.AddClass(cls => cls.AddMethod("DoAction", doNothing));
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 public class GeneratedExpressionClass
@@ -132,7 +132,7 @@ public class GeneratedExpressionClass
                     var doNothing = Lambda<Action>(Empty());
                     sc.AddClass(cls => cls.AddMethod("DoAction", doNothing));
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 public class GeneratedExpressionClass
@@ -158,7 +158,7 @@ public class GeneratedExpressionClass
                         cls.AddMethod("DoAction", doNothing);
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             var expected = @$"
 namespace {typeof(WhenBuildingSourceCode).Namespace}
@@ -200,7 +200,7 @@ It's even better.";
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -250,7 +250,7 @@ It's even better.".TrimStart());
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -309,7 +309,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System;
@@ -365,7 +365,7 @@ namespace GeneratedExpressionCode
                 });
             });
 
-            var translated = sourceCode.ToCSharpString();
+            var translated = sourceCode.ToSourceCodeString();
 
             const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;

@@ -17,7 +17,7 @@
                         cls.AddField<string>("MyField");
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -45,7 +45,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -81,7 +81,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode

@@ -41,7 +41,7 @@
                     goto Complete;
                 }
 
-                _logger.Info($"{builders.Count} builder(s) found...");
+                _logger.Info($"{builders.Count} {nameof(ISourceCodeExpressionBuilder)}(s) found...");
 
                 var outputProject = _projectFactory.GetOutputProjectOrThrow(config);
 

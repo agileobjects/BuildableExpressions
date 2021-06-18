@@ -25,7 +25,7 @@
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -64,7 +64,7 @@ namespace GeneratedExpressionCode
                         });
 
                     }))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -99,7 +99,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("SayHello", Constant("Hello!"));
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -135,7 +135,7 @@ namespace GeneratedExpressionCode
                             ctor.SetBody(Empty());
                         });
                     }))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -167,7 +167,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("SayGoodbye", Constant("Goodbye!"));
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -217,7 +217,7 @@ namespace GeneratedExpressionCode
             genericBaseType.GenericParameters.ShouldHaveSingleItem();
             genericBaseType.BaseType.ShouldBe(typeof(object));
 
-            var translated = sourceCode.ToCSharpString();
+            var translated = sourceCode.ToSourceCodeString();
 
             const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -265,7 +265,7 @@ namespace GeneratedExpressionCode
             genericBaseType.GenericParameters.ShouldHaveSingleItem();
             genericBaseType.BaseType.ShouldBe(typeof(object));
 
-            var translated = sourceCode.ToCSharpString();
+            var translated = sourceCode.ToSourceCodeString();
 
             const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -327,7 +327,7 @@ namespace GeneratedExpressionCode
             grandparentClassExpression.IsGeneric.ShouldBeFalse();
             sourceCode.TypeExpressions.ShouldNotContain(grandparentClassExpression);
 
-            var translated = sourceCode.ToCSharpString();
+            var translated = sourceCode.ToSourceCodeString();
 
             const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -371,7 +371,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -409,7 +409,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -448,7 +448,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System;
@@ -494,7 +494,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("GetTwo", Constant("Two", typeof(string)));
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace AgileObjects.Tests.Yo
@@ -555,7 +555,7 @@ namespace AgileObjects.Tests.Yo
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -591,7 +591,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("GetString", Default(typeof(string)));
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -619,7 +619,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("GetString", Constant("String!"));
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -653,7 +653,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -682,7 +682,7 @@ namespace GeneratedExpressionCode
                 {
                     sc.AddClass("EmptyClass", _ => { });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode

@@ -20,7 +20,7 @@
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod(doNothing)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -44,7 +44,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod(doNothing)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -68,7 +68,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("Get1000", returnOneThousand)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -93,7 +93,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("GetLong", returnGivenLong)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -121,7 +121,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddStruct(str => str
                         .AddMethod("Subtract", subtractShortFromInt)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -161,7 +161,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -197,7 +197,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -234,7 +234,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -276,7 +276,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -314,7 +314,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -349,7 +349,7 @@ namespace GeneratedExpressionCode
                 });
             });
 
-            var translated = sourceCode.ToCSharpString();
+            var translated = sourceCode.ToSourceCodeString();
 
             const string expected = @"
 using System;
@@ -404,7 +404,7 @@ namespace GeneratedExpressionCode
                 });
             });
 
-            var translated = sourceCode.ToCSharpString();
+            var translated = sourceCode.ToSourceCodeString();
 
             const string expected = @"
 namespace AgileObjects.BuildableExpressions.UnitTests
@@ -439,7 +439,7 @@ namespace AgileObjects.BuildableExpressions.UnitTests
                 });
             });
 
-            var translated = sourceCode.ToCSharpString();
+            var translated = sourceCode.ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -476,7 +476,7 @@ namespace GeneratedExpressionCode
                 });
             });
 
-            var translated = sourceCode.ToCSharpString();
+            var translated = sourceCode.ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -513,7 +513,7 @@ namespace GeneratedExpressionCode
                 });
             });
 
-            var translated = sourceCode.ToCSharpString();
+            var translated = sourceCode.ToSourceCodeString();
 
             const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -554,7 +554,7 @@ namespace GeneratedExpressionCode
                 });
             });
 
-            var translated = sourceCode.ToCSharpString();
+            var translated = sourceCode.ToSourceCodeString();
 
             const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -590,7 +590,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -622,7 +622,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -650,7 +650,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -695,7 +695,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System;
@@ -750,7 +750,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -793,7 +793,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -869,7 +869,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode

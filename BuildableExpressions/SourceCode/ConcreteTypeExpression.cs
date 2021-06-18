@@ -32,7 +32,7 @@
         /// The <see cref="ConcreteTypeExpression"/>'s parent <see cref="SourceCodeExpression"/>.
         /// </param>
         /// <param name="name">The name of the <see cref="ConcreteTypeExpression"/>.</param>
-        protected ConcreteTypeExpression(SourceCodeExpression sourceCode, string name)
+        internal ConcreteTypeExpression(ConfiguredSourceCodeExpression sourceCode, string name)
             : base(sourceCode, name)
         {
         }

@@ -25,7 +25,7 @@
         /// </summary>
         /// <param name="type">The Type represented by the <see cref="TypeExpression"/>.</param>
         protected TypeExpression(Type type)
-            : this(new SourceCodeExpression(type.Namespace))
+            : this(new ConfiguredSourceCodeExpression(type.Namespace))
         {
             Name = GetTypedExpressionName(type);
 

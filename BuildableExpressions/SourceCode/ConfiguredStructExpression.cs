@@ -11,7 +11,7 @@
         IStructExpressionConfigurator
     {
         public ConfiguredStructExpression(
-            SourceCodeExpression sourceCode,
+            ConfiguredSourceCodeExpression sourceCode,
             string name,
             Action<IStructExpressionConfigurator> configuration)
             : base(sourceCode, name)

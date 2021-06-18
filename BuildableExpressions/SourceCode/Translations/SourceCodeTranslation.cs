@@ -21,7 +21,7 @@
         private readonly int _typeCount;
 
         public SourceCodeTranslation(
-            SourceCodeExpression sourceCode,
+            ConfiguredSourceCodeExpression sourceCode,
             ITranslationContext context)
         {
             _hasHeader = sourceCode.Header != null;

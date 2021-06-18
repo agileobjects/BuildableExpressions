@@ -31,8 +31,8 @@
         /// The <see cref="ClassExpressionBase"/>'s parent <see cref="SourceCodeExpression"/>.
         /// </param>
         /// <param name="name">The name of the <see cref="ClassExpressionBase"/>.</param>
-        protected ClassExpressionBase(
-            SourceCodeExpression sourceCode,
+        internal ClassExpressionBase(
+            ConfiguredSourceCodeExpression sourceCode,
             string name)
             : base(sourceCode, name)
         {

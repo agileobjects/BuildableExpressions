@@ -26,7 +26,7 @@
         /// The <see cref="InterfaceExpression"/>'s parent <see cref="SourceCodeExpression"/>.
         /// </param>
         /// <param name="name">The name of the <see cref="InterfaceExpression"/>.</param>
-        protected InterfaceExpression(SourceCodeExpression sourceCode, string name)
+        internal InterfaceExpression(ConfiguredSourceCodeExpression sourceCode, string name)
             : base(sourceCode, name)
         {
         }

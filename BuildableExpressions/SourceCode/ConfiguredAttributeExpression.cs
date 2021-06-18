@@ -25,7 +25,7 @@
         private Expression _baseInstanceExpression;
 
         public ConfiguredAttributeExpression(
-            SourceCodeExpression sourceCode,
+            ConfiguredSourceCodeExpression sourceCode,
             string name,
             Action<IAttributeExpressionConfigurator> configuration)
             : base(sourceCode, name)
@@ -34,7 +34,7 @@
             _inherited = true;
             BaseTypeExpression = _attributeTypeExpression;
 
-            configuration.Invoke(this);
+            configuration?.Invoke(this);
             EnsureUsageAttribute();
 
             Validate();

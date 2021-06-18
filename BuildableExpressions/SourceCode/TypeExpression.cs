@@ -22,6 +22,7 @@
         AttributableExpressionBase,
         ICustomTranslationExpression
     {
+        private readonly ConfiguredSourceCodeExpression _sourceCode;
         private List<GenericParameterExpression> _genericParameters;
         private ReadOnlyCollection<GenericParameterExpression> _readOnlyGenericParameters;
         private List<TypeExpression> _genericArguments;
@@ -53,15 +54,15 @@
         /// The <see cref="TypeExpression"/>'s parent <see cref="SourceCodeExpression"/>.
         /// </param>
         /// <param name="name">The name of the <see cref="TypeExpression"/>.</param>
-        protected TypeExpression(SourceCodeExpression sourceCode, string name)
+        internal TypeExpression(ConfiguredSourceCodeExpression sourceCode, string name)
             : this(sourceCode)
         {
             Name = name.ThrowIfInvalidName("Type");
         }
 
-        private TypeExpression(SourceCodeExpression sourceCode)
+        private TypeExpression(ConfiguredSourceCodeExpression sourceCode)
         {
-            SourceCode = sourceCode;
+            _sourceCode = sourceCode;
             _memberExpressions = new List<MemberExpression>();
         }
 
@@ -89,7 +90,7 @@
 
             _rebuildType = false;
 
-            var sourceCode = new SourceCodeExpression(SourceCode);
+            var sourceCode = new ConfiguredSourceCodeExpression(_sourceCode);
 
             var configuredDependencies = ImplementedTypeExpressions
                 .Filter(t => t is not ITypedTypeExpression);
@@ -160,7 +161,7 @@
         /// <summary>
         /// Gets this <see cref="TypeExpression"/>'s parent <see cref="SourceCodeExpression"/>.
         /// </summary>
-        public SourceCodeExpression SourceCode { get; }
+        public SourceCodeExpression SourceCode => _sourceCode;
 
         /// <summary>
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="TypeExpression"/>,

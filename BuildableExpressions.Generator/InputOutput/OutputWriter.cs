@@ -2,7 +2,6 @@
 {
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using AgileObjects.BuildableExpressions.SourceCode;
     using Logging;
     using ProjectManagement;
@@ -49,10 +48,10 @@
                     relativeFilePath = string.Empty;
                 }
 
-                var csFileName = sourceCodeExpression.TypeExpressions.First().Name + ".cs";
+                var csFileName = sourceCodeExpression.TypeName + ".cs";
                 var csFilePath = Path.Combine(outputDirectory!, csFileName);
 
-                var sourceCode = sourceCodeExpression.ToCSharpString();
+                var sourceCode = sourceCodeExpression.ToSourceCodeString();
 
                 Write(csFilePath, sourceCode);
                 newFilePaths.Add(Path.Combine(relativeFilePath, csFileName));

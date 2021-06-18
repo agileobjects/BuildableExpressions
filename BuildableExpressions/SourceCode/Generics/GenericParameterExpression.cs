@@ -34,8 +34,8 @@
         /// The <see cref="GenericParameterExpression"/>'s parent <see cref="SourceCodeExpression"/>.
         /// </param>
         /// <param name="name">The name of the <see cref="GenericParameterExpression"/>.</param>
-        protected GenericParameterExpression(
-            SourceCodeExpression sourceCode,
+        internal GenericParameterExpression(
+            ConfiguredSourceCodeExpression sourceCode,
             string name)
             : base(sourceCode, name)
         {

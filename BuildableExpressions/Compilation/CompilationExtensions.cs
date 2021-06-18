@@ -21,7 +21,7 @@
         {
             return CSharpCompiler.Compile(
                 sourceCodeExpression.ReferencedAssemblies.Distinct(),
-                sourceCodeExpression.ToCSharpString());
+                sourceCodeExpression.ToSourceCodeString());
         }
 
         /// <summary>
@@ -37,7 +37,7 @@
 
             return CSharpCompiler.Compile(
                 expressionsList.SelectMany(sc => sc.ReferencedAssemblies).Distinct(),
-                expressionsList.Project(sc => sc.ToCSharpString()));
+                expressionsList.Project(sc => sc.ToSourceCodeString()));
         }
     }
 }

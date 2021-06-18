@@ -61,7 +61,7 @@
             Action<IGenericParameterExpressionConfigurator> configuration)
         {
             return AddGenericParameter(new ConfiguredGenericParameterExpression(
-                SourceCode,
+               (ConfiguredSourceCodeExpression)SourceCode,
                 name,
                 configuration));
         }

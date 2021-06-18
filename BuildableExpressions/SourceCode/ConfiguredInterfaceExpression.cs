@@ -10,16 +10,19 @@
         InterfaceExpression,
         IInterfaceExpressionConfigurator
     {
+        private readonly ConfiguredSourceCodeExpression _sourceCode;
+
         public ConfiguredInterfaceExpression(
-            SourceCodeExpression sourceCode,
+            ConfiguredSourceCodeExpression sourceCode,
             string name,
             Action<IInterfaceExpressionConfigurator> configuration)
             : this(sourceCode, name)
         {
-            configuration.Invoke(this);
+            _sourceCode = sourceCode;
+            configuration?.Invoke(this);
         }
 
-        private ConfiguredInterfaceExpression(SourceCodeExpression sourceCode, string name)
+        private ConfiguredInterfaceExpression(ConfiguredSourceCodeExpression sourceCode, string name)
             : base(sourceCode, name)
         {
         }
@@ -27,7 +30,7 @@
         #region IClosableTypeExpression Members
 
         protected override InterfaceExpression CreateInstance()
-            => new ConfiguredInterfaceExpression(SourceCode, Name);
+            => new ConfiguredInterfaceExpression(_sourceCode, Name);
 
         #endregion
 

@@ -31,7 +31,7 @@
         /// The <see cref="EnumExpression"/>'s parent <see cref="SourceCodeExpression"/>.
         /// </param>
         /// <param name="name">The name of the <see cref="EnumExpression"/>.</param>
-        protected EnumExpression(SourceCodeExpression sourceCode, string name)
+        internal EnumExpression(ConfiguredSourceCodeExpression sourceCode, string name)
             : base(sourceCode, name)
         {
             _members = new Dictionary<string, int>();

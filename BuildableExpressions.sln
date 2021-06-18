@@ -31,17 +31,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildableExpressions.Genera
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Generator", "Generator", "{3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildableExpressions.Generator.Console.Net461", "BuildableExpressions.Generator.Console.Net461\BuildableExpressions.Generator.Console.Net461.csproj", "{EACB4487-216A-4545-B9AB-8037C0B26177}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildableExpressions.Generator.Console.Net461.Sdk", "BuildableExpressions.Generator.Console.Net461.Sdk\BuildableExpressions.Generator.Console.Net461.Sdk.csproj", "{70754637-57FF-493E-AA0A-154AD0A16A5C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildableExpressions.Generator.Console.NetCore3", "BuildableExpressions.Generator.Console.NetCore3\BuildableExpressions.Generator.Console.NetCore3.csproj", "{19805A90-6094-410B-8041-12AB38318FFF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildableExpressions.Generator.Library.NetStandard2", "BuildableExpressions.Generator.Library.NetStandard2\BuildableExpressions.Generator.Library.NetStandard2.csproj", "{111C2B98-94FF-4357-8838-107B3AB8DC53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildableExpressions.Generator.Console.Net5", "BuildableExpressions.Generator.Console.Net5\BuildableExpressions.Generator.Console.Net5.csproj", "{10DE7734-48B1-46B3-B042-C71D806CFB52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildableExpressions.Generator.Console.Net5", "BuildableExpressions.Generator.Console.Net5\BuildableExpressions.Generator.Console.Net5.csproj", "{10DE7734-48B1-46B3-B042-C71D806CFB52}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildableExpressions.Generator.Console.NetCore2", "BuildableExpressions.Generator.Console.NetCore2\BuildableExpressions.Generator.Console.NetCore2.csproj", "{A6B382B2-1F25-4D03-A213-3A3A3FEC4213}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildableExpressions.Generator.Console.NetCore2", "BuildableExpressions.Generator.Console.NetCore2\BuildableExpressions.Generator.Console.NetCore2.csproj", "{A6B382B2-1F25-4D03-A213-3A3A3FEC4213}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildableExpressions.Generator.Library.Net48.NonSdk", "BuildableExpressions.Generator.Library.Net48.NonSdk\BuildableExpressions.Generator.Library.Net48.NonSdk.csproj", "{9B2214A9-4636-4881-A9F3-5FAE875D02E3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildableExpressions.Generator.Console.Net461", "BuildableExpressions.Generator.Console.Net461\BuildableExpressions.Generator.Console.Net461.csproj", "{CF599676-BA3A-47D5-83D0-D6DCDBC70B7E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildableExpressions.Generator.Console.Net461.NonSdk", "BuildableExpressions.Generator.Console.Net461.NonSdk\BuildableExpressions.Generator.Console.Net461.NonSdk.csproj", "{EACB4487-216A-4545-B9AB-8037C0B26177}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,14 +83,6 @@ Global
 		{5E97274F-25A1-41D2-B2A2-49281DAF9E9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E97274F-25A1-41D2-B2A2-49281DAF9E9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E97274F-25A1-41D2-B2A2-49281DAF9E9B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EACB4487-216A-4545-B9AB-8037C0B26177}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EACB4487-216A-4545-B9AB-8037C0B26177}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EACB4487-216A-4545-B9AB-8037C0B26177}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EACB4487-216A-4545-B9AB-8037C0B26177}.Release|Any CPU.Build.0 = Release|Any CPU
-		{70754637-57FF-493E-AA0A-154AD0A16A5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{70754637-57FF-493E-AA0A-154AD0A16A5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{70754637-57FF-493E-AA0A-154AD0A16A5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{70754637-57FF-493E-AA0A-154AD0A16A5C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{19805A90-6094-410B-8041-12AB38318FFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{19805A90-6094-410B-8041-12AB38318FFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19805A90-6094-410B-8041-12AB38318FFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -105,6 +99,18 @@ Global
 		{A6B382B2-1F25-4D03-A213-3A3A3FEC4213}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6B382B2-1F25-4D03-A213-3A3A3FEC4213}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6B382B2-1F25-4D03-A213-3A3A3FEC4213}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B2214A9-4636-4881-A9F3-5FAE875D02E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B2214A9-4636-4881-A9F3-5FAE875D02E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B2214A9-4636-4881-A9F3-5FAE875D02E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B2214A9-4636-4881-A9F3-5FAE875D02E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF599676-BA3A-47D5-83D0-D6DCDBC70B7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF599676-BA3A-47D5-83D0-D6DCDBC70B7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF599676-BA3A-47D5-83D0-D6DCDBC70B7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF599676-BA3A-47D5-83D0-D6DCDBC70B7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EACB4487-216A-4545-B9AB-8037C0B26177}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EACB4487-216A-4545-B9AB-8037C0B26177}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EACB4487-216A-4545-B9AB-8037C0B26177}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EACB4487-216A-4545-B9AB-8037C0B26177}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -117,12 +123,13 @@ Global
 		{7FFC1C0F-97B2-4D01-867F-41618C49A166} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
 		{A9225CC8-BF92-4076-A67C-BFD083F2A2F3} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
 		{3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F} = {642E8AF9-C13A-4437-B329-3DA87C1EF576}
-		{EACB4487-216A-4545-B9AB-8037C0B26177} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
-		{70754637-57FF-493E-AA0A-154AD0A16A5C} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
 		{19805A90-6094-410B-8041-12AB38318FFF} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
 		{111C2B98-94FF-4357-8838-107B3AB8DC53} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
 		{10DE7734-48B1-46B3-B042-C71D806CFB52} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
 		{A6B382B2-1F25-4D03-A213-3A3A3FEC4213} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
+		{9B2214A9-4636-4881-A9F3-5FAE875D02E3} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
+		{CF599676-BA3A-47D5-83D0-D6DCDBC70B7E} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
+		{EACB4487-216A-4545-B9AB-8037C0B26177} = {3C3393C0-5BA1-4A5C-8187-5C5AF11DD00F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {82AABD60-FAC0-4471-94A9-069251EB8534}

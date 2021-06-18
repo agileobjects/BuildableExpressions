@@ -5,7 +5,7 @@
 
     internal class SourceCodeExpressionTranslation : ExpressionTranslation
     {
-        public SourceCodeExpressionTranslation(SourceCodeExpression expression)
+        public SourceCodeExpressionTranslation(ConfiguredSourceCodeExpression expression)
             : base(expression.Analysis, Settings)
         {
         }

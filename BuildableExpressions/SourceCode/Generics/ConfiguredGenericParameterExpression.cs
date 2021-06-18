@@ -31,7 +31,7 @@
         private ReadOnlyCollection<IType> _readOnlyTypeConstraintTypes;
 
         public ConfiguredGenericParameterExpression(
-            SourceCodeExpression sourceCode,
+            ConfiguredSourceCodeExpression sourceCode,
             string name,
             Action<IGenericParameterExpressionConfigurator> configuration)
             : this(sourceCode, name.ThrowIfInvalidName("Generic Parameter"))
@@ -41,7 +41,7 @@
         }
 
         private ConfiguredGenericParameterExpression(
-            SourceCodeExpression sourceCode,
+            ConfiguredSourceCodeExpression sourceCode,
             string name)
             : base(sourceCode, name)
         {

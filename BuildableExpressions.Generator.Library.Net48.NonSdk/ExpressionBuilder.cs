@@ -1,7 +1,6 @@
 ﻿namespace DefaultNamespace
 {
     using System.Collections.Generic;
-    using System.Linq.Expressions;
     using AgileObjects.BuildableExpressions;
     using AgileObjects.BuildableExpressions.SourceCode;
 
@@ -22,16 +21,17 @@
         /// <returns>A <see cref="SourceCodeExpression"/> to compile to a source code file.</returns>
         public IEnumerable<SourceCodeExpression> Build(IExpressionBuildContext context)
         {
-            var sourceCode = BuildableExpression.SourceCode(sc =>
-            {
-                sc.AddClass(nameof(ExpressionBuilder) + "OutputClassFromNetCore2", cls =>
-                {
-                    var doNothing = Expression.Empty();
-
-                    cls.AddMethod("DoNothingNet5", doNothing);
-                });
-            });
-
+            var sourceCode = BuildableExpression.SourceCode(@"
+namespace AgileObjects.BuildableExpressions.Generator.Console
+{
+    public struct ExpressionBuilderOutputStruct
+    {
+        public void DoNothingNet48()
+        {
+        }
+    }
+}
+");
             yield return sourceCode;
         }
     }

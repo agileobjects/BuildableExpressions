@@ -25,7 +25,7 @@
         /// The <see cref="StructExpression"/>'s parent <see cref="SourceCodeExpression"/>.
         /// </param>
         /// <param name="name">The name of the <see cref="StructExpression"/>.</param>
-        protected StructExpression(SourceCodeExpression sourceCode, string name)
+        internal StructExpression(ConfiguredSourceCodeExpression sourceCode, string name)
             : base(sourceCode, name)
         {
         }

@@ -14,7 +14,7 @@
                 {
                     sc.AddEnum("Numbers", "Zero", "One", "Two", "Three");
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -45,7 +45,7 @@ namespace GeneratedExpressionCode
                         enm.AddMember("Six", 6);
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode

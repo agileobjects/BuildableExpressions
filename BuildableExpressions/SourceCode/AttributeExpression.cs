@@ -25,8 +25,8 @@
         /// The <see cref="AttributeExpression"/>'s parent <see cref="SourceCodeExpression"/>.
         /// </param>
         /// <param name="name">The name of the <see cref="AttributeExpression"/>.</param>
-        protected AttributeExpression(
-            SourceCodeExpression sourceCode,
+        internal AttributeExpression(
+            ConfiguredSourceCodeExpression sourceCode,
             string name)
             : base(sourceCode, name)
         {

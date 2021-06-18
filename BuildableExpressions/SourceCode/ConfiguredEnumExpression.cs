@@ -12,7 +12,7 @@
         private int _nextValue;
 
         public ConfiguredEnumExpression(
-            SourceCodeExpression sourceCode,
+            ConfiguredSourceCodeExpression sourceCode,
             string name,
             Action<IEnumExpressionConfigurator> configuration)
             : this(sourceCode, name)
@@ -20,7 +20,7 @@
             configuration.Invoke(this);
         }
 
-        private ConfiguredEnumExpression(SourceCodeExpression sourceCode, string name)
+        private ConfiguredEnumExpression(ConfiguredSourceCodeExpression sourceCode, string name)
             : base(sourceCode, name)
         {
         }

@@ -15,7 +15,7 @@
         public static string DefaultNamespace { get; set; }
 
         /// <summary>
-        /// Create a <see cref="SourceCodeExpression"/> representing a complete piece of source code.
+        /// Creates a <see cref="SourceCodeExpression"/> representing a complete piece of source code.
         /// </summary>
         /// <param name="configuration">The configuration to use for the <see cref="SourceCodeExpression"/>.</param>
         /// <returns>A <see cref="SourceCodeExpression"/> representing a complete piece of source code.</returns>
@@ -24,15 +24,25 @@
         {
             if (DefaultNamespace == null)
             {
-                return new(configuration);
+                return new ConfiguredSourceCodeExpression(configuration);
             }
 
-            return new(cfg =>
+            return new ConfiguredSourceCodeExpression(cfg =>
             {
                 cfg.SetNamespace(DefaultNamespace);
                 configuration.Invoke(cfg);
             });
-
         }
+
+        /// <summary>
+        /// Creates a <see cref="SourceCodeExpression"/> for the given piece of
+        /// <paramref name="sourceCode"/>. This overload supports 'magic-string' source code, as an
+        /// alternative to building up a <see cref="SourceCodeExpression"/> using the configuration
+        /// API. The resulting <see cref="SourceCodeExpression"/> will be unable to surface any
+        /// <see cref="TypeExpression"/>s.
+        /// </summary>
+        /// <returns>A <see cref="SourceCodeExpression"/> for the given piece of <paramref name="sourceCode"/>.</returns>
+        public static SourceCodeExpression SourceCode(string sourceCode)
+            => LiteralSourceCodeExpression.Parse(sourceCode);
     }
 }

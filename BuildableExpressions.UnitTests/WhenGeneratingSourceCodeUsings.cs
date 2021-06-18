@@ -27,7 +27,7 @@
                         cls.AddMethod("GetDateTime", getDefaultDate);
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System;
@@ -62,7 +62,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("CastObjectToStream", castObjectToStream);
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System.IO;
@@ -96,7 +96,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("GetStreamType", getDefaultDate);
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System;
@@ -128,7 +128,7 @@ namespace GeneratedExpressionCode
                             Property(BuildableExpression.TypeOf(typeof(Stream)), "Name"));
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System.IO;
@@ -160,7 +160,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("GetStrings", getStringCollection);
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System.Collections.Generic;
@@ -187,7 +187,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("MakeStringBuilder", createStringBuilder)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System.Text;
@@ -219,7 +219,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("GetStreamObject", createStreamArray);
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System.IO;
@@ -250,7 +250,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("GetOddOne", getEnumIntValue);
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             var expected = @$"
 using {typeof(OddNumber).Namespace};
@@ -280,7 +280,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("GetNotNull", comparerCheckLambda)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System.Collections.Generic;
@@ -318,7 +318,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("GetTypeName", lambda)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System.Text.RegularExpressions;
@@ -359,7 +359,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("GetHash", lambda)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using AgileObjects.BuildableExpressions.UnitTests;
@@ -390,7 +390,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("GetNowTicks", getDefaultDate)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System;
@@ -418,7 +418,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("IsMatch", stringBuilderMatchesRegex)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System.Text;
@@ -451,7 +451,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("InvokeFactory", joinListItems)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System;
@@ -488,7 +488,7 @@ namespace GeneratedExpressionCode
                         cls.AddMethod("GetInts", joinListItems);
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System;
@@ -522,7 +522,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("ReadFromConsole", tryCatch)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System;
@@ -558,7 +558,7 @@ namespace GeneratedExpressionCode
                 .SourceCode(sc => sc
                     .AddClass(cls => cls
                         .AddMethod("GetContains", stringBuilderContainsOther)))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System.Text;

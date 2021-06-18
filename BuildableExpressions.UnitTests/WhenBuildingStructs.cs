@@ -15,7 +15,7 @@
                 .SourceCode(sc => sc
                     .AddStruct("MyStruct", cls => cls
                         .AddMethod(Empty())))
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -52,7 +52,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -100,7 +100,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -149,7 +149,7 @@ namespace GeneratedExpressionCode
                         });
                     });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 using System.Text;
@@ -180,7 +180,7 @@ namespace GeneratedExpressionCode
                 {
                     sc.AddStruct("EmptyStruct", _ => { });
                 })
-                .ToCSharpString();
+                .ToSourceCodeString();
 
             const string expected = @"
 namespace GeneratedExpressionCode
@@ -209,7 +209,7 @@ namespace GeneratedExpressionCode
                 });
             });
 
-            var translated = sourceCode.ToCSharpString();
+            var translated = sourceCode.ToSourceCodeString();
 
             const string expected = @"
 using System;
