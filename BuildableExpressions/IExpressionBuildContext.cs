@@ -18,7 +18,9 @@
         IEnumerable<Assembly> ProjectAssemblies { get; }
 
         /// <summary>
-        /// Gets the root namespace to which generated source code will be added.
+        /// Gets the root namespace to which generated source code will be added. Defaults to the
+        /// name of the target project, or the value of its &lt;RootNamespace&gt; property if
+        /// present.
         /// </summary>
         string RootNamespace { get; }
 
