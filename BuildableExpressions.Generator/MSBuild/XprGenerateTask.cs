@@ -18,20 +18,6 @@ namespace XprGenerator
     /// </summary>
     public class XprGenerateTask : MsBuildTask, IConfig
     {
-        private readonly MsBuildTaskLogger _logger;
-        private readonly IFileManager _fileManager;
-        private readonly AssemblyResolver _assemblyResolver;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="XprGenerateTask"/> class.
-        /// </summary>
-        public XprGenerateTask()
-        {
-            _logger = new MsBuildTaskLogger(Log);
-            _fileManager = SystemIoFileManager.Instance;
-            _assemblyResolver = new AssemblyResolver(_logger, _fileManager);
-        }
-
         /// <summary>
         /// Gets or sets the full path of the solution providing the 
         /// <see cref="SourceCodeExpression"/>(s) to build.
@@ -62,6 +48,11 @@ namespace XprGenerator
         public string InputDirectory { get; set; }
 
         /// <summary>
+        /// Gets or sets the prefix to use for logged messages.
+        /// </summary>
+        public string LoggerPrefix { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the debugger should be launched during the
         /// task execution.
         /// </summary>
@@ -84,8 +75,6 @@ namespace XprGenerator
                 Debugger.Launch();
             }
 
-            _assemblyResolver.Init(this);
-
             if (TryBuildExpressions(out var builtExpressionsCount))
             {
                 BuiltExpressionsCount = builtExpressionsCount;
@@ -97,11 +86,17 @@ namespace XprGenerator
 
         private bool TryBuildExpressions(out int builtExpressionsCount)
         {
+            var logger = new MsBuildTaskLogger(Log, LoggerPrefix);
+            var fileManager = SystemIoFileManager.Instance;
+            
+            var assemblyResolver = new AssemblyResolver(logger, fileManager);
+            assemblyResolver.Init(this);
+
             var generator = new SourceCodeGenerator(
-                _logger,
-                new ProjectFactory(_fileManager),
-                new SourceCodeExpressionBuildersFinder(_logger, _assemblyResolver),
-                new OutputWriter(_logger, _fileManager));
+                logger,
+                new ProjectFactory(fileManager),
+                new SourceCodeExpressionBuildersFinder(logger, assemblyResolver),
+                new OutputWriter(logger, fileManager));
 
             var result = generator.Execute(this);
 

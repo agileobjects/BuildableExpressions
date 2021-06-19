@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    //using System.IO;
     using System.Linq;
     using System.Reflection;
     using Configuration;
@@ -113,7 +112,18 @@
             var inputExePaths = _fileManager
                 .FindFiles(inputPath, "*.exe");
 
-            return inputAssemblyPaths.Concat(inputExePaths);
+            return inputAssemblyPaths
+                .Concat(inputExePaths)
+                .Where(IncludeOutputAssembly);
+        }
+
+        private static bool IncludeOutputAssembly(string assemblyPath)
+        {
+            var assemblyFileName = GetFileName(assemblyPath);
+
+            return
+                assemblyFileName.DoesNotStartWithIgnoreCase("Microsoft.VisualStudio.") &&
+                assemblyFileName.DoesNotStartWithIgnoreCase("testhost.");
         }
 
         private void AddAssemblyLoader(string assemblyPath, Func<string, Assembly> loader)

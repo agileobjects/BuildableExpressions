@@ -3,15 +3,25 @@
     using System;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
+    using static System.StringComparison;
 
     internal class MsBuildTaskLogger : ILogger
     {
-        private const string _prefix = "Source Code Expressions: ";
         private readonly TaskLoggingHelper _taskLog;
+        private readonly string _prefix;
 
-        public MsBuildTaskLogger(TaskLoggingHelper taskLog)
+        public MsBuildTaskLogger(TaskLoggingHelper taskLog, string prefix)
         {
             _taskLog = taskLog;
+
+            prefix = prefix.TrimEnd();
+
+            if (!prefix.EndsWith(":", Ordinal))
+            {
+                prefix += ":";
+            }
+            
+            _prefix = prefix + " ";
         }
 
         public void Info(string message)

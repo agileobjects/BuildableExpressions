@@ -12,6 +12,7 @@
           DependsOnTargets="AfterBuild" AfterTargets="AfterBuild">
     <PropertyGroup>
       <XprGeneratorOutputProject Condition="'$(XprGeneratorOutputProject)' == ''">$(MSBuildProjectFullPath)</XprGeneratorOutputProject>
+      <XprGeneratorLoggerPrefix Condition="'$(XprGeneratorLoggerPrefix)' == ''">XprGenerator:</XprGeneratorLoggerPrefix>
     </PropertyGroup>
     <XprGenerator.XprGenerateTask
         SolutionPath="$(SolutionPath)"
@@ -19,6 +20,7 @@
         OutputProjectPath="$(XprGeneratorOutputProject)"
         TargetFramework="$(TargetFramework)"
         InputDirectory="bin\$(Configuration)\$(TargetFramework)"
+        LoggerPrefix="$(XprGeneratorLoggerPrefix)"
         Debug="$(XprGeneratorDebug)">
       <Output TaskParameter="BuiltExpressionsCount" PropertyName="BuiltExpressionsCount" />
     </XprGenerator.XprGenerateTask>
