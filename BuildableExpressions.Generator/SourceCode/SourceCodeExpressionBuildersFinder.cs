@@ -58,20 +58,23 @@
                 return false;
             }
 
-            var assemblyName = key.AssemblyName;
+            var assemblyFileName = key.AssemblyFileName;
 
             return
-                assemblyName.DoesNotEqualIgnoreCase("AgileObjects.NetStandardPolyfills.dll") &&
-                assemblyName.DoesNotEqualIgnoreCase("AgileObjects.ReadableExpressions.dll") &&
-                assemblyName.DoesNotEqualIgnoreCase("AgileObjects.BuildableExpressions.dll") &&
-                assemblyName.DoesNotEqualIgnoreCase("AgileObjects.AgileMapper.dll") &&
-                assemblyName.DoesNotStartWithIgnoreCase("System.") &&
-                assemblyName.DoesNotStartWithIgnoreCase("Microsoft.") &&
-                assemblyName.DoesNotStartWithIgnoreCase("EnvDTE") &&
-                assemblyName.DoesNotStartWithIgnoreCase("stdole") &&
-                assemblyName.DoesNotStartWithIgnoreCase("netstandard") &&
-                assemblyName.DoesNotStartWithIgnoreCase("Moq") &&
-                assemblyName.DoesNotStartWithIgnoreCase("Castle");
+                assemblyFileName.DoesNotEqualIgnoreCase("AgileObjects.NetStandardPolyfills.dll") &&
+                assemblyFileName.DoesNotEqualIgnoreCase("AgileObjects.ReadableExpressions.dll") &&
+                assemblyFileName.DoesNotEqualIgnoreCase("AgileObjects.BuildableExpressions.dll") &&
+                assemblyFileName.DoesNotEqualIgnoreCase("AgileObjects.AgileMapper.dll") &&
+                assemblyFileName.DoesNotStartWithIgnoreCase("System.") &&
+                assemblyFileName.DoesNotStartWithIgnoreCase("Microsoft.") &&
+                assemblyFileName.DoesNotStartWithIgnoreCase("EnvDTE") &&
+                assemblyFileName.DoesNotStartWithIgnoreCase("stdole") &&
+                assemblyFileName.DoesNotStartWithIgnoreCase("netstandard") &&
+                assemblyFileName.DoesNotStartWithIgnoreCase("Moq") &&
+                assemblyFileName.DoesNotStartWithIgnoreCase("Castle") &&
+                assemblyFileName.DoesNotStartWithIgnoreCase("nunit.") &&
+                assemblyFileName.DoesNotStartWithIgnoreCase("xunit.") &&
+                assemblyFileName.DoesNotStartWithIgnoreCase("Shouldy");
         }
 
         private IEnumerable<ISourceCodeExpressionBuilder> EnumerateBuilders(

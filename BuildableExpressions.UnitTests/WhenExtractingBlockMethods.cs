@@ -147,9 +147,13 @@ namespace GeneratedExpressionCode
                 intParameter2);
 
             var translated = BuildableExpression
-                .SourceCode(sc => sc
-                    .AddClass(cls => cls
-                        .AddMethod("GetInts", conditionalLambda)))
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        cls.AddMethod("GetInts", conditionalLambda);
+                    });
+                })
                 .ToSourceCodeString();
 
             const string expected = @"
@@ -833,6 +837,69 @@ namespace GeneratedExpressionCode
             var blockScopedInt = 1;
 
             return blockScopedInt + scopedInt;
+        }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
+        public void ShouldHandleAVariableBlockWithAnExtractedBlock()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass(cls =>
+                    {
+                        var stringParam = Parameter(typeof(string), "stringParam");
+                        var blockIntVariable = Variable(typeof(int), "blockInt");
+                        var parseIntVariable = Variable(typeof(int), "parseInt");
+                        var assignBlockInt = Assign(blockIntVariable, Constant(1));
+
+                        var parseParamBlock = Block(
+                            new[] { parseIntVariable },
+                            Condition(
+                                Call(
+                                    typeof(int).GetPublicStaticMethod(
+                                        "TryParse",
+                                        typeof(string),
+                                        typeof(int).MakeByRefType()),
+                                    stringParam,
+                                    parseIntVariable),
+                                parseIntVariable,
+                                Default(typeof(int))));
+
+                        var addInts = Add(blockIntVariable, parseParamBlock);
+                        var block = Block(new[] { blockIntVariable }, assignBlockInt, addInts);
+                        var addIntsLambda = Lambda<Func<string, int>>(block, stringParam);
+
+                        cls.AddMethod("AddParsedInts", addIntsLambda);
+                    });
+                })
+                .ToSourceCodeString();
+
+            const string expected = @"
+namespace GeneratedExpressionCode
+{
+    public class GeneratedExpressionClass
+    {
+        public int AddParsedInts
+        (
+            string stringParam
+        )
+        {
+            var blockInt = 1;
+
+            return blockInt + this.GetInt(stringParam);
+        }
+
+        private int GetInt
+        (
+            string stringParam
+        )
+        {
+            int parseInt;
+            return int.TryParse(stringParam, out parseInt) ? parseInt : default(int);
         }
     }
 }";

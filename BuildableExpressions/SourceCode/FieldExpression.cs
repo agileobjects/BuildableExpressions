@@ -110,9 +110,6 @@
 
         void IFieldExpressionConfigurator.SetReadonly() => _isReadonly = true;
 
-        void IFieldExpressionConfigurator.SetInitialValue<TValue>(TValue value) 
-            => InitialValue = Constant(value, typeof(TValue));
-
         void IFieldExpressionConfigurator.SetInitialValue(Expression value)
             => InitialValue = value;
 

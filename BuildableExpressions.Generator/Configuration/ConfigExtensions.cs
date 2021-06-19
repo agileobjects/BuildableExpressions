@@ -1,7 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.Generator.Configuration
 {
     using System.IO;
-    using ProjectManagement;
 
     internal static class ConfigExtensions
     {

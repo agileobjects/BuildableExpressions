@@ -395,8 +395,22 @@
             ParameterExpression variable,
             BlockExpression block)
         {
-            return base.ShouldBeDeclaredInVariableList(variable, block) &&
-                   _methodParametersByBlock?[block].Contains(variable) != true;
+            if (!base.ShouldBeDeclaredInVariableList(variable, block))
+            {
+                return false;
+            }
+
+            if (_methodParametersByBlock == null)
+            {
+                return true;
+            }
+
+            if (_methodParametersByBlock.TryGetValue(block, out var parameters))
+            {
+                return !parameters.Contains(variable);
+            }
+
+            return true;
         }
 
         protected override bool IsAssignmentJoinable(ParameterExpression variable)

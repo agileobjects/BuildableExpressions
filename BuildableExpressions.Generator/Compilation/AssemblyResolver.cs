@@ -113,20 +113,7 @@
             var inputExePaths = _fileManager
                 .FindFiles(inputPath, "*.exe");
 
-            return inputAssemblyPaths
-                .Concat(inputExePaths)
-                .Where(IncludeOutputAssembly);
-        }
-
-        private static bool IncludeOutputAssembly(string assemblyPath)
-        {
-            var assemblyFileName = GetFileName(assemblyPath);
-
-            return
-                assemblyFileName.DoesNotStartWithIgnoreCase("Microsoft.VisualStudio.") &&
-                assemblyFileName.DoesNotStartWithIgnoreCase("nunit.") &&
-                assemblyFileName.DoesNotStartWithIgnoreCase("xunit.") &&
-                assemblyFileName.DoesNotStartWithIgnoreCase("Shouldy");
+            return inputAssemblyPaths.Concat(inputExePaths);
         }
 
         private void AddAssemblyLoader(string assemblyPath, Func<string, Assembly> loader)
@@ -208,7 +195,7 @@
         }
 
         private static bool Matches(string assemblyDllName, AssemblyKey key)
-            => assemblyDllName.EqualsIgnoreCase(key.AssemblyName);
+            => assemblyDllName.EqualsIgnoreCase(key.AssemblyFileName);
 
         private bool TryFindAssembly(string searchPath, string assemblyName, out Assembly assembly)
         {
@@ -310,18 +297,18 @@
                 IFileManager fileManager,
                 string assemblyPath)
             {
-                AssemblyName = GetFileName(assemblyPath);
+                AssemblyFileName = GetFileName(assemblyPath);
                 AssemblyDirectory = GetFileName(GetDirectoryName(assemblyPath));
                 _versionLoader = new Lazy<string>(() => fileManager.GetVersion(assemblyPath));
             }
 
-            public string AssemblyName { get; }
+            public string AssemblyFileName { get; }
 
             public string AssemblyDirectory { get; }
 
             public string Version => _versionLoader.Value;
 
-            public override string ToString() => AssemblyName;
+            public override string ToString() => AssemblyFileName;
         }
 
         private class AssemblyKeyComparer : IEqualityComparer<AssemblyKey>
@@ -331,7 +318,7 @@
 
             public bool Equals(AssemblyKey x, AssemblyKey y)
             {
-                return x!.AssemblyName.EqualsIgnoreCase(y!.AssemblyName) &&
+                return x!.AssemblyFileName.EqualsIgnoreCase(y!.AssemblyFileName) &&
                        x.Version == y.Version;
             }
 
