@@ -12,11 +12,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HelloWorld", "HelloWorld", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CsvGenerator", "CsvGenerator", "{BDDA3C0E-B370-4428-A4E6-2CFD61203A76}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsvGenerator", "CsvGenerator\CsvGenerator.csproj", "{6641A941-23EA-4196-BC1C-F6BCFB8308B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CsvGenerator", "CsvGenerator\CsvGenerator.csproj", "{6641A941-23EA-4196-BC1C-F6BCFB8308B1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloWorld", "HelloWorld\HelloWorld.csproj", "{78FECDC2-4BDC-44B9-92CC-9A102ACC5E39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsvGenerator.Models", "CsvGenerator.Models\CsvGenerator.Models.csproj", "{865A22B6-F13C-408B-B173-995B90F1A990}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CsvGenerator.Models", "CsvGenerator.Models\CsvGenerator.Models.csproj", "{865A22B6-F13C-408B-B173-995B90F1A990}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XmlSettingsGenerator", "XmlSettingsGenerator", "{E55033EB-AED5-42D6-97EE-92D68A78AF3B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlSettingsGenerator", "XmlSettingsGenerator\XmlSettingsGenerator.csproj", "{024846D4-5021-4AD3-A8FE-753E80411E20}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +40,10 @@ Global
 		{865A22B6-F13C-408B-B173-995B90F1A990}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{865A22B6-F13C-408B-B173-995B90F1A990}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{865A22B6-F13C-408B-B173-995B90F1A990}.Release|Any CPU.Build.0 = Release|Any CPU
+		{024846D4-5021-4AD3-A8FE-753E80411E20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{024846D4-5021-4AD3-A8FE-753E80411E20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{024846D4-5021-4AD3-A8FE-753E80411E20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{024846D4-5021-4AD3-A8FE-753E80411E20}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -44,6 +52,7 @@ Global
 		{6641A941-23EA-4196-BC1C-F6BCFB8308B1} = {BDDA3C0E-B370-4428-A4E6-2CFD61203A76}
 		{78FECDC2-4BDC-44B9-92CC-9A102ACC5E39} = {975B3571-066B-499F-BFB7-48DA9B3CFF53}
 		{865A22B6-F13C-408B-B173-995B90F1A990} = {BDDA3C0E-B370-4428-A4E6-2CFD61203A76}
+		{024846D4-5021-4AD3-A8FE-753E80411E20} = {E55033EB-AED5-42D6-97EE-92D68A78AF3B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DB39022D-5A13-4980-AAD0-F395E2F09103}

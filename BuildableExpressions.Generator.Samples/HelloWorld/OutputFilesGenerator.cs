@@ -1,4 +1,6 @@
-﻿namespace AgileObjects.BuildableExpressions.Generator.Samples.HelloWorld
+﻿// See Program.cs for notes
+
+namespace AgileObjects.BuildableExpressions.Generator.Samples.HelloWorld
 {
     using System;
     using System.Collections.Generic;

@@ -1,6 +1,7 @@
 ﻿// This generator outputs Category.cs and Product.cs to the CsvGenerator.Models
 // project based on the contents of the Categories.csv and Products.csv files.
 
+// This is a .NET Standard 2.0 library project
 // The generator output target is set by this project's XprGeneratorOutputProject property.
 
 // This sample is based on the .NET 5 Source Generators sample:
@@ -36,7 +37,9 @@ namespace AgileObjects.BuildableExpressions.Generator.Samples.CsvGenerator
 
                 yield return BuildableExpression.SourceCode(sc =>
                 {
-                    sc.SetHeader("Generated from CSV file " + fileName);
+                    sc.SetHeader(
+                        $"Generated from CSV file {fileName} by the {nameof(CsvToModelsGenerator)} " +
+                        $"in the {nameof(CsvGenerator)} project.");
 
                     sc.AddClass(className, cls =>
                     {

@@ -1,0 +1,6 @@
+<?xml version="1.0" standalone="yes"?>
+<my-settings className="MySettings">
+  <FavouriteNumber type="int">12345</FavouriteNumber>
+  <FavouriteCity type="string">Vancouver</FavouriteCity>
+  <DateExpires type="DateTime">2022-01-01</DateExpires>
+</my-settings>

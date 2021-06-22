@@ -1,4 +1,12 @@
-﻿// Based on https://github.com/dotnet/roslyn-sdk/blob/main/samples/CSharp/SourceGenerators/SourceGeneratorSamples/HelloWorldGenerator.cs
+﻿// This generator creates an OutputAssemblies class with a static All field, 
+// initialised with the names of the assemblies in this project's build output folder.
+
+// The code generation's build output is prefixed with 'XprBuilder.HelloWorld',
+// which is set using this project's XprGeneratorLoggerPrefix property.
+// This is a .NET 5.0 console app.
+
+// This sample is based on the .NET 5 Source Generators sample:
+// https://github.com/dotnet/roslyn-sdk/blob/main/samples/CSharp/SourceGenerators/SourceGeneratorSamples/HelloWorldGenerator.cs
 
 namespace AgileObjects.BuildableExpressions.Generator.Samples.HelloWorld
 {
