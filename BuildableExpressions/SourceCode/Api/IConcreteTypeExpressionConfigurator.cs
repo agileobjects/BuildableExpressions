@@ -41,6 +41,30 @@
             Action<IFieldExpressionConfigurator> configuration);
 
         /// <summary>
+        /// Add a public, instance-scoped, get-set <see cref="FieldExpression"/> to the
+        /// <see cref="ConcreteTypeExpression"/>, with the given <paramref name="name"/> and
+        /// <paramref name="type"/> .
+        /// </summary>
+        /// <param name="name">The name of the <see cref="FieldExpression"/>.</param>
+        /// <param name="type">The Type of the <see cref="FieldExpression"/>.</param>
+        /// <returns>The newly-created <see cref="FieldExpression"/>.</returns>
+        FieldExpression AddField(string name, Type type);
+
+        /// <summary>
+        /// Add a <see cref="FieldExpression"/> to the <see cref="ConcreteTypeExpression"/>, with
+        /// the given <paramref name="name"/>, <paramref name="type"/> and
+        /// <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="name">The name of the <see cref="FieldExpression"/>.</param>
+        /// <param name="type">The Type of the <see cref="FieldExpression"/>.</param>
+        /// <param name="configuration">The configuration to use.</param>
+        /// <returns>The newly-created <see cref="FieldExpression"/>.</returns>
+        FieldExpression AddField(
+            string name,
+            Type type,
+            Action<IFieldExpressionConfigurator> configuration);
+
+        /// <summary>
         /// Add a <see cref="FieldExpression"/> to the <see cref="ConcreteTypeExpression"/>, with
         /// the given <paramref name="name"/>, <paramref name="type"/> and
         /// <paramref name="configuration"/>.

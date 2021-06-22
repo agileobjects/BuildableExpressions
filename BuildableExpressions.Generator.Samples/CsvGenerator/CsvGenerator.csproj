@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>AgileObjects.BuildableExpressions.Generator.Samples.CsvGenerator</AssemblyName>
+    <RootNamespace>AgileObjects.BuildableExpressions.Generator.Samples.CsvGenerator</RootNamespace>
+
+    <!-- Ensures all dependencies are copied to this project's output directory: -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Sets the project to which to output the models generated from the CSV files: -->
+    <XprGeneratorOutputProject>..\CsvGenerator.Models\CsvGenerator.Models.csproj</XprGeneratorOutputProject>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="AgileObjects.BuildableExpressions.Generator" Version="0.1.0-preview1" />
+    <PackageReference Include="CsvTextFieldParser" Version="1.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="*.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

@@ -66,6 +66,7 @@
 
                 var buildContext = new SourceCodeExpressionBuildContext(
                     _logger,
+                    config,
                     _buildersFinder,
                     outputProject);
 

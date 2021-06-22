@@ -1,4 +1,6 @@
-﻿namespace AgileObjects.BuildableExpressions.Generator.Samples.HelloWorld
+﻿// Based on https://github.com/dotnet/roslyn-sdk/blob/main/samples/CSharp/SourceGenerators/SourceGeneratorSamples/HelloWorldGenerator.cs
+
+namespace AgileObjects.BuildableExpressions.Generator.Samples.HelloWorld
 {
     using System;
 

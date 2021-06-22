@@ -75,6 +75,15 @@
         FieldExpression IConcreteTypeExpressionConfigurator.AddField<TField>(string name) 
             => AddField(name, ClrTypeWrapper.For(typeof(TField)), configuration: null);
 
+        FieldExpression IConcreteTypeExpressionConfigurator.AddField(string name, Type type)
+            => AddField(name, ClrTypeWrapper.For(type), configuration: null);
+
+        FieldExpression IConcreteTypeExpressionConfigurator.AddField(
+            string name,
+            Type type, 
+            Action<IFieldExpressionConfigurator> configuration)
+            => AddField(name, ClrTypeWrapper.For(type), configuration);
+
         FieldExpression IConcreteTypeExpressionConfigurator.AddField<TField>(
             string name,
             Action<IFieldExpressionConfigurator> configuration)

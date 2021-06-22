@@ -12,6 +12,11 @@
     public interface IExpressionBuildContext
     {
         /// <summary>
+        /// Gets the full path to the input project's output directory.
+        /// </summary>
+        string InputProjectOutputPath { get; }
+
+        /// <summary>
         /// Gets the project Assemblies from which <see cref="ISourceCodeExpressionBuilder"/>s have
         /// been retrieved.
         /// </summary>
