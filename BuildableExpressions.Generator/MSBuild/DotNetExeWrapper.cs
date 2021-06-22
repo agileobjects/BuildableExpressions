@@ -24,7 +24,7 @@ namespace AgileObjects.BuildableExpressions.Generator.MSBuild
         {
             var path = typeof(DotNetExeWrapper)
                 .Assembly.Location
-                .Replace("net461", "netcoreapp2.1")
+                .Replace("net461", "net5.0")
                 .Replace(".exe", ".dll");
 
             var args = string.Join(" ", new[]

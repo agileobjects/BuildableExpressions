@@ -24,7 +24,7 @@
         {
             var sourceCode = BuildableExpression.SourceCode(sc =>
             {
-                sc.AddClass(nameof(ExpressionBuilder) + "OutputClassFromNetCore2", cls =>
+                sc.AddClass(nameof(ExpressionBuilder) + "OutputClass", cls =>
                 {
                     var doNothing = Expression.Empty();
 

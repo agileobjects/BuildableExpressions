@@ -4,13 +4,13 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using Compilation;
     using Configuration;
     using Extensions;
     using Logging;
     using NetStandardPolyfills;
-    using static Compilation.AssemblyResolver;
-    using static Compilation.AssemblyResolver.AssemblySource;
+    using Runtime;
+    using static Runtime.AssemblyResolver;
+    using static Runtime.AssemblyResolver.AssemblySource;
 
     internal class SourceCodeExpressionBuildersFinder
     {

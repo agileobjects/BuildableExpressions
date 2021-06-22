@@ -9,7 +9,7 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <XprGeneratorDebug>false</XprGeneratorDebug>
+    <XprGeneratorDebug>true</XprGeneratorDebug>
   </PropertyGroup>
 
   <ItemGroup>

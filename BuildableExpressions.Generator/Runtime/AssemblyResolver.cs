@@ -1,4 +1,4 @@
-﻿namespace AgileObjects.BuildableExpressions.Generator.Compilation
+﻿namespace AgileObjects.BuildableExpressions.Generator.Runtime
 {
     using System;
     using System.Collections.Concurrent;
@@ -207,6 +207,9 @@
                 return assemblies.First();
             }
 
+            // Fallback to a loaded assembly with the same name - if this
+            // matches an assembly it'll be an older version, but it may
+            // still work and that's better than falling over:
             return AppDomain
                 .CurrentDomain
                 .GetAssemblies()
