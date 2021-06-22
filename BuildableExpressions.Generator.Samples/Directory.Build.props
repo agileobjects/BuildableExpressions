@@ -1,0 +1,8 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\..\BuildableExpressions.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+
+</Project>

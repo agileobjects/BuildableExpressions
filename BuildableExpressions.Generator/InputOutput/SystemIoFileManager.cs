@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
+    using System.Reflection;
     using static System.IO.SearchOption;
 
     internal class SystemIoFileManager : IFileManager
@@ -32,8 +32,8 @@
 
         public Stream OpenRead(string filePath) => File.OpenRead(filePath);
 
-        public string GetVersion(string filePath)
-            => FileVersionInfo.GetVersionInfo(filePath).FileVersion;
+        public Version GetVersion(string filePath)
+            => AssemblyName.GetAssemblyName(filePath).Version;
 
         public Stream OpenWrite(string filePath) => File.OpenWrite(filePath);
 

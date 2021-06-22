@@ -12,10 +12,15 @@
     public interface IExpressionBuildContext
     {
         /// <summary>
-        /// Gets the loaded project Assemblies from which <see cref="ISourceCodeExpressionBuilder"/>s
-        /// have been retrieved.
+        /// Gets the project Assemblies from which <see cref="ISourceCodeExpressionBuilder"/>s have
+        /// been retrieved.
         /// </summary>
         IEnumerable<Assembly> ProjectAssemblies { get; }
+
+        /// <summary>
+        /// Gets all Assemblies output by the build of the current project.
+        /// </summary>
+        IEnumerable<Assembly> OutputAssemblies { get; }
 
         /// <summary>
         /// Gets the root namespace to which generated source code will be added. Defaults to the

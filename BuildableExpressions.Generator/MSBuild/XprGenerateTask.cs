@@ -2,12 +2,12 @@
 namespace XprGenerator
 {
     using System.Diagnostics;
-    using AgileObjects.BuildableExpressions.Generator.Compilation;
     using AgileObjects.BuildableExpressions.Generator.Configuration;
     using AgileObjects.BuildableExpressions.Generator.Extensions;
-    using AgileObjects.BuildableExpressions.Generator.InputOutput;
     using AgileObjects.BuildableExpressions.Generator.Logging;
-    using AgileObjects.BuildableExpressions.Generator.ProjectManagement;
+#if NETFRAMEWORK
+    using AgileObjects.BuildableExpressions.Generator.MSBuild;
+#endif
     using AgileObjects.BuildableExpressions.Generator.SourceCode;
     using AgileObjects.BuildableExpressions.SourceCode;
     using Microsoft.Build.Framework;
@@ -18,6 +18,8 @@ namespace XprGenerator
     /// </summary>
     public class XprGenerateTask : MsBuildTask, IConfig
     {
+        private const string _net40Wildcard = "net4*";
+
         /// <summary>
         /// Gets or sets the full path of the solution providing the 
         /// <see cref="SourceCodeExpression"/>(s) to build.
@@ -87,18 +89,18 @@ namespace XprGenerator
         private bool TryBuildExpressions(out int builtExpressionsCount)
         {
             var logger = new MsBuildTaskLogger(Log, LoggerPrefix);
-            var fileManager = SystemIoFileManager.Instance;
-            
-            var assemblyResolver = new AssemblyResolver(logger, fileManager);
-            assemblyResolver.Init(this);
 
-            var generator = new SourceCodeGenerator(
-                logger,
-                new ProjectFactory(fileManager),
-                new SourceCodeExpressionBuildersFinder(logger, assemblyResolver),
-                new OutputWriter(logger, fileManager));
-
-            var result = generator.Execute(this);
+#if NETFRAMEWORK
+            if (GetTargetFramework() != _net40Wildcard)
+            {
+                return DotNetExeWrapper.RunTask(
+                    logger,
+                    this,
+                    LaunchDebugger,
+                    out builtExpressionsCount);
+            }
+#endif
+            var result = SourceCodeGenerator.Execute(logger, this);
 
             builtExpressionsCount = result.BuiltExpressionsCount;
             return result.Success;
@@ -110,14 +112,12 @@ namespace XprGenerator
 
         private string GetTargetFramework()
         {
-            const string net40Wildcard = "net4*";
-
             if (string.IsNullOrEmpty(TargetFramework))
             {
-                return net40Wildcard;
+                return _net40Wildcard;
             }
 
-            return TargetFramework.StartsWithIgnoreCase("net4") ? net40Wildcard : "netstandard2.0";
+            return TargetFramework.StartsWithIgnoreCase("net4") ? _net40Wildcard : "netstandard2.0";
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace DefaultNamespace
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using AgileObjects.BuildableExpressions;
@@ -26,8 +27,15 @@
             {
                 sc.AddClass(nameof(ExpressionBuilder) + "OutputClass", cls =>
                 {
+                    cls.AddField<string>("TypeAssemblyLocation", fld =>
+                    {
+                        fld.SetStatic();
+                        fld.SetReadonly();
+                        fld.SetInitialValue(typeof(Type).Assembly.Location);
+                    });
+
                     cls.AddMethod(
-                        "GetNameNetCore3", 
+                        "GetNameNetCore3",
                         Expression.Property(
                             BuildableExpression.TypeOf(typeof(ExpressionBuilder)),
                             "Name"));

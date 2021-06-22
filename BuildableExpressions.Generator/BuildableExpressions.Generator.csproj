@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard2.0;netcoreapp2.1</TargetFrameworks>
+    <OutputType>Exe</OutputType>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>NU5128</NoWarn>
@@ -41,11 +42,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AgileObjects.BuildableExpressions" Version="0.1.0-preview1" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.6.85" PrivateAssets="All" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\BuildableExpressions\BuildableExpressions.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -56,7 +54,7 @@
 
   <Target Name="PackDependencies" BeforeTargets="GenerateNuspec">
     <ItemGroup>
-      <_PackageFiles Include="$(_BinPath)\*.dll;$(_BinPath)\*.deps.json;$(_BinPath)\*.Generator.pdb" Exclude="$(_BinPath)\AgileObjects.*.dll;$(_BinPath)\Microsoft.Build.*;$(_SharedAssemblies)">
+      <_PackageFiles Include="$(_BinPath)\*.dll;$(_BinPath)\*.json;$(_BinPath)\*.Generator.pdb" Exclude="$(_BinPath)\AgileObjects.*.dll;$(_BinPath)\Microsoft.Build.*;$(_SharedAssemblies)">
         <PackagePath>tools\%(RecursiveDir)</PackagePath>
         <Visible>false</Visible>
         <BuildAction>Content</BuildAction>

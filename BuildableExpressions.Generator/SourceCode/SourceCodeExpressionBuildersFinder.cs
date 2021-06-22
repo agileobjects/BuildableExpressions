@@ -10,12 +10,14 @@
     using Logging;
     using NetStandardPolyfills;
     using static Compilation.AssemblyResolver;
+    using static Compilation.AssemblyResolver.AssemblySource;
 
     internal class SourceCodeExpressionBuildersFinder
     {
         private readonly ILogger _logger;
         private readonly AssemblyResolver _assemblyResolver;
         private ICollection<Assembly> _projectAssemblies;
+        private ICollection<Assembly> _outputAssemblies;
 
         public SourceCodeExpressionBuildersFinder(
             ILogger logger,
@@ -26,6 +28,9 @@
         }
 
         public IEnumerable<Assembly> ProjectAssemblies => _projectAssemblies;
+
+        public IEnumerable<Assembly> OutputAssemblies
+            => _outputAssemblies ??= _assemblyResolver.LoadAssemblies(a => a.Source == Output);
 
         public ICollection<ISourceCodeExpressionBuilder> Find(IConfig config)
         {

@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.Generator.SourceCode
 {
     using System;
+    using Compilation;
     using Configuration;
     using InputOutput;
     using Logging;
@@ -25,7 +26,25 @@
             _outputWriter = outputWriter;
         }
 
-        public SourceCodeGenerationResult Execute(IConfig config)
+        public static SourceCodeGenerationResult Execute(
+            ILogger logger,
+            IConfig config)
+        {
+            var fileManager = SystemIoFileManager.Instance;
+
+            var assemblyResolver = new AssemblyResolver(logger, fileManager);
+            assemblyResolver.Init(config);
+
+            var generator = new SourceCodeGenerator(
+                logger,
+                new ProjectFactory(fileManager),
+                new SourceCodeExpressionBuildersFinder(logger, assemblyResolver),
+                new OutputWriter(logger, fileManager));
+
+            return generator.Execute(config);
+        }
+
+        private SourceCodeGenerationResult Execute(IConfig config)
         {
             var result = new SourceCodeGenerationResult();
 
@@ -46,8 +65,8 @@
                 var outputProject = _projectFactory.GetOutputProjectOrThrow(config);
 
                 var buildContext = new SourceCodeExpressionBuildContext(
-                    _logger, 
-                    _buildersFinder, 
+                    _logger,
+                    _buildersFinder,
                     outputProject);
 
                 var sourceCodeExpressions = builders.ToSourceCodeExpressions(buildContext);
@@ -56,11 +75,11 @@
                 var writtenFiles = _outputWriter.Write(outputProject, sourceCodeExpressions);
 
                 outputProject.Add(writtenFiles);
-                
+
                 _logger.Info(
                     $"{writtenFiles.Count} file(s) written to " +
                     $"project '{config.GetOutputProjectNameWithoutExtension()}'");
-                
+
                 result.BuiltExpressionsCount = writtenFiles.Count;
 
             Complete:
@@ -71,14 +90,14 @@
             {
                 _logger.Error(ex);
             }
-            
+
             return result;
         }
 
         public class SourceCodeGenerationResult
         {
             public bool Success { get; set; }
-            
+
             public int BuiltExpressionsCount { get; set; }
         }
     }

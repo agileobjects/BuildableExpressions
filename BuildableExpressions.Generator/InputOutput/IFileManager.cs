@@ -1,5 +1,6 @@
 ﻿namespace AgileObjects.BuildableExpressions.Generator.InputOutput
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
 
@@ -14,7 +15,7 @@
 
         Stream OpenRead(string filePath);
 
-        string GetVersion(string filePath);
+        Version GetVersion(string filePath);
 
         Stream OpenWrite(string filePath);
 

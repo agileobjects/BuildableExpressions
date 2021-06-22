@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Reflection;
+    using Compilation;
     using Logging;
     using ProjectManagement;
 
@@ -23,6 +24,8 @@
         }
 
         public IEnumerable<Assembly> ProjectAssemblies => _buildersFinder.ProjectAssemblies;
+        
+        public IEnumerable<Assembly> OutputAssemblies => _buildersFinder.OutputAssemblies;
 
         public string RootNamespace => _project.RootNamespace;
 
