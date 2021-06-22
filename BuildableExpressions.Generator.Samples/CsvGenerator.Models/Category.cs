@@ -1,4 +1,4 @@
-// Generated from CSV file Categories.csv
+// Generated from CSV file Categories.csv by the CsvToModelsGenerator in the CsvGenerator project.
 
 using System.Collections.Generic;
 
