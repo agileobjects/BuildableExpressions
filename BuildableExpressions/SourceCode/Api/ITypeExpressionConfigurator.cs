@@ -9,6 +9,12 @@
     public interface ITypeExpressionConfigurator : IAttributableExpressionConfigurator
     {
         /// <summary>
+        /// Sets any source code generated for the <see cref="TypeExpression"/> to be partial,
+        /// enabling multiple source files for the same type.
+        /// </summary>
+        void SetPartial();
+
+        /// <summary>
         /// Gets a Type object for the <see cref="TypeExpression"/>. The returned Type is lazily
         /// and dynamically generated when this property is accessed, and is built from the state
         /// of the <see cref="TypeExpression"/> at the time the property is accessed.

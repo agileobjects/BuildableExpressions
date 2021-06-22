@@ -163,6 +163,8 @@
         /// </summary>
         public SourceCodeExpression SourceCode => _sourceCode;
 
+        internal bool IsPartial { get; set; }
+
         /// <summary>
         /// Gets a <see cref="CommentExpression"/> describing this <see cref="TypeExpression"/>,
         /// if a summary has been set.

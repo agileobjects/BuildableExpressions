@@ -37,6 +37,8 @@
             _readOnlyInterfaceTypes = null;
         }
 
+        void ITypeExpressionConfigurator.SetPartial() => IsPartial = true;
+
         void ITypeExpressionConfigurator.SetSummary(string summary)
             => Summary = ReadableExpression.Comment(summary);
 

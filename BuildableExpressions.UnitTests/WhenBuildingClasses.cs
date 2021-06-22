@@ -88,6 +88,36 @@ namespace GeneratedExpressionCode
         }
 
         [Fact]
+        public void ShouldBuildAPartialClass()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("MessagerPart2", cls =>
+                    {
+                        cls.SetPartial();
+
+                        cls.AddField<string>("Message", fld =>
+                        {
+                            fld.SetReadonly();
+                            fld.SetInitialValue("Hello!");
+                        });
+                    });
+                })
+                .ToSourceCodeString();
+
+            const string expected = @"
+namespace GeneratedExpressionCode
+{
+    public partial class MessagerPart2
+    {
+        public readonly string Message = ""Hello!"";
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
+
+        [Fact]
         public void ShouldBuildAClassWithABaseType()
         {
             var translated = BuildableExpression

@@ -17,7 +17,7 @@
         private readonly bool _isGenericType;
         private readonly string _typeString;
         private readonly ITranslatable _summaryTranslation;
-        private readonly string _visibility;
+        private readonly string _modifiers;
         private readonly IList<ITranslation> _interfaceTypeTranslations;
         private readonly int _interfaceTypeCount;
         private readonly ITranslatable _genericParametersTranslation;
@@ -35,11 +35,16 @@
             _isGenericType = type.IsGeneric;
             _typeString = typeString;
             _summaryTranslation = SummaryTranslation.For(type, context);
-            _visibility = type.Visibility.ToString().ToLowerInvariant();
+            _modifiers = type.Visibility.ToString().ToLowerInvariant();
+
+            if (type.IsPartial)
+            {
+                _modifiers += " partial";
+            }
 
             var translationSize =
                 _summaryTranslation.TranslationSize +
-                _visibility.Length + 1 +
+                _modifiers.Length + 1 +
                 typeString.Length +
                 type.Name.Length +
                 6; // <- for opening and closing braces
@@ -213,7 +218,7 @@
 
             _summaryTranslation.WriteTo(writer);
 
-            var declaration = _visibility + " " + modifiers + _typeString;
+            var declaration = _modifiers + " " + modifiers + _typeString;
 
             writer.WriteKeywordToTranslation(declaration);
             writer.WriteTypeNameToTranslation(_type.Name);
