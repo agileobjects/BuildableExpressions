@@ -11,13 +11,13 @@
 
     <PackageId>AgileObjects.BuildableExpressions.Generator</PackageId>
     <Title>AgileObjects.BuildableExpressions.Generator</Title>
-    <Description>An MSBuild Task which generates C# class files from Expression Trees at build time. Targets .NET 4.6.1 and .NET Standard 2.0, dotnet build and MSBuild, and SDK and non-SDK projects.</Description>
+    <Description>An MSBuild Task which generates C# class files from strings or Expression Trees at build time. Targets .NET 4.6.1 and .NET Standard 2.0, dotnet build and MSBuild, and SDK and non-SDK projects.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>Expression Trees</PackageTags>
+    <PackageTags>"Expression Trees", "Code Generation", MSBuild</PackageTags>
     <PackageProjectUrl>https://github.com/AgileObjects/BuildableExpressions</PackageProjectUrl>
     <PackageReleaseNotes></PackageReleaseNotes>
 
-    <!-- forces SDK to copy dependencies into build output to make packing easier -->
+    <!-- Copy dependencies into build output to make packing easier -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
     <PackageOutputPath>../NuGet</PackageOutputPath>
