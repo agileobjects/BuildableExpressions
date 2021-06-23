@@ -15,7 +15,7 @@ extra_javascript:
     
 nav:
     - General Use:
-        - Building types: Building-Types.md
+        - Building Types: Building-Types.md
         - Generating code: Generating-Code.md
     - Source Code API:
         - Overview: api/index.md

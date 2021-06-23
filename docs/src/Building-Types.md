@@ -19,7 +19,7 @@ namespace Greetings
 }
 ```
 
-### String -> SourceCodeExpression -> Type
+### String -> SourceCode -> Type
 
 To create the `HelloWorldGreeter` SourceCodeExpression and Type from a C# source-code string, use:
 
@@ -53,7 +53,7 @@ var helloWorldGreeter =
 Console.WriteLine(helloWorldGreeter.Greet());
 ```
 
-### Expression Tree -> SourceCodeExpression -> Type
+### Expression Tree -> SourceCode -> Type
 
 To create the `HelloWorldGreeter` SourceCodeExpression and Type from an Expression Tree, use:
 
@@ -89,4 +89,4 @@ var helloWorldGreeter =
 Console.WriteLine(helloWorldGreeter.Greet());
 ```
 
-More on the SourceCodeExpression API can be found [here](api).
+More on the SourceCodeExpression API can be found [here](/api).
