@@ -53,7 +53,7 @@ var helloWorldGreeter =
 Console.WriteLine(helloWorldGreeter.Greet());
 ```
 
-### Expression Tree -> SourceCode -> Type
+### Expression -> SourceCode -> Type
 
 To create the `HelloWorldGreeter` SourceCodeExpression and Type from an Expression Tree, use:
 
