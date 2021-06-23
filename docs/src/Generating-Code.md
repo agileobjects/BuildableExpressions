@@ -22,13 +22,14 @@ When the project is built:
 1. Types implementing `ISourceCodeExpressionBuilder` are discovered in the build output
 2. An instance of each `ISourceCodeExpressionBuilder` type is created and its `.Build()` method is called
 3. Any `SourceCodeExpression`s returned from `.Build()` method calls are converted to C# source-code strings
-4. The C# source-code strings are written to files in the target project
-5. If any source code is generated, the project is built again to include the generated types. This build skips the previous steps.
+4. Any C# source-code strings are written to files in the target project
+5. If any source code files are generated, the project is built again to include the generated types.<br />
+   This build skips the previous steps.
 
 ## Examples
 
 These simple examples generate a set of `Greeter` C# source code files from a set of newline-separated
-names in a `names.txt` text file in the build output. Each `Greeter` implements the following `IGreeter` interface:
+names in a `names.txt` file in the build output. Each `Greeter` implements the following `IGreeter` interface:
 
 ```csharp
 namespace Greetings
@@ -68,12 +69,12 @@ public class GreeterGenerator : ISourceCodeExpressionBuilder
 using Greetings;
 
 public class {className} : IGreeter
-{
+{{
     public string Greet()
-    {
+    {{
         return ""{nameInFile}"";
-    }
-}";
+    }}
+}}";
             yield return BuildableExpression.SourceCode(sourceCodeCSharp);
         }
     }
@@ -102,7 +103,7 @@ public class GreeterGenerator : ISourceCodeExpressionBuilder
         foreach (var nameInFile in namesInFile)
         {
             // Get a valid class name:
-            var className = nameInFile.Replace(" ", "").Trim() + "Greeter;
+            var className = nameInFile.Replace(" ", "").Trim() + "Greeter";
             
             // Build a SourceCodeExpression using the API:
             yield return BuildableExpression.SourceCode(sc =>
