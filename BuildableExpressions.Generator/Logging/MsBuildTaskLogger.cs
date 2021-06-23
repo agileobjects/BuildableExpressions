@@ -1,4 +1,5 @@
-﻿namespace AgileObjects.BuildableExpressions.Generator.Logging
+﻿#if FEATURE_MSBUILD
+namespace AgileObjects.BuildableExpressions.Generator.Logging
 {
     using System;
     using Microsoft.Build.Framework;
@@ -34,3 +35,4 @@
             => _taskLog.LogErrorFromException(ex);
     }
 }
+#endif

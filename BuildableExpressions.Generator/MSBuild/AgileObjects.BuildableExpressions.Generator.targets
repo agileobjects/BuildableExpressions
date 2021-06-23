@@ -3,9 +3,7 @@
   <PropertyGroup>
     <_XprGeneratorFramework Condition="'$(MSBuildRuntimeType)' != 'Core'">net461</_XprGeneratorFramework>
     <_XprGeneratorFramework Condition="'$(MSBuildRuntimeType)' == 'Core'">netstandard2.0</_XprGeneratorFramework>
-    <_XprGeneratorExtension Condition="'$(MSBuildRuntimeType)' != 'Core'">exe</_XprGeneratorExtension>
-    <_XprGeneratorExtension Condition="'$(MSBuildRuntimeType)' == 'Core'">dll</_XprGeneratorExtension>
-    <_XprGeneratorTaskAssembly>..\tools\$(_XprGeneratorFramework)\AgileObjects.BuildableExpressions.Generator.$(_XprGeneratorExtension)</_XprGeneratorTaskAssembly>
+    <_XprGeneratorTaskAssembly>..\tools\$(_XprGeneratorFramework)\AgileObjects.BuildableExpressions.Generator.dll</_XprGeneratorTaskAssembly>
   </PropertyGroup>
 
   <UsingTask AssemblyFile="$(_XprGeneratorTaskAssembly)" TaskName="XprGenerator.XprGenerateTask" />

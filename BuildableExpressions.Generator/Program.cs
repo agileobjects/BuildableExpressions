@@ -1,4 +1,5 @@
-﻿namespace AgileObjects.BuildableExpressions.Generator
+﻿#if NET5_0
+namespace AgileObjects.BuildableExpressions.Generator
 {
     using System;
     using System.Diagnostics;
@@ -77,3 +78,4 @@
         }
     }
 }
+#endif

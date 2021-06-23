@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net461;netstandard2.0;net5.0</TargetFrameworks>
-    <OutputType>Exe</OutputType>
+    <OutputType Condition=" '$(TargetFramework)' == 'net5.0' ">Exe</OutputType>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>NU5128</NoWarn>
@@ -24,6 +24,10 @@
     <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net5.0'">
+    <DefineConstants>$(DefineConstants);FEATURE_MSBUILD</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="..\ClsCompliant.cs">
       <Link>Properties\ClsCompliant.cs</Link>
@@ -41,9 +45,12 @@
     <PackageReference Include="EnvDTE" Version="16.9.31023.347" />
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' ">
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.6.85" PrivateAssets="All" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="AgileObjects.BuildableExpressions" Version="0.1.0-preview1" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.6.85" PrivateAssets="All" />
   </ItemGroup>
 
   <PropertyGroup>

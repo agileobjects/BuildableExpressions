@@ -1,4 +1,5 @@
-﻿// ReSharper disable once CheckNamespace
+﻿#if FEATURE_MSBUILD
+// ReSharper disable once CheckNamespace
 namespace XprGenerator
 {
     using System.Diagnostics;
@@ -121,3 +122,4 @@ namespace XprGenerator
         }
     }
 }
+#endif
