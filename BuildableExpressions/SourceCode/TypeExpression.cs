@@ -107,18 +107,7 @@
                 sourceCode.Analyse();
             }
 
-            var compilationResult = sourceCode.Compile();
-
-            if (compilationResult.Failed)
-            {
-                throw new InvalidOperationException(
-                    $"Compilation of type '{Name}' failed:{Environment.NewLine}" +
-                    string.Join(Environment.NewLine, compilationResult.Errors));
-            }
-
-            var compiledTypes = compilationResult
-                .CompiledAssembly
-                .GetTypes();
+            var compiledTypes = sourceCode.CompileToTypesOrThrow();
 
             return _type = compiledTypes.First(t =>
             {

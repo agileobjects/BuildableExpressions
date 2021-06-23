@@ -1,1 +1,1 @@
-## Generating Code
+**BuildableExpressions.Generator** enables built-time C# source code file generation.

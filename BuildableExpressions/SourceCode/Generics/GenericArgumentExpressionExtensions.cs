@@ -27,10 +27,7 @@
                 }
             });
 
-            var compiledTypes = paramSourceCode
-                .Compile()
-                .CompiledAssembly
-                .GetTypes();
+            var compiledTypes = paramSourceCode.CompileToTypesOrThrow();
 
             return compiledTypes[0];
         }

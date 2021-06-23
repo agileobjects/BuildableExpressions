@@ -17,5 +17,18 @@ nav:
     - General Use:
         - Building types: Building-Types.md
         - Generating code: Generating-Code.md
+    - Source Code API:
+        - Overview: api/index.md
+        - Classes: api/Building-Classes.md
+        - Structs: api/Building-Structs.md
+        - Interfaces: api/Building-Interfaces.md
+        - Enums: api/Building-Enums.md
+        - Implementing Interfaces: api/Implementing-Interfaces.md
+        - Derived Types: api/Building-Derived-Types.md
+        - Generics: api/Generics.md
+        - Constructors: api/Building-Constructors.md
+        - Methods: api/Building-Methods.md
+        - Fields: api/Building-Fields.md
+        - Properties: api/Building-Properties.md
 
 theme: readthedocs

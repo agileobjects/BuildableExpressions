@@ -1,8 +1,9 @@
 ﻿namespace AgileObjects.BuildableExpressions.Compilation
 {
-    using System.Collections.Generic;
+    using System;
     using System.Linq;
-    using Extensions;
+    using System.Reflection;
+    using ReadableExpressions.Extensions;
     using SourceCode;
 
     /// <summary>
@@ -11,33 +12,56 @@
     public static class CompilationExtensions
     {
         /// <summary>
-        /// Compiles this <paramref name="sourceCodeExpression"/>, returning a
-        /// <see cref="CompilationResult"/> describing the results.
+        /// Compiles this <paramref name="sourceCodeExpression"/>, returning an array containing the
+        /// compiled CLR Types, or throwing an InvalidOperationException is compilation fails.
         /// </summary>
-        /// <param name="sourceCodeExpression">The <see cref="SourceCodeExpression"/>s to compile.</param>
-        /// <returns>A <see cref="CompilationResult"/> describing the result of the compilation.</returns>
-        public static CompilationResult Compile(
-            this SourceCodeExpression sourceCodeExpression)
+        /// <param name="sourceCodeExpression">The <see cref="SourceCodeExpression"/> to compile.</param>
+        /// <param name="referenceAssemblies">
+        /// Any extra reference Assemblies required to compile this
+        /// <paramref name="sourceCodeExpression"/>.
+        /// </param>
+        /// <returns>An array containing the compiled CLR Types.</returns>
+        public static Type[] CompileToTypesOrThrow(
+            this SourceCodeExpression sourceCodeExpression,
+            params Assembly[] referenceAssemblies)
         {
-            return CSharpCompiler.Compile(
-                sourceCodeExpression.ReferencedAssemblies.Distinct(),
-                sourceCodeExpression.ToSourceCodeString());
+            var compilationResult = sourceCodeExpression.Compile(referenceAssemblies);
+
+            if (!compilationResult.Failed)
+            {
+                return compilationResult.CompiledAssembly.GetTypes();
+            }
+
+            var typeNames = string.Join(", ", sourceCodeExpression
+                .TypeExpressions
+                .Select(te => te.GetFriendlyName()));
+
+            throw new InvalidOperationException(
+                $"Compilation of type(s) '{typeNames}' failed:{Environment.NewLine}" +
+                string.Join(Environment.NewLine, compilationResult.Errors));
         }
 
         /// <summary>
-        /// Compiles these <paramref name="sourceCodeExpressions"/>, returning a
+        /// Compiles this <paramref name="sourceCodeExpression"/>, returning a
         /// <see cref="CompilationResult"/> describing the results.
         /// </summary>
-        /// <param name="sourceCodeExpressions">One or more <see cref="SourceCodeExpression"/>s to compile.</param>
+        /// <param name="sourceCodeExpression">The <see cref="SourceCodeExpression"/> to compile.</param>
+        /// <param name="referenceAssemblies">
+        /// Any extra reference Assemblies required to compile this
+        /// <paramref name="sourceCodeExpression"/>.
+        /// </param>
         /// <returns>A <see cref="CompilationResult"/> describing the result of the compilation.</returns>
         public static CompilationResult Compile(
-            this IEnumerable<SourceCodeExpression> sourceCodeExpressions)
+            this SourceCodeExpression sourceCodeExpression,
+            params Assembly[] referenceAssemblies)
         {
-            var expressionsList = sourceCodeExpressions.ToList();
+            var allReferenceAssemblies = referenceAssemblies
+                .Concat(sourceCodeExpression.ReferencedAssemblies)
+                .Distinct();
 
             return CSharpCompiler.Compile(
-                expressionsList.SelectMany(sc => sc.ReferencedAssemblies).Distinct(),
-                expressionsList.Project(sc => sc.ToSourceCodeString()));
+                allReferenceAssemblies,
+                sourceCodeExpression.ToSourceCodeString());
         }
     }
 }
