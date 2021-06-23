@@ -5,7 +5,7 @@ To install from NuGet, use:
 
     PM> Install-Package AgileObjects.BuildableExpressions
 
-### Examples
+## Examples
 
 These simple examples create a `Greeter` type which implements the following `IGreeter` interface:
 
@@ -55,26 +55,25 @@ Console.WriteLine(helloWorldGreeter.Greet());
 
 ### Expression -> SourceCode -> Type
 
-To create the `HelloWorldGreeter` SourceCodeExpression and Type from an Expression Tree, use:
+To create the `HelloWorldGreeter` SourceCodeExpression and Type from an Expression, use:
 
 ```csharp
 // Build a SourceCodeExpression using the API:
-var sourceCode = BuildableExpression
-    .SourceCode(sc =>
+var sourceCode = BuildableExpression.SourceCode(sc =>
+{
+    // Define the HelloWorldGreeter class:
+    sc.AddClass("HelloWorldGreeter", cls =>
     {
-        // Define the HelloWorldGreeter class:
-        sc.AddClass("HelloWorldGreeter", cls =>
+        // Implement the IGreeter interface:
+        cls.SetImplements<IGreeter>(impl =>
         {
-            // Implement the IGreeter interface:
-            cls.SetImplements<IGreeter>(impl =>
-            {
-                // Implement the .Greet() method:
-                impl.AddMethod(
-                    nameof(IGreeter.Greet),
-                    body: Expression.Constant("Hello world!"));
-            });
+            // Implement the .Greet() method:
+            impl.AddMethod(
+                nameof(IGreeter.Greet),
+                body: Expression.Constant("Hello world!"));
         });
     });
+});
 
 // Compile the SourceCodeExpression to its CLR Types -
 // unlike the String -> SourceCodeExpression example, 
