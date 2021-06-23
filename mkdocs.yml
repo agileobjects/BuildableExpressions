@@ -1,0 +1,21 @@
+site_name: BuildableExpressions
+site_description: ''
+site_author: Steve Wilkes
+repo_url: https://github.com/agileobjects/BuildableExpressions
+
+docs_dir: 'docs/src'
+site_dir: 'docs/site'
+
+extra_css:
+    - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/vs2015.min.css
+    - css/styles.min.css
+
+extra_javascript:
+    - scripts/docs.min.js
+    
+nav:
+    - General Use:
+        - Building types: Building-Types.md
+        - Generating code: Generating-Code.md
+
+theme: readthedocs
