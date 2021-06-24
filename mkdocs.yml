@@ -22,9 +22,10 @@ nav:
         - Classes: api/Building-Classes.md
         - Structs: api/Building-Structs.md
         - Interfaces: api/Building-Interfaces.md
+        - Attributes: api/Building-Attributes.md
         - Enums: api/Building-Enums.md
         - Implementing Interfaces: api/Implementing-Interfaces.md
-        - Derived Types: api/Building-Derived-Types.md
+        - Implementing Inheritance: api/Implementing-Inheritance.md
         - Generics: api/Generics.md
         - Constructors: api/Building-Constructors.md
         - Methods: api/Building-Methods.md

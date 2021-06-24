@@ -2,7 +2,9 @@
 
 To install from NuGet, use:
 
-    PM> Install-Package AgileObjects.BuildableExpressions.Generator
+```shell
+PM> Install-Package AgileObjects.BuildableExpressions.Generator
+```
 
 ## How it Works
 
@@ -54,7 +56,7 @@ public class GreeterGenerator : ISourceCodeExpressionBuilder
         // Get the path to the names.txt file:
         var namesFilePath = Path.Combine(
             context.InputProjectOutputPath,
-            "names.text");
+            "names.txt");
 
         // Read the file into a string collection:
         var namesInFile = File.ReadAllLines(namesFilePath);
