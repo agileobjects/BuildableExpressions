@@ -22,9 +22,13 @@ interface ISourceCodeExpressionBuilder
 When the project is built:
 
 1. Types implementing `ISourceCodeExpressionBuilder` are discovered in the build output
+
 2. An instance of each `ISourceCodeExpressionBuilder` type is created and its `.Build()` method is called
+
 3. Any `SourceCodeExpression`s returned from `.Build()` method calls are converted to C# source-code strings
+
 4. Any C# source-code strings are written to files in the target project
+
 5. If any source code files are generated, the project is built again to include the generated types.<br />
    This build skips the previous steps.
 
