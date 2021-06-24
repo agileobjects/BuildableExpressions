@@ -31,6 +31,26 @@ The Attribute API supports:
 - [Interface implementation](Implementing-Interfaces)
 - [Inheritance](Implementing-Inheritance)
 
+## Setting Attribute Usage
+
+To customise to which targets an attribute can be applied, use:
+
+```csharp
+BuildableExpression.SourceCode(sc =>
+{
+    // Add an attribute which can only be applied to
+    // classes, structs or interfaces:
+    sc.AddAttribute("TypesOnlyAttribute", attr =>
+    {
+        // Set multiple AttributeTargets values:
+        attr.SetValidOn(
+            AttributeTargets.Class | 
+            AttributeTargets.Struct | 
+            AttributeTargets.Interface);
+    });
+});
+```
+
 ## Applying Attributes
 
 To apply an Attribute, use the following - normal CLR attributes can be applied as well as Attributes
@@ -62,7 +82,7 @@ BuildableExpression.SourceCode(sc =>
             p.AddAttribute<RequiredAttribute>();
         });
 
-        // Add an string get-only property:
+        // Add a string get-only property:
         cls.AddProperty<int>("AttributedGetOnlyProperty", p =>
         {
             // Set the property's getter:
@@ -97,22 +117,39 @@ BuildableExpression.SourceCode(sc =>
 });
 ```
 
-## Setting Attribute Usage
+### Attribute Constructors
 
-To customise to which targets an attribute can be applied, use:
+To apply an Attribute with a constructor, use:
 
 ```csharp
 BuildableExpression.SourceCode(sc =>
 {
-    // Add an attribute which can only be applied to
-    // classes, structs or interfaces:
-    sc.AddAttribute("TypesOnlyAttribute", attr =>
+    // Create an attribute with a single 
+    // string constructor parameter:
+    var nameAttribute = sc.AddAttribute("NameAttribute", attr =>
     {
-        // Set multiple AttributeTargets values:
-        attr.SetValidOn(
-            AttributeTargets.Class | 
-            AttributeTargets.Struct | 
-            AttributeTargets.Interface);
+        // Add the constructor:
+        attr.AddConstructor(ctor =>
+        {
+            // Add the constructor parameter:
+            ctor.AddParameter<string>("name");
+
+            // Add an empty constructor body
+            // (just for this example):
+            ctor.SetBody(Expressions.Empty());
+        });
+    });
+
+    // Add a class to which to apply the attribute:
+    sc.AddClass("HasANameAttribute", cls =>
+    {
+        // Apply the attribute:
+        cls.AddAttribute(nameAttribute, attr =>
+        {
+            // Set the constructor argument to pass
+            // to the NameAttribute:
+            attr.SetConstructorArguments("Dennis");
+        });
     });
 });
 ```
