@@ -11,4 +11,4 @@ which generates C# source code files at build-time. It works from `dotnet build`
 Both packages generate from C# source-code strings or
 [Expression Trees](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/expression-trees), and target .NET 4.6.1
 and [.NETStandard 2.0](https://dotnet.microsoft.com/platform/dotnet-standard). Both are available via NuGet and licensed with the 
-[MIT licence](LICENCE.md). 
+[MIT licence](LICENCE.md). Check out [the documentation](https://buildableexpressions.readthedocs.io) for more!

@@ -127,3 +127,6 @@ public class GreeterGenerator : ISourceCodeExpressionBuilder
 ```
 
 More on the SourceCodeExpression API can be found [here](/api).
+
+Source code generation samples can be found in 
+[the BuildableExpressions repository](https://github.com/agileobjects/BuildableExpressions/tree/master/BuildableExpressions.Generator.Samples).
