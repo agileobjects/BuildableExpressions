@@ -18,7 +18,7 @@ BuildableExpression.SourceCode(sc =>
 ```
 
 The `AddField()` method returns a `FieldExpression` with a `FieldInfo` property which can be used 
-to include the field in other Expressions.
+to access the field from other Expressions.
 
 For example, to assign a field in a [constructor](Building-Constructors), use:
 
