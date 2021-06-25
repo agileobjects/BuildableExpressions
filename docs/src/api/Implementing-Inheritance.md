@@ -26,7 +26,7 @@ BuildableExpression.SourceCode(sc =>
         {
             // Get a reference the abstract 'Animal.LegCount' property:
             var legCountProperty = 
-                animal.PropertyExpressions.First()
+                animal.PropertyExpressions.First();
 
             // Implement Animal.LegCount:
             impl.AddProperty(legCountProperty, p =>
@@ -43,7 +43,9 @@ BuildableExpression.SourceCode(sc =>
 });
 ```
 
-// To call a base class constructor when generating a derived type, use:
+### Base Constructor Calls
+
+To call a base class constructor when generating a derived type, use:
 
 ```csharp
 BuildableExpression.SourceCode(sc =>
@@ -55,7 +57,7 @@ BuildableExpression.SourceCode(sc =>
 
         // Add a get-only int LegCount property:
         var legCountProperty = cls
-            .AddProperty<int>("LegCount, p => p.SetGetter());
+            .AddProperty<int>("LegCount", p => p.SetGetter());
 
         cls.AddConstructor(ctor =>
         {
