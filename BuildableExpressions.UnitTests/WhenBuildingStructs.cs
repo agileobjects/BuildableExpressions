@@ -84,7 +84,7 @@ namespace GeneratedExpressionCode
                     {
                         param = itf.AddGenericParameter("T");
 
-                        itf.AddMethod("GetTypeName", typeof(string));
+                        itf.AddMethod<string>("GetTypeName");
                     });
 
                     sc.AddStruct("StructTypeGetter", str =>
@@ -133,7 +133,7 @@ namespace GeneratedExpressionCode
                     {
                         param = itf.AddGenericParameter("T");
 
-                        itf.AddMethod("GetTypeName", typeof(string));
+                        itf.AddMethod<string>("GetTypeName");
                     });
 
                     sc.AddStruct("StringBuilderTypeGetter", str =>

@@ -867,7 +867,8 @@
         /// <summary>
         /// Add a public, instance-scoped <see cref="MethodExpression"/> to the
         /// <see cref="ClassExpression"/>, with the given <paramref name="name"/> and
-        /// <paramref name="body"/>.
+        /// <paramref name="body"/>. If <paramref name="body"/> is a LambdaExpression, its parameters
+        /// are used as the method's parameters.
         /// </summary>
         /// <param name="classConfig">The <see cref="IClassImplementationConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
@@ -887,7 +888,8 @@
         /// <summary>
         /// Add a public, instance-scoped <see cref="MethodExpression"/> to the
         /// <see cref="StructExpression"/>, with the given <paramref name="name"/> and
-        /// <paramref name="body"/>.
+        /// <paramref name="body"/>. If <paramref name="body"/> is a LambdaExpression, its parameters
+        /// are used as the method's parameters.
         /// </summary>
         /// <param name="structConfig">The <see cref="IStructImplementationConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
@@ -931,6 +933,22 @@
         /// <summary>
         /// Add a parameterless <see cref="MethodExpression"/> to the
         /// <see cref="InterfaceExpression"/>, with the given <paramref name="name"/> and
+        /// <typeparamref name="TReturnType"/> return type.
+        /// </summary>
+        /// <typeparam name="TReturnType">The return type of the <see cref="MethodExpression"/>.</typeparam>
+        /// <param name="interfaceConfig">The <see cref="IInterfaceExpressionConfigurator"/> to configure.</param>
+        /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
+        /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
+        public static MethodExpression AddMethod<TReturnType>(
+            this IInterfaceExpressionConfigurator interfaceConfig,
+            string name)
+        {
+            return interfaceConfig.AddMethod(name, typeof(TReturnType));
+        }
+
+        /// <summary>
+        /// Add a parameterless <see cref="MethodExpression"/> to the
+        /// <see cref="InterfaceExpression"/>, with the given <paramref name="name"/> and
         /// <paramref name="returnType"/>.
         /// </summary>
         /// <param name="interfaceConfig">The <see cref="IInterfaceExpressionConfigurator"/> to configure.</param>
@@ -968,7 +986,8 @@
         /// <summary>
         /// Add a public, instance-scoped <see cref="MethodExpression"/> to the
         /// <see cref="ClassExpressionBase"/>, with the given <paramref name="name"/> and
-        /// <paramref name="body"/>.
+        /// <paramref name="body"/>. If <paramref name="body"/> is a LambdaExpression, its parameters
+        /// are used as the method's parameters.
         /// </summary>
         /// <param name="memberConfig">The <see cref="IClassMemberConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
@@ -988,7 +1007,8 @@
         /// <summary>
         /// Add a public, instance-scoped <see cref="MethodExpression"/> to the
         /// <see cref="StructExpression"/>, with the given <paramref name="name"/> and
-        /// <paramref name="body"/>.
+        /// <paramref name="body"/>. If <paramref name="body"/> is a LambdaExpression, its parameters
+        /// are used as the method's parameters.
         /// </summary>
         /// <param name="structConfig">The <see cref="IStructExpressionConfigurator"/> to configure.</param>
         /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
@@ -1156,7 +1176,8 @@
 
         /// <summary>
         /// Set the body of the <see cref="MethodExpression"/>, using the body Expression's Type as
-        /// the <see cref="MethodExpression"/>'s return type.
+        /// the <see cref="MethodExpression"/>'s return type. If <paramref name="body"/> is a
+        /// LambdaExpression, its parameters are used as the method's parameters.
         /// </summary>
         /// <param name="methodConfig">The <see cref="IConcreteTypeMethodExpressionConfigurator"/> to configure.</param>
         /// <param name="body">The Expression to use.</param>

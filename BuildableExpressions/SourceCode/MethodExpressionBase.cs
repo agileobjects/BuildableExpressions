@@ -283,7 +283,8 @@
 
         /// <summary>
         /// Sets the body of this <see cref="MethodExpressionBase"/>, using the given
-        /// <paramref name="returnType"/>.
+        /// <paramref name="returnType"/>. If <paramref name="body"/> is a LambdaExpression, its
+        /// parameters are used as the method's parameters.
         /// </summary>
         /// <param name="body">The Expression to use.</param>
         /// <param name="returnType">The return type to use for the method.</param>

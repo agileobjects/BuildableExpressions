@@ -18,7 +18,8 @@
         void SetStatic();
 
         /// <summary>
-        /// Set the body of the <see cref="MethodExpression"/>.
+        /// Set the body of the <see cref="MethodExpression"/>. If <paramref name="body"/> is a
+        /// LambdaExpression, its parameters are used as the method's parameters.
         /// </summary>
         /// <param name="body">The Expression to use.</param>
         /// <param name="returnType">The return type to use for the method.</param>

@@ -425,7 +425,7 @@ namespace GeneratedExpressionCode
                 {
                     var @interface = sc.AddInterface("IMyInterface", itf =>
                     {
-                        itf.AddMethod("GetMessage", typeof(string));
+                        itf.AddMethod<string>("GetMessage");
                     });
 
                     sc.AddClass("ClassImpl", cls =>

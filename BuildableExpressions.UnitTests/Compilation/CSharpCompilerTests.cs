@@ -183,9 +183,11 @@ namespace MyNamespace
             {
                 sc.AddClass(""MyClass"", cls => 
                 {
-                    var doNothing = Expression.Lambda<Action>(Expression.Empty());
-                    
-                    cls.AddMethod(nameof(Build), doNothing, m => { });
+                    cls.AddMethod(nameof(Build), m =>
+                    {
+                        var doNothing = Expression.Lambda<Action>(Expression.Empty());
+                        m.SetDefinition(doNothing);
+                    });
                 });
             });
         }

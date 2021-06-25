@@ -42,7 +42,7 @@ BuildableExpression.SourceCode(sc =>
     // classes, structs or interfaces:
     sc.AddAttribute("TypesOnlyAttribute", attr =>
     {
-        // Set multiple AttributeTargets values:
+        // Set one or more AttributeTargets values:
         attr.SetValidOn(
             AttributeTargets.Class | 
             AttributeTargets.Struct | 
