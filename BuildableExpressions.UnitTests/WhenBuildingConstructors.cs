@@ -392,8 +392,6 @@ namespace GeneratedExpressionCode
         [Fact]
         public void ShouldBuildAChainedBaseDesignTimeClassConstructorCall()
         {
-            var allMembers = typeof(BaseType<>).GetNonPublicStaticMembers();
-
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
