@@ -795,7 +795,7 @@
 
         /// <summary>
         /// Add an auto-property getter with the optional given <paramref name="visibility"/> to the
-        /// <see cref="PropertyExpression"/>.
+        /// <see cref="PropertyExpression"/>. Use this method to create a get-only property.
         /// </summary>
         /// <param name="propertyConfig">
         /// The <see cref="IConcreteTypePropertyExpressionConfigurator"/> to configure.
@@ -814,7 +814,7 @@
 
         /// <summary>
         /// Add an auto-property setter with the optional given <paramref name="visibility"/> to the
-        /// <see cref="PropertyExpression"/>.
+        /// <see cref="PropertyExpression"/>. Use this method to create a set-only property.
         /// </summary>
         /// <param name="propertyConfig">
         /// The <see cref="IConcreteTypePropertyExpressionConfigurator"/> to configure.
@@ -1003,62 +1003,6 @@
             Expression body)
         {
             return structConfig.AddMethod(name, cfg => cfg.SetBody(body));
-        }
-
-        /// <summary>
-        /// Add a <see cref="MethodExpression"/> to the <see cref="StructExpression"/>, with the
-        /// given <paramref name="name"/> and <paramref name="body"/>, using the given
-        /// <paramref name="configuration"/>.
-        /// </summary>
-        /// <param name="structConfig">The <see cref="IStructExpressionConfigurator"/> to configure.</param>
-        /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
-        /// <param name="body">
-        /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
-        /// body.
-        /// </param>
-        /// <param name="configuration">
-        /// The configuration with which to configure the new <see cref="MethodExpression"/>.
-        /// </param>
-        /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
-        public static MethodExpression AddMethod(
-            this IStructExpressionConfigurator structConfig,
-            string name,
-            Expression body,
-            Action<IConcreteTypeMethodExpressionConfigurator> configuration)
-        {
-            return structConfig.AddMethod(name, cfg =>
-            {
-                configuration.Invoke(cfg);
-                cfg.SetBody(body);
-            });
-        }
-
-        /// <summary>
-        /// Add a <see cref="MethodExpression"/> to the <see cref="ClassExpressionBase"/>, with the
-        /// given <paramref name="name"/> and <paramref name="body"/>, using the given
-        /// <paramref name="configuration"/>.
-        /// </summary>
-        /// <param name="memberConfig">The <see cref="IClassMemberConfigurator"/> to configure.</param>
-        /// <param name="name">The name of the <see cref="MethodExpression"/>.</param>
-        /// <param name="body">
-        /// The Expression from which to create the <see cref="MethodExpression"/>'s parameters and
-        /// body.
-        /// </param>
-        /// <param name="configuration">
-        /// The configuration with which to configure the new <see cref="MethodExpression"/>.
-        /// </param>
-        /// <returns>The newly-created <see cref="MethodExpression"/>.</returns>
-        public static MethodExpression AddMethod(
-            this IClassMemberConfigurator memberConfig,
-            string name,
-            Expression body,
-            Action<IClassMethodExpressionConfigurator> configuration)
-        {
-            return memberConfig.AddMethod(name, cfg =>
-            {
-                configuration.Invoke(cfg);
-                cfg.SetBody(body);
-            });
         }
 
         /// <summary>

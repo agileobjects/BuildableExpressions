@@ -27,7 +27,7 @@ The Attribute API supports:
 - [Fields](Building-Fields)
 - [Properties](Building-Properties)
 - [Methods](Building-Methods)
-- Attributes
+- Attributes (applying attributes to an Attribute)
 - [Interface implementation](Implementing-Interfaces)
 - [Inheritance](Implementing-Inheritance)
 

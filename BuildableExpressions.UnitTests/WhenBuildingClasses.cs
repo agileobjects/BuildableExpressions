@@ -677,9 +677,10 @@ namespace GeneratedExpressionCode
 
                         cls.AddMethod("GetString", Default(typeof(string)));
 
-                        cls.AddMethod("GetInt", Default(typeof(int)), m =>
+                        cls.AddMethod("GetInt", m =>
                         {
                             m.SetStatic();
+                            m.SetBody(Default(typeof(int)));
                         });
                     });
                 })
