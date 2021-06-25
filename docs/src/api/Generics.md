@@ -45,3 +45,27 @@ BuildableExpression.SourceCode(sc =>
     });
 });
 ```
+
+## Closing Generic Parameters
+
+To close an open generic parameter to a generic argument, use:
+
+```csharp
+BuildableExpression.SourceCode(sc =>
+{
+    // Add a class to implement IDictionary<TKey, TValue>:
+    sc.AddClass("StringKeyedDictionary", cls =>
+    {
+        // Add a TValue generic parameter - this will be 
+        // used for IDictionary<,>'s TValue parameter:
+        cls.AddGenericParameter("TValue");
+
+        // Implement IDictionary<,>:
+        cls.SetImplements(typeof(IDictionary<,>), impl =>
+        {
+            // Close the TKey generic parameter to string:
+            cls.SetGenericArgument<string>("TKey");
+        });
+    });
+});
+```
