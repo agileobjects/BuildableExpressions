@@ -8,8 +8,9 @@ accessors.
 The `BuildableExpression.SourceCode()` factory method can also take a C# source-code string, so why
 use Expressions?
 
-- To use complex [Expression Trees](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/expression-trees) 
-  built by existing code as method implementations
+- To implement methods using 
+  [Expression Trees](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/expression-trees) 
+  built by existing code
 
 - To write more refactor-friendly code - source code strings cannot be statically checked and have
   no design-time safety

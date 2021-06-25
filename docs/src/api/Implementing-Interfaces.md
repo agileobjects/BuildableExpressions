@@ -7,6 +7,9 @@ BuildableExpression.SourceCode(sc =>
     // Define a custom interface type:
     var messagerInterface = sc.AddInterface("IMessager", itf =>
     {
+        // Make IMessager implement IDisposable:
+        itf.SetImplements<IDisposable>();
+
         // Add a single, void method:
         itf.AddMethod("SendMessage", typeof(void), m =>
         {
@@ -19,19 +22,16 @@ BuildableExpression.SourceCode(sc =>
     sc.AddClass("Implementer", cls =>
     {
         // Implement the custom interface:
-        cls.Implements(messagerInterface, impl =>
+        cls.SetImplements(messagerInterface, impl =>
         {
+            // Implement the IMessager.SendMessage() method:
             impl.AddMethod("SendMessage", m =>
             {
                 // Empty body for this example:
                 m.SetBody(Expression.Empty());
             });
-        });
 
-        // Implement IDisposable:
-        cls.Implements<IDisposable>(impl =>
-        {
-            // Add the IDisposable.Dispose() method:
+            // Implement the IDisposable.Dispose() method:
             impl.AddMethod("Dispose", m =>
             {
                 // Empty body for this example:
