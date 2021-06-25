@@ -17,6 +17,10 @@ BuildableExpression.SourceCode(sc =>
     // Add an enum named 'OddNumbers':
     sc.AddEnum("OddNumbers", enm =>
     {
+        // Set enum options:
+        enm.SetVisibility(TypeVisibility.Internal);
+        enm.SetPartial();
+
         // Add the enum members and their numeric values:
         enm.AddMember("Two", 2);
         enm.AddMember("Four", 4);

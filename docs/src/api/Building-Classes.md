@@ -12,6 +12,7 @@ BuildableExpression.SourceCode(sc =>
     sc.AddClass("MyClass", cls =>
     {
         // Set class attributes:
+        cls.SetVisibility(TypeVisibility.Internal);
         cls.SetStatic();
         cls.SetAbstract();
         cls.SetSealed();

@@ -442,7 +442,7 @@ namespace GeneratedExpressionCode
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
-                    sc.AddClass("IValueWrapper", itf =>
+                    sc.AddInterface("IValueWrapper", itf =>
                     {
                         var valueParam = itf.AddGenericParameter("TValue");
 

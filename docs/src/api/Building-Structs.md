@@ -12,6 +12,7 @@ BuildableExpression.SourceCode(sc =>
     sc.AddStruct("MyStruct", str =>
     {
         // Set struct attributes:
+        str.SetVisibility(TypeVisibility.Internal);
         str.SetPartial();
 
         // Add struct members

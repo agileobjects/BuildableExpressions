@@ -12,6 +12,7 @@ BuildableExpression.SourceCode(sc =>
     sc.AddInterface("IMyInterface", itf =>
     {
         // Set interface attributes:
+        itf.SetVisibility(TypeVisibility.Internal);
         itf.SetPartial();
 
         // Add interface members
