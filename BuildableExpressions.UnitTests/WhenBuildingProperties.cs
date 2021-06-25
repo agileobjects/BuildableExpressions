@@ -1,6 +1,7 @@
 ﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
+    using System.Linq;
     using BuildableExpressions.SourceCode;
     using Common;
     using NetStandardPolyfills;
@@ -206,11 +207,9 @@ namespace GeneratedExpressionCode
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
-                    var interfaceProperty = default(PropertyExpression);
-
                     var @interface = sc.AddInterface("IHasName", itf =>
                     {
-                        interfaceProperty = itf.AddProperty<string>("Name", p =>
+                        itf.AddProperty<string>("Name", p =>
                         {
                             p.SetGetter();
                         });
@@ -230,7 +229,7 @@ namespace GeneratedExpressionCode
 
                         str.SetImplements(@interface, impl =>
                         {
-                            impl.AddProperty(interfaceProperty, p =>
+                            impl.AddProperty(@interface.PropertyExpressions.First(), p =>
                             {
                                 p.SetGetter(g =>
                                 {
@@ -346,22 +345,31 @@ namespace GeneratedExpressionCode
             var translated = BuildableExpression
                 .SourceCode(sc =>
                 {
-                    var overrideMe = default(PropertyExpression);
+                    var isGroovy = default(PropertyExpression);
 
                     var baseType = sc.AddClass("BaseAbstract", cls =>
                     {
                         cls.SetAbstract();
 
-                        overrideMe = cls.AddProperty<string>("OverrideMe", p =>
+                        isGroovy = cls.AddProperty<bool>("IsGroovy", p =>
                         {
                             p.SetAbstract();
+                            p.SetGetter();
                         });
                     });
 
                     sc.AddClass("DerivedAbstract", cls =>
                     {
-                        cls.SetBaseType(baseType);
-                        cls.AddProperty(overrideMe);
+                        cls.SetBaseType(baseType, impl =>
+                        {
+                            impl.AddProperty(isGroovy, p =>
+                            {
+                                p.SetGetter(gtr =>
+                                {
+                                    gtr.SetBody(Constant(true));
+                                });
+                            });
+                        });
                     });
                 })
                 .ToSourceCodeString();
@@ -371,12 +379,18 @@ namespace GeneratedExpressionCode
 {
     public abstract class BaseAbstract
     {
-        public abstract string OverrideMe { get; set; }
+        public abstract bool IsGroovy { get; }
     }
 
     public class DerivedAbstract : BaseAbstract
     {
-        public override string OverrideMe { get; set; }
+        public override bool IsGroovy
+        {
+            get
+            {
+                return true;
+            }
+        }
     }
 }";
             translated.ShouldBe(expected.TrimStart());
