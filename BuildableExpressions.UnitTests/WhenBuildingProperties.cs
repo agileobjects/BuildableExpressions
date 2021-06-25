@@ -435,5 +435,31 @@ namespace GeneratedExpressionCode
 }";
             translated.ShouldBe(expected.TrimStart());
         }
+
+        [Fact]
+        public void ShouldBuildAGenericParameterTypeInterfaceProperty()
+        {
+            var translated = BuildableExpression
+                .SourceCode(sc =>
+                {
+                    sc.AddClass("IValueWrapper", itf =>
+                    {
+                        var valueParam = itf.AddGenericParameter("TValue");
+
+                        itf.AddProperty("Value", valueParam);
+                    });
+                })
+                .ToSourceCodeString();
+
+            const string expected = @"
+namespace GeneratedExpressionCode
+{
+    public interface IValueWrapper<TValue>
+    {
+        TValue Value { get; set; }
+    }
+}";
+            translated.ShouldBe(expected.TrimStart());
+        }
     }
 }

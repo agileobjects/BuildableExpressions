@@ -48,11 +48,8 @@
             IType type,
             Action<IInterfacePropertyExpressionConfigurator> configuration)
         {
-            return AddProperty(new InterfacePropertyExpression(
-                this,
-                name,
-                type,
-                configuration));
+            return AddProperty(
+                new InterfacePropertyExpression(this, name, type, configuration));
         }
 
         MethodExpression IInterfaceExpressionConfigurator.AddMethod(string name,

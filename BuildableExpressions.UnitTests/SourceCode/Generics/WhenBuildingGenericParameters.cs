@@ -246,7 +246,7 @@
                     {
                         param = m.AddGenericParameter("TDerived", gp =>
                         {
-                            gp.AddTypeConstraint(typeof(AbstractBaseType));
+                            gp.AddTypeConstraint<AbstractBaseType>();
                         });
 
                         m.SetBody(Empty());
