@@ -1,4 +1,4 @@
-To add a field to a [class](/api/Building-Classes) or [struct](/api/Building-Fields), use:
+To add a field to a [class](/api/Building-Classes) or [struct](/api/Building-Structs), use:
 
 ```csharp
 BuildableExpression.SourceCode(sc =>
