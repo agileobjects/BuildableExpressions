@@ -9,7 +9,7 @@ BuildableExpression.SourceCode(sc =>
         cls.SetAbstract();
 
         // Add an abstract int LegCount property:
-        cls.AddProperty<int>("LegCount, p =>
+        cls.AddProperty<int>("LegCount", p =>
         {
             p.SetAbstract();
 
