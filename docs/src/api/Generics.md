@@ -1,5 +1,5 @@
-Generic parameters can be added to [classes](Building-Classes), [structs](Building-Structs), 
-[interfaces](Building-Interfaces) and [methods](Building-Methods).
+Generic parameters can be added to [classes](/api/Building-Classes), [structs](/api/Building-Structs), 
+[interfaces](/api/Building-Interfaces) and [methods](/api/Building-Methods).
 
 To add a generic parameter to a type, use:
 

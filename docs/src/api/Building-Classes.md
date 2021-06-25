@@ -25,10 +25,10 @@ BuildableExpression.SourceCode(sc =>
 
 The Class API supports:
 
-- [Constructors](Building-Constructors)
-- [Fields](Building-Fields)
-- [Properties](Building-Properties)
-- [Methods](Building-Methods)
-- [Attributes](Building-Attributes)
-- [Interface implementation](Implementing-Interfaces)
-- [Inheritance](Implementing-Inheritance)
+- [Constructors](/api/Building-Constructors)
+- [Fields](/api/Building-Fields)
+- [Properties](/api/Building-Properties)
+- [Methods](/api/Building-Methods)
+- [Attributes](/api/Building-Attributes)
+- [Interface implementation](/api/Implementing-Interfaces)
+- [Inheritance](/api/Implementing-Inheritance)

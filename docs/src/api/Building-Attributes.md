@@ -23,13 +23,13 @@ BuildableExpression.SourceCode(sc =>
 
 The Attribute API supports:
 
-- [Constructors](Building-Constructors)
-- [Fields](Building-Fields)
-- [Properties](Building-Properties)
-- [Methods](Building-Methods)
+- [Constructors](/api/Building-Constructors)
+- [Fields](/api/Building-Fields)
+- [Properties](/api/Building-Properties)
+- [Methods](/api/Building-Methods)
 - Attributes (applying attributes to an Attribute)
-- [Interface implementation](Implementing-Interfaces)
-- [Inheritance](Implementing-Inheritance)
+- [Interface implementation](/api/Implementing-Interfaces)
+- [Inheritance](/api/Implementing-Inheritance)
 
 ## Setting Attribute Usage
 

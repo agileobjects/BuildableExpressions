@@ -1,5 +1,5 @@
-To implement an interface in a [class](Building-Classes), [struct](Building-Structs) or other 
-[interface](Building-Interfaces), use:
+To implement an interface in a [class](/api/Building-Classes), [struct](/api/Building-Structs) or other 
+[interface](/api/Building-Interfaces), use:
 
 ```csharp
 BuildableExpression.SourceCode(sc =>

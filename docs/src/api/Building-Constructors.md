@@ -1,4 +1,4 @@
-[Classes](Building-Classes) and [structs](Building-Structs) can be given multiple constructors, and
+[Classes](/api/Building-Classes) and [structs](/api/Building-Structs) can be given multiple constructors, and
 constructors can be chained together.
 
 To add a constructor, use:

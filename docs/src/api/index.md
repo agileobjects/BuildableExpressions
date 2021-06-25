@@ -1,7 +1,7 @@
-The **BuildableExpressions** configuration API enables creation of [classes](Building-Classes), 
-[structs](Building-Structs), [interfaces](Building-Interfaces), [enums](Building-Enums) and
-[attributes](Building-Attributes), with Expressions used to implement method bodies and property 
-accessors.
+The **BuildableExpressions** configuration API enables creation of [classes](/api/Building-Classes), 
+[structs](/api/Building-Structs), [interfaces](/api/Building-Interfaces), [enums](/api/Building-Enums) 
+and [attributes](/api/Building-Attributes), with Expressions used to implement method bodies and 
+property accessors.
 
 ## Expressions vs Strings
 

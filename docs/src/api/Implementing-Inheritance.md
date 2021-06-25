@@ -1,4 +1,4 @@
-To derive a generated [class](Building-Classes) from another, use:
+To derive a generated [class](/api/Building-Classes) from another, use:
 
 ```csharp
 BuildableExpression.SourceCode(sc =>
@@ -100,4 +100,4 @@ BuildableExpression.SourceCode(sc =>
 });
 ```
 
-For more on constructors, see [here](Building-Constructors).
+For more on constructors, see [here](/api/Building-Constructors).

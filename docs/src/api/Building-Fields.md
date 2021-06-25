@@ -1,4 +1,4 @@
-To add a field to a [class](Building-Classes) or [struct](Building-Fields), use:
+To add a field to a [class](/api/Building-Classes) or [struct](/api/Building-Fields), use:
 
 ```csharp
 BuildableExpression.SourceCode(sc =>
@@ -20,7 +20,7 @@ BuildableExpression.SourceCode(sc =>
 The `AddField()` method returns a `FieldExpression` with a `FieldInfo` property which can be used 
 to access the field from other Expressions.
 
-For example, to assign a field in a [constructor](Building-Constructors), use:
+For example, to assign a field in a [constructor](/api/Building-Constructors), use:
 
 ```csharp
 BuildableExpression.SourceCode(sc =>
@@ -68,4 +68,4 @@ BuildableExpression.SourceCode(sc =>
 });
 ```
 
-Fields cannot be added to [interfaces](Building-Interfaces).
+Fields cannot be added to [interfaces](/api/Building-Interfaces).

@@ -22,11 +22,11 @@ BuildableExpression.SourceCode(sc =>
 
 The Interface API supports:
 
-- [Properties](Building-Properties)
-- [Methods](Building-Methods)
-- [Attributes](Building-Attributes)
-- [Interface implementation](Implementing-Interfaces)
+- [Properties](/api/Building-Properties)
+- [Methods](/api/Building-Methods)
+- [Attributes](/api/Building-Attributes)
+- [Interface implementation](/api/Implementing-Interfaces)
 
 ## Implementing an Interface
 
-For information on how to implement an interface, see [here](Implementing-Interfaces).
+For information on how to implement an interface, see [here](/api/Implementing-Interfaces).
