@@ -5,7 +5,7 @@ property accessors.
 
 ## Expressions vs Strings
 
-The `BuildableExpression.SourceCode()` factory method can also take a C# source-code string, which
+The `BuildableExpression.SourceCode()` factory method can take a C# source-code string, which
 depending on your scenario could be simpler and faster.
 
 So why use Expressions?
