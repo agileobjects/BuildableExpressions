@@ -1,4 +1,8 @@
-**BuildableExpressions.Generator** enables build-time C# source code file generation.
+**BuildableExpressions.Generator** enables build-time C# source code file generation via a 
+[configurable](/generating-code/Configuration) 
+[MSBuild task](https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild-tasks). It works within
+Visual Studio or from `dotnet build`, and supports 
+[SDK](https://docs.microsoft.com/en-us/dotnet/core/project-sdk/overview) and non-SDK projects.
 
 To install from NuGet, use:
 

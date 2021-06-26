@@ -1,7 +1,8 @@
 ## Overview
 
-**BuildableExpressions** is a library which [generates .NET Types](/building-types/) at runtime.
-
+**BuildableExpressions** enables runtime [CLR type generation](/building-types/). It can build 
+[classes](/api/Building-Classes), [structs](/api/Building-Structs), [interfaces](/api/Building-Interfaces),
+[enums](/api/Building-Enums) and [attributes](/api/Building-Attributes).
 
 To install from NuGet, use:
 
@@ -10,9 +11,11 @@ PM> Install-Package AgileObjects.BuildableExpressions
 ```
 [![NuGet version](https://badge.fury.io/nu/AgileObjects.BuildableExpressions.svg)](https://badge.fury.io/nu/AgileObjects.BuildableExpressions)
 
-**BuildableExpressions.Generator** is an [MSBuild task](https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild-tasks)
-which [generates C# source code](/generating-code/) files at build-time. It works from `dotnet build` or from within Visual Studio, and 
-supports [SDK](https://docs.microsoft.com/en-us/dotnet/core/project-sdk/overview) and non-SDK projects.
+**BuildableExpressions.Generator** enables build-time [C# source code generation](/generating-code/)
+via a [configurable](/generating-code/Configuration) 
+[MSBuild task](https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild-tasks). It works within
+Visual Studio or from `dotnet build`, and supports 
+[SDK](https://docs.microsoft.com/en-us/dotnet/core/project-sdk/overview) and non-SDK projects.
 
 
 To install from NuGet, use:
