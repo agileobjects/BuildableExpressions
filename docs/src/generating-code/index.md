@@ -29,8 +29,8 @@ When the project is built:
 
 4. Any C# source-code strings are written to files in the target project
 
-5. If any source code files are generated, the project is built again to include the generated types.<br />
-   This build skips the previous steps.
+5. If any source code files are generated, the target project is built again, to include the generated types.<br />
+   This second build skips steps 1-4.
 
 ## Examples
 
@@ -134,5 +134,4 @@ public class GreeterGenerator : ISourceCodeExpressionBuilder
 
 More on the SourceCodeExpression API can be found [here](/api).
 
-Source code generation samples can be found in 
-[the BuildableExpressions repository](https://github.com/agileobjects/BuildableExpressions/tree/master/BuildableExpressions.Generator.Samples).
+More on source code generation samples can be found [here](/generating-code/Samples).

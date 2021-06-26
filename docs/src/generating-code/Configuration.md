@@ -1,13 +1,3 @@
-## Disable Code Generation
-
-To disable code generation, add the following to the project containing the generators:
-
-```xml
-<PropertyGroup>
-  <XprGenerator>False</XprGenerator>
-</PropertyGroup>
-```
-
 ## Code Generation Target Project
 
 By default, generated source code files are added to the project containing the `ISourceCodeExpressionBuilder`
@@ -27,5 +17,15 @@ To log messages with a different prefix, add the following to the project contai
 ```xml
 <PropertyGroup>
   <XprGeneratorLoggerPrefix>[Your prefix]</XprGeneratorLoggerPrefix>
+</PropertyGroup>
+```
+
+## Disable Code Generation
+
+To disable code generation, add the following to the project containing the generators:
+
+```xml
+<PropertyGroup>
+  <XprGenerator>False</XprGenerator>
 </PropertyGroup>
 ```
