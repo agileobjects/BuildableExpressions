@@ -3,7 +3,10 @@
 
 To install from NuGet, use:
 
-    PM> Install-Package AgileObjects.BuildableExpressions
+```shell
+PM> Install-Package AgileObjects.BuildableExpressions
+```
+[![NuGet version](https://badge.fury.io/nu/AgileObjects.BuildableExpressions.svg)](https://badge.fury.io/nu/AgileObjects.BuildableExpressions)
 
 ## Examples
 

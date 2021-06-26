@@ -5,6 +5,7 @@ To install from NuGet, use:
 ```shell
 PM> Install-Package AgileObjects.BuildableExpressions.Generator
 ```
+[![NuGet version](https://badge.fury.io/nu/AgileObjects.BuildableExpressions.Generator.svg)](https://badge.fury.io/nu/AgileObjects.BuildableExpressions.Generator)
 
 ## How it Works
 
@@ -31,6 +32,12 @@ When the project is built:
 
 5. If any source code files are generated, the target project is built again, to include the generated types.<br />
    This second build skips steps 1-4.
+
+## Rules
+
+- Each `SourceCodeExpression` returned from an `ISourceCodeExpressionBuilder.Build()` method is given
+  its own source code file, named after the first type added to the source code. If multiple types are
+  added to the same `SourceCodeExpression`, the generated source code file will contain them all.
 
 ## Examples
 
