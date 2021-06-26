@@ -139,6 +139,16 @@ Source code generation samples can be found in
 
 ## Configuration
 
+### Disable Code Generation
+
+To disable code generation, add the following to the project containing the generators:
+
+```xml
+<PropertyGroup>
+  <XprGenerator>False</XprGenerator>
+</PropertyGroup>
+```
+
 ### Generated Code Target Project
 
 By default, generated source code files are added to the project containing the `ISourceCodeExpressionBuilder`
