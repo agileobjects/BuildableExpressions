@@ -14,9 +14,12 @@ extra_javascript:
     - scripts/docs.min.js
     
 nav:
-    - General Use:
-        - Building Types: Building-Types.md
-        - Generating code: Generating-Code.md
+    - Building Types:
+        - Overview: building-types/index.md
+    - Generating Code:
+        - Overview: generating-code/index.md
+        - Configuration: generating-code/Configuration.md
+        - Samples: generating-code/Samples.md
     - Source Code API:
         - Overview: api/index.md
         - Classes: api/Building-Classes.md
