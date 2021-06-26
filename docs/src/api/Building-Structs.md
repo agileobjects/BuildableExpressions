@@ -16,12 +16,12 @@ BuildableExpression.SourceCode(sc =>
         // str.SetVisibility(TypeVisibility.Internal);
         // str.SetPartial();
 
-        // Add struct members
+        // Add struct members - see below
     });
 });
 ```
 
-The Struct API supports:
+Members are added via the struct API, which supports:
 
 - [Constructors](/api/Building-Constructors)
 - [Fields](/api/Building-Fields)

@@ -19,12 +19,12 @@ BuildableExpression.SourceCode(sc =>
         // cls.SetSealed();
         // cls.SetPartial();
 
-        // Add class members
+        // Add class members - see below
     });
 });
 ```
 
-The Class API supports:
+Members are added via the class API, which supports:
 
 - [Constructors](/api/Building-Constructors)
 - [Fields](/api/Building-Fields)

@@ -16,12 +16,12 @@ BuildableExpression.SourceCode(sc =>
         // itf.SetVisibility(TypeVisibility.Internal);
         // itf.SetPartial();
 
-        // Add interface members
+        // Add interface members - see below
     });
 });
 ```
 
-The Interface API supports:
+Members are added via the interface API, which supports:
 
 - [Properties](/api/Building-Properties)
 - [Methods](/api/Building-Methods)

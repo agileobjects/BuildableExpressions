@@ -11,17 +11,18 @@ BuildableExpression.SourceCode(sc =>
 {
     sc.AddAttribute("MyAttribute", attr =>
     {
-        // Set attribute attributes:
-        attr.SetAbstract();
-        attr.SetSealed();
-        attr.SetPartial();
+        // Set attribute options if desired:
+        // attr.AddAttribute<SomeAttribute>();
+        // attr.SetAbstract();
+        // attr.SetSealed();
+        // attr.SetPartial();
 
-        // Add attribute members
+        // Add attribute members - see below
     });
 });
 ```
 
-The Attribute API supports:
+Members are added via the attribute API, which supports:
 
 - [Constructors](/api/Building-Constructors)
 - [Fields](/api/Building-Fields)
