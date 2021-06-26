@@ -42,7 +42,8 @@ var sourceCode = BuildableExpression.SourceCode(sourceCodeCSharp);
 // Compile the SourceCodeExpression to its CLR Types -
 // pass the IGreeter type's Assembly to enable compilation:
 var greeterType = sourceCode
-    .CompileToTypes(referenceAssemblies: typeof(IGreeter).Assembly)
+    .CompileToTypesOrThrow(
+        referenceAssemblies: typeof(IGreeter).Assembly)
     .First();
 
 // Create an instance of the HelloWorldGreeter as an IGreeter:
@@ -78,7 +79,7 @@ var sourceCode = BuildableExpression.SourceCode(sc =>
 // Compile the SourceCodeExpression to its CLR Types -
 // unlike the String -> SourceCodeExpression example, 
 // reference Assemblies are not required:
-var greeterType = sourceCode.CompileToTypes().First();
+var greeterType = sourceCode.CompileToTypesOrThrow().First();
 
 // Create an instance of the HelloWorldGreeter as an IGreeter:
 var helloWorldGreeter = 
