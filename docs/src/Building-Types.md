@@ -9,7 +9,7 @@ To install from NuGet, use:
 
 These simple examples create a `Greeter` type which implements the following `IGreeter` interface:
 
-```csharp
+```cs
 namespace Greetings
 {
     public interface IGreeter
@@ -23,7 +23,7 @@ namespace Greetings
 
 To create the `HelloWorldGreeter` SourceCodeExpression and Type from a C# source-code string, use:
 
-```csharp
+```cs
 // Define a C# source-code string:
 const string sourceCodeCSharp = @"
 using Greetings;
@@ -57,7 +57,7 @@ Console.WriteLine(helloWorldGreeter.Greet());
 
 To create the `HelloWorldGreeter` SourceCodeExpression and Type from an Expression, use:
 
-```csharp
+```cs
 // Build a SourceCodeExpression using the API:
 var sourceCode = BuildableExpression.SourceCode(sc =>
 {

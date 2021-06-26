@@ -3,7 +3,7 @@ Generic parameters can be added to [classes](/api/Building-Classes), [structs](/
 
 To add a generic parameter to a type, use:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     // Add a class:
@@ -24,7 +24,7 @@ BuildableExpression.SourceCode(sc =>
 
 To add type constraints to a generic parameter, use:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     // Add a struct:
@@ -50,7 +50,7 @@ BuildableExpression.SourceCode(sc =>
 
 To close an open generic parameter to a generic argument, use:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     // Add a class to implement IDictionary<TKey, TValue>:

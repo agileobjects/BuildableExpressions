@@ -3,7 +3,7 @@ constructors can be chained together.
 
 To add a constructor, use:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     // Add a struct:
@@ -29,7 +29,7 @@ BuildableExpression.SourceCode(sc =>
 
 To call one constructor from another, call:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     // Add a class:

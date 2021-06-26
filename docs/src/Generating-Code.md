@@ -12,7 +12,7 @@ To generate source code files, add the **AgileObjects.BuildableExpressions.Gener
 to a project, then add a class which implements the `AgileObjects.BuildableExpressions.ISourceCodeExpressionBuilder`
 interface:
 
-```csharp
+```cs
 interface ISourceCodeExpressionBuilder
 {
     IEnumerable<SourceCodeExpression> Build(IExpressionBuildContext context);
@@ -37,7 +37,7 @@ When the project is built:
 These simple examples generate a set of `Greeter` C# source code files from a set of newline-separated
 names in a `names.txt` file in the build output. Each `Greeter` implements the following `IGreeter` interface:
 
-```csharp
+```cs
 namespace Greetings
 {
     public interface IGreeter
@@ -51,7 +51,7 @@ namespace Greetings
 
 To create `Greeter` SourceCodeExpressions and files from C# source-code strings, use:
 
-```csharp
+```cs
 public class GreeterGenerator : ISourceCodeExpressionBuilder
 {
     public IEnumerable<SourceCodeExpression> Build(
@@ -91,7 +91,7 @@ public class {className} : IGreeter
 
 To create `Greeter` SourceCodeExpressions and files from an Expression, use:
 
-```csharp
+```cs
 public class GreeterGenerator : ISourceCodeExpressionBuilder
 {
     public IEnumerable<SourceCodeExpression> Build(

@@ -1,7 +1,7 @@
 To add a property to a [class](/api/Building-Classes), [struct](/api/Building-Structs) or 
 [interface](/api/Building-Interface), use:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     sc.AddClass("MyClass", cls =>
@@ -67,7 +67,7 @@ BuildableExpression.SourceCode(sc =>
 
 To add auto properties, use:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     sc.AddClass("MyClass", cls =>
@@ -91,7 +91,7 @@ BuildableExpression.SourceCode(sc =>
 
 To override an abstract or virtual property, use:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     // Add an abstract base class:

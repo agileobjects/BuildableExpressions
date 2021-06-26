@@ -6,7 +6,7 @@ code files at build-time. A `SourceCodeExpression` consists of one or more types
 
 To add an attribute to your `SourceCodeExpression`, use:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     sc.AddAttribute("MyAttribute", attr =>
@@ -36,7 +36,7 @@ Members are added via the attribute API, which supports:
 
 To customise to which targets an attribute can be applied, use:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     // Add an attribute which can only be applied to
@@ -57,7 +57,7 @@ BuildableExpression.SourceCode(sc =>
 To apply an Attribute, use the following - normal CLR attributes can be applied as well as Attributes
 you define in a SourceCodeExpression:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     // Make an empty marker attribute:
@@ -122,7 +122,7 @@ BuildableExpression.SourceCode(sc =>
 
 To apply an Attribute with a constructor, use:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     // Create an attribute with a single 

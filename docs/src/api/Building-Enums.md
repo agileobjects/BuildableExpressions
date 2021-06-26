@@ -6,7 +6,7 @@ code files at build-time. A `SourceCodeExpression` consists of one or more types
 
 To add an enum to your `SourceCodeExpression`, use:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     // Add an enum named 'Numbers' with the members

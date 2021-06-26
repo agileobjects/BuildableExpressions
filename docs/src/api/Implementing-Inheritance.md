@@ -1,6 +1,6 @@
 To derive a generated [class](/api/Building-Classes) from another, use:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     // Add an abstract Animal class:
@@ -47,7 +47,7 @@ BuildableExpression.SourceCode(sc =>
 
 To call a base class constructor when generating a derived type, use:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     // Add an abstract Animal class:

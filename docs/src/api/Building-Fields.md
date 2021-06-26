@@ -1,6 +1,6 @@
 To add a field to a [class](/api/Building-Classes) or [struct](/api/Building-Structs), use:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     sc.AddClass("MyClass", cls =>
@@ -23,7 +23,7 @@ to access the field from other Expressions.
 
 For example, to assign a field in a [constructor](/api/Building-Constructors), use:
 
-```csharp
+```cs
 BuildableExpression.SourceCode(sc =>
 {
     sc.AddStruct("MyStruct", str =>
