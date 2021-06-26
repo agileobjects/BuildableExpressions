@@ -46,10 +46,17 @@ BuildableExpression.SourceCode(sc =>
                 // str.SetVisibility(MemberVisibility.Protected);
 
                 // If the passed value is greater than zero, 
-                // update the value of the backing field:
+                // update the value of the backing field -
+                // the lambda 'value' parameter is a ParameterExpression
+                // providing access to the property setter's
+                // 'value' keyword:
                 str.SetBody(value => Expression.IfThen(
-                    Expression.GreaterThan(value, Constant(0),
-                    Expression.Assign(intFieldAccess, value))));
+                    Expression.GreaterThan(
+                        value, 
+                        Expression.Constant(0),
+                    Expression.Assign(
+                        intFieldAccess,
+                        value))));
             });
         });        
     });
@@ -118,7 +125,7 @@ BuildableExpression.SourceCode(sc =>
                 // base class getter:
                 p.SetGetter(gtr =>
                 {
-                    gtr.SetBody(Constant(true));
+                    gtr.SetBody(Expression.Constant(true));
                 });
             })
         });
