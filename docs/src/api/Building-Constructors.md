@@ -12,6 +12,9 @@ BuildableExpression.SourceCode(sc =>
         // Add a constructor:
         str.AddConstructor(ctor =>
         {
+            // Set constructor options if desired:
+            // ctor.SetVisibility(MemberVisibility.Protected);
+
             // Add an int parameter:
             ctor.AddParameter<int>("intValue");
 

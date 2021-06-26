@@ -5,12 +5,16 @@ property accessors.
 
 ## Expressions vs Strings
 
-The `BuildableExpression.SourceCode()` factory method can also take a C# source-code string, so why
-use Expressions?
+The `BuildableExpression.SourceCode()` factory method can also take a C# source-code string, which
+depending on your scenario could be simpler and faster.
 
-- To implement methods using 
+So why use Expressions?
+
+- To implement methods using complex
   [Expression Trees](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/expression-trees) 
-  built by existing code
+  built by existing code - perhaps to move runtime logic to build-time
 
 - To write more refactor-friendly code - source code strings cannot be statically checked and have
   no design-time safety
+
+- Expression Tree code compilation or generation handles referencing required assemblies for you

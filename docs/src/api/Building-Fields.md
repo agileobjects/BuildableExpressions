@@ -7,11 +7,12 @@ BuildableExpression.SourceCode(sc =>
     {
         cls.AddField<string>("StringField", f =>
         {
-            // Set field options:
-            f.SetVisibility(MemberVisibility.Internal);
-            f.SetStatic();
-            f.SetReadonly();
-            f.SetInitialValue("Hello world!");
+            // Set field options if desired:
+            // f.AddAttribute(typeof(SomeAttribute));
+            // f.SetVisibility(MemberVisibility.Internal);
+            // f.SetStatic();
+            // f.SetReadonly();
+            // f.SetInitialValue("Hello world!");
         })
     });
 });
