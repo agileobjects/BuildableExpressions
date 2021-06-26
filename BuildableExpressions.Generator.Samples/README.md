@@ -43,6 +43,7 @@ The below gif shows:
 
 - The input CSV files
 - Output files being generating by the build
+- The target project being rebuilt with its new, generated classes
 - The generated output files
 
 ![CsvGenerator](CsvGenerator/CsvGenerator.gif)
