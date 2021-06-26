@@ -13,6 +13,10 @@
     <!-- Sets the project to which to output the models generated from the CSV files: -->
     <XprGeneratorOutputProject>..\CsvGenerator.Models\CsvGenerator.Models.csproj</XprGeneratorOutputProject>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="CsvGenerator.gif" />
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="AgileObjects.BuildableExpressions.Generator" Version="0.1.0-preview1" />

@@ -1,0 +1,42 @@
+# BuildableExpressions.Generator.Samples
+
+These sample projects demonstrate the **BuildableExpressions.Generator**.
+
+### HelloWorld
+
+- Generates an `OutputAssemblies` class with an `All` property listing the names of the Assemblies in
+  the project's output directory
+
+- `HelloWorld.csproj` demonstrates setting a custom build output message log prefix
+
+- Uses the BuildableExpressions source code generation API
+
+- .NET 5.0 Console App
+
+### XmlSettingsGenerator
+
+- Generates one class for each `*.xmlsettings` file in the build output, adding get-only properties
+  for each XML element
+
+- Uses a source code string
+
+- .NET 4.7.2 class library, non-SDK project
+
+### CsvGenerator
+
+- Generates one class for each `*.csv` file in the build output, adding get-set properties for each
+  CSV 'column'
+
+- `CsvGenerator.csproj` demonstrates generating output for a different project - `CsvGenerator.Models.csproj`
+
+- Uses the BuildableExpressions source code generation API
+
+- .NET Standard 2.0 class library
+
+The below gif shows:
+
+- The input CSV files
+- The output files being generating by the build
+- The generated output files
+
+![CsvGenerator](CsvGenerator/CsvGenerator.gif)
