@@ -149,7 +149,7 @@ To disable code generation, add the following to the project containing the gene
 </PropertyGroup>
 ```
 
-### Generated Code Target Project
+### Code Generation Target Project
 
 By default, generated source code files are added to the project containing the `ISourceCodeExpressionBuilder`
 implementation. To add files to a different project, add the following to the project containing the generators:
