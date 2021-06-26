@@ -42,7 +42,7 @@ These sample projects demonstrate the **BuildableExpressions.Generator**.
 The below gif shows:
 
 - The input CSV files
-- The output files being generating by the build
+- Output files being generating by the build
 - The generated output files
 
 ![CsvGenerator](CsvGenerator/CsvGenerator.gif)
