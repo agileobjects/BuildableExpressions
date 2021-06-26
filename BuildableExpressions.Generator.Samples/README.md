@@ -12,7 +12,7 @@ These sample projects demonstrate the **BuildableExpressions.Generator**.
 - Demonstrates using the BuildableExpressions
   [source code generation API](https://buildableexpressions.readthedocs.io/api)
 
-- .NET 5.0 Console App
+- `HelloWorld.csproj` is a .NET 5.0 Console App project
 
 ## XmlSettingsGenerator
 
@@ -21,7 +21,7 @@ These sample projects demonstrate the **BuildableExpressions.Generator**.
 
 - Demonstrates using a source code string
 
-- .NET 4.7.2 class library, non-SDK project
+- `XmlSettingsGenerator.csproj` is a .NET 4.7.2 non-SDK class library project
 
 ## CsvGenerator
 
@@ -33,7 +33,7 @@ These sample projects demonstrate the **BuildableExpressions.Generator**.
 - Demonstrates using the BuildableExpressions 
   [source code generation API](https://buildableexpressions.readthedocs.io/api)
 
-- .NET Standard 2.0 class library
+- `CsvGenerator.csproj` is a .NET Standard 2.0 class library project
 
 ### CsvGenerator in Action
 
