@@ -14,7 +14,6 @@ extra_javascript:
     - scripts/docs.min.js
     
 nav:
-    - Overview: index.md
     - Building Types:
         - Overview: building-types/index.md
     - Generating Code:
