@@ -18,3 +18,6 @@ So why use Expressions?
   no design-time safety
 
 - Expression Tree code compilation or generation handles referencing required assemblies for you
+
+Ultimately, you may just find it simpler to build strings. The best use case for using Expressions
+is to move an existing runtime operation - *e.g* creating object-object mappers - to build-time.
