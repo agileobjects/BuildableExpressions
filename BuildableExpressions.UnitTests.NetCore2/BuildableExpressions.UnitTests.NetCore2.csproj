@@ -39,7 +39,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BuildableExpressions\BuildableExpressions.csproj" />
     <ProjectReference Include="..\BuildableExpressions.UnitTests.Common\BuildableExpressions.UnitTests.Common.csproj" />
   </ItemGroup>
 

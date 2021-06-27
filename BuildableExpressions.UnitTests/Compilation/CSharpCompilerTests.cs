@@ -25,7 +25,7 @@ namespace MyNamespace
         }
     }
 }";
-            var result = CSharpCompiler.Compile(source);
+            var result = CSharpCompiler.Default.Compile(source);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -33,7 +33,7 @@ namespace MyNamespace
                 .ShouldNotBeNull();
 
             var testType = compiledAssembly.GetType("MyNamespace.MyClass").ShouldNotBeNull();
-            var testInstance = Activator.CreateInstance(testType).ShouldNotBeNull();
+            var testInstance = Activator.CreateInstance(testType!).ShouldNotBeNull();
             var testMethod = testType.GetPublicInstanceMethod("SayHello").ShouldNotBeNull();
             testMethod.Invoke(testInstance, Array.Empty<object>()).ShouldBe("Hello!");
         }
@@ -76,7 +76,8 @@ namespace MyNamespace
         }
     }
 }";
-            var result = CSharpCompiler
+
+            var result = CSharpCompiler.Default
                 .Compile(new[] { source1, source2, source3 }.AsEnumerable());
 
             var compiledAssembly = result
@@ -105,7 +106,7 @@ namespace Factories
         }
     }
 }";
-            var result = CSharpCompiler.Compile(source);
+            var result = CSharpCompiler.Default.Compile(source);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -140,7 +141,8 @@ namespace MyNamespace
         }
     }
 }";
-            var result = CSharpCompiler.Compile(source);
+
+            var result = CSharpCompiler.Default.Compile(source);
 
             var compiledAssembly = result
                 .ShouldNotBeNull()
@@ -194,7 +196,7 @@ namespace MyNamespace
     }
 }
     ";
-            var result = CSharpCompiler.Compile(
+            var result = CSharpCompiler.Default.Compile(
                 new[] { typeof(BuildableExpression).GetAssembly() },
                 source);
 

@@ -27,7 +27,8 @@
                 }
             });
 
-            var compiledTypes = paramSourceCode.CompileToTypesOrThrow();
+            var compiledTypes = CSharpCompiler.Default
+                .CompileToTypesOrThrow(paramSourceCode);
 
             return compiledTypes[0];
         }

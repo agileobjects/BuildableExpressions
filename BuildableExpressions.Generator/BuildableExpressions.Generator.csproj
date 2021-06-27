@@ -24,11 +24,18 @@
     <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);FEATURE_GENERATOR</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework)' != 'net5.0'">
     <DefineConstants>$(DefineConstants);FEATURE_MSBUILD</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\BuildableExpressions\InputOutput\IFileManager.cs" Link="InputOutput\IFileManager.cs" />
+    <Compile Include="..\BuildableExpressions\InputOutput\OutputCleaner.cs" Link="InputOutput\OutputCleaner.cs" />
+    <Compile Include="..\BuildableExpressions\InputOutput\SystemIoFileManager.cs" Link="InputOutput\SystemIoFileManager.cs" />
     <Compile Include="..\ClsCompliant.cs">
       <Link>Properties\ClsCompliant.cs</Link>
     </Compile>
@@ -61,7 +68,7 @@
 
   <Target Name="PackDependencies" BeforeTargets="GenerateNuspec">
     <ItemGroup>
-      <_PackageFiles Include="$(_BinPath)\*.dll;$(_BinPath)\*.json;$(_BinPath)\*.Generator.pdb" Exclude="$(_BinPath)\AgileObjects.*.dll;$(_BinPath)\Microsoft.Build.*;$(_SharedAssemblies)">
+      <_PackageFiles Include="$(_BinPath)\*.dll;$(_BinPath)\*.json;$(_BinPath)\*.Generator.pdb" Exclude="$(_BinPath)\*.runtimeconfig.json;$(_BinPath)\AgileObjects.*.dll;$(_BinPath)\Microsoft.Build.*;$(_SharedAssemblies)">
         <PackagePath>tools\%(RecursiveDir)</PackagePath>
         <Visible>false</Visible>
         <BuildAction>Content</BuildAction>

@@ -107,7 +107,8 @@
                 sourceCode.Analyse();
             }
 
-            var compiledTypes = sourceCode.CompileToTypesOrThrow();
+            var compiledTypes = CSharpCompiler.Default
+                .CompileToTypesOrThrow(sourceCode);
 
             return _type = compiledTypes.First(t =>
             {

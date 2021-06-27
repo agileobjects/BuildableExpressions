@@ -28,20 +28,22 @@
 
         public static SourceCodeGenerationResult Execute(
             ILogger logger,
-            IConfig config)
+            IConfig config,
+            IFileManager fileManager)
         {
-            var fileManager = SystemIoFileManager.Instance;
+            using (new OutputCleaner(fileManager))
+            {
+                var assemblyResolver = new AssemblyResolver(logger, fileManager);
+                assemblyResolver.Init(config);
 
-            var assemblyResolver = new AssemblyResolver(logger, fileManager);
-            assemblyResolver.Init(config);
+                var generator = new SourceCodeGenerator(
+                    logger,
+                    new ProjectFactory(fileManager),
+                    new SourceCodeExpressionBuildersFinder(logger, assemblyResolver),
+                    new OutputWriter(logger, fileManager));
 
-            var generator = new SourceCodeGenerator(
-                logger,
-                new ProjectFactory(fileManager),
-                new SourceCodeExpressionBuildersFinder(logger, assemblyResolver),
-                new OutputWriter(logger, fileManager));
-
-            return generator.Execute(config);
+                return generator.Execute(config);
+            }
         }
 
         private SourceCodeGenerationResult Execute(IConfig config)

@@ -5,6 +5,7 @@ namespace XprGenerator
     using System.Diagnostics;
     using AgileObjects.BuildableExpressions.Generator.Configuration;
     using AgileObjects.BuildableExpressions.Generator.Extensions;
+    using AgileObjects.BuildableExpressions.Generator.InputOutput;
     using AgileObjects.BuildableExpressions.Generator.Logging;
 #if NETFRAMEWORK
     using AgileObjects.BuildableExpressions.Generator.MSBuild;
@@ -101,7 +102,8 @@ namespace XprGenerator
                     out builtExpressionsCount);
             }
 #endif
-            var result = SourceCodeGenerator.Execute(logger, this);
+            var result = SourceCodeGenerator
+                .Execute(logger, this, SystemIoFileManager.Instance);
 
             builtExpressionsCount = result.BuiltExpressionsCount;
             return result.Success;

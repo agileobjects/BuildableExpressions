@@ -12,9 +12,10 @@
     public static class CompilationExtensions
     {
         /// <summary>
-        /// Compiles this <paramref name="sourceCodeExpression"/>, returning an array containing the
-        /// compiled CLR Types, or throwing an InvalidOperationException is compilation fails.
+        /// Compiles the given <paramref name="sourceCodeExpression"/>, returning an array containing
+        /// the compiled CLR Types, or throwing an InvalidOperationException is compilation fails.
         /// </summary>
+        /// <param name="compiler">The <see cref="CSharpCompiler"/> with which to perform the compilation.</param>
         /// <param name="sourceCodeExpression">The <see cref="SourceCodeExpression"/> to compile.</param>
         /// <param name="referenceAssemblies">
         /// Any extra reference Assemblies required to compile this
@@ -22,10 +23,11 @@
         /// </param>
         /// <returns>An array containing the compiled CLR Types.</returns>
         public static Type[] CompileToTypesOrThrow(
-            this SourceCodeExpression sourceCodeExpression,
+            this CSharpCompiler compiler,
+            SourceCodeExpression sourceCodeExpression,
             params Assembly[] referenceAssemblies)
         {
-            var compilationResult = sourceCodeExpression.Compile(referenceAssemblies);
+            var compilationResult = compiler.Compile(sourceCodeExpression, referenceAssemblies);
 
             if (!compilationResult.Failed)
             {
@@ -42,9 +44,10 @@
         }
 
         /// <summary>
-        /// Compiles this <paramref name="sourceCodeExpression"/>, returning a
+        /// Compiles the given <paramref name="sourceCodeExpression"/>, returning a
         /// <see cref="CompilationResult"/> describing the results.
         /// </summary>
+        /// <param name="compiler">The <see cref="CSharpCompiler"/> with which to perform the compilation.</param>
         /// <param name="sourceCodeExpression">The <see cref="SourceCodeExpression"/> to compile.</param>
         /// <param name="referenceAssemblies">
         /// Any extra reference Assemblies required to compile this
@@ -52,14 +55,15 @@
         /// </param>
         /// <returns>A <see cref="CompilationResult"/> describing the result of the compilation.</returns>
         public static CompilationResult Compile(
-            this SourceCodeExpression sourceCodeExpression,
+            this CSharpCompiler compiler,
+            SourceCodeExpression sourceCodeExpression,
             params Assembly[] referenceAssemblies)
         {
             var allReferenceAssemblies = referenceAssemblies
                 .Concat(sourceCodeExpression.ReferencedAssemblies)
                 .Distinct();
 
-            return CSharpCompiler.Compile(
+            return compiler.Compile(
                 allReferenceAssemblies,
                 sourceCodeExpression.ToSourceCodeString());
         }

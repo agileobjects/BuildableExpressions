@@ -5,6 +5,7 @@ namespace AgileObjects.BuildableExpressions.Generator
     using System.Diagnostics;
     using System.IO;
     using Configuration;
+    using InputOutput;
     using Logging;
     using SourceCode;
 
@@ -47,7 +48,9 @@ namespace AgileObjects.BuildableExpressions.Generator
                 InputDirectory = args[4]
             };
 
-            var result = SourceCodeGenerator.Execute(logger, config);
+            var result = SourceCodeGenerator
+                .Execute(logger, config, SystemIoFileManager.Instance);
+
             logger.Info(result.Success + ":" + result.BuiltExpressionsCount);
         }
 
