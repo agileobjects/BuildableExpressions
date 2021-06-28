@@ -103,7 +103,7 @@ BuildableExpression.SourceCode(sc =>
         // Add an abstract property to override:
         cls.AddProperty<bool>("IsMagic", p =>
         {
-            // Mark as abstract or virtual:
+            // Mark as abstract (or virtual):
             p.SetAbstract(); // Or p.SetVirtual();
 
             // Make get-only [optional]:
