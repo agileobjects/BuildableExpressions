@@ -17,13 +17,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\BuildableExpressions.Generator.UnitTests\**\*.cs" Exclude="..\BuildableExpressions.Generator.UnitTests\obj\**\*.cs">
+    <Compile Include="..\BuildableExpressions.Generator.UnitTests\**\*.cs" Exclude="..\BuildableExpressions.Generator.UnitTests\obj\**\*.cs;..\BuildableExpressions.Generator.UnitTests\ProjectManagement\NonSdk\DevToolsFactoryTests.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="..\BuildableExpressions.Generator.UnitTests\ProjectManagement\NonSdk\EnvDteExtensionsTests.cs" />
   </ItemGroup>
 
   <ItemGroup>

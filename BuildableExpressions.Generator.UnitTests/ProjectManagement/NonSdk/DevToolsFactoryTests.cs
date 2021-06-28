@@ -1,5 +1,4 @@
-﻿#if NETFRAMEWORK
-namespace AgileObjects.BuildableExpressions.Generator.UnitTests.ProjectManagement.NonSdk
+﻿namespace AgileObjects.BuildableExpressions.Generator.UnitTests.ProjectManagement.NonSdk
 {
     using System.Linq;
     using BuildableExpressions.UnitTests.Common;
@@ -46,4 +45,3 @@ namespace AgileObjects.BuildableExpressions.Generator.UnitTests.ProjectManagemen
         }
     }
 }
-#endif
