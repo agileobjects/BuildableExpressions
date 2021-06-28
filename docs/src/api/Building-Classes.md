@@ -12,6 +12,7 @@ BuildableExpression.SourceCode(sc =>
     sc.AddClass("MyClass", cls =>
     {
         // Set class options if desired:
+        // cls.SetSummary("Class description");
         // cls.AddAttribute(typeof(SomeAttribute));
         // cls.SetVisibility(TypeVisibility.Internal);
         // cls.SetStatic();
@@ -26,6 +27,7 @@ BuildableExpression.SourceCode(sc =>
 
 Members are added via the class API, which supports:
 
+- [Documentation](/api/Documentation)
 - [Constructors](/api/Building-Constructors)
 - [Fields](/api/Building-Fields)
 - [Properties](/api/Building-Properties)

@@ -18,6 +18,7 @@ BuildableExpression.SourceCode(sc =>
     sc.AddEnum("OddNumbers", enm =>
     {
         // Set enum options if desired:
+        // enm.SetSummary("Enum description");
         // enm.AddAttribute(typeof(SomeAttribute));
         // enm.SetVisibility(TypeVisibility.Internal);
         // enm.SetPartial();

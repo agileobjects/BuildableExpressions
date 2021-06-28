@@ -20,6 +20,7 @@ BuildableExpression.SourceCode(sc =>
         cls.AddProperty<int>("IntValue", p =>
         {
             // Set property options if desired:
+            // p.SetSummary("Property description");
             // p.AddAttribute(typeof(SomeAttribute));
             // p.SetVisibility(MemberVisibility.Internal);
             // p.SetStatic();

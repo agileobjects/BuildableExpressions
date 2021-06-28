@@ -8,6 +8,7 @@ BuildableExpression.SourceCode(sc =>
         cls.AddField<string>("StringField", f =>
         {
             // Set field options if desired:
+            // f.SetSummary("Field description");
             // f.AddAttribute(typeof(SomeAttribute));
             // f.SetVisibility(MemberVisibility.Internal);
             // f.SetStatic();

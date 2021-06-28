@@ -12,6 +12,7 @@ BuildableExpression.SourceCode(sc =>
     sc.AddAttribute("MyAttribute", attr =>
     {
         // Set attribute options if desired:
+        // attr.SetSummary("Attribute description");
         // attr.AddAttribute<SomeAttribute>();
         // attr.SetAbstract();
         // attr.SetSealed();
@@ -24,6 +25,7 @@ BuildableExpression.SourceCode(sc =>
 
 Members are added via the attribute API, which supports:
 
+- [Documentation](/api/Documentation)
 - [Constructors](/api/Building-Constructors)
 - [Fields](/api/Building-Fields)
 - [Properties](/api/Building-Properties)

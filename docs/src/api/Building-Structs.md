@@ -12,6 +12,7 @@ BuildableExpression.SourceCode(sc =>
     sc.AddStruct("MyStruct", str =>
     {
         // Set struct options if desired:
+        // str.SetSummary("Struct description");
         // str.AddAttribute(typeof(SomeAttribute));
         // str.SetVisibility(TypeVisibility.Internal);
         // str.SetPartial();
@@ -23,6 +24,7 @@ BuildableExpression.SourceCode(sc =>
 
 Members are added via the struct API, which supports:
 
+- [Documentation](/api/Documentation)
 - [Constructors](/api/Building-Constructors)
 - [Fields](/api/Building-Fields)
 - [Properties](/api/Building-Properties)

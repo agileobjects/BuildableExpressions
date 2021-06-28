@@ -12,6 +12,7 @@ BuildableExpression.SourceCode(sc =>
     sc.AddInterface("IMyInterface", itf =>
     {
         // Set interface options if desired:
+        // itf.SetSummary("Interface description");
         // itf.AddAttribute<SomeAttribute>();
         // itf.SetVisibility(TypeVisibility.Internal);
         // itf.SetPartial();
@@ -23,6 +24,7 @@ BuildableExpression.SourceCode(sc =>
 
 Members are added via the interface API, which supports:
 
+- [Documentation](/api/Documentation)
 - [Properties](/api/Building-Properties)
 - [Methods](/api/Building-Methods)
 - [Attributes](/api/Building-Attributes)

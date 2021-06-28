@@ -34,5 +34,6 @@ nav:
         - Methods: api/Building-Methods.md
         - Fields: api/Building-Fields.md
         - Properties: api/Building-Properties.md
+        - Documentation: api/Documentation.md
 
 theme: readthedocs
