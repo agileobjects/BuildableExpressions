@@ -9,7 +9,7 @@ site_dir: 'docs/site'
 extra_css:
     - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/vs2015.min.css
     - css/styles.min.css
-    - https://github.com/agileobjects/agileobjects.github.io/blob/docs-styles/assets/css/docs-styles.css
+    - https://agileobjects.co.uk/assets/css/docs-styles.min.css
 
 extra_javascript:
     - scripts/docs.min.js

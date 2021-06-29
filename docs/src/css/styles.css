@@ -1,10 +1,32 @@
 body {
+    color: #fff;
+    background: #1e1e1e;
     font: 400 11pt 'Segoe UI', Calibri, Arial, sans-serif !important;
+}
+
+.wy-nav-side {
+    background-color: #1a1a1a;
+}
+
+.wy-side-nav-search {
+    background-color: #101010;
+}
+
+.wy-side-nav-search > a, .wy-side-nav-search .wy-dropdown > a {
+    color: #59a6ff;
+}
+
+.wy-nav-content, .wy-body-for-nav {
+    background-color: #1e1e1e;
 }
 
 h1, h2, h3, h4, input[type=submit] {
     font-family: 'Segoe UI Light', Calibri, Arial, sans-serif !important;
     margin: 0 0 .5em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #59a6ff;
 }
 
 h1 {
@@ -29,6 +51,14 @@ p code, li code {
     padding: 2px 0;
     font-size: 11pt;
     color: black;
+}
+
+a, a:hover, a:visited {
+    color: #EFE524;
+}
+
+a:hover {
+    text-decoration: underline;
 }
 
 pre code {
