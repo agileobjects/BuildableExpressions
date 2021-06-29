@@ -8,7 +8,6 @@ site_dir: 'docs/site'
 
 extra_css:
     - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/vs2015.min.css
-    - css/styles.min.css
     - https://agileobjects.co.uk/assets/css/docs-styles.min.css
 
 extra_javascript:
