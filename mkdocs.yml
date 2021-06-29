@@ -11,7 +11,8 @@ extra_css:
     - https://agileobjects.co.uk/assets/css/docs-styles.min.css
 
 extra_javascript:
-    - https://agileobjects.co.uk/assets/js/ao-docs.min.js?t=BuildableExpression|Expression
+    - scripts/assets/dox-cls.js
+    - https://agileobjects.co.uk/assets/js/ao-docs.min.js
     
 nav:
     - Building Types:
