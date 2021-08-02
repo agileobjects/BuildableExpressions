@@ -5,7 +5,6 @@
     using System.Linq;
     using BuildableExpressions.Generator.InputOutput;
     using BuildableExpressions.SourceCode;
-    using BuildableExpressions.UnitTests.Common;
     using Configuration;
     using Generator.Configuration;
     using Logging;
@@ -32,9 +31,9 @@
                 {
                     sc.SetNamespace(project.RootNamespace);
 
-                    sc.AddClass(cls =>
+                    sc.AddClass("GeneratedExpressionClass", cls =>
                     {
-                        cls.AddMethod(Empty());
+                        cls.AddMethod("DoAction", Empty());
                     });
                 });
 
@@ -61,9 +60,9 @@
             {
                 sc.SetNamespace($"{project.RootNamespace}.GeneratedCode");
 
-                sc.AddClass(cls =>
+                sc.AddClass("GeneratedExpressionClass", cls =>
                 {
-                    cls.AddMethod(Empty());
+                    cls.AddMethod("DoAction", Empty());
                 });
             });
 

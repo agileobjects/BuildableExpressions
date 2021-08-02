@@ -1,9 +1,9 @@
-﻿namespace AgileObjects.BuildableExpressions.UnitTests.Common
+﻿namespace AgileObjects.BuildableExpressions.UnitTests
 {
     using System;
     using System.Linq.Expressions;
-    using SourceCode;
-    using SourceCode.Api;
+    using AgileObjects.BuildableExpressions.SourceCode;
+    using AgileObjects.BuildableExpressions.SourceCode.Api;
     using static System.Linq.Expressions.Expression;
 
     public static class SourceCodeExpressionTestExtensions
