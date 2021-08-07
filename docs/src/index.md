@@ -7,7 +7,7 @@
 To install from NuGet, use:
 
 ```shell
-PM> Install-Package AgileObjects.BuildableExpressions
+PM> Install-Package AgileObjects.BuildableExpressions -Pre
 ```
 [![NuGet version](https://badge.fury.io/nu/AgileObjects.BuildableExpressions.svg)](https://badge.fury.io/nu/AgileObjects.BuildableExpressions)
 
@@ -21,7 +21,7 @@ Visual Studio or from `dotnet build`, and supports
 To install from NuGet, use:
 
 ```shell
-PM> Install-Package AgileObjects.BuildableExpressions.Generator
+PM> Install-Package AgileObjects.BuildableExpressions.Generator -Pre
 ```
 [![NuGet version](https://badge.fury.io/nu/AgileObjects.BuildableExpressions.Generator.svg)](https://badge.fury.io/nu/AgileObjects.BuildableExpressions.Generator)
 
